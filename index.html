@@ -516,8 +516,7 @@ textarea.form-input{resize:vertical;min-height:80px}
                 <th>Total Custo</th>
                 <th>EBIT</th>
                 <th>Margem</th>
-                <th></th>
-              </tr></thead>
+                </tr></thead>
               <tbody id="fin-table-mes"></tbody>
             </table>
           </div>
@@ -674,9 +673,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <option value="custo">Custo</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group form-full">
         <label>Mês de Referência</label>
-        <input class="form-input" id="fl-mes" type="month">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="fl-mes-grid"></div>
+        <input type="hidden" id="fl-mes">
       </div>
       <!-- RECEITA -->
       <div class="form-group" id="fl-cat-receita-wrap">
@@ -727,11 +727,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="form-group" id="fl-meses-rep-wrap" style="display:none">
         <label>Repetir por quantos meses?</label>
-        <select class="form-input" id="fl-meses-rep">
-          <option value="3">3 meses</option>
-          <option value="6">6 meses</option>
-          <option value="12" selected>12 meses (ano inteiro)</option>
-        </select>
+        <input class="form-input" id="fl-meses-rep" type="number" min="1" max="60" placeholder="Ex: 12" value="12">
       </div>
       <div class="form-group form-full">
         <label>Descrição</label>
@@ -1393,19 +1389,30 @@ function renderFinanceiro(){
         var editBtn = document.createElement('button');
         editBtn.className='btn-ghost';
         editBtn.style='padding:5px 10px;font-size:12px';
-        editBtn.textContent='✏️';
+        editBtn.title='Editar';
+        editBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
         editBtn.type='button';
         (function(id){ editBtn.onclick=function(e){ e.stopPropagation(); openModalLancamento(id); }; })(l.id);
+
+        var copyBtn = document.createElement('button');
+        copyBtn.className='btn-ghost';
+        copyBtn.style='padding:5px 10px;font-size:12px';
+        copyBtn.title='Copiar';
+        copyBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+        copyBtn.type='button';
+        (function(id){ copyBtn.onclick=function(e){ e.stopPropagation(); copyLancamento(id); }; })(l.id);
 
         var delBtn = document.createElement('button');
         delBtn.className='btn-dsm';
         delBtn.style='padding:5px 10px;font-size:12px';
-        delBtn.textContent='🗑';
+        delBtn.title='Excluir';
+        delBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
         delBtn.type='button';
         (function(id){ delBtn.onclick=function(e){ e.stopPropagation(); deleteLancamento(id); }; })(l.id);
 
         actions.appendChild(valSpan);
         actions.appendChild(editBtn);
+        actions.appendChild(copyBtn);
         actions.appendChild(delBtn);
         row.appendChild(info);
         row.appendChild(actions);
@@ -1473,6 +1480,9 @@ function openModalLancamento(id){
   if(l && l.cliente) document.getElementById('fl-cliente').value = l.cliente;
   if(l && l.periodicidade) document.getElementById('fl-period').value = l.periodicidade;
   toggleLancTipo();
+  // Build month grid
+  var mesVal = l ? (l.ano+'-'+String(l.mes).padStart(2,'0')) : (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'));
+  buildMesGrid(mesVal);
   // populate clientes
   var sel=document.getElementById('fl-cliente');
   sel.innerHTML='<option value="">Selecione...</option>';
@@ -1557,6 +1567,69 @@ function saveLancamento(){
   closeModal('modal-lanc');
   return; // prevent double execution
 
+}
+
+// Month selector grid
+function buildMesGrid(selectedVal){
+  var grid = document.getElementById('fl-mes-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  var now = new Date();
+  var curYear = now.getFullYear();
+  // Show 2 years: current and previous
+  for(var yr = curYear-1; yr <= curYear+1; yr++){
+    // Year label
+    var yrLabel = document.createElement('div');
+    yrLabel.style='width:100%;font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:'+(yr===curYear-1?'0':'8px');
+    yrLabel.textContent=yr;
+    grid.appendChild(yrLabel);
+    var row = document.createElement('div');
+    row.style='display:flex;gap:4px;flex-wrap:wrap';
+    for(var m=1;m<=12;m++){
+      var val=yr+'-'+String(m).padStart(2,'0');
+      var btn=document.createElement('button');
+      btn.type='button';
+      btn.textContent=MESES[m-1];
+      btn.setAttribute('data-val',val);
+      var isSelected = val===selectedVal;
+      btn.style='padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid '+(isSelected?'var(--blue)':'var(--border)')+';background:'+(isSelected?'var(--blue)':'var(--card2)')+';color:'+(isSelected?'#000':'var(--text2)')+';transition:all .15s';
+      btn.onclick=function(){
+        document.querySelectorAll('#fl-mes-grid button').forEach(function(b){
+          b.style.background='var(--card2)';b.style.color='var(--text2)';b.style.borderColor='var(--border)';
+        });
+        this.style.background='var(--blue)';this.style.color='#000';this.style.borderColor='var(--blue)';
+        document.getElementById('fl-mes').value=this.getAttribute('data-val');
+      };
+      row.appendChild(btn);
+    }
+    grid.appendChild(row);
+  }
+  if(selectedVal) document.getElementById('fl-mes').value=selectedVal;
+}
+
+// Copy lancamento
+function copyLancamento(id){
+  var l=lancamentos.find(function(x){return x.id===id;});
+  if(!l)return;
+  var now=new Date();
+  var curVal=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('modal-lanc-title').textContent='Copiar Lançamento';
+  editingLancId=null;
+  document.getElementById('fl-tipo').value=l.tipo;
+  document.getElementById('fl-cat-receita').value=l.catReceita||'consultoria';
+  document.getElementById('fl-cat-custo').value=l.catCusto||'contador';
+  document.getElementById('fl-desc').value=l.descricao||'';
+  document.getElementById('fl-valor').value=l.valor||'';
+  document.getElementById('fl-data').value=now.toISOString().split('T')[0];
+  document.getElementById('fl-obs').value=l.obs||'';
+  document.getElementById('fl-dia-venc').value=l.diaVencimento||'';
+  document.getElementById('fl-recorrente').value='nao';
+  toggleLancTipo();
+  buildMesGrid(curVal);
+  var sel=document.getElementById('fl-cliente');
+  sel.innerHTML='<option value="">Selecione...</option>';
+  clientes.forEach(function(c){var o=document.createElement('option');o.value=c.nome;o.textContent=c.nome;if(l.cliente===c.nome)o.selected=true;sel.appendChild(o);});
+  openModal('modal-lanc');
 }
 
 function deleteLancamento(id){
