@@ -1497,7 +1497,12 @@ function saveLancamento(){
 }
 
 function deleteLancamento(id){
-  confirmDelete(function(){db.collection('financeiro').doc(id).delete();});
+  if(!id){alert('ID não encontrado');return;}
+  confirmDelete(function(){
+    db.collection('financeiro').doc(id).delete().then(function(){
+      renderFinanceiro();
+    }).catch(function(e){alert('Erro ao excluir: '+e.message);});
+  });
 }
 
 </script>
