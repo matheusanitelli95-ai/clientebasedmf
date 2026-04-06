@@ -1358,18 +1358,63 @@ function renderFinanceiro(){
   var recs = lancamentos.filter(function(l){return l.tipo==='receita'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);}).slice(0,8);
   var custos = lancamentos.filter(function(l){return l.tipo==='custo'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);}).slice(0,8);
 
-  document.getElementById('fin-list-receita').innerHTML = recs.length ? recs.map(function(l){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">'+l.descricao+'</div><div style="font-size:11px;color:var(--text3)">'+MESES[l.mes-1]+' · '+(l.catReceita==='consultoria'?'Consultoria':l.catReceita==='black'?'DMF Black':'Outros')+(l.cliente?' · '+l.cliente:'')+'</div></div><div style="display:flex;align-items:center;gap:10px"><span style="font-family:DM Mono,monospace;color:#22c55e;font-size:13px;font-weight:600">'+fmtFull(l.valor)+'</span>🗑</button></div></div>';
-  }).join('') : '<div class=empty style=padding:24px><div style=font-size:13px>Nenhum lançamento</div></div>';
+  // Build lancamento lists with proper DOM elements
+  (function(){
+    function buildList(items, elId, cor){
+      var el = document.getElementById(elId);
+      while(el.firstChild) el.removeChild(el.firstChild);
+      if(!items.length){
+        var empty = document.createElement('div');
+        empty.style='text-align:center;padding:24px;color:var(--text3);font-size:13px';
+        empty.textContent='Nenhum lançamento';
+        el.appendChild(empty);
+        return;
+      }
+      items.forEach(function(l){
+        var catLabel = l.tipo==='receita'
+          ? (l.catReceita==='consultoria'?'Consultoria':l.catReceita==='black'?'DMF Black':'Outros')+(l.cliente?' · '+l.cliente:'')
+          : (CUSTO_CAT[l.catCusto]||l.catCusto)+(l.diaVencimento?' · venc. dia '+l.diaVencimento:'')+(l.recorrente?' 🔁':'');
 
-  document.getElementById('fin-list-custo').innerHTML = custos.length ? custos.map(function(l){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">'+l.descricao+'</div><div style="font-size:11px;color:var(--text3)">'+MESES[l.mes-1]+' · '+(CUSTO_CAT[l.catCusto]||l.catCusto)+'</div></div><div style="display:flex;align-items:center;gap:10px"><span style="font-family:DM Mono,monospace;color:#ef4444;font-size:13px;font-weight:600">'+fmtFull(l.valor)+'</span>🗑</button></div></div>';
-  }).join('') : '<div class=empty style=padding:24px><div style=font-size:13px>Nenhum lançamento</div></div>';
-}
+        var row = document.createElement('div');
+        row.style='display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)';
 
-function openMesDetalhe(mes, ano){
-  var items = lancamentos.filter(function(l){return l.mes===mes&&l.ano===ano;});
-  var html = '<div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">'+MESES[mes-1]+' '+ano+'</div>';
+        var info = document.createElement('div');
+        info.style='flex:1;min-width:0';
+        info.innerHTML='<div style="font-size:13px;color:var(--text);margin-bottom:2px">'+l.descricao+'</div>'
+          +'<div style="font-size:11px;color:var(--text3)">'+MESES[l.mes-1]+'/'+l.ano+' · '+catLabel+'</div>';
+
+        var actions = document.createElement('div');
+        actions.style='display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:12px';
+
+        var valSpan = document.createElement('span');
+        valSpan.style='font-family:"DM Mono",monospace;color:'+cor+';font-size:13px;font-weight:600;white-space:nowrap';
+        valSpan.textContent=fmtFull(l.valor);
+
+        var editBtn = document.createElement('button');
+        editBtn.className='btn-ghost';
+        editBtn.style='padding:5px 10px;font-size:12px';
+        editBtn.textContent='✏️';
+        editBtn.type='button';
+        (function(id){ editBtn.onclick=function(e){ e.stopPropagation(); openModalLancamento(id); }; })(l.id);
+
+        var delBtn = document.createElement('button');
+        delBtn.className='btn-dsm';
+        delBtn.style='padding:5px 10px;font-size:12px';
+        delBtn.textContent='🗑';
+        delBtn.type='button';
+        (function(id){ delBtn.onclick=function(e){ e.stopPropagation(); deleteLancamento(id); }; })(l.id);
+
+        actions.appendChild(valSpan);
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        el.appendChild(row);
+      });
+    }
+    buildList(recs, 'fin-list-receita', '#22c55e');
+    buildList(custos, 'fin-list-custo', '#ef4444');
+  })();
   var recs = items.filter(function(l){return l.tipo==='receita';});
   var custos = items.filter(function(l){return l.tipo==='custo';});
   var totR = recs.reduce(function(s,l){return s+(l.valor||0);},0);
@@ -1385,11 +1430,29 @@ function openMesDetalhe(mes, ano){
   document.getElementById('modal-del').style.display='none';
   // Reuse delete modal as detail modal temporarily
   var overlay = document.createElement('div');
-  overlay.className='modal-overlay';overlay.style.display='flex';overlay.style.zIndex='300';
-  overlay.onclick=function(e){if(e.target===overlay)document.body.removeChild(overlay);};
-  var box = document.createElement('div');box.className='modal modal-sm';box.style.maxWidth='480px';
-  box.innerHTML=html+'<div style="margin-top:16px;text-align:right"><button class="btn-secondary" onclick="this.closest(".modal-overlay").remove()">Fechar</button></div>';
-  overlay.appendChild(box);document.body.appendChild(overlay);
+  overlay.className='modal-overlay';
+  overlay.style.cssText='display:flex;z-index:300';
+  var box = document.createElement('div');
+  box.className='modal modal-sm';
+  box.style.maxWidth='480px';
+  box.innerHTML=html;
+  var footer = document.createElement('div');
+  footer.style='margin-top:16px;text-align:right';
+  var fecharBtn = document.createElement('button');
+  fecharBtn.className='btn-secondary';
+  fecharBtn.textContent='Fechar';
+  fecharBtn.type='button';
+  fecharBtn.onclick=function(e){
+    e.stopPropagation();
+    overlay.parentNode.removeChild(overlay);
+  };
+  overlay.onclick=function(e){
+    if(e.target===overlay) overlay.parentNode.removeChild(overlay);
+  };
+  footer.appendChild(fecharBtn);
+  box.appendChild(footer);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
 }
 
 function openModalLancamento(id){
