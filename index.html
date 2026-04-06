@@ -786,8 +786,17 @@ var cliSortCol='nome',cliSortAsc=true,deleteCallback=null;
 var pieChart=null,barChart=null;
 
 var fmt=function(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',notation:'compact',maximumFractionDigits:1}).format(v||0);};
-var fmtFull=function(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);};
-var fmtDate=function(s){if(!s)return'—';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0];};
+var fmtFull=function(v){
+  return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
+};
+var fmtNum=function(v){return new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);};
+var fmtDate=function(s){
+  if(!s||s==='—')return'—';
+  if(s.includes('/'))return s; // already formatted
+  var p=s.split('-');
+  if(p.length!==3)return s;
+  return p[2]+'/'+p[1]+'/'+p[0];
+};
 var today=function(){return new Date().toISOString().split('T')[0];};
 var daysDiff=function(d){if(!d)return 9999;return Math.floor((new Date()-new Date(d))/86400000);};
 
@@ -1383,21 +1392,30 @@ function openMesDetalhe(mes, ano){
   overlay.appendChild(box);document.body.appendChild(overlay);
 }
 
-function openModalLancamento(){
-  editingLancId = null;
+function openModalLancamento(id){
+  editingLancId = id||null;
   var now = new Date();
-  document.getElementById('fl-tipo').value='receita';
-  document.getElementById('fl-mes').value=now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
-  document.getElementById('fl-cat-receita').value='consultoria';
-  document.getElementById('fl-desc').value='';
-  document.getElementById('fl-valor').value='';
-  document.getElementById('fl-data').value=now.toISOString().split('T')[0];
-  document.getElementById('fl-obs').value='';
+  var l = id ? lancamentos.find(function(x){return x.id===id;}) : null;
+  document.getElementById('modal-lanc-title').textContent = l ? 'Editar Lançamento' : 'Novo Lançamento';
+  document.getElementById('fl-tipo').value = l ? l.tipo : 'receita';
+  document.getElementById('fl-mes').value = l ? l.ano+'-'+String(l.mes).padStart(2,'0') : now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
+  document.getElementById('fl-cat-receita').value = l ? (l.catReceita||'consultoria') : 'consultoria';
+  document.getElementById('fl-cat-custo').value = l ? (l.catCusto||'contador') : 'contador';
+  document.getElementById('fl-desc').value = l ? (l.descricao||'') : '';
+  document.getElementById('fl-valor').value = l ? (l.valor||'') : '';
+  document.getElementById('fl-data').value = l ? (l.data||now.toISOString().split('T')[0]) : now.toISOString().split('T')[0];
+  document.getElementById('fl-obs').value = l ? (l.obs||'') : '';
+  document.getElementById('fl-dia-venc').value = l ? (l.diaVencimento||'') : '';
+  document.getElementById('fl-recorrente').value = 'nao';
+  if(l && l.cliente) document.getElementById('fl-cliente').value = l.cliente;
+  if(l && l.periodicidade) document.getElementById('fl-period').value = l.periodicidade;
   toggleLancTipo();
   // populate clientes
   var sel=document.getElementById('fl-cliente');
   sel.innerHTML='<option value="">Selecione...</option>';
-  clientes.forEach(function(c){var o=document.createElement('option');o.value=c.nome;o.textContent=c.nome;sel.appendChild(o);});
+  clientes.forEach(function(c){var o=document.createElement('option');o.value=c.nome;o.textContent=c.nome;if(l&&l.cliente===c.nome)o.selected=true;sel.appendChild(o);});
+  // Hide recorrente when editing
+  if(l){document.getElementById('fl-recorrente-wrap').style.display='none';document.getElementById('fl-meses-rep-wrap').style.display='none';}
   openModal('modal-lanc');
 }
 
@@ -1444,35 +1462,38 @@ function saveLancamento(){
       data.cliente=document.getElementById('fl-cliente').value;
       data.periodicidade=document.getElementById('fl-period').value;
     }
-    db.collection('financeiro').add(data);
+    if(editingLancId) db.collection('financeiro').doc(editingLancId).update(data);
+    else db.collection('financeiro').add(data);
   } else {
     data.catCusto=document.getElementById('fl-cat-custo').value;
     var diaVenc=document.getElementById('fl-dia-venc').value;
     if(diaVenc) data.diaVencimento=Number(diaVenc);
-    var recorrente=document.getElementById('fl-recorrente').value;
-    data.recorrente=recorrente==='sim';
-    if(recorrente==='sim'){
-      // Salvar para N meses a partir do mês selecionado
-      var nMeses=Number(document.getElementById('fl-meses-rep').value)||12;
-      var batch=db.batch();
-      for(var i=0;i<nMeses;i++){
-        var novoMes=mes+i;
-        var novoAno=ano;
-        while(novoMes>12){novoMes-=12;novoAno++;}
-        var d=Object.assign({},data,{mes:novoMes,ano:novoAno});
-        // Ajusta data de vencimento para o mês correto
-        if(diaVenc){
-          d.data=novoAno+'-'+String(novoMes).padStart(2,'0')+'-'+String(diaVenc).padStart(2,'0');
-        }
-        var ref=db.collection('financeiro').doc();
-        batch.set(ref,d);
-      }
-      batch.commit();
+    if(editingLancId){
+      db.collection('financeiro').doc(editingLancId).update(data);
     } else {
-      db.collection('financeiro').add(data);
+      var recorrente=document.getElementById('fl-recorrente').value;
+      data.recorrente=recorrente==='sim';
+      if(recorrente==='sim'){
+        var nMeses=Number(document.getElementById('fl-meses-rep').value)||12;
+        var batch=db.batch();
+        for(var i=0;i<nMeses;i++){
+          var novoMes=mes+i;
+          var novoAno=ano;
+          while(novoMes>12){novoMes-=12;novoAno++;}
+          var d=Object.assign({},data,{mes:novoMes,ano:novoAno});
+          if(diaVenc){d.data=novoAno+'-'+String(novoMes).padStart(2,'0')+'-'+String(diaVenc).padStart(2,'0');}
+          var ref=db.collection('financeiro').doc();
+          batch.set(ref,d);
+        }
+        batch.commit();
+      } else {
+        db.collection('financeiro').add(data);
+      }
     }
   }
   closeModal('modal-lanc');
+  return; // prevent double execution
+
 }
 
 function deleteLancamento(id){
