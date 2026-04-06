@@ -713,6 +713,26 @@ textarea.form-input{resize:vertical;min-height:80px}
           <option value="outros">Outros</option>
         </select>
       </div>
+      <!-- RECORRENTE (só custo) -->
+      <div class="form-group" id="fl-recorrente-wrap" style="display:none">
+        <label>Recorrente?</label>
+        <select class="form-input" id="fl-recorrente" onchange="toggleRecorrente()">
+          <option value="nao">Não</option>
+          <option value="sim">Sim — repetir nos próximos meses</option>
+        </select>
+      </div>
+      <div class="form-group" id="fl-dia-venc-wrap" style="display:none">
+        <label>Dia de Vencimento</label>
+        <input class="form-input" id="fl-dia-venc" type="number" min="1" max="31" placeholder="Ex: 10">
+      </div>
+      <div class="form-group" id="fl-meses-rep-wrap" style="display:none">
+        <label>Repetir por quantos meses?</label>
+        <select class="form-input" id="fl-meses-rep">
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="12" selected>12 meses (ano inteiro)</option>
+        </select>
+      </div>
       <div class="form-group form-full">
         <label>Descrição</label>
         <input class="form-input" id="fl-desc" placeholder="Ex: Fee de consultoria março, Contador março...">
@@ -1389,6 +1409,18 @@ function toggleLancTipo(){
   var isBlack=tipo==='receita'&&cat==='black';
   document.getElementById('fl-cliente-wrap').style.display=isBlack?'flex':'none';
   document.getElementById('fl-period-wrap').style.display=isBlack?'flex':'none';
+  // Recorrente só aparece em custo
+  document.getElementById('fl-recorrente-wrap').style.display=tipo==='custo'?'flex':'none';
+  document.getElementById('fl-dia-venc-wrap').style.display=tipo==='custo'?'flex':'none';
+  if(tipo!=='custo'){
+    document.getElementById('fl-recorrente').value='nao';
+    document.getElementById('fl-meses-rep-wrap').style.display='none';
+  }
+}
+
+function toggleRecorrente(){
+  var rec=document.getElementById('fl-recorrente').value;
+  document.getElementById('fl-meses-rep-wrap').style.display=rec==='sim'?'flex':'none';
 }
 document.getElementById('fl-cat-receita').addEventListener('change',toggleLancTipo);
 
@@ -1412,10 +1444,34 @@ function saveLancamento(){
       data.cliente=document.getElementById('fl-cliente').value;
       data.periodicidade=document.getElementById('fl-period').value;
     }
+    db.collection('financeiro').add(data);
   } else {
     data.catCusto=document.getElementById('fl-cat-custo').value;
+    var diaVenc=document.getElementById('fl-dia-venc').value;
+    if(diaVenc) data.diaVencimento=Number(diaVenc);
+    var recorrente=document.getElementById('fl-recorrente').value;
+    data.recorrente=recorrente==='sim';
+    if(recorrente==='sim'){
+      // Salvar para N meses a partir do mês selecionado
+      var nMeses=Number(document.getElementById('fl-meses-rep').value)||12;
+      var batch=db.batch();
+      for(var i=0;i<nMeses;i++){
+        var novoMes=mes+i;
+        var novoAno=ano;
+        while(novoMes>12){novoMes-=12;novoAno++;}
+        var d=Object.assign({},data,{mes:novoMes,ano:novoAno});
+        // Ajusta data de vencimento para o mês correto
+        if(diaVenc){
+          d.data=novoAno+'-'+String(novoMes).padStart(2,'0')+'-'+String(diaVenc).padStart(2,'0');
+        }
+        var ref=db.collection('financeiro').doc();
+        batch.set(ref,d);
+      }
+      batch.commit();
+    } else {
+      db.collection('financeiro').add(data);
+    }
   }
-  db.collection('financeiro').add(data);
   closeModal('modal-lanc');
 }
 
