@@ -555,48 +555,59 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="view" id="view-black-detalhe">
       <div class="page-header" style="padding-bottom:0">
         <div>
-          <button class="back-btn" onclick="showView('black-operacoes',document.querySelectorAll('.nav-item')[5])">← Voltar para Operações</button>
+          <button class="back-btn" id="btn-back-black">← Voltar para Operações</button>
           <div class="page-title" id="black-detalhe-title">—</div>
           <div class="page-sub" id="black-detalhe-sub">—</div>
         </div>
-        <div style="display:flex;gap:10px">
+        <div style="display:flex;gap:8px">
           <button class="btn-secondary" onclick="openModalBlackLanc('simplificado')">+ Simplificado</button>
-          <button class="btn-primary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
+          <button class="btn-secondary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
+          <button class="btn-primary" onclick="openModalBlackNota()">📄 Nota de Corretagem</button>
         </div>
       </div>
       <div class="page-content" style="padding-top:20px">
         <!-- KPIs do cliente -->
-        <div class="grid-3" style="margin-bottom:20px">
-          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
-          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-compras" style="font-size:20px">R$0</div><div class="kpi-label">Total Compras</div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
-          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-vendas" style="font-size:20px">R$0</div><div class="kpi-label">Total Vendas</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px">
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-acumulado" style="font-size:18px">R$0</div><div class="kpi-label">Acumulado</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-media" style="font-size:18px">R$0</div><div class="kpi-label">Média Mensal</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-retorno" style="font-size:18px">0%</div><div class="kpi-label">Retorno s/ Patrim.</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-patrimonio" style="font-size:18px">R$0</div><div class="kpi-label">Patrimônio</div></div><div class="kpi-accent" style="background:#94a3b8"></div></div>
+          <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-margem" style="font-size:18px">R$0</div><div class="kpi-label">Margem Utilizada ✏️</div></div><div class="kpi-accent" style="background:#f59e0b"></div>
+          </div>
+          <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-notional" style="font-size:18px">R$0</div><div class="kpi-label">Notional ✏️</div></div><div class="kpi-accent" style="background:#ec4899"></div>
+          </div>
         </div>
+
+        <!-- Gráfico comparativo -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title">Carteira DMF vs IBOV vs CDI — Acumulado</div>
+          <canvas id="black-chart-comp" height="120"></canvas>
+        </div>
+
         <!-- Tabela mensal -->
         <div class="card" style="margin-bottom:20px">
-          <div class="section-title">Histórico Mensal</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="section-title" style="margin:0">Fechamento Mês x Mês</div>
+          </div>
           <div class="table-wrap" style="border:none">
             <table>
               <thead><tr>
                 <th>Mês/Ano</th>
-                <th>Compras</th>
-                <th>Vendas</th>
-                <th>Saldo</th>
-                <th>Custos</th>
-                <th>Líquido</th>
-                <th>Acumulado</th>
+                <th>Operações R$</th>
+                <th>Saldo Opções</th>
+                <th>Acum. R$</th>
+                <th>% DMF</th>
+                <th>% IBOV</th>
+                <th>% CDI</th>
+                <th>Acum. %</th>
                 <th>Tipo</th>
                 <th>Ações</th>
               </tr></thead>
               <tbody id="black-table-mensal"></tbody>
             </table>
           </div>
-        </div>
-        <!-- Operações detalhadas -->
-        <div class="card" id="black-operacoes-detalhe-card" style="display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div class="section-title" style="margin:0">Operações Detalhadas</div>
-          </div>
-          <div id="black-operacoes-detalhe-list"></div>
         </div>
       </div>
     </div>
@@ -648,7 +659,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="form-group"><label>Profissional Responsável</label><select class="form-input" id="fc-prof"><option value="">Selecione...</option></select></div>
         <div class="form-group"><label>Banco / Corretora</label><select class="form-input" id="fc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Guide</option><option>Ágora</option><option>Sicoob</option><option>Sicredi</option><option>Outro</option></select></div>
         <div class="form-group"><label>Serviço Contratado</label><select class="form-input" id="fc-servico"><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select></div>
-        <div class="form-group"><label>Nível DMF Black</label><select class="form-input" id="fc-nivel"><option value="">N/A</option><option>Start</option><option>Growth</option><option>Scale</option><option>Vitalício</option><option>Sócio</option></select></div>
+        <div class="form-group"><label>Nível DMF Black</label><select class="form-input" id="fc-nivel"><option value="">N/A</option><option>Assinatura</option><option>Vitalício</option><option>Sócio</option></select></div>
         <div class="form-group"><label>Perfil de Investidor</label><select class="form-input" id="fc-perfil"><option>Conservador</option><option>Moderado</option><option>Arrojado</option><option>Agressivo</option></select></div>
         <div class="form-group"><label>Segmentação</label><select class="form-input" id="fc-seg"><option>Varejo</option><option>Alta Renda</option><option>Private</option></select></div>
         <div class="form-group"><label>Objetivo da Carteira</label><select class="form-input" id="fc-obj"><option>Acumulação</option><option>Sucessão</option><option>Usufruto</option><option>Proteção Patrimonial</option></select></div>
@@ -853,7 +864,16 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-section">
       <div class="form-section-title">Mês de Referência</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bs-mes-grid"></div>
+      <div style="display:flex;gap:10px">
+        <div class="form-group" style="flex:1">
+          <label>Ano</label>
+          <select class="form-input" id="bs-ano"></select>
+        </div>
+        <div class="form-group" style="flex:2">
+          <label>Mês</label>
+          <select class="form-input" id="bs-mes-sel"></select>
+        </div>
+      </div>
       <input type="hidden" id="bs-mes">
     </div>
     <div class="form-section">
@@ -872,6 +892,14 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="form-group"><label>Impostos / IRRF (R$)</label><input class="form-input" id="bs-impostos" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Taxa de Custódia (R$)</label><input class="form-input" id="bs-custodia" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="bs-outros" type="number" step="0.01" placeholder="0,00"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Benchmarks do Mês (%)</div>
+      <div class="form-grid">
+        <div class="form-group"><label>IBOV % no mês</label><input class="form-input" id="bs-ibov" type="number" step="0.01" placeholder="Ex: 1,50"></div>
+        <div class="form-group"><label>CDI % no mês</label><input class="form-input" id="bs-cdi" type="number" step="0.01" placeholder="Ex: 0,92"></div>
+        <div class="form-group"><label>Carteira DI / Saldo F.M. (R$)</label><input class="form-input" id="bs-carteira-di" type="number" step="0.01" placeholder="0,00"></div>
       </div>
     </div>
     <div class="form-section">
@@ -907,7 +935,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="form-grid">
         <div class="form-group">
           <label>Mês de Referência</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="bd-mes-grid"></div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <select class="form-input" id="bd-ano" style="flex:1"></select>
+            <select class="form-input" id="bd-mes-sel" style="flex:2"></select>
+          </div>
           <input type="hidden" id="bd-mes">
         </div>
         <div class="form-group"><label>Ativo Subjacente</label><input class="form-input" id="bd-ativo" placeholder="Ex: BOVA11, PETR4..."></div>
@@ -927,7 +958,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="form-group"><label>Execução (R$)</label><input class="form-input" id="bd-exec" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Impostos / IRRF (R$)</label><input class="form-input" id="bd-impostos" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="bd-outros" type="number" step="0.01" placeholder="0,00"></div>
-        <div class="form-group"><label>Observações</label><input class="form-input" id="bd-obs" placeholder="Ex: rolagem..."></div>
+        <div class="form-group"><label>IBOV % no mês</label><input class="form-input" id="bd-ibov" type="number" step="0.01" placeholder="Ex: 1,50"></div>
+        <div class="form-group"><label>CDI % no mês</label><input class="form-input" id="bd-cdi" type="number" step="0.01" placeholder="Ex: 0,92"></div>
+        <div class="form-group form-full"><label>Observações</label><input class="form-input" id="bd-obs" placeholder="Ex: rolagem..."></div>
       </div>
     </div>
     <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
@@ -951,6 +984,67 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-black-det')">Cancelar</button>
       <button class="btn-primary" onclick="saveBlackDetalhado()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTA CORRETAGEM -->
+<div class="modal-overlay" id="modal-black-nota" style="display:none" onclick="if(event.target===this)closeModal('modal-black-nota')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nota de Corretagem</div>
+      <button class="modal-close" onclick="closeModal('modal-black-nota')">×</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div class="form-group" style="flex:1"><label>Ano</label><select class="form-input" id="nota-ano"></select></div>
+      <div class="form-group" style="flex:2"><label>Mês</label><select class="form-input" id="nota-mes-sel"></select></div>
+      <input type="hidden" id="nota-mes">
+    </div>
+    <div style="border:2px dashed var(--border2);border-radius:12px;padding:32px;text-align:center;margin-bottom:16px;cursor:pointer;transition:border-color .2s" id="nota-drop-area" onclick="document.getElementById('nota-file-input').click()">
+      <div style="font-size:40px;margin-bottom:10px">📄</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Clique para selecionar a imagem da nota</div>
+      <div style="font-size:12px;color:var(--text3)">JPG, PNG ou PDF — a IA vai extrair os dados automaticamente</div>
+      <input type="file" id="nota-file-input" accept="image/*,.pdf" style="display:none" onchange="handleNotaUpload(event)">
+    </div>
+    <div id="nota-preview" style="display:none">
+      <img id="nota-img-preview" style="width:100%;border-radius:10px;margin-bottom:12px;border:1px solid var(--border)">
+      <div id="nota-status" style="text-align:center;padding:12px;font-size:13px;color:var(--text2)"></div>
+    </div>
+    <div id="nota-resultado" style="display:none">
+      <div class="form-section-title" style="margin-bottom:12px">Dados Extraídos — Confirme antes de salvar</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Total Compras (R$)</label><input class="form-input" id="nota-compras" type="number" step="0.01"></div>
+        <div class="form-group"><label>Total Vendas (R$)</label><input class="form-input" id="nota-vendas" type="number" step="0.01"></div>
+        <div class="form-group"><label>Emolumentos (R$)</label><input class="form-input" id="nota-emol" type="number" step="0.01"></div>
+        <div class="form-group"><label>Taxa Operacional (R$)</label><input class="form-input" id="nota-taxa-op" type="number" step="0.01"></div>
+        <div class="form-group"><label>Execução (R$)</label><input class="form-input" id="nota-exec" type="number" step="0.01"></div>
+        <div class="form-group"><label>Impostos (R$)</label><input class="form-input" id="nota-impostos" type="number" step="0.01"></div>
+        <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="nota-outros" type="number" step="0.01"></div>
+        <div class="form-group"><label>Líquido (R$)</label><input class="form-input" id="nota-liquido" type="number" step="0.01"></div>
+      </div>
+      <div class="form-group" style="margin-top:10px"><label>Observações</label><input class="form-input" id="nota-obs" placeholder="Ex: nota XP 09/02/2026"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-black-nota')">Cancelar</button>
+      <button class="btn-primary" id="nota-save-btn" style="display:none" onclick="saveNota()">Salvar Operação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BLACK CONFIG (Margem + Notional) -->
+<div class="modal-overlay" id="modal-black-config" style="display:none" onclick="if(event.target===this)closeModal('modal-black-config')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Configurações do Cliente Black</div>
+      <button class="modal-close" onclick="closeModal('modal-black-config')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Margem Utilizada (R$)</label><input class="form-input" id="cfg-margem" type="number" placeholder="0"></div>
+      <div class="form-group form-full"><label>Notional (R$)</label><input class="form-input" id="cfg-notional" type="number" placeholder="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-black-config')">Cancelar</button>
+      <button class="btn-primary" onclick="saveBlackConfig()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1005,9 +1099,9 @@ var NIVEL_BADGE={
   'DMF Consultoria':'badge-consultoria',
   'DMF Black':'badge-black',
   'DMF Consultoria + Black':'badge-vitalicio',
+  'Assinatura':'badge-black',
   'Vitalício':'badge-vitalicio',
-  'Sócio':'badge-socio',
-  'Start':'badge-black','Growth':'badge-black','Scale':'badge-consultoria'
+  'Sócio':'badge-socio'
 };
 var COLORS=['#1e8fff','#22c55e','#c084fc','#f59e0b','#ef4444','#ec4899','#14b8a6'];
 var AV_COLORS=['#1565c0','#1e8fff','#0d47a1','#1976d2','#0288d1'];
@@ -1844,398 +1938,348 @@ function deleteLancamento(id){
 }
 
 
+
 // ═══════════════════════════════════════════════════════════
-// DMF BLACK
+// DMF BLACK - MÓDULO COMPLETO
 // ═══════════════════════════════════════════════════════════
-var blackClientesAtivos = []; // lista de clienteIds com operações Black
 var currentBlackClienteId = null;
-var blackOps = []; // operações do cliente atual
+var blackOps = [];
 var pernaCount = 0;
 var editingBlackId = null;
+var blackCompChart = null;
 
-var MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+// ── Helpers ──────────────────────────────────────────────
+function buildYearMonthSelectors(anoId, mesSelId, hiddenId){
+  var anoSel=document.getElementById(anoId);
+  var mesSel=document.getElementById(mesSelId);
+  if(!anoSel||!mesSel) return;
+  var now=new Date(), curYear=now.getFullYear(), curMonth=now.getMonth()+1;
+  anoSel.innerHTML='';
+  for(var y=curYear+1;y>=curYear-3;y--){
+    var o=document.createElement('option');o.value=y;o.textContent=y;
+    if(y===curYear)o.selected=true;
+    anoSel.appendChild(o);
+  }
+  mesSel.innerHTML='';
+  MESES.forEach(function(m,i){
+    var o=document.createElement('option');o.value=i+1;o.textContent=m;
+    if(i+1===curMonth)o.selected=true;
+    mesSel.appendChild(o);
+  });
+  function updateHidden(){
+    var y=anoSel.value, m=String(mesSel.value).padStart(2,'0');
+    document.getElementById(hiddenId).value=y+'-'+m;
+  }
+  anoSel.onchange=updateHidden; mesSel.onchange=updateHidden;
+  updateHidden();
+}
 
-// ── Load Black operações ──────────────────────────────────
+function getVencimentoFromCodigo(codigo, anoVenc){
+  if(!codigo||codigo.length<5) return '';
+  var letra=codigo[4].toUpperCase();
+  var callMap={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12};
+  var putMap={M:1,N:2,O:3,P:4,Q:5,R:6,S:7,T:8,U:9,V:10,W:11,X:12};
+  var mes=callMap[letra]||putMap[letra];
+  if(!mes||!anoVenc) return '';
+  // Terceira sexta-feira do mês de vencimento
+  return anoVenc+'-'+String(mes).padStart(2,'0')+'-15'; // approx
+}
+
+// ── Load ──────────────────────────────────────────────────
 function loadBlackOperacoes(){
-  // Load all black operations to build the clients list
   db.collection('black_operacoes').onSnapshot(function(snap){
-    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    var ops=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     renderBlackDashboard(ops);
   });
 }
 
-// Override showView to load black when needed
-var _origShowView2 = showView;
-showView = function(v,btn){
-  _origShowView2(v,btn);
+var _origShowViewBK = showView;
+showView=function(v,btn){
+  _origShowViewBK(v,btn);
   if(v==='black-operacoes') loadBlackOperacoes();
 };
 
-// ── Render Black Dashboard ────────────────────────────────
+document.getElementById('btn-back-black').onclick=function(){
+  showView('black-operacoes',document.querySelectorAll('.nav-item')[5]);
+};
+
+// ── Dashboard ─────────────────────────────────────────────
 function renderBlackDashboard(ops){
-  // Group by cliente
-  var byCliente = {};
+  var byCliente={};
   ops.forEach(function(op){
-    if(!byCliente[op.clienteId]) byCliente[op.clienteId]={id:op.clienteId,nome:op.clienteNome,ops:[]};
+    if(!byCliente[op.clienteId])byCliente[op.clienteId]={id:op.clienteId,nome:op.clienteNome,ops:[]};
     byCliente[op.clienteId].ops.push(op);
   });
-
-  var clientesList = Object.values(byCliente);
-  var now = new Date();
-  var curMes = now.getMonth()+1, curAno = now.getFullYear();
-
-  // KPIs
-  var totalAcumulado = 0, totalMes = 0, totalCustos = 0;
-  clientesList.forEach(function(c){
+  var list=Object.values(byCliente);
+  var now=new Date(),curMes=now.getMonth()+1,curAno=now.getFullYear();
+  var totAcum=0,totMes=0,totCustos=0;
+  list.forEach(function(c){
     c.ops.forEach(function(op){
-      var saldo = (op.vendas||0)-(op.compras||0);
-      totalAcumulado += saldo;
-      totalCustos += op.custoTotal||0;
-      if(op.mes===curMes && op.ano===curAno) totalMes += saldo;
+      var s=(op.vendas||0)-(op.compras||0);
+      totAcum+=s; totCustos+=op.custoTotal||0;
+      if(op.mes===curMes&&op.ano===curAno) totMes+=s;
     });
   });
+  document.getElementById('black-kpi-clientes').textContent=list.length;
+  document.getElementById('black-kpi-acumulado').textContent=fmt(totAcum);
+  document.getElementById('black-kpi-mes').textContent=fmt(totMes);
+  document.getElementById('black-kpi-custos').textContent=fmt(totCustos);
 
-  document.getElementById('black-kpi-clientes').textContent = clientesList.length;
-  document.getElementById('black-kpi-acumulado').textContent = fmt(totalAcumulado);
-  document.getElementById('black-kpi-mes').textContent = fmt(totalMes);
-  document.getElementById('black-kpi-custos').textContent = fmt(totalCustos);
-
-  // Render clients list
-  var el = document.getElementById('black-clientes-list');
+  var el=document.getElementById('black-clientes-list');
   el.innerHTML='';
-
-  if(!clientesList.length){
+  if(!list.length){
     el.innerHTML='<div class="empty"><div class="empty-icon">⚡</div><div class="empty-title">Nenhum cliente Black ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Cliente" para começar</p></div>';
     return;
   }
-
-  clientesList.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
-    var acum = c.ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
-    var custos = c.ops.reduce(function(s,op){return s+(op.custoTotal||0);},0);
-    var liquido = acum - custos;
-    var meses = [...new Set(c.ops.map(function(op){return op.ano+'/'+String(op.mes).padStart(2,'0');}))].length;
-
-    var card = document.createElement('div');
+  list.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
+    var acum=c.ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
+    var custos=c.ops.reduce(function(s,op){return s+(op.custoTotal||0);},0);
+    var liquido=acum-custos;
+    var meses=[...new Set(c.ops.map(function(op){return op.ano+'/'+String(op.mes).padStart(2,'0');}))].length;
+    var card=document.createElement('div');
     card.style='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:12px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .2s';
     card.onmouseover=function(){this.style.borderColor='var(--border2)';};
     card.onmouseout=function(){this.style.borderColor='var(--border)';};
-
-    var av = document.createElement('div');
+    var av=document.createElement('div');
     av.style='width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e8fff);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:#fff;flex-shrink:0';
     av.textContent=initials(c.nome);
-
-    var info = document.createElement('div');
-    info.style='flex:1';
-    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+c.nome+'</div>'
-      +'<div style="font-size:11px;color:var(--text3)">'+meses+' meses de operação</div>';
-
-    var stats = document.createElement('div');
-    stats.style='display:flex;gap:32px;align-items:center';
+    var info=document.createElement('div');info.style='flex:1';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+c.nome+'</div><div style="font-size:11px;color:var(--text3)">'+meses+' meses operados</div>';
+    var stats=document.createElement('div');stats.style='display:flex;gap:28px;align-items:center';
     stats.innerHTML='<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Acumulado</div><div style="font-family:DM Mono,monospace;color:#22c55e;font-size:16px;font-weight:700">'+fmtFull(acum)+'</div></div>'
       +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Custos</div><div style="font-family:DM Mono,monospace;color:#ef4444;font-size:14px;font-weight:600">'+fmtFull(custos)+'</div></div>'
       +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Líquido</div><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:700">'+fmtFull(liquido)+'</div></div>';
-
-    var arrow = document.createElement('div');
-    arrow.style='color:var(--text3);font-size:18px';
-    arrow.textContent='→';
-
-    (function(cid,cnome){ card.onclick=function(){ openBlackCliente(cid,cnome); }; })(c.id, c.nome);
-
-    card.appendChild(av);
-    card.appendChild(info);
-    card.appendChild(stats);
-    card.appendChild(arrow);
+    var arrow=document.createElement('div');arrow.style='color:var(--text3);font-size:18px';arrow.textContent='→';
+    (function(cid,cnome){card.onclick=function(){openBlackCliente(cid,cnome);};;})(c.id,c.nome);
+    card.appendChild(av);card.appendChild(info);card.appendChild(stats);card.appendChild(arrow);
     el.appendChild(card);
   });
 }
 
-// ── Open cliente selector ─────────────────────────────────
+// ── Selector ──────────────────────────────────────────────
 function openBlackClienteSelector(){
-  var sel = document.getElementById('black-sel-cliente');
+  var sel=document.getElementById('black-sel-cliente');
   sel.innerHTML='<option value="">Selecione...</option>';
-  clientes.forEach(function(c){
-    var o=document.createElement('option');
-    o.value=c.id; o.textContent=c.nome;
-    sel.appendChild(o);
-  });
+  clientes.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;sel.appendChild(o);});
   openModal('modal-black-selector');
 }
-
 function addBlackCliente(){
   var sel=document.getElementById('black-sel-cliente');
-  var id=sel.value, nome=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+  var id=sel.value,nome=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
   if(!id){alert('Selecione um cliente!');return;}
   closeModal('modal-black-selector');
-  openBlackCliente(id, nome);
+  openBlackCliente(id,nome);
 }
 
-// ── Open cliente detalhe ──────────────────────────────────
-function openBlackCliente(clienteId, clienteNome){
-  currentBlackClienteId = clienteId;
-  document.getElementById('black-detalhe-title').textContent = clienteNome;
-  document.getElementById('black-detalhe-sub').textContent = 'Histórico de operações Black';
-  showView('black-detalhe', null);
-
+// ── Detalhe ───────────────────────────────────────────────
+function openBlackCliente(clienteId,clienteNome){
+  currentBlackClienteId=clienteId;
+  document.getElementById('black-detalhe-title').textContent=clienteNome;
+  document.getElementById('black-detalhe-sub').textContent='Histórico de operações com opções';
+  showView('black-detalhe',null);
   db.collection('black_operacoes').where('clienteId','==',clienteId).onSnapshot(function(snap){
-    blackOps = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    renderBlackClienteDetalhe();
+    blackOps=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderBlackDetalhe();
   });
 }
 
-// ── Render cliente detalhe ────────────────────────────────
-function renderBlackClienteDetalhe(){
-  var ops = blackOps.sort(function(a,b){
-    if(a.ano!==b.ano) return b.ano-a.ano;
-    return b.mes-a.mes;
+function renderBlackDetalhe(){
+  var ops=blackOps.slice().sort(function(a,b){return a.ano!==b.ano?a.ano-b.ano:a.mes-b.mes;});
+  var totalAcum=0,totalCompras=0,totalVendas=0,mesesCount=ops.length;
+  var acumArr=[];
+  ops.forEach(function(op){
+    var s=(op.vendas||0)-(op.compras||0);
+    totalAcum+=s; totalCompras+=op.compras||0; totalVendas+=op.vendas||0;
+    acumArr.push({mes:MESES[op.mes-1]+'/'+op.ano,acum:totalAcum,ibov:op.ibov||0,cdi:op.cdi||0});
   });
+  var media=mesesCount?totalAcum/mesesCount:0;
+  var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
+  var patrimonio=cli?(cli.custodiaRF||0)+(cli.custodiaRV||0):0;
+  var retorno=patrimonio?((totalAcum/patrimonio)*100):0;
 
-  var totalCompras=0, totalVendas=0, acumulado=0;
-  ops.forEach(function(op){ totalCompras+=op.compras||0; totalVendas+=op.vendas||0; });
-  
-  document.getElementById('black-cli-compras').textContent = fmtFull(totalCompras);
-  document.getElementById('black-cli-vendas').textContent = fmtFull(totalVendas);
-  
-  // Build acumulado running total
-  var sorted = ops.slice().sort(function(a,b){ return a.ano!==b.ano?a.ano-b.ano:a.mes-b.mes; });
-  var acumMap = {};
-  var running = 0;
-  sorted.forEach(function(op){
-    var key = op.ano+'-'+op.mes;
-    running += (op.vendas||0)-(op.compras||0);
-    acumMap[key] = running;
-  });
-  acumulado = running;
-  document.getElementById('black-cli-acumulado').textContent = fmtFull(acumulado);
+  document.getElementById('black-cli-acumulado').textContent=fmtFull(totalAcum);
+  document.getElementById('black-cli-acumulado').style.color=totalAcum>=0?'#22c55e':'#ef4444';
+  document.getElementById('black-cli-media').textContent=fmtFull(media);
+  document.getElementById('black-cli-retorno').textContent=retorno.toFixed(2)+'%';
+  document.getElementById('black-cli-retorno').style.color=retorno>=0?'#c084fc':'#ef4444';
+  document.getElementById('black-cli-patrimonio').textContent=fmtFull(patrimonio);
 
-  // Table
-  var tb = document.getElementById('black-table-mensal');
-  tb.innerHTML='';
+  // Load config (margem/notional)
+  db.collection('black_config').doc(currentBlackClienteId).get().then(function(doc){
+    var cfg=doc.exists?doc.data():{};
+    document.getElementById('black-cli-margem').textContent=fmtFull(cfg.margem||0);
+    document.getElementById('black-cli-notional').textContent=fmtFull(cfg.notional||0);
+  }).catch(function(){});
 
-  if(!ops.length){
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td colspan="9" style="text-align:center;padding:40px;color:var(--text3)">Nenhuma operação lançada</td>';
-    tb.appendChild(tr);
-    return;
+  // Chart
+  if(blackCompChart) blackCompChart.destroy();
+  var ctx=document.getElementById('black-chart-comp');
+  if(ctx&&acumArr.length){
+    var acumIbov=0,acumCdi=0;
+    var ibovData=[],cdiData=[],dmfData=[],labels=[];
+    acumArr.forEach(function(a){
+      acumIbov+=a.ibov; acumCdi+=a.cdi;
+      labels.push(a.mes);
+      dmfData.push(Number(a.acum.toFixed(2)));
+      ibovData.push(Number(acumIbov.toFixed(2)));
+      cdiData.push(Number(acumCdi.toFixed(2)));
+    });
+    blackCompChart=new Chart(ctx.getContext('2d'),{
+      type:'line',
+      data:{labels:labels,datasets:[
+        {label:'DMF Black (R$)',data:dmfData,borderColor:'#1e8fff',backgroundColor:'#1e8fff22',tension:.4,pointRadius:3,fill:true},
+        {label:'IBOV acum. %',data:ibovData,borderColor:'#22c55e',tension:.4,pointRadius:3,borderDash:[4,4]},
+        {label:'CDI acum. %',data:cdiData,borderColor:'#f59e0b',tension:.4,pointRadius:3,borderDash:[2,4]}
+      ]},
+      options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#4a6080',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#4a6080',font:{size:10}},grid:{color:'#0e2040'}}}}
+    });
   }
 
-  ops.forEach(function(op){
+  // Table
+  var tb=document.getElementById('black-table-mensal');
+  tb.innerHTML='';
+  var acumRun=0;
+  var sortedDesc=blackOps.slice().sort(function(a,b){return b.ano!==a.ano?b.ano-a.ano:b.mes-a.mes;});
+  sortedDesc.forEach(function(op){
     var saldo=(op.vendas||0)-(op.compras||0);
-    var custoTotal=op.custoTotal||0;
-    var liquido=saldo-custoTotal;
+    var custos=op.custoTotal||0;
+    var liquido=saldo-custos;
+    // Calc acum for this op (from sorted asc)
     var key=op.ano+'-'+op.mes;
-    var acumVal=acumMap[key]||0;
+    var acumVal=0;
+    var runAcum=0;
+    ops.forEach(function(o){ runAcum+=(o.vendas||0)-(o.compras||0); if(o.ano===op.ano&&o.mes===op.mes) acumVal=runAcum; });
 
     var tr=document.createElement('tr');
+    var ibovPct=op.ibov?op.ibov.toFixed(2)+'%':'—';
+    var cdiPct=op.cdi?op.cdi.toFixed(2)+'%':'—';
+    var dmfPct=patrimonio?(saldo/patrimonio*100).toFixed(2)+'%':'—';
+    var acumPct=patrimonio?(acumVal/patrimonio*100).toFixed(2)+'%':'—';
+
     tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
-      +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(op.compras||0)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;color:#22c55e;font-size:12px">'+fmtFull(op.vendas||0)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custoTotal)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:var(--blue)">'+fmtFull(liquido)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--blue)">'+fmtFull(op.carteiraTotal||0)+'</td>'
       +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acumVal)+'</td>'
-      +'<td><span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+(op.tipo==='detalhado'?'#1e8fff22':'#c084fc22')+';color:'+(op.tipo==='detalhado'?'#1e8fff':'#c084fc')+';font-weight:700">'+(op.tipo==='detalhado'?'Detalhado':'Simplificado')+'</span></td>'
+      +'<td style="font-size:12px;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+dmfPct+'</td>'
+      +'<td style="font-size:12px;color:#22c55e">'+ibovPct+'</td>'
+      +'<td style="font-size:12px;color:#f59e0b">'+cdiPct+'</td>'
+      +'<td style="font-size:12px;color:#c084fc">'+acumPct+'</td>'
+      +'<td><span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+(op.tipo==='detalhado'?'#1e8fff22':op.tipo==='nota'?'#22c55e22':'#c084fc22')+';color:'+(op.tipo==='detalhado'?'#1e8fff':op.tipo==='nota'?'#22c55e':'#c084fc')+';font-weight:700">'+(op.tipo==='detalhado'?'Detalhado':op.tipo==='nota'?'Nota':'Simples')+'</span></td>'
       +'<td></td>';
 
-    // Add action buttons via DOM
-    var td = tr.lastElementChild;
-    var btnDiv = document.createElement('div');
-    btnDiv.style='display:flex;gap:6px';
-
-    if(op.tipo==='detalhado' && op.pernas && op.pernas.length){
-      var verBtn=document.createElement('button');
-      verBtn.className='btn-ghost';
-      verBtn.style='padding:4px 10px;font-size:11px';
-      verBtn.textContent='Pernas';
-      (function(o){ verBtn.onclick=function(){ showPernas(o); }; })(op);
-      btnDiv.appendChild(verBtn);
+    var td=tr.lastElementChild;
+    var div=document.createElement('div');div.style='display:flex;gap:6px';
+    if(op.tipo==='detalhado'&&op.pernas&&op.pernas.length){
+      var vb=document.createElement('button');vb.className='btn-ghost';vb.style='padding:4px 8px;font-size:11px';vb.textContent='Pernas';
+      (function(o){vb.onclick=function(){showPernas(o);};})(op);div.appendChild(vb);
     }
-
-    var editBtn=document.createElement('button');
-    editBtn.className='btn-ghost';
-    editBtn.style='padding:4px 8px;font-size:11px';
-    editBtn.innerHTML='✏️';
-    (function(o){ editBtn.onclick=function(){ editBlackOp(o); }; })(op);
-
-    var delBtn=document.createElement('button');
-    delBtn.className='btn-dsm';
-    delBtn.style='padding:4px 8px;font-size:11px';
-    delBtn.innerHTML='🗑';
-    (function(oid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('black_operacoes').doc(oid).delete(); }); }; })(op.id);
-
-    btnDiv.appendChild(editBtn);
-    btnDiv.appendChild(delBtn);
-    td.appendChild(btnDiv);
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML='✏️';
+    (function(o){eb.onclick=function(){editBlackOp(o);};})(op);
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML='🗑';
+    (function(oid){db2.onclick=function(){confirmDelete(function(){db.collection('black_operacoes').doc(oid).delete();});};})(op.id);
+    div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
   });
 }
 
-function showPernas(op){
-  if(!op.pernas||!op.pernas.length) return;
-  var html='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:4px">'+op.estrutura+'</div>'
-    +'<div style="font-size:11px;color:var(--text3);margin-bottom:16px">'+op.ativo+' · '+MESES[op.mes-1]+'/'+op.ano+'</div>'
-    +'<div class="table-wrap"><table><thead><tr><th>Cód.</th><th>C/V</th><th>Especificação</th><th>Venc.</th><th>Qtde.</th><th>Prêmio Unit.</th><th>Total</th></tr></thead><tbody>';
-  op.pernas.forEach(function(p){
-    var cv = p.cv==='V'?'Venda':'Compra';
-    var cor = p.cv==='V'?'#22c55e':'#ef4444';
-    html+='<tr><td style="font-family:DM Mono,monospace;font-size:12px">'+p.codigo+'</td>'
-      +'<td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+cor+'22;color:'+cor+';font-weight:700">'+cv+'</span></td>'
-      +'<td>'+p.especificacao+'</td>'
-      +'<td style="font-size:12px">'+fmtDate(p.vencimento)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+p.quantidade+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+fmtFull(p.premio)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+cor+'">'+fmtFull(p.total)+'</td></tr>';
-  });
-  html+='</tbody></table></div>';
-
-  var overlay=document.createElement('div');
-  overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
-  var box=document.createElement('div');box.className='modal modal-lg';box.style.maxWidth='680px';
-  box.innerHTML=html;
-  var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
-  var btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Fechar';
-  btn.onclick=function(){overlay.parentNode.removeChild(overlay);};
-  overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
-  footer.appendChild(btn);box.appendChild(footer);
-  overlay.appendChild(box);document.body.appendChild(overlay);
-}
-
-// ── Lançamento Simplificado ───────────────────────────────
+// ── Modais de lançamento ──────────────────────────────────
 function openModalBlackLanc(tipo){
-  editingBlackId = null;
-  var now = new Date();
-  var mesVal = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  editingBlackId=null;
   if(tipo==='simplificado'){
     document.getElementById('modal-bs-title').textContent='Lançamento Simplificado';
-    ['bs-compras','bs-vendas','bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros','bs-obs'].forEach(function(id){
-      var el=document.getElementById(id); if(el) el.value='';
-    });
-    buildBlackMesGrid('bs-mes-grid','bs-mes',mesVal);
+    ['bs-compras','bs-vendas','bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros','bs-obs','bs-ibov','bs-cdi','bs-carteira-di'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    buildYearMonthSelectors('bs-ano','bs-mes-sel','bs-mes');
     updateBsPreview();
     openModal('modal-black-simples');
   } else {
     document.getElementById('modal-bd-title').textContent='Lançamento Detalhado';
     document.getElementById('bd-ativo').value='';
     document.getElementById('bd-estrutura').value='';
-    ['bd-emol','bd-taxa-op','bd-exec','bd-impostos','bd-outros','bd-obs'].forEach(function(id){
-      var el=document.getElementById(id); if(el) el.value='';
-    });
-    pernaCount=0;
-    document.getElementById('bd-pernas-list').innerHTML='';
-    buildBlackMesGrid('bd-mes-grid','bd-mes',mesVal);
-    addPerna();
-    updateBdPreview();
+    ['bd-emol','bd-taxa-op','bd-exec','bd-impostos','bd-outros','bd-obs','bd-ibov','bd-cdi'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    pernaCount=0;document.getElementById('bd-pernas-list').innerHTML='';
+    buildYearMonthSelectors('bd-ano','bd-mes-sel','bd-mes');
+    addPerna();updateBdPreview();
     openModal('modal-black-det');
   }
-}
-
-function buildBlackMesGrid(gridId, hiddenId, selectedVal){
-  var grid=document.getElementById(gridId);
-  if(!grid)return;
-  grid.innerHTML='';
-  var now=new Date(), curYear=now.getFullYear();
-  for(var yr=curYear-1;yr<=curYear+1;yr++){
-    var yrLabel=document.createElement('div');
-    yrLabel.style='width:100%;font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:'+(yr===curYear-1?'0':'8px');
-    yrLabel.textContent=yr; grid.appendChild(yrLabel);
-    var row=document.createElement('div'); row.style='display:flex;gap:4px;flex-wrap:wrap';
-    for(var m=1;m<=12;m++){
-      var val=yr+'-'+String(m).padStart(2,'0');
-      var btn=document.createElement('button');
-      btn.type='button'; btn.textContent=MESES[m-1];
-      btn.setAttribute('data-val',val);
-      btn.setAttribute('data-grid',gridId);
-      btn.setAttribute('data-hidden',hiddenId);
-      var isSel=val===selectedVal;
-      btn.style='padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid '+(isSel?'var(--blue)':'var(--border)')+';background:'+(isSel?'var(--blue)':'var(--card2)')+';color:'+(isSel?'#000':'var(--text2)')+'';
-      btn.onclick=function(){
-        var gid=this.getAttribute('data-grid');
-        document.querySelectorAll('#'+gid+' button').forEach(function(b){b.style.background='var(--card2)';b.style.color='var(--text2)';b.style.borderColor='var(--border)';});
-        this.style.background='var(--blue)';this.style.color='#000';this.style.borderColor='var(--blue)';
-        document.getElementById(this.getAttribute('data-hidden')).value=this.getAttribute('data-val');
-      };
-      row.appendChild(btn);
-    }
-    grid.appendChild(row);
-  }
-  if(selectedVal) document.getElementById(hiddenId).value=selectedVal;
 }
 
 function updateBsPreview(){
   var c=Number(document.getElementById('bs-compras').value)||0;
   var v=Number(document.getElementById('bs-vendas').value)||0;
-  var custos=(Number(document.getElementById('bs-emol').value)||0)
-    +(Number(document.getElementById('bs-taxa-op').value)||0)
-    +(Number(document.getElementById('bs-exec').value)||0)
-    +(Number(document.getElementById('bs-impostos').value)||0)
-    +(Number(document.getElementById('bs-custodia').value)||0)
-    +(Number(document.getElementById('bs-outros').value)||0);
+  var custos=['bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros'].reduce(function(s,id){return s+(Number(document.getElementById(id).value)||0);},0);
   var saldo=v-c;
+  var liq=saldo-custos;
   document.getElementById('bs-preview-saldo').textContent=fmtFull(saldo);
   document.getElementById('bs-preview-saldo').style.color=saldo>=0?'#22c55e':'#ef4444';
-  var liq=saldo-custos;
   document.getElementById('bs-preview-liquido').textContent=fmtFull(liq);
   document.getElementById('bs-preview-liquido').style.color=liq>=0?'var(--blue)':'#ef4444';
 }
 ['bs-compras','bs-vendas','bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros'].forEach(function(id){
-  var el=document.getElementById(id); if(el) el.addEventListener('input',updateBsPreview);
+  var el=document.getElementById(id);if(el)el.addEventListener('input',updateBsPreview);
 });
 
 function saveBlackSimples(){
-  if(!currentBlackClienteId){alert('Nenhum cliente selecionado!');return;}
+  if(!currentBlackClienteId){alert('Nenhum cliente!');return;}
   var mesStr=document.getElementById('bs-mes').value;
   if(!mesStr){alert('Selecione o mês!');return;}
   var parts=mesStr.split('-');
   var c=Number(document.getElementById('bs-compras').value)||0;
   var v=Number(document.getElementById('bs-vendas').value)||0;
-  var custoTotal=(Number(document.getElementById('bs-emol').value)||0)
-    +(Number(document.getElementById('bs-taxa-op').value)||0)
-    +(Number(document.getElementById('bs-exec').value)||0)
-    +(Number(document.getElementById('bs-impostos').value)||0)
-    +(Number(document.getElementById('bs-custodia').value)||0)
-    +(Number(document.getElementById('bs-outros').value)||0);
+  var custoTotal=['bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros'].reduce(function(s,id){return s+(Number(document.getElementById(id).value)||0);},0);
   var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
-  var data={
-    clienteId:currentBlackClienteId,
-    clienteNome:cli?cli.nome:'',
-    ano:Number(parts[0]),mes:Number(parts[1]),
-    tipo:'simplificado',
-    compras:c,vendas:v,custoTotal:custoTotal,
+  var data={clienteId:currentBlackClienteId,clienteNome:cli?cli.nome:'',ano:Number(parts[0]),mes:Number(parts[1]),tipo:'simplificado',compras:c,vendas:v,custoTotal:custoTotal,
     custos:{emolumentos:Number(document.getElementById('bs-emol').value)||0,taxaOperacional:Number(document.getElementById('bs-taxa-op').value)||0,execucao:Number(document.getElementById('bs-exec').value)||0,impostos:Number(document.getElementById('bs-impostos').value)||0,custodia:Number(document.getElementById('bs-custodia').value)||0,outros:Number(document.getElementById('bs-outros').value)||0},
-    obs:document.getElementById('bs-obs').value,
-    criadoEm:new Date().toISOString()
-  };
+    ibov:Number(document.getElementById('bs-ibov').value)||0,
+    cdi:Number(document.getElementById('bs-cdi').value)||0,
+    carteiraTotal:Number(document.getElementById('bs-carteira-di').value)||0,
+    obs:document.getElementById('bs-obs').value,criadoEm:new Date().toISOString()};
   if(editingBlackId) db.collection('black_operacoes').doc(editingBlackId).update(data);
   else db.collection('black_operacoes').add(data);
   closeModal('modal-black-simples');
 }
 
-// ── Pernas (Detalhado) ────────────────────────────────────
+// ── Pernas ────────────────────────────────────────────────
 function addPerna(){
-  pernaCount++;
-  var idx=pernaCount;
+  pernaCount++;var idx=pernaCount;
   var list=document.getElementById('bd-pernas-list');
   var perna=document.createElement('div');
   perna.id='perna-'+idx;
-  perna.style='background:#030810;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative';
-  perna.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-    +'<span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Perna '+idx+'</span>'
-    +(idx>1?'<button type="button" class="btn-dsm" style="padding:3px 8px;font-size:11px" onclick="removePerna('+idx+')">Remover</button>':'')
-    +'</div>'
+  perna.style='background:#030810;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px';
+  perna.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Perna '+idx+'</span>'
+    +(idx>1?'<button type="button" class="btn-dsm" style="padding:3px 8px;font-size:11px" onclick="removePerna('+idx+')">Remover</button>':'')+'</div>'
     +'<div class="form-grid">'
     +'<div class="form-group"><label>C/V</label><select class="form-input" id="p'+idx+'-cv" onchange="updateBdPreview()"><option value="V">Venda</option><option value="C">Compra</option></select></div>'
-    +'<div class="form-group"><label>Código</label><input class="form-input" id="p'+idx+'-codigo" placeholder="Ex: GDMF A 250"></div>'
-    +'<div class="form-group form-full"><label>Especificação</label><input class="form-input" id="p'+idx+'-especificacao" placeholder="Ex: INVESTO LFTB F11"></div>'
-    +'<div class="form-group"><label>Vencimento</label><input class="form-input" id="p'+idx+'-vencimento" type="date"></div>'
+    +'<div class="form-group"><label>Código da Opção</label><input class="form-input" id="p'+idx+'-codigo" placeholder="Ex: BOVAB250" oninput="autoVencimento('+idx+')"></div>'
+    +'<div class="form-group form-full"><label>Especificação / Estrutura</label><input class="form-input" id="p'+idx+'-especificacao" placeholder="Ex: INVESTO LFTB F11"></div>'
+    +'<div class="form-group"><label>Mês Venc. (auto)</label><input class="form-input" id="p'+idx+'-mes-venc" readonly style="background:#030810;color:var(--blue)" placeholder="Automático pelo código"></div>'
+    +'<div class="form-group"><label>Ano Venc.</label><select class="form-input" id="p'+idx+'-ano-venc" onchange="autoVencimento('+idx+')"></select></div>'
     +'<div class="form-group"><label>Quantidade</label><input class="form-input" id="p'+idx+'-qtde" type="number" placeholder="0" oninput="updateBdPreview()"></div>'
     +'<div class="form-group"><label>Prêmio Unitário (R$)</label><input class="form-input" id="p'+idx+'-premio" type="number" step="0.01" placeholder="0,00" oninput="updateBdPreview()"></div>'
+    +'<div class="form-group"><label>Total (R$)</label><input class="form-input" id="p'+idx+'-total" readonly style="background:#030810;color:var(--blue)" placeholder="Automático"></div>'
     +'</div>';
   list.appendChild(perna);
+  // Populate ano venc select
+  var anoVencSel=document.getElementById('p'+idx+'-ano-venc');
+  var now=new Date(),cy=now.getFullYear();
+  for(var y=cy;y<=cy+3;y++){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;anoVencSel.appendChild(o);}
   updateBdPreview();
 }
 
-function removePerna(idx){
-  var el=document.getElementById('perna-'+idx);
-  if(el) el.parentNode.removeChild(el);
+function removePerna(idx){var el=document.getElementById('perna-'+idx);if(el)el.parentNode.removeChild(el);updateBdPreview();}
+
+function autoVencimento(idx){
+  var codigo=document.getElementById('p'+idx+'-codigo').value.toUpperCase();
+  var anoVenc=document.getElementById('p'+idx+'-ano-venc').value;
+  var callMap={A:'Janeiro',B:'Fevereiro',C:'Março',D:'Abril',E:'Maio',F:'Junho',G:'Julho',H:'Agosto',I:'Setembro',J:'Outubro',K:'Novembro',L:'Dezembro'};
+  var putMap={M:'Janeiro',N:'Fevereiro',O:'Março',P:'Abril',Q:'Maio',R:'Junho',S:'Julho',T:'Agosto',U:'Setembro',V:'Outubro',W:'Novembro',X:'Dezembro'};
+  if(codigo.length>=5){
+    var letra=codigo[4];
+    var mes=callMap[letra]||putMap[letra];
+    var tipo=callMap[letra]?'Call':'Put';
+    if(mes){
+      document.getElementById('p'+idx+'-mes-venc').value=mes+'/'+anoVenc+' ('+tipo+')';
+    }
+  }
   updateBdPreview();
 }
 
@@ -2245,57 +2289,173 @@ function updateBdPreview(){
     var cvEl=document.getElementById('p'+i+'-cv');
     var qtdeEl=document.getElementById('p'+i+'-qtde');
     var premEl=document.getElementById('p'+i+'-premio');
+    var totEl=document.getElementById('p'+i+'-total');
     if(!cvEl||!qtdeEl||!premEl) continue;
     var total=(Number(qtdeEl.value)||0)*(Number(premEl.value)||0);
+    if(totEl) totEl.value=fmtFull(total);
     if(cvEl.value==='V') totalV+=total; else totalC+=total;
   }
-  var custos=(Number(document.getElementById('bd-emol').value)||0)+(Number(document.getElementById('bd-taxa-op').value)||0)+(Number(document.getElementById('bd-exec').value)||0)+(Number(document.getElementById('bd-impostos').value)||0)+(Number(document.getElementById('bd-outros').value)||0);
-  var saldo=totalV-totalC, liquido=saldo-custos;
+  var custos=['bd-emol','bd-taxa-op','bd-exec','bd-impostos','bd-outros'].reduce(function(s,id){return s+(Number(document.getElementById(id).value)||0);},0);
+  var saldo=totalV-totalC,liq=saldo-custos;
   document.getElementById('bd-preview-compras').textContent=fmtFull(totalC);
   document.getElementById('bd-preview-vendas').textContent=fmtFull(totalV);
   document.getElementById('bd-preview-saldo').textContent=fmtFull(saldo);
   document.getElementById('bd-preview-saldo').style.color=saldo>=0?'#22c55e':'#ef4444';
-  document.getElementById('bd-preview-liquido').textContent=fmtFull(liquido);
+  document.getElementById('bd-preview-liquido').textContent=fmtFull(liq);
 }
 
 function saveBlackDetalhado(){
-  if(!currentBlackClienteId){alert('Nenhum cliente selecionado!');return;}
+  if(!currentBlackClienteId){alert('Nenhum cliente!');return;}
   var mesStr=document.getElementById('bd-mes').value;
   if(!mesStr){alert('Selecione o mês!');return;}
   var parts=mesStr.split('-');
-  var pernas=[], totalC=0, totalV=0;
+  var pernas=[],totalC=0,totalV=0;
   for(var i=1;i<=pernaCount;i++){
-    var cvEl=document.getElementById('p'+i+'-cv');
-    if(!cvEl)continue;
+    var cvEl=document.getElementById('p'+i+'-cv');if(!cvEl)continue;
     var qtde=Number(document.getElementById('p'+i+'-qtde').value)||0;
     var premio=Number(document.getElementById('p'+i+'-premio').value)||0;
     var total=qtde*premio;
-    var p={cv:cvEl.value,codigo:document.getElementById('p'+i+'-codigo').value,especificacao:document.getElementById('p'+i+'-especificacao').value,vencimento:document.getElementById('p'+i+'-vencimento').value,quantidade:qtde,premio:premio,total:total};
-    pernas.push(p);
-    if(p.cv==='V') totalV+=total; else totalC+=total;
+    pernas.push({cv:cvEl.value,codigo:document.getElementById('p'+i+'-codigo').value,especificacao:document.getElementById('p'+i+'-especificacao').value,mesVenc:document.getElementById('p'+i+'-mes-venc').value,quantidade:qtde,premio:premio,total:total});
+    if(cvEl.value==='V') totalV+=total; else totalC+=total;
   }
-  var custoTotal=(Number(document.getElementById('bd-emol').value)||0)+(Number(document.getElementById('bd-taxa-op').value)||0)+(Number(document.getElementById('bd-exec').value)||0)+(Number(document.getElementById('bd-impostos').value)||0)+(Number(document.getElementById('bd-outros').value)||0);
+  var custoTotal=['bd-emol','bd-taxa-op','bd-exec','bd-impostos','bd-outros'].reduce(function(s,id){return s+(Number(document.getElementById(id).value)||0);},0);
   var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
-  var data={
-    clienteId:currentBlackClienteId,clienteNome:cli?cli.nome:'',
-    ano:Number(parts[0]),mes:Number(parts[1]),
-    tipo:'detalhado',ativo:document.getElementById('bd-ativo').value,
-    estrutura:document.getElementById('bd-estrutura').value,
-    pernas:pernas,compras:totalC,vendas:totalV,
-    custoTotal:custoTotal,
+  var data={clienteId:currentBlackClienteId,clienteNome:cli?cli.nome:'',ano:Number(parts[0]),mes:Number(parts[1]),tipo:'detalhado',ativo:document.getElementById('bd-ativo').value,estrutura:document.getElementById('bd-estrutura').value,pernas:pernas,compras:totalC,vendas:totalV,custoTotal:custoTotal,
     custos:{emolumentos:Number(document.getElementById('bd-emol').value)||0,taxaOperacional:Number(document.getElementById('bd-taxa-op').value)||0,execucao:Number(document.getElementById('bd-exec').value)||0,impostos:Number(document.getElementById('bd-impostos').value)||0,outros:Number(document.getElementById('bd-outros').value)||0},
-    obs:document.getElementById('bd-obs').value,
-    criadoEm:new Date().toISOString()
-  };
+    ibov:Number(document.getElementById('bd-ibov').value)||0,cdi:Number(document.getElementById('bd-cdi').value)||0,
+    obs:document.getElementById('bd-obs').value,criadoEm:new Date().toISOString()};
   if(editingBlackId) db.collection('black_operacoes').doc(editingBlackId).update(data);
   else db.collection('black_operacoes').add(data);
   closeModal('modal-black-det');
 }
 
+// ── Nota de Corretagem ────────────────────────────────────
+function openModalBlackNota(){
+  buildYearMonthSelectors('nota-ano','nota-mes-sel','nota-mes');
+  document.getElementById('nota-preview').style.display='none';
+  document.getElementById('nota-resultado').style.display='none';
+  document.getElementById('nota-save-btn').style.display='none';
+  document.getElementById('nota-drop-area').style.display='block';
+  openModal('modal-black-nota');
+}
+
+function handleNotaUpload(event){
+  var file=event.target.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('nota-drop-area').style.display='none';
+    document.getElementById('nota-preview').style.display='block';
+    document.getElementById('nota-status').textContent='Analisando nota com IA...';
+    var imgEl=document.getElementById('nota-img-preview');
+    imgEl.src=e.target.result;
+    // Send to Claude API
+    var base64=e.target.result.split(',')[1];
+    var mediaType=file.type||'image/jpeg';
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+          {type:'text',text:'Você é um especialista em notas de corretagem brasileiras. Extraia os seguintes dados desta nota e retorne SOMENTE um JSON válido sem markdown: {"compras": número, "vendas": número, "emolumentos": número, "taxaOperacional": número, "execucao": número, "impostos": número, "outros": número, "liquido": número}. Use 0 para campos não encontrados. Valores em reais (número decimal).'}
+        ]}]
+      })
+    }).then(function(r){return r.json();}).then(function(data){
+      var text=data.content&&data.content[0]?data.content[0].text:'{}';
+      try{
+        var parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+        document.getElementById('nota-compras').value=parsed.compras||0;
+        document.getElementById('nota-vendas').value=parsed.vendas||0;
+        document.getElementById('nota-emol').value=parsed.emolumentos||0;
+        document.getElementById('nota-taxa-op').value=parsed.taxaOperacional||0;
+        document.getElementById('nota-exec').value=parsed.execucao||0;
+        document.getElementById('nota-impostos').value=parsed.impostos||0;
+        document.getElementById('nota-outros').value=parsed.outros||0;
+        document.getElementById('nota-liquido').value=parsed.liquido||0;
+        document.getElementById('nota-status').textContent='✅ Dados extraídos! Confira e salve.';
+        document.getElementById('nota-resultado').style.display='block';
+        document.getElementById('nota-save-btn').style.display='inline-flex';
+      }catch(e){document.getElementById('nota-status').textContent='⚠️ Não foi possível extrair automaticamente. Preencha manualmente.';document.getElementById('nota-resultado').style.display='block';document.getElementById('nota-save-btn').style.display='inline-flex';}
+    }).catch(function(){
+      document.getElementById('nota-status').textContent='⚠️ Erro na IA. Preencha manualmente.';
+      document.getElementById('nota-resultado').style.display='block';
+      document.getElementById('nota-save-btn').style.display='inline-flex';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveNota(){
+  if(!currentBlackClienteId){alert('Nenhum cliente!');return;}
+  var mesStr=document.getElementById('nota-mes').value;
+  if(!mesStr){alert('Selecione o mês!');return;}
+  var parts=mesStr.split('-');
+  var c=Number(document.getElementById('nota-compras').value)||0;
+  var v=Number(document.getElementById('nota-vendas').value)||0;
+  var custoTotal=(Number(document.getElementById('nota-emol').value)||0)+(Number(document.getElementById('nota-taxa-op').value)||0)+(Number(document.getElementById('nota-exec').value)||0)+(Number(document.getElementById('nota-impostos').value)||0)+(Number(document.getElementById('nota-outros').value)||0);
+  var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
+  var data={clienteId:currentBlackClienteId,clienteNome:cli?cli.nome:'',ano:Number(parts[0]),mes:Number(parts[1]),tipo:'nota',compras:c,vendas:v,custoTotal:custoTotal,
+    custos:{emolumentos:Number(document.getElementById('nota-emol').value)||0,taxaOperacional:Number(document.getElementById('nota-taxa-op').value)||0,execucao:Number(document.getElementById('nota-exec').value)||0,impostos:Number(document.getElementById('nota-impostos').value)||0,outros:Number(document.getElementById('nota-outros').value)||0},
+    ibov:0,cdi:0,obs:'Nota de corretagem',criadoEm:new Date().toISOString()};
+  db.collection('black_operacoes').add(data);
+  closeModal('modal-black-nota');
+}
+
+// ── Config (Margem + Notional) ────────────────────────────
+function openModalBlackConfig(){
+  db.collection('black_config').doc(currentBlackClienteId).get().then(function(doc){
+    var cfg=doc.exists?doc.data():{};
+    document.getElementById('cfg-margem').value=cfg.margem||'';
+    document.getElementById('cfg-notional').value=cfg.notional||'';
+    openModal('modal-black-config');
+  }).catch(function(){openModal('modal-black-config');});
+}
+function saveBlackConfig(){
+  if(!currentBlackClienteId)return;
+  var data={margem:Number(document.getElementById('cfg-margem').value)||0,notional:Number(document.getElementById('cfg-notional').value)||0};
+  db.collection('black_config').doc(currentBlackClienteId).set(data);
+  document.getElementById('black-cli-margem').textContent=fmtFull(data.margem);
+  document.getElementById('black-cli-notional').textContent=fmtFull(data.notional);
+  closeModal('modal-black-config');
+}
+
+// ── Pernas modal ──────────────────────────────────────────
+function showPernas(op){
+  if(!op.pernas||!op.pernas.length)return;
+  var html='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:4px">'+(op.estrutura||'Operação Detalhada')+'</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:16px">'+(op.ativo||'')+(op.ativo?' · ':'')+MESES[op.mes-1]+'/'+op.ano+'</div>'
+    +'<div class="table-wrap"><table><thead><tr><th>C/V</th><th>Código</th><th>Especificação</th><th>Vencimento</th><th>Qtde.</th><th>Prêmio</th><th>Total</th></tr></thead><tbody>';
+  op.pernas.forEach(function(p){
+    var cv=p.cv==='V'?'Venda':'Compra',cor=p.cv==='V'?'#22c55e':'#ef4444';
+    html+='<tr><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+cor+'22;color:'+cor+';font-weight:700">'+cv+'</span></td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+p.codigo+'</td>'
+      +'<td>'+p.especificacao+'</td>'
+      +'<td style="font-size:12px">'+p.mesVenc+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+p.quantidade+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+fmtFull(p.premio)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+cor+'">'+fmtFull(p.total)+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  var overlay=document.createElement('div');
+  overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+  var box=document.createElement('div');box.className='modal modal-lg';box.style.maxWidth='720px';
+  box.innerHTML=html;
+  var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
+  var btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Fechar';
+  btn.onclick=function(){overlay.parentNode.removeChild(overlay);};
+  overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+  footer.appendChild(btn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
+}
+
+// ── Edit Black Op ─────────────────────────────────────────
 function editBlackOp(op){
   editingBlackId=op.id;
-  if(op.tipo==='simplificado'){
-    var mesVal=op.ano+'-'+String(op.mes).padStart(2,'0');
+  var mesVal=op.ano+'-'+String(op.mes).padStart(2,'0');
+  if(op.tipo==='simplificado'||op.tipo==='nota'){
+    document.getElementById('modal-bs-title').textContent='Editar Lançamento';
     document.getElementById('bs-compras').value=op.compras||'';
     document.getElementById('bs-vendas').value=op.vendas||'';
     document.getElementById('bs-emol').value=op.custos?op.custos.emolumentos||'':'';
@@ -2304,23 +2464,27 @@ function editBlackOp(op){
     document.getElementById('bs-impostos').value=op.custos?op.custos.impostos||'':'';
     document.getElementById('bs-custodia').value=op.custos?op.custos.custodia||'':'';
     document.getElementById('bs-outros').value=op.custos?op.custos.outros||'':'';
+    document.getElementById('bs-ibov').value=op.ibov||'';
+    document.getElementById('bs-cdi').value=op.cdi||'';
+    document.getElementById('bs-carteira-di').value=op.carteiraTotal||'';
     document.getElementById('bs-obs').value=op.obs||'';
-    buildBlackMesGrid('bs-mes-grid','bs-mes',mesVal);
+    buildYearMonthSelectors('bs-ano','bs-mes-sel','bs-mes');
+    document.getElementById('bs-ano').value=op.ano;
+    document.getElementById('bs-mes-sel').value=op.mes;
+    document.getElementById('bs-mes').value=mesVal;
     updateBsPreview();
     openModal('modal-black-simples');
   } else {
-    var mesVal2=op.ano+'-'+String(op.mes).padStart(2,'0');
+    document.getElementById('modal-bd-title').textContent='Editar Lançamento';
     document.getElementById('bd-ativo').value=op.ativo||'';
     document.getElementById('bd-estrutura').value=op.estrutura||'';
-    pernaCount=0;
-    document.getElementById('bd-pernas-list').innerHTML='';
-    if(op.pernas) op.pernas.forEach(function(p){
-      addPerna();
-      var i=pernaCount;
+    pernaCount=0;document.getElementById('bd-pernas-list').innerHTML='';
+    if(op.pernas)op.pernas.forEach(function(p){
+      addPerna();var i=pernaCount;
       document.getElementById('p'+i+'-cv').value=p.cv||'V';
       document.getElementById('p'+i+'-codigo').value=p.codigo||'';
       document.getElementById('p'+i+'-especificacao').value=p.especificacao||'';
-      document.getElementById('p'+i+'-vencimento').value=p.vencimento||'';
+      document.getElementById('p'+i+'-mes-venc').value=p.mesVenc||'';
       document.getElementById('p'+i+'-qtde').value=p.quantidade||'';
       document.getElementById('p'+i+'-premio').value=p.premio||'';
     });
@@ -2329,8 +2493,13 @@ function editBlackOp(op){
     document.getElementById('bd-exec').value=op.custos?op.custos.execucao||'':'';
     document.getElementById('bd-impostos').value=op.custos?op.custos.impostos||'':'';
     document.getElementById('bd-outros').value=op.custos?op.custos.outros||'':'';
+    document.getElementById('bd-ibov').value=op.ibov||'';
+    document.getElementById('bd-cdi').value=op.cdi||'';
     document.getElementById('bd-obs').value=op.obs||'';
-    buildBlackMesGrid('bd-mes-grid','bd-mes',mesVal2);
+    buildYearMonthSelectors('bd-ano','bd-mes-sel','bd-mes');
+    document.getElementById('bd-ano').value=op.ano;
+    document.getElementById('bd-mes-sel').value=op.mes;
+    document.getElementById('bd-mes').value=mesVal;
     updateBdPreview();
     openModal('modal-black-det');
   }
