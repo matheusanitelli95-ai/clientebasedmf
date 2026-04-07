@@ -3596,14 +3596,30 @@ function saveGlossario(){
 function editGlossario(id){ openModalGlossario(id); }
 
 function restaurarGlossarioPadrao(){
-  if(!confirm('Isso vai ADICIONAR todos os '+GLOSSARIO_DEFAULT.length+' termos padrão ao glossário. Continuar?')) return;
-  var batch = db.batch();
-  GLOSSARIO_DEFAULT.forEach(function(t){
-    var ref = db.collection('glossario').doc();
-    batch.set(ref, Object.assign({}, t, {criadoEm: new Date().toISOString()}));
-  });
-  batch.commit().then(function(){
-    alert('✅ '+GLOSSARIO_DEFAULT.length+' termos adicionados com sucesso!');
+  if(!confirm('Isso vai APAGAR todos os termos atuais e recriar os '+GLOSSARIO_DEFAULT.length+' termos padrão. Continuar?')) return;
+  // First delete all existing terms
+  db.collection('glossario').get().then(function(snap){
+    var batch = db.batch();
+    snap.docs.forEach(function(d){ batch.delete(d.ref); });
+    return batch.commit();
+  }).then(function(){
+    // Then add all default terms in batches of 500
+    var batch = db.batch();
+    var count = 0;
+    var promises = [];
+    GLOSSARIO_DEFAULT.forEach(function(t){
+      var ref = db.collection('glossario').doc();
+      batch.set(ref, Object.assign({}, t, {criadoEm: new Date().toISOString()}));
+      count++;
+      if(count % 400 === 0){
+        promises.push(batch.commit());
+        batch = db.batch();
+      }
+    });
+    promises.push(batch.commit());
+    return Promise.all(promises);
+  }).then(function(){
+    alert('✅ Glossário restaurado com '+GLOSSARIO_DEFAULT.length+' termos!');
   }).catch(function(e){
     alert('Erro: '+e.message);
   });
