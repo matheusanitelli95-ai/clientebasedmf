@@ -381,6 +381,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon">📅</span><span>Agendamento</span></button>
       <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon">💬</span><span>WhatsApp</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon">🌐</span><span>Notícias</span></button>
+      <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon">♟️</span><span>Estratégias</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -907,6 +908,46 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- ESTRATÉGIAS DE OPÇÕES -->
+    <div class="view" id="view-estrategias">
+      <div class="page-header">
+        <div><div class="page-title">Estratégias de Opções</div><div class="page-sub">43 estratégias · Ativo de referência: R$ 30</div></div>
+      </div>
+      <div class="page-content">
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <input class="filter-input" id="est-busca" placeholder="🔍 Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <select class="filter-input" id="est-fin" onchange="filtrarEst()">
+              <option value="">Todos — Financeiro</option>
+              <option value="Débito">Débito</option>
+              <option value="Crédito">Crédito</option>
+              <option value="Zero custo">Zero custo</option>
+            </select>
+            <select class="filter-input" id="est-vies" onchange="filtrarEst()">
+              <option value="">Todos — Viés</option>
+              <option value="Alta">Alta</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Lateralidade">Lateralidade</option>
+            </select>
+            <div style="font-size:12px;color:var(--text3)" id="est-count"></div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th onclick="ordEst('n')"># ↕</th>
+              <th onclick="ordEst('nome')">Estratégia ↕</th>
+              <th>Operação (Ativo = R$ 30)</th>
+              <th onclick="ordEst('fin')">Financeiro ↕</th>
+              <th onclick="ordEst('vies')">Viés ↕</th>
+              <th>Risco</th>
+            </tr></thead>
+            <tbody id="est-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
 
     <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
@@ -1183,6 +1224,46 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Feed -->
         <div id="noticias-feed">
           <div class="empty"><div class="empty-icon">🌐</div><div class="empty-title">Carregando notícias...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTRATÉGIAS DE OPÇÕES -->
+    <div class="view" id="view-estrategias">
+      <div class="page-header">
+        <div><div class="page-title">Estratégias de Opções</div><div class="page-sub">43 estratégias · Ativo de referência: R$ 30</div></div>
+      </div>
+      <div class="page-content">
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <input class="filter-input" id="est-busca" placeholder="🔍 Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <select class="filter-input" id="est-fin" onchange="filtrarEst()">
+              <option value="">Todos — Financeiro</option>
+              <option value="Débito">Débito</option>
+              <option value="Crédito">Crédito</option>
+              <option value="Zero custo">Zero custo</option>
+            </select>
+            <select class="filter-input" id="est-vies" onchange="filtrarEst()">
+              <option value="">Todos — Viés</option>
+              <option value="Alta">Alta</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Lateralidade">Lateralidade</option>
+            </select>
+            <div style="font-size:12px;color:var(--text3)" id="est-count"></div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th onclick="ordEst('n')"># ↕</th>
+              <th onclick="ordEst('nome')">Estratégia ↕</th>
+              <th>Operação (Ativo = R$ 30)</th>
+              <th onclick="ordEst('fin')">Financeiro ↕</th>
+              <th onclick="ordEst('vies')">Viés ↕</th>
+              <th>Risco</th>
+            </tr></thead>
+            <tbody id="est-tbody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -4211,6 +4292,126 @@ function renderNoticiasManual(el){
     el.appendChild(card);
   });
 }
+
+// ═══════════════════════════════════════════════════════════
+// ESTRATÉGIAS DE OPÇÕES
+// ═══════════════════════════════════════════════════════════
+var ESTRATEGIAS_DADOS = [
+  {n:1,nome:'Trava de Alta de CALL',op:'+A32 -A34',fin:'Débito',vies:'Alta',risco:'Custo de montagem'},
+  {n:2,nome:'Trava de Alta de PUT',op:'+M26 -M28',fin:'Crédito',vies:'Alta',risco:'Pagar o delta negativo'},
+  {n:3,nome:'Broken Wing Short PUT',op:'+A28 -2A30 +A33 -M33',fin:'Crédito',vies:'Alta',risco:'PUT descoberta'},
+  {n:4,nome:'Seagull',op:'-M28 +A32 -A35',fin:'Zero custo',vies:'Alta',risco:'PUT descoberta'},
+  {n:5,nome:'Straddle HA de CALL',op:'-M30 -A30 +2B32',fin:'Zero custo',vies:'Alta ou Lateralidade',risco:'PUT descoberta'},
+  {n:6,nome:'Short Strangle Coberto',op:'-M32 -A30 +A32',fin:'Crédito',vies:'Alta ou Lateralidade',risco:'PUT descoberta'},
+  {n:7,nome:'Slide Estrutural de CALL',op:'+A32 -A34 -A36',fin:'Zero custo',vies:'Alta + Intervalo',risco:'CALL descoberta'},
+  {n:8,nome:'Borboleta de CALL OTM',op:'+A32 -2A34 +A36',fin:'Débito',vies:'Alta + Intervalo',risco:'Custo de montagem'},
+  {n:9,nome:'Booster Vertical de CALL',op:'+A32 -2A34',fin:'Zero custo',vies:'Alta + Intervalo',risco:'CALL descoberta'},
+  {n:10,nome:'Booster Modular de CALL',op:'+2A33 -3A34',fin:'Zero custo',vies:'Alta + Intervalo',risco:'CALL descoberta'},
+  {n:11,nome:'Broken Wing Butterfly (BWB)',op:'+A32 -2A34 +A37',fin:'Zero custo',vies:'Alta + Intervalo',risco:'Pagar o delta negativo'},
+  {n:12,nome:'Booster Horizontal de CALL',op:'+2B32 -3A32',fin:'Zero custo',vies:'Lateralidade',risco:'CALL descoberta'},
+  {n:13,nome:'Booster Horizontal de PUT',op:'+3N28 -4M28',fin:'Zero custo',vies:'Lateralidade',risco:'PUT descoberta'},
+  {n:14,nome:'Módulo de Atlas de CALL',op:'+B32 -2A32 +A33',fin:'Zero custo',vies:'Lateralidade',risco:'Pagar o delta negativo'},
+  {n:15,nome:'Módulo de Atlas de PUT',op:'+N28 -2M28 +M27',fin:'Zero custo',vies:'Lateralidade',risco:'Pagar o delta negativo'},
+  {n:16,nome:'Booster Diagonal de CALL',op:'+B28 -2A30',fin:'Zero custo',vies:'Lateralidade',risco:'CALL descoberta'},
+  {n:17,nome:'Booster Diagonal de PUT',op:'+N32 -2M30',fin:'Zero custo',vies:'Lateralidade',risco:'PUT descoberta'},
+  {n:18,nome:'Trava Horizontal de Linha de CALL (THL)',op:'+B30 -A30',fin:'Débito',vies:'Lateralidade',risco:'Custo de montagem'},
+  {n:19,nome:'Trava Horizontal de Linha de PUT (THL)',op:'+N30 -M30',fin:'Débito',vies:'Lateralidade',risco:'Custo de montagem'},
+  {n:20,nome:'Trava Horizontal Perene de CALL (THL/p)',op:'+L30 -A30',fin:'Débito',vies:'Lateralidade',risco:'Custo de montagem'},
+  {n:21,nome:'Trava Horizontal Perene de PUT (THL/p)',op:'+X30 -M30',fin:'Débito',vies:'Lateralidade',risco:'Custo de montagem e queda forte'},
+  {n:22,nome:'Linha de Mannerheim Tradicional',op:'-M32 +2,5B32 -2,5A32',fin:'Zero custo',vies:'Lateralidade',risco:'PUT descoberta'},
+  {n:23,nome:'Linha de Mannerheim Reversa',op:'-A28 +3N28 -3M28',fin:'Zero custo',vies:'Lateralidade',risco:'CALL descoberta'},
+  {n:24,nome:'Trava de Baixa de PUT',op:'+M28 -M26',fin:'Débito',vies:'Baixa',risco:'Custo de montagem'},
+  {n:25,nome:'Trava de Baixa de CALL',op:'+A34 -A32',fin:'Crédito',vies:'Baixa',risco:'Pagar o delta negativo'},
+  {n:26,nome:'Straddle HA de PUT',op:'-A30 -M30 +2N28',fin:'Zero custo',vies:'Baixa ou Lateralidade',risco:'CALL descoberta'},
+  {n:27,nome:'Fence com Ativo',op:'+Ativo -A32 +M28 -M25',fin:'Débito',vies:'Baixa pequena ou Lateralidade',risco:'Queda forte'},
+  {n:28,nome:'Short Strangle Coberto Reverso',op:'-A30 -M32 +M30',fin:'Crédito',vies:'Baixa ou Lateralidade',risco:'CALL descoberta'},
+  {n:29,nome:'Slide Estrutural de PUT',op:'+M28 -M26 -M24',fin:'Zero custo',vies:'Baixa + Intervalo',risco:'PUT descoberta'},
+  {n:30,nome:'Borboleta de PUT OTM',op:'+M28 -2M26 +M24',fin:'Débito',vies:'Baixa + Intervalo',risco:'Custo de montagem'},
+  {n:31,nome:'Booster Vertical de PUT',op:'+M28 -2M26',fin:'Zero custo',vies:'Baixa + Intervalo',risco:'PUT descoberta'},
+  {n:32,nome:'Booster Modular de PUT',op:'+2M27 -3M26',fin:'Zero custo',vies:'Baixa + Intervalo',risco:'PUT descoberta'},
+  {n:33,nome:'Broken Wing Butterfly de PUT',op:'+M28 -2M26 +M23',fin:'Zero custo',vies:'Baixa + Intervalo',risco:'Pagar o delta negativo'},
+  {n:34,nome:'Box de 3 Pontas',op:'+Ativo -A30 +M30',fin:'Débito',vies:'Renda Fixa',risco:'Perda de oportunidade'},
+  {n:35,nome:'Collar',op:'+Ativo -A31 +M30',fin:'Débito',vies:'Proteção do ativo',risco:'Perda de oportunidade'},
+  {n:36,nome:'Venda Coberta: Operação de Taxa',op:'+Ativo -A28',fin:'Débito',vies:'Lateralidade ou Alta',risco:'Queda forte'},
+  {n:37,nome:'Venda Coberta Agressiva',op:'+Ativo -A30',fin:'Débito',vies:'Lateralidade ou Alta',risco:'Queda forte'},
+  {n:38,nome:'Venda Coberta: Remuneração de Carteira',op:'+Ativo -A32',fin:'Débito',vies:'Lateralidade ou Alta',risco:'Queda forte'},
+  {n:39,nome:'Short Straddle',op:'-A30 -M30',fin:'Crédito',vies:'Lateralidade',risco:'CALL e PUT descobertas'},
+  {n:40,nome:'Short Straddle Coberto de CALL',op:'-A30 -M30 +A32',fin:'Crédito',vies:'Lateralidade ou Alta',risco:'PUT descoberta'},
+  {n:41,nome:'Short Straddle Coberto de PUT',op:'-A30 -M30 +M28',fin:'Crédito',vies:'Lateralidade ou Baixa',risco:'CALL descoberta'},
+  {n:42,nome:'Calendar Line de CALL',op:'-A30 -M30 +D30',fin:'Zero custo',vies:'Lateralidade ou Alta',risco:'PUT descoberta'},
+  {n:43,nome:'Calendar Line de PUT',op:'-A30 -M30 +P30',fin:'Zero custo',vies:'Lateralidade ou Baixa',risco:'CALL descoberta'}
+];
+
+var estFiltrados = ESTRATEGIAS_DADOS.slice();
+var estSortKey = 'n', estSortAsc = true;
+
+function fcEst(f){return f==='Débito'?'badge-consultoria':f==='Crédito'?'badge-black':'badge-vitalicio';}
+function vcEst(v){
+  if(v.includes('Alta')&&v.includes('Baixa')) return '#f59e0b';
+  if(v.includes('Alta')) return '#1e8fff';
+  if(v.includes('Baixa')) return '#ef4444';
+  return '#22c55e';
+}
+function rcEst(r){
+  if(r.includes('CALL')&&r.includes('PUT')) return '#f59e0b';
+  if(r.includes('CALL')) return '#c084fc';
+  if(r.includes('PUT')) return '#1e8fff';
+  if(r.includes('delta')) return '#f59e0b';
+  if(r.includes('forte')||r.includes('Queda')) return '#ef4444';
+  return '#4a6080';
+}
+
+function renderEst(){
+  var countEl = document.getElementById('est-count');
+  var tb = document.getElementById('est-tbody');
+  if(!tb) return;
+  if(countEl) countEl.textContent = estFiltrados.length + ' de ' + ESTRATEGIAS_DADOS.length + ' estratégias';
+  tb.innerHTML = '';
+  estFiltrados.forEach(function(d){
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="color:var(--text3);font-size:12px">'+d.n+'</td>'
+      +'<td style="font-weight:600;color:var(--white)">'+d.nome+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#64748b">'+d.op+'</td>'
+      +'<td><span class="'+fcEst(d.fin)+'">'+d.fin+'</span></td>'
+      +'<td style="color:'+vcEst(d.vies)+';font-weight:600;font-size:13px">'+d.vies+'</td>'
+      +'<td style="color:'+rcEst(d.risco)+';font-size:12px">'+d.risco+'</td>';
+    tb.appendChild(tr);
+  });
+}
+
+function filtrarEst(){
+  var b = (document.getElementById('est-busca')||{value:''}).value.toLowerCase();
+  var f = (document.getElementById('est-fin')||{value:''}).value;
+  var v = (document.getElementById('est-vies')||{value:''}).value;
+  estFiltrados = ESTRATEGIAS_DADOS.filter(function(d){
+    return (!b || d.nome.toLowerCase().includes(b) || d.op.toLowerCase().includes(b))
+      && (!f || d.fin === f)
+      && (!v || d.vies.includes(v));
+  });
+  ordEst(estSortKey, true);
+}
+
+function ordEst(key, manter){
+  if(!manter){
+    if(estSortKey === key) estSortAsc = !estSortAsc;
+    else { estSortKey = key; estSortAsc = true; }
+  }
+  estFiltrados.sort(function(a,b){
+    var va=a[key], vb=b[key];
+    return typeof va==='number'
+      ? (estSortAsc ? va-vb : vb-va)
+      : (estSortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va)));
+  });
+  renderEst();
+}
+
+// Load when view shown
+var _origShowViewEst = showView;
+showView = function(v,btn){
+  _origShowViewEst(v,btn);
+  if(v==='estrategias') setTimeout(renderEst, 50);
+};
+
 </script>
 </body>
 </html>
