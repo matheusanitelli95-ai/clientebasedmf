@@ -3853,13 +3853,19 @@ function buscarGruposZAPI(){
   var creds = getZAPICredentials();
   var btn = event.target;
   btn.textContent='Buscando...';btn.disabled=true;
-  fetch('https://api.z-api.io/instances/'+creds.instance+'/token/'+creds.token+'/chats?pageSize=100',{
-    headers:{'Client-Token':creds.token}
+  // Z-API correct endpoint for groups
+  fetch('https://api.z-api.io/instances/'+creds.instance+'/token/'+creds.token+'/groups',{
+    method:'GET',
+    headers:{'Content-Type':'application/json','Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
     btn.textContent='🔄 Buscar grupos da Z-API';btn.disabled=false;
-    var chats = Array.isArray(data)?data:(data.chats||[]);
-    var grpChats = chats.filter(function(c){return c.id&&c.id.includes('@g.us');});
-    if(!grpChats.length){alert('Nenhum grupo encontrado. Verifique se o WhatsApp está conectado.');return;}
+    // Z-API returns array directly or nested
+    var grpChats = Array.isArray(data)?data:(data.groups||data.value||[]);
+    if(!grpChats.length){
+      console.log('Z-API response:', JSON.stringify(data).substring(0,500));
+      alert('Nenhum grupo encontrado. Resposta da API: '+JSON.stringify(data).substring(0,200));
+      return;
+    }
     
     // Show selection modal
     var overlay=document.createElement('div');
@@ -3868,17 +3874,24 @@ function buscarGruposZAPI(){
     box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:4px">Grupos encontrados</div>'
       +'<div style="font-size:13px;color:var(--text3);margin-bottom:16px">'+grpChats.length+' grupos. Clique para adicionar:</div>';
     grpChats.forEach(function(g){
+      // Z-API group fields: id, name, subject, participants
+      var grpName = g.subject||g.name||g.pushname||'Sem nome';
+      var grpId = g.id||g.groupId||'';
+      var participants = g.participants||g.membersCount||0;
+      
       var row=document.createElement('div');
       row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
       row.onmouseover=function(){this.style.borderColor='var(--border2)';};
       row.onmouseout=function(){this.style.borderColor='var(--border)';};
-      row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+(g.name||g.pushname||'Sem nome')+'</div>'
-        +'<div style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+g.id+'</div></div>'
+      row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+grpName+'</div>'
+        +'<div style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+grpId+'</div>'
+        +(participants?'<div style="font-size:11px;color:var(--text3)">'+participants+' participantes</div>':'')
+        +'</div>'
         +'<button class="btn-primary" style="padding:6px 12px;font-size:11px">+ Adicionar</button>';
       row.querySelector('button').onclick=function(e){
         e.stopPropagation();
-        db.collection('wa_grupos').add({nome:g.name||g.pushname||'Grupo',grupoId:g.id,descricao:'',criadoEm:new Date().toISOString()});
-        this.textContent='✅ Adicionado';this.disabled=true;this.style.background='#22c55e';
+        db.collection('wa_grupos').add({nome:grpName,grupoId:grpId,descricao:'',criadoEm:new Date().toISOString()});
+        this.textContent='Adicionado';this.disabled=true;this.style.background='#22c55e';
       };
       box.appendChild(row);
     });
