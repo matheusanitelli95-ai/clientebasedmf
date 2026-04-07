@@ -303,6 +303,11 @@ textarea.form-input{resize:vertical;min-height:80px}
 .empty-icon{font-size:44px;margin-bottom:12px;opacity:.6}
 .empty-title{font-size:14px;color:var(--text2);margin-bottom:4px;font-weight:500}
 
+.noticia-tema-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.noticia-tema-btn.active{border-color:var(--blue);background:#1e8fff22;color:var(--blue);font-weight:700}
+.noticia-tema-btn:hover:not(.active){border-color:var(--border2);color:var(--text)}
+.noticia-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;display:flex;gap:16px;transition:all .2s;cursor:pointer;text-decoration:none}
+.noticia-card:hover{border-color:var(--border2);transform:translateX(3px)}
 .sim-rate-btn{padding:9px 24px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
 .sim-rate-btn.active{border-color:var(--blue);background:#1e8fff22;color:var(--blue);font-weight:700}
 .sim-rate-btn:hover:not(.active){border-color:var(--border2);color:var(--text)}
@@ -375,6 +380,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon">📚</span><span>Glossário</span></button>
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon">📅</span><span>Agendamento</span></button>
       <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon">💬</span><span>WhatsApp</span></button>
+      <button class="nav-item" onclick="showView('noticias',this)"><span class="icon">🌐</span><span>Notícias</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -764,6 +770,14 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title">WhatsApp</div><div class="page-sub">Disparos e comunicação com clientes</div></div>
       </div>
       <div class="page-content">
+        <div class="tabs" style="margin-bottom:20px">
+          <button class="tab active" onclick="showWaTab('disparos',this)">📤 Disparos</button>
+          <button class="tab" onclick="showWaTab('grupos',this)">👥 Grupos</button>
+          <button class="tab" onclick="showWaTab('config',this)">⚙️ Configuração</button>
+        </div>
+
+        <!-- TAB DISPAROS -->
+        <div id="wa-tab-disparos" class="tab-content active">
         <div class="grid-2" style="margin-bottom:20px">
           <!-- Disparo individual -->
           <div class="card">
@@ -828,6 +842,66 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
             ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
+        </div>
+        </div><!-- end tab disparos -->
+
+        <!-- TAB GRUPOS -->
+        <div id="wa-tab-grupos" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="section-title" style="margin:0">Grupos cadastrados</div>
+            <div style="display:flex;gap:10px">
+              <button class="btn-secondary" onclick="buscarGruposZAPI()">🔄 Buscar grupos da Z-API</button>
+              <button class="btn-primary" onclick="openModalGrupo(null)">+ Adicionar Grupo</button>
+            </div>
+          </div>
+          <div id="grupos-list"></div>
+        </div>
+
+        <!-- TAB CONFIG -->
+        <div id="wa-tab-config" class="tab-content">
+          <div class="card">
+            <div class="section-title">Credenciais Z-API</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance-cfg" value="3F14CB4D47F7902A51809270C2FA2FFD"></div>
+              <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token-cfg" value="6BCE83E14C27EB9C89DD71A8"></div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
+              ✅ Z-API Conectada — Instância ativa. Status: Multi Device
+            </div>
+            <button class="btn-primary" style="margin-top:16px" onclick="testarZAPI()">Testar Conexão</button>
+            <div id="zapi-test-result" style="margin-top:10px;font-size:13px"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NOTÍCIAS -->
+    <div class="view" id="view-noticias">
+      <div class="page-header">
+        <div><div class="page-title">Notícias</div><div class="page-sub">Feed de notícias do mercado financeiro em tempo real</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="loadNoticias()">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <!-- Filtros de tema -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Temas</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="noticias-temas">
+            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)">📈 Mercado</button>
+            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)">📊 Ibovespa</button>
+            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)">⚡ Opções</button>
+            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)">🏦 Renda Fixa</button>
+            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)">🇧🇷 Economia</button>
+            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)">💵 Câmbio</button>
+            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)">🛢️ Ações</button>
+            <button class="noticia-tema-btn" data-tema="bitcoin cripto" onclick="setNoticiaTema(this)">₿ Cripto</button>
+          </div>
+        </div>
+        <!-- Feed -->
+        <div id="noticias-feed">
+          <div class="empty"><div class="empty-icon">🌐</div><div class="empty-title">Carregando notícias...</div></div>
         </div>
       </div>
     </div>
@@ -975,6 +1049,14 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title">WhatsApp</div><div class="page-sub">Disparos e comunicação com clientes</div></div>
       </div>
       <div class="page-content">
+        <div class="tabs" style="margin-bottom:20px">
+          <button class="tab active" onclick="showWaTab('disparos',this)">📤 Disparos</button>
+          <button class="tab" onclick="showWaTab('grupos',this)">👥 Grupos</button>
+          <button class="tab" onclick="showWaTab('config',this)">⚙️ Configuração</button>
+        </div>
+
+        <!-- TAB DISPAROS -->
+        <div id="wa-tab-disparos" class="tab-content active">
         <div class="grid-2" style="margin-bottom:20px">
           <!-- Disparo individual -->
           <div class="card">
@@ -1039,6 +1121,66 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
             ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
+        </div>
+        </div><!-- end tab disparos -->
+
+        <!-- TAB GRUPOS -->
+        <div id="wa-tab-grupos" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="section-title" style="margin:0">Grupos cadastrados</div>
+            <div style="display:flex;gap:10px">
+              <button class="btn-secondary" onclick="buscarGruposZAPI()">🔄 Buscar grupos da Z-API</button>
+              <button class="btn-primary" onclick="openModalGrupo(null)">+ Adicionar Grupo</button>
+            </div>
+          </div>
+          <div id="grupos-list"></div>
+        </div>
+
+        <!-- TAB CONFIG -->
+        <div id="wa-tab-config" class="tab-content">
+          <div class="card">
+            <div class="section-title">Credenciais Z-API</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance-cfg" value="3F14CB4D47F7902A51809270C2FA2FFD"></div>
+              <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token-cfg" value="6BCE83E14C27EB9C89DD71A8"></div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
+              ✅ Z-API Conectada — Instância ativa. Status: Multi Device
+            </div>
+            <button class="btn-primary" style="margin-top:16px" onclick="testarZAPI()">Testar Conexão</button>
+            <div id="zapi-test-result" style="margin-top:10px;font-size:13px"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NOTÍCIAS -->
+    <div class="view" id="view-noticias">
+      <div class="page-header">
+        <div><div class="page-title">Notícias</div><div class="page-sub">Feed de notícias do mercado financeiro em tempo real</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="loadNoticias()">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <!-- Filtros de tema -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Temas</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="noticias-temas">
+            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)">📈 Mercado</button>
+            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)">📊 Ibovespa</button>
+            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)">⚡ Opções</button>
+            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)">🏦 Renda Fixa</button>
+            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)">🇧🇷 Economia</button>
+            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)">💵 Câmbio</button>
+            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)">🛢️ Ações</button>
+            <button class="noticia-tema-btn" data-tema="bitcoin cripto" onclick="setNoticiaTema(this)">₿ Cripto</button>
+          </div>
+        </div>
+        <!-- Feed -->
+        <div id="noticias-feed">
+          <div class="empty"><div class="empty-icon">🌐</div><div class="empty-title">Carregando notícias...</div></div>
         </div>
       </div>
     </div>
@@ -1578,6 +1720,29 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-reuniao')">Cancelar</button>
       <button class="btn-primary" onclick="saveReuniao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GRUPO WHATSAPP -->
+<div class="modal-overlay" id="modal-grupo" style="display:none" onclick="if(event.target===this)closeModal('modal-grupo')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-gru-title">Adicionar Grupo</div>
+      <button class="modal-close" onclick="closeModal('modal-grupo')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Nome do Grupo *</label><input class="form-input" id="gru-nome" placeholder="Ex: DMF Black Geral"></div>
+      <div class="form-group form-full">
+        <label>ID do Grupo *</label>
+        <input class="form-input" id="gru-id" placeholder="Ex: 120363XXXXXXXXXX@g.us">
+        <div style="font-size:11px;color:var(--text3);margin-top:5px">Use "Buscar grupos da Z-API" para encontrar o ID automaticamente</div>
+      </div>
+      <div class="form-group form-full"><label>Descrição</label><input class="form-input" id="gru-desc" placeholder="Ex: Grupo de clientes DMF Black"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-grupo')">Cancelar</button>
+      <button class="btn-primary" onclick="saveGrupo()">Salvar</button>
     </div>
   </div>
 </div>
@@ -3578,6 +3743,331 @@ function prepararDisparo(){
       sendNext(0);
     };
   }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// WHATSAPP GRUPOS
+// ═══════════════════════════════════════════════════════════
+var grupos = [];
+var editingGrupoId = null;
+var ZAPI_INSTANCE = '3F14CB4D47F7902A51809270C2FA2FFD';
+var ZAPI_TOKEN = '6BCE83E14C27EB9C89DD71A8';
+
+function getZAPICredentials(){
+  return {
+    instance: (document.getElementById('zapi-instance-cfg')||{value:ZAPI_INSTANCE}).value || ZAPI_INSTANCE,
+    token: (document.getElementById('zapi-token-cfg')||{value:ZAPI_TOKEN}).value || ZAPI_TOKEN
+  };
+}
+
+function showWaTab(tab, btn){
+  document.querySelectorAll('#view-whatsapp .tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('#view-whatsapp .tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('wa-tab-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab==='grupos') loadGrupos();
+}
+
+function loadGrupos(){
+  db.collection('wa_grupos').onSnapshot(function(snap){
+    grupos = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderGrupos();
+  });
+}
+
+function renderGrupos(){
+  var el = document.getElementById('grupos-list');
+  if(!el) return;
+  el.innerHTML = '';
+  if(!grupos.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Nenhum grupo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "Buscar grupos da Z-API" ou "+ Adicionar Grupo"</p></div>';
+    return;
+  }
+  grupos.forEach(function(g){
+    var card = document.createElement('div');
+    card.style='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:10px;display:flex;align-items:center;gap:16px';
+    
+    var icon = document.createElement('div');
+    icon.style='width:44px;height:44px;border-radius:12px;background:#25d36622;border:1px solid #25d36633;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0';
+    icon.textContent='👥';
+
+    var info = document.createElement('div');
+    info.style='flex:1';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:3px">'+g.nome+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+g.grupoId+'</div>'
+      +(g.descricao?'<div style="font-size:12px;color:var(--text2);margin-top:3px">'+g.descricao+'</div>':'');
+
+    var actions = document.createElement('div');
+    actions.style='display:flex;gap:8px;flex-shrink:0';
+
+    var sendBtn = document.createElement('button');
+    sendBtn.className='btn-primary';
+    sendBtn.style='padding:8px 14px;font-size:12px';
+    sendBtn.textContent='💬 Disparar';
+    (function(gr){ sendBtn.onclick=function(){ openDisparoGrupo(gr); }; })(g);
+
+    var editBtn = document.createElement('button');
+    editBtn.className='btn-ghost';
+    editBtn.style='padding:8px 10px;font-size:12px';
+    editBtn.textContent='✏️';
+    (function(gid){ editBtn.onclick=function(){ openModalGrupo(gid); }; })(g.id);
+
+    var delBtn = document.createElement('button');
+    delBtn.className='btn-dsm';
+    delBtn.style='padding:8px 10px;font-size:12px';
+    delBtn.textContent='🗑';
+    (function(gid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('wa_grupos').doc(gid).delete(); }); }; })(g.id);
+
+    actions.appendChild(sendBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    card.appendChild(icon);
+    card.appendChild(info);
+    card.appendChild(actions);
+    el.appendChild(card);
+  });
+}
+
+function openModalGrupo(id){
+  editingGrupoId = id;
+  var g = id ? grupos.find(function(x){return x.id===id;}) : null;
+  document.getElementById('modal-gru-title').textContent = g ? 'Editar Grupo' : 'Adicionar Grupo';
+  document.getElementById('gru-nome').value = g ? g.nome||'' : '';
+  document.getElementById('gru-id').value = g ? g.grupoId||'' : '';
+  document.getElementById('gru-desc').value = g ? g.descricao||'' : '';
+  openModal('modal-grupo');
+}
+
+function saveGrupo(){
+  var nome = document.getElementById('gru-nome').value.trim();
+  var grupoId = document.getElementById('gru-id').value.trim();
+  if(!nome||!grupoId){alert('Nome e ID do grupo são obrigatórios!');return;}
+  var data = {nome:nome, grupoId:grupoId, descricao:document.getElementById('gru-desc').value, criadoEm:new Date().toISOString()};
+  if(editingGrupoId) db.collection('wa_grupos').doc(editingGrupoId).update(data);
+  else db.collection('wa_grupos').add(data);
+  closeModal('modal-grupo');
+}
+
+function buscarGruposZAPI(){
+  var creds = getZAPICredentials();
+  var btn = event.target;
+  btn.textContent='Buscando...';btn.disabled=true;
+  fetch('https://api.z-api.io/instances/'+creds.instance+'/token/'+creds.token+'/chats?pageSize=100',{
+    headers:{'Client-Token':creds.token}
+  }).then(function(r){return r.json();}).then(function(data){
+    btn.textContent='🔄 Buscar grupos da Z-API';btn.disabled=false;
+    var chats = Array.isArray(data)?data:(data.chats||[]);
+    var grpChats = chats.filter(function(c){return c.id&&c.id.includes('@g.us');});
+    if(!grpChats.length){alert('Nenhum grupo encontrado. Verifique se o WhatsApp está conectado.');return;}
+    
+    // Show selection modal
+    var overlay=document.createElement('div');
+    overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+    var box=document.createElement('div');box.className='modal';box.style.maxWidth='520px;max-height:80vh;overflow-y:auto';
+    box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:4px">Grupos encontrados</div>'
+      +'<div style="font-size:13px;color:var(--text3);margin-bottom:16px">'+grpChats.length+' grupos. Clique para adicionar:</div>';
+    grpChats.forEach(function(g){
+      var row=document.createElement('div');
+      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
+      row.onmouseover=function(){this.style.borderColor='var(--border2)';};
+      row.onmouseout=function(){this.style.borderColor='var(--border)';};
+      row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+(g.name||g.pushname||'Sem nome')+'</div>'
+        +'<div style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+g.id+'</div></div>'
+        +'<button class="btn-primary" style="padding:6px 12px;font-size:11px">+ Adicionar</button>';
+      row.querySelector('button').onclick=function(e){
+        e.stopPropagation();
+        db.collection('wa_grupos').add({nome:g.name||g.pushname||'Grupo',grupoId:g.id,descricao:'',criadoEm:new Date().toISOString()});
+        this.textContent='✅ Adicionado';this.disabled=true;this.style.background='#22c55e';
+      };
+      box.appendChild(row);
+    });
+    var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
+    var fbtn=document.createElement('button');fbtn.className='btn-secondary';fbtn.textContent='Fechar';
+    fbtn.onclick=function(){overlay.parentNode.removeChild(overlay);};
+    overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+    footer.appendChild(fbtn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
+  }).catch(function(e){
+    btn.textContent='🔄 Buscar grupos da Z-API';btn.disabled=false;
+    alert('Erro ao buscar grupos: '+e.message);
+  });
+}
+
+function openDisparoGrupo(grupo){
+  var overlay=document.createElement('div');
+  overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+  var box=document.createElement('div');box.className='modal';box.style.maxWidth='480px';
+  box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:4px">Disparar para grupo</div>'
+    +'<div style="font-size:13px;color:var(--blue);margin-bottom:16px">👥 '+grupo.nome+'</div>'
+    +'<div class="form-group" style="margin-bottom:16px"><label>Tipo</label>'
+    +'<select class="form-input" id="gru-tipo-msg">'
+    +'<option>📈 Abertura de Mercado</option><option>📉 Fechamento de Mercado</option>'
+    +'<option>📰 Notícia / Análise</option><option>⚡ Alerta de Operação</option>'
+    +'<option>📌 Comunicado Geral</option><option>Mensagem Personalizada</option>'
+    +'</select></div>'
+    +'<div class="form-group" style="margin-bottom:16px"><label>Mensagem</label>'
+    +'<textarea class="form-input" id="gru-msg" rows="5" placeholder="Digite a mensagem para o grupo..."></textarea></div>'
+    +'<div id="gru-send-status" style="margin-bottom:10px"></div>'
+    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
+    +'<button class="btn-primary" id="gru-send-btn">💬 Enviar para grupo</button>'
+    +'<button class="btn-secondary" id="gru-fechar-btn">Fechar</button>'
+    +'</div>';
+  overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+  overlay.appendChild(box);document.body.appendChild(overlay);
+
+  box.querySelector('#gru-fechar-btn').onclick=function(){overlay.parentNode.removeChild(overlay);};
+  box.querySelector('#gru-send-btn').onclick=function(){
+    var msg=box.querySelector('#gru-msg').value.trim();
+    if(!msg){alert('Digite a mensagem!');return;}
+    var creds=getZAPICredentials();
+    var btn=this;btn.textContent='Enviando...';btn.disabled=true;
+    var statusEl=box.querySelector('#gru-send-status');
+    fetch('https://api.z-api.io/instances/'+creds.instance+'/token/'+creds.token+'/send-text',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Client-Token':creds.token},
+      body:JSON.stringify({phone:grupo.grupoId,message:msg})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.zaapId||data.messageId){
+        statusEl.innerHTML='<div style="padding:10px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e">✅ Mensagem enviada para o grupo!</div>';
+        btn.textContent='✅ Enviado!';
+        // Log comunicado
+        db.collection('comunicados').add({titulo:box.querySelector('#gru-tipo-msg').value,conteudo:msg,tipo:'💬 WhatsApp Grupo',data:today(),visivel:'interno',destaque:'normal',grupo:grupo.nome,criadoEm:new Date().toISOString()});
+      } else {
+        statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border:1px solid #ef444422;border-radius:8px;font-size:13px;color:#ef4444">⚠️ Erro ao enviar. Verifique o ID do grupo.</div>';
+        btn.textContent='Enviar para grupo';btn.disabled=false;
+      }
+    }).catch(function(){
+      statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border-radius:8px;font-size:13px;color:#ef4444">⚠️ Erro de conexão com a Z-API.</div>';
+      btn.textContent='Enviar para grupo';btn.disabled=false;
+    });
+  };
+}
+
+function testarZAPI(){
+  var creds=getZAPICredentials();
+  var el=document.getElementById('zapi-test-result');
+  el.innerHTML='<span style="color:var(--text3)">Testando...</span>';
+  fetch('https://api.z-api.io/instances/'+creds.instance+'/token/'+creds.token+'/status',{
+    headers:{'Client-Token':creds.token}
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.connected||data.status==='CONNECTED'){
+      el.innerHTML='<span style="color:#22c55e">✅ Conectado! Número: '+(data.phone||data.connectedPhone||'OK')+'</span>';
+    } else {
+      el.innerHTML='<span style="color:#f59e0b">⚠️ Status: '+(data.status||JSON.stringify(data))+'</span>';
+    }
+  }).catch(function(e){el.innerHTML='<span style="color:#ef4444">❌ Erro: '+e.message+'</span>';});
+}
+
+// Also update zapi-instance/token from config tab
+function syncZAPICredentials(){
+  var cfg_inst=document.getElementById('zapi-instance-cfg');
+  var cfg_tok=document.getElementById('zapi-token-cfg');
+  var inst=document.getElementById('zapi-instance');
+  var tok=document.getElementById('zapi-token');
+  if(cfg_inst&&inst) inst.value=cfg_inst.value;
+  if(cfg_tok&&tok) tok.value=cfg_tok.value;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTÍCIAS
+// ═══════════════════════════════════════════════════════════
+var noticiaTemaAtual = 'mercado financeiro brasil';
+
+var _origShowViewNot = showView;
+showView = function(v,btn){
+  _origShowViewNot(v,btn);
+  if(v==='noticias') loadNoticias();
+  if(v==='whatsapp') { populateWaClientes(); updateWaCount(); }
+};
+
+function setNoticiaTema(btn){
+  document.querySelectorAll('.noticia-tema-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  noticiaTemaAtual = btn.getAttribute('data-tema');
+  loadNoticias();
+}
+
+function loadNoticias(){
+  var el = document.getElementById('noticias-feed');
+  if(!el) return;
+  el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:36px;animation:spin 1s linear infinite">🔄</div><div style="font-size:13px;margin-top:8px;color:var(--text3)">Buscando notícias...</div></div>';
+  
+  // Use AllOrigins proxy to bypass CORS + Google News RSS
+  var query = encodeURIComponent(noticiaTemaAtual);
+  var rssUrl = 'https://news.google.com/rss/search?q='+query+'&hl=pt-BR&gl=BR&ceid=BR:pt-419';
+  var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(rssUrl);
+  
+  fetch(proxyUrl)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var xml = data.contents;
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(xml,'text/xml');
+      var items = doc.querySelectorAll('item');
+      if(!items.length){
+        el.innerHTML='<div class="empty"><div class="empty-icon">📰</div><div class="empty-title">Nenhuma notícia encontrada</div><p style="font-size:13px;margin-top:4px">Tente outro tema ou atualize</div>';
+        return;
+      }
+      el.innerHTML='';
+      var count = 0;
+      items.forEach(function(item){
+        if(count>=20) return;
+        count++;
+        var title = (item.querySelector('title')||{textContent:''}).textContent.replace(/<[^>]+>/g,'');
+        var link = (item.querySelector('link')||{textContent:''}).textContent||(item.querySelector('link')||{getAttribute:function(){return '';}}).getAttribute('href')||'';
+        var pubDate = (item.querySelector('pubDate')||{textContent:''}).textContent;
+        var source = (item.querySelector('source')||{textContent:'Google News'}).textContent;
+        var desc = (item.querySelector('description')||{textContent:''}).textContent.replace(/<[^>]+>/g,'').substring(0,180);
+
+        // Format date
+        var dateStr = '';
+        if(pubDate){
+          var d = new Date(pubDate);
+          dateStr = d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        }
+
+        var card = document.createElement('a');
+        card.href = link||'#';
+        card.target = '_blank';
+        card.className = 'noticia-card';
+        card.style='display:flex;gap:16px;text-decoration:none';
+
+        var icon = document.createElement('div');
+        icon.style='font-size:28px;flex-shrink:0;margin-top:2px';
+        icon.textContent=noticiaTemaAtual.includes('bitcoin')||noticiaTemaAtual.includes('cripto')?'₿':noticiaTemaAtual.includes('dólar')?'💵':noticiaTemaAtual.includes('ibov')?'📊':noticiaTemaAtual.includes('opções')?'⚡':'📰';
+
+        var body = document.createElement('div');
+        body.style='flex:1;min-width:0';
+        body.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;line-height:1.4;margin-bottom:6px">'+title+'</div>'
+          +(desc?'<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:8px">'+desc+'</div>':'')
+          +'<div style="display:flex;align-items:center;gap:12px">'
+          +'<span style="font-size:11px;font-weight:600;color:var(--blue)">'+source+'</span>'
+          +(dateStr?'<span style="font-size:11px;color:var(--text3)">'+dateStr+'</span>':'')
+          +'</div>';
+
+        // Share to WhatsApp button
+        var shareBtn = document.createElement('button');
+        shareBtn.className='btn-ghost';
+        shareBtn.style='padding:6px 10px;font-size:11px;flex-shrink:0;align-self:flex-start';
+        shareBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+        shareBtn.title='Compartilhar no WhatsApp';
+        (function(t,l){
+          shareBtn.onclick=function(e){
+            e.preventDefault();e.stopPropagation();
+            var msg='*'+t+'*\n\n'+l;
+            window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+          };
+        })(title, link);
+
+        card.appendChild(icon);
+        card.appendChild(body);
+        card.appendChild(shareBtn);
+        el.appendChild(card);
+      });
+    })
+    .catch(function(e){
+      el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erro ao carregar notícias</div><p style="font-size:13px;margin-top:4px;color:var(--text3)">Verifique sua conexão e tente novamente</p><button class="btn-primary" style="margin-top:16px" onclick="loadNoticias()">Tentar novamente</button></div>';
+    });
 }
 
 </script>
