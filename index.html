@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DMF · Sistema de Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -467,7 +468,12 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="view" id="view-clientes">
       <div class="page-header">
         <div><div class="page-title">Clientes</div><div class="page-sub" id="clientes-sub">—</div></div>
-        <button class="btn-primary" onclick="openModalCliente(null)">+ Novo Cliente</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="downloadTemplate()">⬇️ Template Excel</button>
+          <button class="btn-secondary" onclick="document.getElementById('import-excel-input').click()">📂 Importar Excel</button>
+          <input type="file" id="import-excel-input" accept=".xlsx,.xls" style="display:none" onchange="importarExcel(event)">
+          <button class="btn-primary" onclick="openModalCliente(null)">+ Novo Cliente</button>
+        </div>
       </div>
       <div class="page-content">
         <div class="table-toolbar">
@@ -4840,6 +4846,239 @@ function saveCargo(){
   if(editingCargoId) db.collection('organograma').doc(editingCargoId).update(data);
   else db.collection('organograma').add(data);
   closeModal('modal-cargo');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// IMPORTAÇÃO VIA EXCEL
+// ═══════════════════════════════════════════════════════════
+var TEMPLATE_COLS = [
+  'Nome','Tipo (PF/PJ)','CPF/CNPJ','Nascimento (DD/MM/AAAA)','Entrada (DD/MM/AAAA)',
+  'Email','Telefone','Endereco','Cidade','Estado',
+  'Banco/Corretora','Servico (DMF Consultoria / DMF Black / DMF Consultoria + Black)',
+  'Nivel (N/A / Assinatura / Vitalicio / Socio)',
+  'Perfil (Conservador / Moderado / Arrojado / Agressivo)',
+  'Segmentacao (Varejo / Alta Renda / Private)',
+  'Objetivo (Acumulacao / Sucessao / Usufruto / Protecao Patrimonial)',
+  'Status (Ativo / Inativo / Prospecto)',
+  'Custodia RF (R$)','Custodia RV (R$)',
+  'Profissional Responsavel','Observacoes'
+];
+
+function downloadTemplate(){
+  if(typeof XLSX === 'undefined'){alert('Aguarde o carregamento da biblioteca...');return;}
+  var wb = XLSX.utils.book_new();
+  // Header row
+  var ws_data = [TEMPLATE_COLS];
+  // Example row
+  ws_data.push([
+    'João Silva','PF','123.456.789-00','15/03/1985','01/01/2024',
+    'joao@email.com','(11) 99999-9999','Rua das Flores, 123','São Paulo','SP',
+    'XP Investimentos','DMF Consultoria','N/A','Moderado','Alta Renda',
+    'Acumulação','Ativo','500000','100000','Matheus Anitelli',''
+  ]);
+  var ws = XLSX.utils.aoa_to_sheet(ws_data);
+  // Column widths
+  ws['!cols'] = TEMPLATE_COLS.map(function(){ return {wch:22}; });
+  // Style header
+  XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+  XLSX.writeFile(wb, 'template_clientes_dmf.xlsx');
+}
+
+function importarExcel(event){
+  var file = event.target.files[0];
+  if(!file) return;
+  if(typeof XLSX === 'undefined'){alert('Biblioteca não carregada. Tente novamente.');return;}
+  
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var data = new Uint8Array(e.target.result);
+    var wb = XLSX.read(data, {type:'array'});
+    var ws = wb.Sheets[wb.SheetNames[0]];
+    var rows = XLSX.utils.sheet_to_json(ws, {header:1});
+    
+    if(rows.length < 2){
+      alert('Planilha vazia ou sem dados!');
+      return;
+    }
+
+    // Skip header row
+    var dataRows = rows.slice(1).filter(function(r){ return r[0]; }); // skip empty rows
+
+    if(!dataRows.length){
+      alert('Nenhum cliente encontrado na planilha!');
+      return;
+    }
+
+    // Show preview modal
+    showImportPreview(dataRows);
+  };
+  reader.readAsArrayBuffer(file);
+  // Reset input
+  event.target.value = '';
+}
+
+function parseDateBR(str){
+  if(!str) return '';
+  str = String(str).trim();
+  // DD/MM/YYYY
+  var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  // Already YYYY-MM-DD
+  if(str.match(/^\d{4}-\d{2}-\d{2}$/)) return str;
+  // Excel serial date
+  if(!isNaN(str)){
+    var d = XLSX.SSF.parse_date_code(Number(str));
+    if(d) return d.y+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');
+  }
+  return '';
+}
+
+function showImportPreview(rows){
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;z-index:300';
+  
+  var box = document.createElement('div');
+  box.className = 'modal modal-lg';
+  box.style.maxWidth = '780px';
+
+  var header = document.createElement('div');
+  header.className = 'modal-header';
+  header.innerHTML = '<div class="modal-title">Importar '+rows.length+' clientes</div>';
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '×';
+  closeBtn.onclick = function(){ overlay.parentNode.removeChild(overlay); };
+  header.appendChild(closeBtn);
+  box.appendChild(header);
+
+  var info = document.createElement('div');
+  info.style = 'font-size:13px;color:var(--text2);margin-bottom:16px;padding:12px;background:#1e8fff11;border:1px solid #1e8fff33;border-radius:9px';
+  info.textContent = rows.length+' clientes encontrados. Revise e confirme a importação.';
+  box.appendChild(info);
+
+  // Preview table (first 5 rows)
+  var preview = document.createElement('div');
+  preview.style = 'overflow-x:auto;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;max-height:300px;overflow-y:auto';
+  var table = document.createElement('table');
+  table.style = 'width:100%;border-collapse:collapse;font-size:12px';
+  var thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th style="padding:10px;background:var(--card2);color:var(--text3);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left">Nome</th><th style="padding:10px;background:var(--card2);color:var(--text3);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left">Email</th><th style="padding:10px;background:var(--card2);color:var(--text3);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left">Serviço</th><th style="padding:10px;background:var(--card2);color:var(--text3);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left">Status</th><th style="padding:10px;background:var(--card2);color:var(--text3);font-size:10px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left">Custódia Total</th></tr>';
+  table.appendChild(thead);
+  var tbody = document.createElement('tbody');
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+    var rf = Number(String(r[17]||'0').replace(',','.'));
+    var rv = Number(String(r[18]||'0').replace(',','.'));
+    tr.innerHTML = '<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text);font-weight:500">'+( r[0]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[5]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--blue);font-size:11px">'+(r[11]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[16]||'Ativo')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtFull(rf+rv)+'</td>';
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  preview.appendChild(table);
+  box.appendChild(preview);
+
+  var actions = document.createElement('div');
+  actions.className = 'modal-actions';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn-secondary';
+  cancelBtn.textContent = 'Cancelar';
+  cancelBtn.onclick = function(){ overlay.parentNode.removeChild(overlay); };
+
+  var importBtn = document.createElement('button');
+  importBtn.className = 'btn-primary';
+  importBtn.textContent = 'Importar '+rows.length+' clientes';
+  importBtn.onclick = function(){
+    importBtn.textContent = 'Importando...';
+    importBtn.disabled = true;
+    executarImportacao(rows, overlay, importBtn);
+  };
+
+  actions.appendChild(cancelBtn);
+  actions.appendChild(importBtn);
+  box.appendChild(actions);
+  overlay.onclick = function(e){ if(e.target===overlay) overlay.parentNode.removeChild(overlay); };
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function executarImportacao(rows, overlay, btn){
+  var total = rows.length;
+  var done = 0;
+  var erros = 0;
+
+  // Find profissional by name
+  function findProfId(nome){
+    var p = profissionais.find(function(x){ return x.nome === nome; });
+    return p ? p.id : '';
+  }
+
+  // Process in batches
+  var batch = db.batch();
+  var batchCount = 0;
+  var promises = [];
+
+  rows.forEach(function(r){
+    var nome = String(r[0]||'').trim();
+    if(!nome) return;
+
+    var profNome = String(r[19]||'').trim();
+    var data = {
+      nome: nome,
+      tipo: String(r[1]||'PF').trim(),
+      cpf: String(r[2]||'').trim(),
+      nasc: parseDateBR(r[3]),
+      entrada: parseDateBR(r[4]) || new Date().toISOString().split('T')[0],
+      email: String(r[5]||'').trim(),
+      telefone: String(r[6]||'').trim(),
+      endereco: String(r[7]||'').trim(),
+      cidade: String(r[8]||'').trim(),
+      estado: String(r[9]||'').trim(),
+      banco: String(r[10]||'').trim(),
+      servico: String(r[11]||'DMF Consultoria').trim(),
+      nivel: String(r[12]||'').trim(),
+      perfil: String(r[13]||'Moderado').trim(),
+      segmentacao: String(r[14]||'Varejo').trim(),
+      objetivo: String(r[15]||'Acumulação').trim(),
+      status: String(r[16]||'Ativo').trim(),
+      custodiaRF: Number(String(r[17]||'0').replace(',','.')),
+      custodiaRV: Number(String(r[18]||'0').replace(',','.')),
+      responsavel: profNome,
+      responsavelId: findProfId(profNome),
+      obs: String(r[20]||'').trim(),
+      importadoEm: new Date().toISOString()
+    };
+
+    var ref = db.collection('clientes').doc();
+    batch.set(ref, data);
+    batchCount++;
+
+    if(batchCount >= 400){
+      promises.push(batch.commit());
+      batch = db.batch();
+      batchCount = 0;
+    }
+  });
+
+  if(batchCount > 0) promises.push(batch.commit());
+
+  Promise.all(promises).then(function(){
+    overlay.parentNode.removeChild(overlay);
+    // Show success
+    var s = document.createElement('div');
+    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999;box-shadow:0 8px 24px #22c55e44';
+    s.textContent = '✅ '+total+' clientes importados!';
+    document.body.appendChild(s);
+    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 4000);
+  }).catch(function(e){
+    btn.textContent = 'Importar';
+    btn.disabled = false;
+    alert('Erro na importação: '+e.message);
+  });
 }
 
 </script>
