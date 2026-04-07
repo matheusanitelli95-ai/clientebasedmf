@@ -30,6 +30,46 @@
   --success:#22c55e;
   --white:#ffffff;
 }
+body.light-mode{
+  --bg:#f0f4f8;
+  --sidebar:#ffffff;
+  --card:#ffffff;
+  --card2:#f8fafc;
+  --border:#e2e8f0;
+  --border2:#cbd5e1;
+  --blue:#1e8fff;
+  --blue-dim:#1565c0;
+  --blue-glow:#1e8fff22;
+  --text:#0f172a;
+  --text2:#334155;
+  --text3:#64748b;
+  --danger:#ef4444;
+  --warn:#f59e0b;
+  --success:#16a34a;
+  --white:#0f172a;
+}
+body.light-mode .login-box{background:#ffffff;border-color:#e2e8f0;box-shadow:0 20px 60px #00000018}
+body.light-mode .login-input{background:#f8fafc;border-color:#e2e8f0;color:#0f172a}
+body.light-mode table{background:#ffffff}
+body.light-mode thead{background:#f8fafc}
+body.light-mode .sidebar::after{opacity:.3}
+body.light-mode .nav-item.active{background:linear-gradient(135deg,#1e8fff18,#1e8fff08)}
+body.light-mode .form-input{background:#f8fafc;border-color:#e2e8f0;color:#0f172a}
+body.light-mode .filter-input{background:#f8fafc;border-color:#e2e8f0;color:#0f172a}
+body.light-mode #login-screen{background:radial-gradient(ellipse 80% 50% at 50% -10%,#dbeafe 0%,#f0f4f8 60%)}
+body.light-mode .modal{background:#ffffff;border-color:#e2e8f0}
+body.light-mode .tabs{background:#f1f5f9;border-color:#e2e8f0}
+body.light-mode .tab.active{background:#ffffff}
+body.light-mode .user-chip{background:#f8fafc;border-color:#e2e8f0}
+body.light-mode .kpi-card{background:#ffffff;border-color:#e2e8f0}
+body.light-mode .rank-bar-track{background:#e2e8f0}
+body.light-mode .pb-track{background:#e2e8f0}
+body.light-mode .asset-row{background:#f8fafc;border-color:#e2e8f0}
+body.light-mode .contact-item{background:#f8fafc;border-color:#e2e8f0}
+body.light-mode .alert-card{background:#ffffff;border-color:#e2e8f0}
+body.light-mode .prof-card{background:#ffffff;border-color:#e2e8f0}
+body.light-mode .check-item{background:#f8fafc;border-color:#e2e8f0}
+body.light-mode .noticia-card{background:#ffffff;border-color:#e2e8f0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -388,6 +428,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="user-dot"></div>
         <div class="user-email" id="user-email-badge">—</div>
       </div>
+      <button class="btn-ghost" id="theme-toggle" onclick="toggleTheme()" style="width:100%;margin-bottom:8px;justify-content:center;display:flex;align-items:center;gap:6px;font-size:12px">
+        <span id="theme-icon">☀️</span><span id="theme-label">Modo Claro</span>
+      </button>
       <button class="btn-sair" onclick="firebase.auth().signOut()">↩ Sair</button>
     </div>
   </div>
@@ -4411,6 +4454,28 @@ showView = function(v,btn){
   _origShowViewEst(v,btn);
   if(v==='estrategias') setTimeout(renderEst, 50);
 };
+
+
+// ── Tema Claro/Escuro ────────────────────────────────────
+function toggleTheme(){
+  var isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('dmf-theme', isLight ? 'light' : 'dark');
+  updateThemeBtn(isLight);
+}
+function updateThemeBtn(isLight){
+  var icon = document.getElementById('theme-icon');
+  var label = document.getElementById('theme-label');
+  if(icon) icon.textContent = isLight ? '🌙' : '☀️';
+  if(label) label.textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
+}
+// Apply saved theme on load
+(function(){
+  var saved = localStorage.getItem('dmf-theme');
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    updateThemeBtn(true);
+  }
+})();
 
 </script>
 </body>
