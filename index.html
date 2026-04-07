@@ -3990,84 +3990,95 @@ function setNoticiaTema(btn){
 function loadNoticias(){
   var el = document.getElementById('noticias-feed');
   if(!el) return;
-  el.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:36px;animation:spin 1s linear infinite">🔄</div><div style="font-size:13px;margin-top:8px;color:var(--text3)">Buscando notícias...</div></div>';
-  
-  // Use AllOrigins proxy to bypass CORS + Google News RSS
-  var query = encodeURIComponent(noticiaTemaAtual);
-  var rssUrl = 'https://news.google.com/rss/search?q='+query+'&hl=pt-BR&gl=BR&ceid=BR:pt-419';
-  var proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(rssUrl);
-  
-  fetch(proxyUrl)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      var xml = data.contents;
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(xml,'text/xml');
-      var items = doc.querySelectorAll('item');
-      if(!items.length){
-        el.innerHTML='<div class="empty"><div class="empty-icon">📰</div><div class="empty-title">Nenhuma notícia encontrada</div><p style="font-size:13px;margin-top:4px">Tente outro tema ou atualize</div>';
-        return;
-      }
-      el.innerHTML='';
-      var count = 0;
-      items.forEach(function(item){
-        if(count>=20) return;
-        count++;
-        var title = (item.querySelector('title')||{textContent:''}).textContent.replace(/<[^>]+>/g,'');
-        var link = (item.querySelector('link')||{textContent:''}).textContent||(item.querySelector('link')||{getAttribute:function(){return '';}}).getAttribute('href')||'';
-        var pubDate = (item.querySelector('pubDate')||{textContent:''}).textContent;
-        var source = (item.querySelector('source')||{textContent:'Google News'}).textContent;
-        var desc = (item.querySelector('description')||{textContent:''}).textContent.replace(/<[^>]+>/g,'').substring(0,180);
+  el.innerHTML='<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:32px;margin-bottom:12px">&#9203;</div><div style="font-size:13px">Buscando noticias com IA...</div></div>';
 
-        // Format date
-        var dateStr = '';
-        if(pubDate){
-          var d = new Date(pubDate);
-          dateStr = d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-        }
+  var temaLabel = noticiaTemaAtual;
+  var prompt = 'Busque as 8 noticias mais recentes e importantes sobre "'+temaLabel+'" no mercado financeiro brasileiro. Para cada noticia retorne SOMENTE um JSON array sem markdown no formato: [{"titulo":"...","resumo":"...","fonte":"...","data":"DD/MM/AAAA","url":"..."}]. Use fontes como InfoMoney, Valor Economico, Bloomberg BR, Reuters Brasil, Exame. Retorne apenas o JSON puro.';
 
-        var card = document.createElement('a');
-        card.href = link||'#';
-        card.target = '_blank';
-        card.className = 'noticia-card';
-        card.style='display:flex;gap:16px;text-decoration:none';
-
-        var icon = document.createElement('div');
-        icon.style='font-size:28px;flex-shrink:0;margin-top:2px';
-        icon.textContent=noticiaTemaAtual.includes('bitcoin')||noticiaTemaAtual.includes('cripto')?'₿':noticiaTemaAtual.includes('dólar')?'💵':noticiaTemaAtual.includes('ibov')?'📊':noticiaTemaAtual.includes('opções')?'⚡':'📰';
-
-        var body = document.createElement('div');
-        body.style='flex:1;min-width:0';
-        body.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;line-height:1.4;margin-bottom:6px">'+title+'</div>'
-          +(desc?'<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:8px">'+desc+'</div>':'')
-          +'<div style="display:flex;align-items:center;gap:12px">'
-          +'<span style="font-size:11px;font-weight:600;color:var(--blue)">'+source+'</span>'
-          +(dateStr?'<span style="font-size:11px;color:var(--text3)">'+dateStr+'</span>':'')
-          +'</div>';
-
-        // Share to WhatsApp button
-        var shareBtn = document.createElement('button');
-        shareBtn.className='btn-ghost';
-        shareBtn.style='padding:6px 10px;font-size:11px;flex-shrink:0;align-self:flex-start';
-        shareBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
-        shareBtn.title='Compartilhar no WhatsApp';
-        (function(t,l){
-          shareBtn.onclick=function(e){
-            e.preventDefault();e.stopPropagation();
-            var msg='*'+t+'*\n\n'+l;
-            window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-          };
-        })(title, link);
-
-        card.appendChild(icon);
-        card.appendChild(body);
-        card.appendChild(shareBtn);
-        el.appendChild(card);
-      });
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      tools: [{"type": "web_search_20250305", "name": "web_search"}],
+      messages: [{ role: 'user', content: prompt }]
     })
-    .catch(function(e){
-      el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erro ao carregar notícias</div><p style="font-size:13px;margin-top:4px;color:var(--text3)">Verifique sua conexão e tente novamente</p><button class="btn-primary" style="margin-top:16px" onclick="loadNoticias()">Tentar novamente</button></div>';
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    // Extract text from response
+    var text = '';
+    if(data.content){
+      data.content.forEach(function(block){
+        if(block.type === 'text') text += block.text;
+      });
+    }
+    // Parse JSON
+    var noticias = [];
+    try {
+      var clean = text.replace(/```json|```/g,'').trim();
+      // Find JSON array
+      var arrStart = clean.indexOf('[');
+      var arrEnd = clean.lastIndexOf(']');
+      if(arrStart >= 0 && arrEnd > arrStart){
+        noticias = JSON.parse(clean.substring(arrStart, arrEnd+1));
+      }
+    } catch(e){
+      console.error('Parse error:', e, text);
+    }
+
+    el.innerHTML = '';
+    if(!noticias.length){
+      el.innerHTML='<div class="empty"><div class="empty-icon">&#128240;</div><div class="empty-title">Nenhuma noticia encontrada</div><p style="font-size:13px;margin-top:4px">Tente outro tema</p></div>';
+      return;
+    }
+
+    noticias.forEach(function(n){
+      var card = document.createElement('a');
+      card.href = n.url||'#';
+      card.target = '_blank';
+      card.className = 'noticia-card';
+
+      var iconMap = {bitcoin:'B',cripto:'B',dolar:'$',ibov:'[up]',opcao:'[flash]',renda:'[bank]'};
+      var iconChar = '[news]';
+      Object.keys(iconMap).forEach(function(k){ if(noticiaTemaAtual.toLowerCase().includes(k)) iconChar=iconMap[k]; });
+
+      var iconEl = document.createElement('div');
+      iconEl.style='font-size:22px;flex-shrink:0;margin-top:2px;width:36px;text-align:center';
+      iconEl.textContent='&#128240;';
+
+      var body = document.createElement('div');
+      body.style='flex:1;min-width:0';
+      body.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;line-height:1.4;margin-bottom:6px">'+(n.titulo||'')+'</div>'
+        +(n.resumo?'<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:8px">'+(n.resumo||'')+'</div>':'')
+        +'<div style="display:flex;align-items:center;gap:12px">'
+        +(n.fonte?'<span style="font-size:11px;font-weight:600;color:var(--blue)">'+(n.fonte||'')+'</span>':'')
+        +(n.data?'<span style="font-size:11px;color:var(--text3)">'+(n.data||'')+'</span>':'')
+        +'</div>';
+
+      var shareBtn = document.createElement('button');
+      shareBtn.className='btn-ghost';
+      shareBtn.style='padding:6px 10px;font-size:11px;flex-shrink:0;align-self:flex-start';
+      shareBtn.textContent='Compartilhar';
+      (function(titulo, url){
+        shareBtn.onclick=function(e){
+          e.preventDefault(); e.stopPropagation();
+          var msg='*'+titulo+'*\n\n'+(url||'');
+          window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+        };
+      })(n.titulo, n.url);
+
+      card.appendChild(iconEl);
+      card.appendChild(body);
+      card.appendChild(shareBtn);
+      el.appendChild(card);
     });
+  })
+  .catch(function(e){
+    console.error(e);
+    el.innerHTML='<div class="empty"><div class="empty-icon">&#9888;</div><div class="empty-title">Erro ao carregar noticias</div><p style="font-size:13px;margin-top:4px;color:var(--text3)">Verifique sua conexao</p><button class="btn-primary" style="margin-top:16px" onclick="loadNoticias()">Tentar novamente</button></div>';
+  });
 }
 
 </script>
