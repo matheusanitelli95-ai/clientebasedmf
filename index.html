@@ -446,7 +446,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="kpi-grid">
           <div class="kpi-card" style="--c:#1e8fff"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-total">0</div><div class="kpi-label">Total Clientes</div></div><div class="kpi-icon">👥</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-custodia">R$0</div><div class="kpi-label">Custódia Total</div></div><div class="kpi-icon">💼</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-custodia">R$0</div><div class="kpi-label">AuM</div></div><div class="kpi-icon">💼</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-ativos">0</div><div class="kpi-label">Clientes Ativos</div></div><div class="kpi-icon">✅</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-alertas">0</div><div class="kpi-label">Sem Contato 30d</div></div><div class="kpi-icon">⚠️</div></div><div class="kpi-accent" style="background:var(--warn)"></div></div>
         </div>
@@ -537,8 +537,18 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="view" id="view-crm">
       <div class="page-header">
         <div><div class="page-title">CRM & Tarefas</div><div class="page-sub">Relacionamento com clientes</div></div>
+        <button class="btn-primary" onclick="openModalTarefa()">+ Nova Tarefa</button>
       </div>
-      <div class="page-content"><div id="crm-content"></div></div>
+      <div class="page-content">
+        <div class="tabs" style="margin-bottom:20px">
+          <button class="tab active" onclick="showCRMTab('agenda',this)">📅 Agenda</button>
+          <button class="tab" onclick="showCRMTab('tarefas',this)">✅ Tarefas</button>
+          <button class="tab" onclick="showCRMTab('alertas-crm',this)">🔔 Alertas</button>
+        </div>
+        <div id="crm-tab-agenda" class="tab-content active"><div id="crm-content"></div></div>
+        <div id="crm-tab-tarefas" class="tab-content"><div id="crm-tarefas-content"></div></div>
+        <div id="crm-tab-alertas-crm" class="tab-content"><div id="alertas-content"></div></div>
+      </div>
     </div>
 
     <!-- FINANCEIRO -->
@@ -991,6 +1001,17 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- ORGANOGRAMA -->
+    <div class="view" id="view-organograma">
+      <div class="page-header">
+        <div><div class="page-title">Organograma</div><div class="page-sub">Estrutura da equipe DMF</div></div>
+        <button class="btn-primary" onclick="openModalCargo(null)">+ Adicionar Cargo</button>
+      </div>
+      <div class="page-content">
+        <div id="organograma-content"></div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
 
     <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
@@ -1308,6 +1329,17 @@ textarea.form-input{resize:vertical;min-height:80px}
             <tbody id="est-tbody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ORGANOGRAMA -->
+    <div class="view" id="view-organograma">
+      <div class="page-header">
+        <div><div class="page-title">Organograma</div><div class="page-sub">Estrutura da equipe DMF</div></div>
+        <button class="btn-primary" onclick="openModalCargo(null)">+ Adicionar Cargo</button>
+      </div>
+      <div class="page-content">
+        <div id="organograma-content"></div>
       </div>
     </div>
 
@@ -1869,6 +1901,41 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-grupo')">Cancelar</button>
       <button class="btn-primary" onclick="saveGrupo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CARGO -->
+<div class="modal-overlay" id="modal-cargo" style="display:none" onclick="if(event.target===this)closeModal('modal-cargo')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-cargo-title">Novo Cargo</div>
+      <button class="modal-close" onclick="closeModal('modal-cargo')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Nome *</label><input class="form-input" id="cargo-nome" placeholder="Ex: Matheus Anitelli"></div>
+      <div class="form-group form-full"><label>Cargo / Função *</label><input class="form-input" id="cargo-funcao" placeholder="Ex: Sócio Fundador, Assessor, Analista..."></div>
+      <div class="form-group form-full"><label>Departamento</label>
+        <select class="form-input" id="cargo-dept">
+          <option>Diretoria</option>
+          <option>Comercial</option>
+          <option>Operações</option>
+          <option>Financeiro</option>
+          <option>Tecnologia</option>
+          <option>Compliance</option>
+          <option>Atendimento</option>
+        </select>
+      </div>
+      <div class="form-group form-full"><label>Reporta para</label>
+        <select class="form-input" id="cargo-reporta"><option value="">— Nível superior —</option></select>
+      </div>
+      <div class="form-group"><label>Email</label><input class="form-input" id="cargo-email" type="email" placeholder="email@dmf.com"></div>
+      <div class="form-group"><label>Telefone</label><input class="form-input" id="cargo-tel" placeholder="(11) 99999-9999"></div>
+      <div class="form-group form-full"><label>Responsabilidades</label><textarea class="form-input" id="cargo-resp" placeholder="Principais responsabilidades do cargo..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-cargo')">Cancelar</button>
+      <button class="btn-primary" onclick="saveCargo()">Salvar</button>
     </div>
   </div>
 </div>
@@ -4476,6 +4543,303 @@ function updateThemeBtn(isLight){
     updateThemeBtn(true);
   }
 })();
+
+
+// ═══════════════════════════════════════════════════════════
+// CRM TABS + TAREFAS
+// ═══════════════════════════════════════════════════════════
+var tarefas = [], editingTarefaId = null;
+var PRIORIDADE_C = {Alta:'#ef4444', Média:'#f59e0b', Baixa:'#22c55e'};
+var STATUS_T_C = {Aberta:'#1e8fff', 'Em andamento':'#f59e0b', Concluída:'#22c55e', Cancelada:'#4a6080'};
+
+function showCRMTab(tab, btn){
+  document.querySelectorAll('#view-crm .tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('#view-crm .tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('crm-tab-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab==='tarefas') loadTarefas();
+  if(tab==='alertas-crm') renderAlertas();
+}
+
+function loadTarefas(){
+  db.collection('tarefas').orderBy('criadoEm','desc').onSnapshot(function(snap){
+    tarefas = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderTarefas();
+  });
+}
+
+function renderTarefas(){
+  var el = document.getElementById('crm-tarefas-content');
+  if(!el) return;
+  el.innerHTML = '';
+
+  // Kanban-style columns
+  var cols = ['Aberta','Em andamento','Concluída'];
+  var grid = document.createElement('div');
+  grid.style = 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px';
+
+  cols.forEach(function(status){
+    var items = tarefas.filter(function(t){return t.status===status;});
+    var col = document.createElement('div');
+    col.style = 'background:#030810;border:1px solid var(--border);border-radius:14px;padding:16px';
+    
+    var header = document.createElement('div');
+    header.style = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px';
+    header.innerHTML = '<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+STATUS_T_C[status]+'"></div>'
+      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">'+status+'</span>'
+      +'</div><span style="font-size:11px;color:var(--text3)">'+items.length+'</span>';
+    col.appendChild(header);
+
+    if(!items.length){
+      var empty = document.createElement('div');
+      empty.style = 'text-align:center;padding:24px;color:var(--text3);font-size:12px';
+      empty.textContent = 'Nenhuma tarefa';
+      col.appendChild(empty);
+    }
+
+    items.forEach(function(t){
+      var card = document.createElement('div');
+      card.style = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s';
+      card.onmouseover = function(){this.style.borderColor='var(--border2)';};
+      card.onmouseout = function(){this.style.borderColor='var(--border)';};
+      
+      var prio = t.prioridade||'Média';
+      card.innerHTML = '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.3;flex:1">'+t.titulo+'</div>'
+        +'<span style="font-size:9px;padding:2px 7px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700;flex-shrink:0;margin-left:8px">'+prio+'</span>'
+        +'</div>'
+        +(t.cliente?'<div style="font-size:11px;color:var(--blue);margin-bottom:4px">👤 '+t.cliente+'</div>':'')
+        +(t.responsavel?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">🏢 '+t.responsavel+'</div>':'')
+        +(t.prazo?'<div style="font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)')+'">📅 '+fmtDate(t.prazo)+'</div>':'')
+        +'<div style="display:flex;gap:6px;margin-top:10px">';
+      
+      // Status buttons
+      var btnDiv = card.querySelector('div:last-child');
+      if(status !== 'Concluída'){
+        var nextStatus = status === 'Aberta' ? 'Em andamento' : 'Concluída';
+        var advBtn = document.createElement('button');
+        advBtn.className = 'btn-ghost';
+        advBtn.style = 'padding:3px 8px;font-size:10px;flex:1';
+        advBtn.textContent = status === 'Aberta' ? '▶ Iniciar' : '✓ Concluir';
+        (function(id, ns){ advBtn.onclick = function(e){ e.stopPropagation(); db.collection('tarefas').doc(id).update({status:ns}); }; })(t.id, nextStatus);
+        btnDiv.appendChild(advBtn);
+      }
+      var editBtn = document.createElement('button');
+      editBtn.className = 'btn-ghost';
+      editBtn.style = 'padding:3px 8px;font-size:10px';
+      editBtn.textContent = '✏️';
+      (function(tid){ editBtn.onclick = function(e){ e.stopPropagation(); openModalTarefaEdit(tid); }; })(t.id);
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn-dsm';
+      delBtn.style = 'padding:3px 8px;font-size:10px';
+      delBtn.textContent = '🗑';
+      (function(tid){ delBtn.onclick = function(e){ e.stopPropagation(); confirmDelete(function(){ db.collection('tarefas').doc(tid).delete(); }); }; })(t.id);
+      btnDiv.appendChild(editBtn);
+      btnDiv.appendChild(delBtn);
+      col.appendChild(card);
+    });
+    grid.appendChild(col);
+  });
+  el.appendChild(grid);
+}
+
+function openModalTarefa(){
+  editingTarefaId = null;
+  // Build tarefa modal dynamically
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;z-index:200';
+  overlay.onclick = function(e){ if(e.target===overlay) document.body.removeChild(overlay); };
+  
+  var box = document.createElement('div');
+  box.className = 'modal';
+  box.style.maxWidth = '520px';
+  
+  // Populate prof options
+  var profOpts = '<option value="">Selecione...</option>' + profissionais.map(function(p){return '<option>'+p.nome+'</option>';}).join('');
+  var cliOpts = '<option value="">Selecione...</option>' + clientes.map(function(c){return '<option>'+c.nome+'</option>';}).join('');
+  
+  // Build modal via DOM
+  var mh2=document.createElement('div');mh2.className='modal-header';
+  var mt2=document.createElement('div');mt2.className='modal-title';mt2.textContent='Nova Tarefa';
+  var mc2=document.createElement('button');mc2.className='modal-close';mc2.textContent='x';
+  mc2.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
+  mh2.appendChild(mt2);mh2.appendChild(mc2);box.appendChild(mh2);
+  var fg2=document.createElement('div');fg2.className='form-grid';
+  fg2.innerHTML='<div class="form-group form-full"><label>Titulo</label><input class="form-input" id="t-titulo" placeholder="Descreva a tarefa..."></div>'
+    +'<div class="form-group"><label>Responsavel</label><select class="form-input" id="t-resp">'+profOpts+'</select></div>'
+    +'<div class="form-group"><label>Cliente</label><select class="form-input" id="t-cli">'+cliOpts+'</select></div>'
+    +'<div class="form-group"><label>Prioridade</label><select class="form-input" id="t-prio"><option>Alta</option><option selected>Media</option><option>Baixa</option></select></div>'
+    +'<div class="form-group"><label>Prazo</label><input class="form-input" id="t-prazo" type="date"></div>'
+    +'<div class="form-group form-full"><label>Descricao</label><textarea class="form-input" id="t-desc" rows="3" placeholder="Detalhes..."></textarea></div>';
+  box.appendChild(fg2);
+  var ma2=document.createElement('div');ma2.className='modal-actions';
+  var cb2=document.createElement('button');cb2.className='btn-secondary';cb2.textContent='Cancelar';
+  cb2.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
+  var sb2=document.createElement('button');sb2.className='btn-primary';sb2.textContent='Salvar';
+  sb2.onclick=function(){saveTarefa(overlay);};
+  ma2.appendChild(cb2);ma2.appendChild(sb2);box.appendChild(ma2);
+    overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function openModalTarefaEdit(id){
+  var t = tarefas.find(function(x){return x.id===id;});
+  if(!t) return;
+  openModalTarefa();
+  setTimeout(function(){
+    document.getElementById('t-titulo').value = t.titulo||'';
+    document.getElementById('t-resp').value = t.responsavel||'';
+    document.getElementById('t-cli').value = t.cliente||'';
+    document.getElementById('t-prio').value = t.prioridade||'Média';
+    document.getElementById('t-prazo').value = t.prazo||'';
+    document.getElementById('t-desc').value = t.descricao||'';
+    editingTarefaId = id;
+  }, 50);
+}
+
+function saveTarefa(overlay){
+  var titulo = document.getElementById('t-titulo').value.trim();
+  if(!titulo){alert('Título obrigatório!');return;}
+  var data = {
+    titulo:titulo,
+    responsavel:document.getElementById('t-resp').value,
+    cliente:document.getElementById('t-cli').value,
+    prioridade:document.getElementById('t-prio').value,
+    prazo:document.getElementById('t-prazo').value,
+    descricao:document.getElementById('t-desc').value,
+    status:editingTarefaId?(tarefas.find(function(t){return t.id===editingTarefaId;})||{status:'Aberta'}).status:'Aberta',
+    criadoEm:new Date().toISOString()
+  };
+  if(editingTarefaId) db.collection('tarefas').doc(editingTarefaId).update(data);
+  else db.collection('tarefas').add(data);
+  if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ORGANOGRAMA
+// ═══════════════════════════════════════════════════════════
+var cargos = [], editingCargoId = null;
+var DEPT_C = {Diretoria:'#1e8fff',Comercial:'#22c55e',Operações:'#c084fc',Financeiro:'#f59e0b',Tecnologia:'#06b6d4',Compliance:'#ec4899',Atendimento:'#94a3b8'};
+
+var _origShowViewOrg = showView;
+showView = function(v,btn){
+  _origShowViewOrg(v,btn);
+  if(v==='organograma') loadOrganograma();
+  if(v==='crm'){ renderCRM(); setTimeout(function(){ if(document.getElementById('crm-tab-alertas-crm').classList.contains('active')) renderAlertas(); },100); }
+};
+
+function loadOrganograma(){
+  db.collection('organograma').onSnapshot(function(snap){
+    cargos = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderOrganograma();
+  });
+}
+
+function renderOrganograma(){
+  var el = document.getElementById('organograma-content');
+  if(!el) return;
+  el.innerHTML = '';
+
+  if(!cargos.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">Organograma vazio</div><p style="font-size:13px;margin-top:4px">Adicione os membros e seus cargos</p></div>';
+    return;
+  }
+
+  // Group by dept
+  var byDept = {};
+  cargos.forEach(function(c){
+    var d = c.departamento||'Geral';
+    if(!byDept[d]) byDept[d] = [];
+    byDept[d].push(c);
+  });
+
+  Object.keys(byDept).sort().forEach(function(dept){
+    var section = document.createElement('div');
+    section.style = 'margin-bottom:24px';
+
+    var dHeader = document.createElement('div');
+    dHeader.style = 'display:flex;align-items:center;gap:10px;margin-bottom:12px';
+    dHeader.innerHTML = '<div style="width:10px;height:10px;border-radius:50%;background:'+(DEPT_C[dept]||'#94a3b8')+';flex-shrink:0"></div>'
+      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white)">'+dept+'</span>'
+      +'<div style="flex:1;height:1px;background:var(--border)"></div>';
+    section.appendChild(dHeader);
+
+    var grid = document.createElement('div');
+    grid.style = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px';
+
+    byDept[dept].forEach(function(c){
+      var card = document.createElement('div');
+      card.style = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border-color .2s';
+      card.onmouseover=function(){this.style.borderColor='var(--border2)';};
+      card.onmouseout=function(){this.style.borderColor='var(--border)';};
+
+      var av = document.createElement('div');
+      av.style = 'width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,'+(DEPT_C[dept]||'#1e8fff')+'88,'+(DEPT_C[dept]||'#1e8fff')+');display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:12px';
+      av.textContent = initials(c.nome);
+
+      card.innerHTML = '';
+      card.appendChild(av);
+      card.innerHTML += '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:3px">'+c.nome+'</div>'
+        +'<div style="font-size:12px;color:'+(DEPT_C[dept]||'#94a3b8')+';font-weight:600;margin-bottom:8px">'+c.funcao+'</div>'
+        +(c.reporta?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">Reporta: '+c.reporta+'</div>':'')
+        +(c.email?'<div style="font-size:11px;color:var(--text3);margin-bottom:2px">'+c.email+'</div>':'')
+        +(c.tel?'<div style="font-size:11px;color:var(--text3)">'+c.tel+'</div>':'')
+        +(c.responsabilidades?'<div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;border-top:1px solid var(--border);padding-top:8px">'+c.responsabilidades+'</div>':'')
+        +'<div style="display:flex;gap:6px;margin-top:12px" id="org-act-'+c.id+'"></div>';
+      
+      var actWrap = card.querySelector('#org-act-'+c.id);
+      var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';eb.textContent='✏️ Editar';
+      (function(cid){eb.onclick=function(){openModalCargo(cid);};})(c.id);
+      var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent='🗑';
+      (function(cid){db2.onclick=function(){confirmDelete(function(){db.collection('organograma').doc(cid).delete();});};})(c.id);
+      actWrap.appendChild(eb);actWrap.appendChild(db2);
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    el.appendChild(section);
+  });
+}
+
+function openModalCargo(id){
+  editingCargoId = id;
+  var c = id ? cargos.find(function(x){return x.id===id;}) : null;
+  document.getElementById('modal-cargo-title').textContent = id ? 'Editar Cargo' : 'Novo Cargo';
+  document.getElementById('cargo-nome').value = c?c.nome||'':'';
+  document.getElementById('cargo-funcao').value = c?c.funcao||'':'';
+  document.getElementById('cargo-dept').value = c?c.departamento||'Diretoria':'Diretoria';
+  document.getElementById('cargo-email').value = c?c.email||'':'';
+  document.getElementById('cargo-tel').value = c?c.tel||'':'';
+  document.getElementById('cargo-resp').value = c?c.responsabilidades||'':'';
+  // Populate reporta
+  var sel = document.getElementById('cargo-reporta');
+  sel.innerHTML = '<option value="">— Nível superior —</option>';
+  cargos.filter(function(x){return x.id!==id;}).forEach(function(x){
+    var o=document.createElement('option');o.value=x.nome;o.textContent=x.nome+(x.funcao?' ('+x.funcao+')':'');
+    if(c&&c.reporta===x.nome)o.selected=true;
+    sel.appendChild(o);
+  });
+  openModal('modal-cargo');
+}
+
+function saveCargo(){
+  var nome = document.getElementById('cargo-nome').value.trim();
+  var funcao = document.getElementById('cargo-funcao').value.trim();
+  if(!nome||!funcao){alert('Nome e cargo são obrigatórios!');return;}
+  var data = {
+    nome:nome,funcao:funcao,
+    departamento:document.getElementById('cargo-dept').value,
+    reporta:document.getElementById('cargo-reporta').value,
+    email:document.getElementById('cargo-email').value,
+    tel:document.getElementById('cargo-tel').value,
+    responsabilidades:document.getElementById('cargo-resp').value,
+    criadoEm:new Date().toISOString()
+  };
+  if(editingCargoId) db.collection('organograma').doc(editingCargoId).update(data);
+  else db.collection('organograma').add(data);
+  closeModal('modal-cargo');
+}
 
 </script>
 </body>
