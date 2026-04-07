@@ -3990,97 +3990,143 @@ function setNoticiaTema(btn){
 function loadNoticias(){
   var el = document.getElementById('noticias-feed');
   if(!el) return;
-  el.innerHTML='<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:32px;margin-bottom:12px">&#9203;</div><div style="font-size:13px">Buscando noticias com IA...</div></div>';
+  el.innerHTML='<div style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:32px;margin-bottom:12px">&#9203;</div><div style="font-size:13px">Buscando noticias...</div></div>';
 
-  var temaLabel = noticiaTemaAtual;
-  var prompt = 'Busque as 8 noticias mais recentes e importantes sobre "'+temaLabel+'" no mercado financeiro brasileiro. Para cada noticia retorne SOMENTE um JSON array sem markdown no formato: [{"titulo":"...","resumo":"...","fonte":"...","data":"DD/MM/AAAA","url":"..."}]. Use fontes como InfoMoney, Valor Economico, Bloomberg BR, Reuters Brasil, Exame. Retorne apenas o JSON puro.';
+  // RSS feeds by tema
+  var feedMap = {
+    'mercado financeiro brasil': 'https://www.infomoney.com.br/feed/',
+    'ibovespa bolsa': 'https://www.infomoney.com.br/mercados/feed/',
+    'opcoes derivativos': 'https://www.infomoney.com.br/mercados/feed/',
+    'renda fixa juros selic': 'https://www.infomoney.com.br/onde-investir/renda-fixa/feed/',
+    'economia brasil': 'https://www.infomoney.com.br/economia/feed/',
+    'dolar cambio': 'https://www.infomoney.com.br/mercados/feed/',
+    'petroleo vale': 'https://www.infomoney.com.br/mercados/acoes/feed/',
+    'bitcoin cripto': 'https://www.infomoney.com.br/guias/bitcoin/feed/'
+  };
 
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      tools: [{"type": "web_search_20250305", "name": "web_search"}],
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    // Extract text from response
-    var text = '';
-    if(data.content){
-      data.content.forEach(function(block){
-        if(block.type === 'text') text += block.text;
-      });
-    }
-    // Parse JSON
-    var noticias = [];
-    try {
-      var clean = text.replace(/```json|```/g,'').trim();
-      // Find JSON array
-      var arrStart = clean.indexOf('[');
-      var arrEnd = clean.lastIndexOf(']');
-      if(arrStart >= 0 && arrEnd > arrStart){
-        noticias = JSON.parse(clean.substring(arrStart, arrEnd+1));
-      }
-    } catch(e){
-      console.error('Parse error:', e, text);
-    }
+  var rssUrl = feedMap[noticiaTemaAtual] || 'https://www.infomoney.com.br/feed/';
+  
+  // Try multiple CORS proxies in sequence
+  var proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(rssUrl),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(rssUrl),
+    'https://thingproxy.freeboard.io/fetch/' + rssUrl
+  ];
 
-    el.innerHTML = '';
-    if(!noticias.length){
-      el.innerHTML='<div class="empty"><div class="empty-icon">&#128240;</div><div class="empty-title">Nenhuma noticia encontrada</div><p style="font-size:13px;margin-top:4px">Tente outro tema</p></div>';
+  function tryProxy(idx){
+    if(idx >= proxies.length){
+      renderNoticiasManual(el);
       return;
     }
+    fetch(proxies[idx])
+      .then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.text();
+      })
+      .then(function(xml){
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, 'text/xml');
+        var items = doc.querySelectorAll('item');
+        if(!items || !items.length) throw new Error('No items');
+        
+        el.innerHTML = '';
+        var count = 0;
+        items.forEach(function(item){
+          if(count >= 15) return;
+          count++;
+          var title = (item.querySelector('title')||{textContent:''}).textContent.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g,'').trim();
+          var link = '';
+          var linkEl = item.querySelector('link');
+          if(linkEl) link = linkEl.textContent || linkEl.getAttribute('href') || '';
+          var nextSibling = linkEl && linkEl.nextSibling;
+          if(!link && nextSibling) link = nextSibling.nodeValue || nextSibling.textContent || '';
+          var pubDate = (item.querySelector('pubDate')||{textContent:''}).textContent;
+          var source = (doc.querySelector('channel > title')||{textContent:'InfoMoney'}).textContent;
+          var desc = (item.querySelector('description')||{textContent:''}).textContent.replace(/<[^>]+>/g,'').replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g,'').substring(0,200).trim();
+          
+          if(!title) return;
 
-    noticias.forEach(function(n){
-      var card = document.createElement('a');
-      card.href = n.url||'#';
-      card.target = '_blank';
-      card.className = 'noticia-card';
+          var dateStr = '';
+          if(pubDate){
+            try {
+              var d = new Date(pubDate);
+              if(!isNaN(d)) dateStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+            } catch(e){}
+          }
 
-      var iconMap = {bitcoin:'B',cripto:'B',dolar:'$',ibov:'[up]',opcao:'[flash]',renda:'[bank]'};
-      var iconChar = '[news]';
-      Object.keys(iconMap).forEach(function(k){ if(noticiaTemaAtual.toLowerCase().includes(k)) iconChar=iconMap[k]; });
+          var card = document.createElement('a');
+          card.href = link || '#';
+          card.target = '_blank';
+          card.className = 'noticia-card';
 
-      var iconEl = document.createElement('div');
-      iconEl.style='font-size:22px;flex-shrink:0;margin-top:2px;width:36px;text-align:center';
-      iconEl.textContent='&#128240;';
+          var iconEl = document.createElement('div');
+          iconEl.style = 'font-size:24px;flex-shrink:0;margin-top:2px;width:36px;text-align:center';
+          iconEl.innerHTML = '&#128240;';
 
-      var body = document.createElement('div');
-      body.style='flex:1;min-width:0';
-      body.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;line-height:1.4;margin-bottom:6px">'+(n.titulo||'')+'</div>'
-        +(n.resumo?'<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:8px">'+(n.resumo||'')+'</div>':'')
-        +'<div style="display:flex;align-items:center;gap:12px">'
-        +(n.fonte?'<span style="font-size:11px;font-weight:600;color:var(--blue)">'+(n.fonte||'')+'</span>':'')
-        +(n.data?'<span style="font-size:11px;color:var(--text3)">'+(n.data||'')+'</span>':'')
-        +'</div>';
+          var body = document.createElement('div');
+          body.style = 'flex:1;min-width:0';
+          body.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;line-height:1.4;margin-bottom:6px">' + title + '</div>'
+            + (desc ? '<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:8px">' + desc + '</div>' : '')
+            + '<div style="display:flex;align-items:center;gap:12px">'
+            + '<span style="font-size:11px;font-weight:600;color:var(--blue)">' + source + '</span>'
+            + (dateStr ? '<span style="font-size:11px;color:var(--text3)">' + dateStr + '</span>' : '')
+            + '</div>';
 
-      var shareBtn = document.createElement('button');
-      shareBtn.className='btn-ghost';
-      shareBtn.style='padding:6px 10px;font-size:11px;flex-shrink:0;align-self:flex-start';
-      shareBtn.textContent='Compartilhar';
-      (function(titulo, url){
-        shareBtn.onclick=function(e){
-          e.preventDefault(); e.stopPropagation();
-          var msg='*'+titulo+'*\n\n'+(url||'');
-          window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-        };
-      })(n.titulo, n.url);
+          var shareBtn = document.createElement('button');
+          shareBtn.className = 'btn-ghost';
+          shareBtn.style = 'padding:6px 10px;font-size:11px;flex-shrink:0;align-self:flex-start';
+          shareBtn.textContent = 'Compartilhar';
+          (function(t, l){
+            shareBtn.onclick = function(e){
+              e.preventDefault(); e.stopPropagation();
+              window.open('https://wa.me/?text=' + encodeURIComponent('*' + t + '*\n\n' + l), '_blank');
+            };
+          })(title, link);
 
-      card.appendChild(iconEl);
-      card.appendChild(body);
-      card.appendChild(shareBtn);
-      el.appendChild(card);
-    });
-  })
-  .catch(function(e){
-    console.error(e);
-    el.innerHTML='<div class="empty"><div class="empty-icon">&#9888;</div><div class="empty-title">Erro ao carregar noticias</div><p style="font-size:13px;margin-top:4px;color:var(--text3)">Verifique sua conexao</p><button class="btn-primary" style="margin-top:16px" onclick="loadNoticias()">Tentar novamente</button></div>';
-  });
+          card.appendChild(iconEl);
+          card.appendChild(body);
+          card.appendChild(shareBtn);
+          el.appendChild(card);
+        });
+
+        if(!el.children.length) renderNoticiasManual(el);
+      })
+      .catch(function(){ tryProxy(idx + 1); });
+  }
+
+  tryProxy(0);
 }
 
+function renderNoticiasManual(el){
+  // Fallback: show direct links to financial news sources
+  el.innerHTML = '';
+  var sources = [
+    {nome:'InfoMoney', url:'https://www.infomoney.com.br', desc:'Noticias do mercado financeiro brasileiro'},
+    {nome:'Valor Economico', url:'https://valor.globo.com', desc:'Economia e negocios'},
+    {nome:'Bloomberg BR', url:'https://www.bloomberglinea.com.br', desc:'Mercados globais em portugues'},
+    {nome:'Exame Invest', url:'https://exame.com/invest/', desc:'Investimentos e mercados'},
+    {nome:'MoneyTimes', url:'https://www.moneytimes.com.br', desc:'Negocios e financas'},
+    {nome:'Suno Research', url:'https://www.sunoresearch.com.br/noticias/', desc:'Analises e recomendacoes'}
+  ];
+
+  var header = document.createElement('div');
+  header.style = 'margin-bottom:16px;padding:14px;background:#1e8fff11;border:1px solid #1e8fff33;border-radius:10px;font-size:13px;color:var(--text2)';
+  header.innerHTML = 'Acesse diretamente as principais fontes de noticias financeiras:';
+  el.appendChild(header);
+
+  sources.forEach(function(s){
+    var card = document.createElement('a');
+    card.href = s.url;
+    card.target = '_blank';
+    card.className = 'noticia-card';
+    card.style = 'text-decoration:none';
+    card.innerHTML = '<div style="font-size:24px;flex-shrink:0">&#128240;</div>'
+      + '<div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:4px">' + s.nome + '</div>'
+      + '<div style="font-size:12px;color:var(--text3)">' + s.desc + '</div></div>'
+      + '<div style="color:var(--blue);font-size:13px;flex-shrink:0">Abrir &#8594;</div>';
+    el.appendChild(card);
+  });
+}
 </script>
 </body>
 </html>
