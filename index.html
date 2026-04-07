@@ -718,8 +718,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <button class="btn-primary" onclick="openModalGlossario(null)">+ Novo Termo</button>
       </div>
       <div class="page-content">
-        <div style="margin-bottom:16px">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
           <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
+          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px">🔄 Restaurar termos padrão</button>
         </div>
         <div id="glossario-list"></div>
       </div>
@@ -997,8 +998,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <button class="btn-primary" onclick="openModalGlossario(null)">+ Novo Termo</button>
       </div>
       <div class="page-content">
-        <div style="margin-bottom:16px">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
           <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
+          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px">🔄 Restaurar termos padrão</button>
         </div>
         <div id="glossario-list"></div>
       </div>
@@ -3592,6 +3594,20 @@ function saveGlossario(){
 }
 
 function editGlossario(id){ openModalGlossario(id); }
+
+function restaurarGlossarioPadrao(){
+  if(!confirm('Isso vai ADICIONAR todos os '+GLOSSARIO_DEFAULT.length+' termos padrão ao glossário. Continuar?')) return;
+  var batch = db.batch();
+  GLOSSARIO_DEFAULT.forEach(function(t){
+    var ref = db.collection('glossario').doc();
+    batch.set(ref, Object.assign({}, t, {criadoEm: new Date().toISOString()}));
+  });
+  batch.commit().then(function(){
+    alert('✅ '+GLOSSARIO_DEFAULT.length+' termos adicionados com sucesso!');
+  }).catch(function(e){
+    alert('Erro: '+e.message);
+  });
+}
 function deleteGlossario(id){ confirmDelete(function(){ db.collection('glossario').doc(id).delete(); }); }
 
 // ── Reuniões ──────────────────────────────────────────────
