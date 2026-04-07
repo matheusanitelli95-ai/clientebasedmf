@@ -1216,10 +1216,10 @@ function renderCRM(){
   var html='<div class="grid-2">';
   html+='<div class="card"><div class="section-title">Próximos Contatos Agendados</div>';
   if(!comAgenda.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">📅</div><div style="font-size:13px">Nenhum contato agendado</div></div>';
-  else comAgenda.slice(0,8).forEach(function(c){var d=daysDiff(c.proximoContato),color=d<0?'var(--danger)':d<3?'var(--warn)':'var(--success)';html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">📅</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub" style="color:'+color+'">'+fmtDate(c.proximoContato)+(d<0?' · '+Math.abs(d)+'d atrasado':d===0?' · Hoje!':' · em '+d+'d')+'</div></div></div>';});
+  else comAgenda.forEach(function(c){var d=daysDiff(c.proximoContato),color=d<0?'var(--danger)':d<3?'var(--warn)':'var(--success)';html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">📅</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub" style="color:'+color+'">'+fmtDate(c.proximoContato)+(d<0?' · '+Math.abs(d)+'d atrasado':d===0?' · Hoje!':' · em '+d+'d')+'</div></div></div>';});
   html+='</div><div class="card"><div class="section-title">Sem Contato há +30 dias</div>';
   if(!semContato.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">✅</div><div style="font-size:13px">Todos em dia!</div></div>';
-  else semContato.slice(0,8).forEach(function(c){var d=daysDiff(c.ultimoContato);html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">⚠️</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+(d>8000?'Nunca contatado':d+'d sem contato')+' · '+(c.responsavel||'N/A')+'</div></div></div>';});
+  else semContato.forEach(function(c){var d=daysDiff(c.ultimoContato);html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">⚠️</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+(d>8000?'Nunca contatado':d+'d sem contato')+' · '+(c.responsavel||'N/A')+'</div></div></div>';});
   el.innerHTML=html+'</div></div>';
 }
 
@@ -1347,12 +1347,12 @@ function renderFinanceiro(){
     var eb = r - c;
     var mg = r ? Math.round(eb/r*100) : 0;
     var hasData = r > 0 || c > 0;
-    return '<tr style="'+(hasData?'':'opacity:.35')+'"><td style="font-weight:600;color:var(--white)">'+MESES[i]+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e">'+fmtFull(m.recConsultoria)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(m.recBlack)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(m.recOutros)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;font-weight:600;color:#22c55e">'+fmtFull(r)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#ef4444">'+fmtFull(c)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;font-weight:600;color:'+(eb>=0?'#22c55e':'#ef4444')+'">'+fmtFull(eb)+'</td><td><span style="font-size:12px;color:'+(mg>=0?'#22c55e':'#ef4444')+'">'+mg+'%</span></td><td><button class="btn-ghost" style="font-size:11px;padding:4px 8px" onclick="openMesDetalhe('+(i+1)+','+ano+')">Ver</button></td></tr>';
+    return '<tr style="'+(hasData?'':'opacity:.35')+'"><td style="font-weight:600;color:var(--white)">'+MESES[i]+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e">'+fmtFull(m.recConsultoria)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(m.recBlack)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(m.recOutros)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;font-weight:600;color:#22c55e">'+fmtFull(r)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#ef4444">'+fmtFull(c)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;font-weight:600;color:'+(eb>=0?'#22c55e':'#ef4444')+'">'+fmtFull(eb)+'</td><td><span style="font-size:12px;color:'+(mg>=0?'#22c55e':'#ef4444')+'">'+mg+'%</span></td></tr>';
   }).join('');
 
   // Listas laterais
-  var recs = lancamentos.filter(function(l){return l.tipo==='receita'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);}).slice(0,8);
-  var custos = lancamentos.filter(function(l){return l.tipo==='custo'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);}).slice(0,8);
+  var recs = lancamentos.filter(function(l){return l.tipo==='receita'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);});
+  var custos = lancamentos.filter(function(l){return l.tipo==='custo'&&l.ano===ano;}).sort(function(a,b){return b.mes-a.mes||b.data.localeCompare(a.data);});
 
   // Build lancamento lists with proper DOM elements
   (function(){
@@ -1542,7 +1542,7 @@ function saveLancamento(){
     var diaVenc=document.getElementById('fl-dia-venc').value;
     if(diaVenc) data.diaVencimento=Number(diaVenc);
     if(editingLancId){
-      db.collection('financeiro').doc(editingLancId).update(data);
+      db.collection('financeiro').doc(editingLancId).update(data).catch(function(e){alert('Erro: '+e.message);});
     } else {
       var recorrente=document.getElementById('fl-recorrente').value;
       data.recorrente=recorrente==='sim';
