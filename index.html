@@ -1369,45 +1369,70 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="modal-title" id="modal-cli-title">Novo Cliente</div>
       <button class="modal-close" onclick="closeModal('modal-cliente')">×</button>
     </div>
+
+    <!-- ESSENCIAIS -->
     <div class="form-section">
-      <div class="form-section-title">Dados Pessoais</div>
+      <div class="form-section-title">Informações Essenciais</div>
       <div class="form-grid">
         <div class="form-group form-full"><label>Nome completo *</label><input class="form-input" id="fc-nome" placeholder="Nome do cliente"></div>
-        <div class="form-group"><label>Tipo</label><select class="form-input" id="fc-tipo"><option>PF</option><option>PJ</option></select></div>
-        <div class="form-group"><label>CPF / CNPJ</label><input class="form-input" id="fc-cpf" placeholder="000.000.000-00"></div>
-        <div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="fc-nasc" type="date"></div>
-        <div class="form-group"><label>Data de Entrada</label><input class="form-input" id="fc-entrada" type="date"></div>
-        <div class="form-group"><label>E-mail</label><input class="form-input" id="fc-email" type="email" placeholder="email@exemplo.com"></div>
-        <div class="form-group"><label>Telefone / WhatsApp</label><input class="form-input" id="fc-tel" placeholder="(11) 99999-9999"></div>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">Endereço</div>
-      <div class="form-grid">
-        <div class="form-group form-full"><label>Endereço</label><input class="form-input" id="fc-end" placeholder="Rua, número, complemento"></div>
-        <div class="form-group"><label>Cidade</label><input class="form-input" id="fc-cidade" placeholder="Cidade"></div>
-        <div class="form-group"><label>Estado</label><select class="form-input" id="fc-estado"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">Perfil e Serviço</div>
-      <div class="form-grid">
-        <div class="form-group"><label>Profissional Responsável</label><select class="form-input" id="fc-prof"><option value="">Selecione...</option></select></div>
-        <div class="form-group"><label>Banco / Corretora</label><select class="form-input" id="fc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Guide</option><option>Ágora</option><option>Sicoob</option><option>Sicredi</option><option>Outro</option></select></div>
-        <div class="form-group"><label>Serviço Contratado</label><select class="form-input" id="fc-servico"><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select></div>
-        <div class="form-group"><label>Nível DMF Black</label><select class="form-input" id="fc-nivel"><option value="">N/A</option><option>Assinatura</option><option>Vitalício</option><option>Sócio</option></select></div>
-        <div class="form-group"><label>Perfil de Investidor</label><select class="form-input" id="fc-perfil"><option>Conservador</option><option>Moderado</option><option>Arrojado</option><option>Agressivo</option></select></div>
-        <div class="form-group"><label>Segmentação</label><select class="form-input" id="fc-seg"><option>Varejo</option><option>Alta Renda</option><option>Private</option></select></div>
-        <div class="form-group"><label>Objetivo da Carteira</label><select class="form-input" id="fc-obj"><option>Acumulação</option><option>Sucessão</option><option>Usufruto</option><option>Proteção Patrimonial</option></select></div>
+        <div class="form-group"><label>Banco / Corretora *</label><select class="form-input" id="fc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Guide</option><option>Ágora</option><option>Sicoob</option><option>Sicredi</option><option>Outro</option></select></div>
+        <div class="form-group"><label>Serviço Contratado *</label><select class="form-input" id="fc-servico" onchange="toggleResp()"><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select></div>
         <div class="form-group"><label>Status</label><select class="form-input" id="fc-status"><option>Ativo</option><option>Inativo</option><option>Prospecto</option></select></div>
-        <div class="form-group"><label>Custódia Renda Fixa (R$)</label><input class="form-input" id="fc-rf" type="number" placeholder="0"></div>
-        <div class="form-group"><label>Custódia Renda Variável (R$)</label><input class="form-input" id="fc-rv" type="number" placeholder="0"></div>
+        <div class="form-group"><label>Patrimônio em Ativos (R$) *</label><input class="form-input" id="fc-patrimonio" type="number" placeholder="0" style="font-size:15px;font-weight:600"></div>
+        <div class="form-group"><label>Nível DMF Black</label><select class="form-input" id="fc-nivel"><option value="">N/A</option><option>Assinatura</option><option>Vitalício</option><option>Sócio</option></select></div>
+        <!-- Responsável Consultoria -->
+        <div class="form-group" id="fc-resp-cons-wrap">
+          <label>Responsável — Consultoria</label>
+          <select class="form-input" id="fc-prof-cons"><option value="">Selecione...</option></select>
+        </div>
+        <!-- Responsável Black -->
+        <div class="form-group" id="fc-resp-black-wrap">
+          <label>Responsável — DMF Black</label>
+          <select class="form-input" id="fc-prof-black"><option value="">Selecione...</option></select>
+        </div>
       </div>
     </div>
-    <div class="form-section">
-      <div class="form-section-title">Observações</div>
-      <div class="form-group"><label>Notas internas</label><textarea class="form-input" id="fc-obs" placeholder="Informações relevantes sobre o cliente..."></textarea></div>
-    </div>
+
+    <!-- COMPLEMENTARES (recolhidos) -->
+    <details style="margin-bottom:16px">
+      <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px">
+        <span>▶</span> Dados Complementares (opcional — cliente pode preencher depois)
+      </summary>
+      <div style="margin-top:16px">
+        <div class="form-section">
+          <div class="form-section-title">Dados Pessoais</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Tipo</label><select class="form-input" id="fc-tipo"><option>PF</option><option>PJ</option></select></div>
+            <div class="form-group"><label>CPF / CNPJ</label><input class="form-input" id="fc-cpf" placeholder="000.000.000-00"></div>
+            <div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="fc-nasc" type="date"></div>
+            <div class="form-group"><label>Data de Entrada</label><input class="form-input" id="fc-entrada" type="date"></div>
+            <div class="form-group"><label>E-mail</label><input class="form-input" id="fc-email" type="email" placeholder="email@exemplo.com"></div>
+            <div class="form-group"><label>Telefone / WhatsApp</label><input class="form-input" id="fc-tel" placeholder="(11) 99999-9999"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Endereço</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Endereço</label><input class="form-input" id="fc-end" placeholder="Rua, número, complemento"></div>
+            <div class="form-group"><label>Cidade</label><input class="form-input" id="fc-cidade" placeholder="Cidade"></div>
+            <div class="form-group"><label>Estado</label><select class="form-input" id="fc-estado"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Perfil de Investimento</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Perfil de Investidor</label><select class="form-input" id="fc-perfil"><option>Conservador</option><option>Moderado</option><option>Arrojado</option><option>Agressivo</option></select></div>
+            <div class="form-group"><label>Segmentação</label><select class="form-input" id="fc-seg"><option>Varejo</option><option>Alta Renda</option><option>Private</option></select></div>
+            <div class="form-group"><label>Objetivo da Carteira</label><select class="form-input" id="fc-obj"><option>Acumulação</option><option>Sucessão</option><option>Usufruto</option><option>Proteção Patrimonial</option></select></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Observações</div>
+          <div class="form-group"><label>Notas internas</label><textarea class="form-input" id="fc-obs" placeholder="Informações relevantes sobre o cliente..."></textarea></div>
+        </div>
+      </div>
+    </details>
+
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-cliente')">Cancelar</button>
       <button class="btn-primary" onclick="saveCliente()">Salvar Cliente</button>
@@ -2257,6 +2282,12 @@ function openModalCliente(id){
   document.getElementById('modal-cli-title').textContent=id?'Editar Cliente':'Novo Cliente';
   var c=id?clientes.find(function(x){return x.id===id;}):null;
   document.getElementById('fc-nome').value=c?c.nome||'':'';
+  document.getElementById('fc-banco').value=c?c.banco||'':'';
+  document.getElementById('fc-servico').value=c?c.servico||'DMF Consultoria':'DMF Consultoria';
+  document.getElementById('fc-status').value=c?c.status||'Ativo':'Ativo';
+  document.getElementById('fc-patrimonio').value=c?c.patrimonio||'':'';
+  document.getElementById('fc-nivel').value=c?c.nivel||'':'';
+  // Complementares
   document.getElementById('fc-tipo').value=c?c.tipo||'PF':'PF';
   document.getElementById('fc-cpf').value=c?c.cpf||'':'';
   document.getElementById('fc-nasc').value=c?c.nasc||'':'';
@@ -2266,39 +2297,55 @@ function openModalCliente(id){
   document.getElementById('fc-end').value=c?c.endereco||'':'';
   document.getElementById('fc-cidade').value=c?c.cidade||'':'';
   document.getElementById('fc-estado').value=c?c.estado||'':'';
-  document.getElementById('fc-banco').value=c?c.banco||'':'';
-  document.getElementById('fc-servico').value=c?c.servico||'DMF Consultoria':'DMF Consultoria';
-  document.getElementById('fc-nivel').value=c?c.nivel||'':'';
   document.getElementById('fc-perfil').value=c?c.perfil||'Conservador':'Conservador';
   document.getElementById('fc-seg').value=c?c.segmentacao||'Varejo':'Varejo';
   document.getElementById('fc-obj').value=c?c.objetivo||'Acumulação':'Acumulação';
-  document.getElementById('fc-status').value=c?c.status||'Ativo':'Ativo';
-  document.getElementById('fc-rf').value=c?c.custodiaRF||'':'';
-  document.getElementById('fc-rv').value=c?c.custodiaRV||'':'';
   document.getElementById('fc-obs').value=c?c.obs||'':'';
-  updateProfSelect(c?c.responsavelId:'');
+  updateProfSelect(c?c.responsavelConsId:'', c?c.responsavelBlackId:'');
+  toggleResp();
   openModal('modal-cliente');
 }
 
 function saveCliente(){
   var nome=document.getElementById('fc-nome').value.trim();
   if(!nome){alert('Nome é obrigatório!');return;}
-  var profSel=document.getElementById('fc-prof');
+  var selCons=document.getElementById('fc-prof-cons');
+  var selBlack=document.getElementById('fc-prof-black');
+  var consNome=selCons&&selCons.selectedIndex>0?selCons.options[selCons.selectedIndex].text:'';
+  var blackNome=selBlack&&selBlack.selectedIndex>0?selBlack.options[selBlack.selectedIndex].text:'';
+  // For backwards compat, responsavel = consultoria name or black name
+  var respPrincipal = consNome || blackNome;
+  var respPrincipalId = selCons&&selCons.value?selCons.value:(selBlack?selBlack.value:'');
   var data={
-    nome:nome,tipo:document.getElementById('fc-tipo').value,
-    cpf:document.getElementById('fc-cpf').value,nasc:document.getElementById('fc-nasc').value,
-    entrada:document.getElementById('fc-entrada').value,email:document.getElementById('fc-email').value,
-    telefone:document.getElementById('fc-tel').value,endereco:document.getElementById('fc-end').value,
-    cidade:document.getElementById('fc-cidade').value,estado:document.getElementById('fc-estado').value,
+    nome:nome,
     banco:document.getElementById('fc-banco').value,
-    servico:document.getElementById('fc-servico').value,nivel:document.getElementById('fc-nivel').value,
-    perfil:document.getElementById('fc-perfil').value,segmentacao:document.getElementById('fc-seg').value,
-    objetivo:document.getElementById('fc-obj').value,status:document.getElementById('fc-status').value,
-    custodiaRF:Number(document.getElementById('fc-rf').value)||0,
-    custodiaRV:Number(document.getElementById('fc-rv').value)||0,
-    obs:document.getElementById('fc-obs').value,
-    responsavelId:profSel.value,
-    responsavel:profSel.options[profSel.selectedIndex]?profSel.options[profSel.selectedIndex].text:''
+    servico:document.getElementById('fc-servico').value,
+    status:document.getElementById('fc-status').value,
+    patrimonio:Number(document.getElementById('fc-patrimonio').value)||0,
+    // Keep custodiaRF/RV as patrimonio for compatibility
+    custodiaRF:Number(document.getElementById('fc-patrimonio').value)||0,
+    custodiaRV:0,
+    nivel:document.getElementById('fc-nivel').value,
+    responsavelConsultoria:consNome,
+    responsavelConsId:selCons?selCons.value:'',
+    responsavelBlack:blackNome,
+    responsavelBlackId:selBlack?selBlack.value:'',
+    responsavel:respPrincipal,
+    responsavelId:respPrincipalId,
+    // Complementares
+    tipo:document.getElementById('fc-tipo').value,
+    cpf:document.getElementById('fc-cpf').value,
+    nasc:document.getElementById('fc-nasc').value,
+    entrada:document.getElementById('fc-entrada').value,
+    email:document.getElementById('fc-email').value,
+    telefone:document.getElementById('fc-tel').value,
+    endereco:document.getElementById('fc-end').value,
+    cidade:document.getElementById('fc-cidade').value,
+    estado:document.getElementById('fc-estado').value,
+    perfil:document.getElementById('fc-perfil').value,
+    segmentacao:document.getElementById('fc-seg').value,
+    objetivo:document.getElementById('fc-obj').value,
+    obs:document.getElementById('fc-obs').value
   };
   if(editingCliId)db.collection('clientes').doc(editingCliId).update(data);
   else db.collection('clientes').add(data);
@@ -2311,10 +2358,23 @@ function deleteCliente(id){
 }
 
 // PROFISSIONAIS
-function updateProfSelect(selId){
-  var sel=document.getElementById('fc-prof');if(!sel)return;
-  sel.innerHTML='<option value="">Selecione...</option>';
-  profissionais.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nome;if(p.id===selId)o.selected=true;sel.appendChild(o);});
+function toggleResp(){
+  var srv = document.getElementById('fc-servico').value;
+  var consWrap = document.getElementById('fc-resp-cons-wrap');
+  var blackWrap = document.getElementById('fc-resp-black-wrap');
+  if(!consWrap||!blackWrap) return;
+  consWrap.style.display = (srv==='DMF Black') ? 'none' : 'flex';
+  blackWrap.style.display = (srv==='DMF Consultoria') ? 'none' : 'flex';
+}
+
+function updateProfSelect(selConsId, selBlackId){
+  // Populate responsavel consultoria
+  ['fc-prof-cons','fc-prof-black'].forEach(function(id, idx){
+    var sel=document.getElementById(id);if(!sel)return;
+    var curId = idx===0?selConsId:selBlackId;
+    sel.innerHTML='<option value="">Selecione...</option>';
+    profissionais.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nome;if(p.id===curId)o.selected=true;sel.appendChild(o);});
+  });
   var fp=document.getElementById('filter-cli-prof');
   if(fp){var cur=fp.value;fp.innerHTML='<option value="">Todos os profissionais</option>';profissionais.forEach(function(p){var o=document.createElement('option');o.value=p.nome;o.textContent=p.nome;if(p.nome===cur)o.selected=true;fp.appendChild(o);});}
 }
