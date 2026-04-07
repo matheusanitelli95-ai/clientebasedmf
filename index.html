@@ -362,6 +362,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('alertas',this)"><span class="icon">🔔</span><span>Alertas</span></button>
       <div class="nav-section">Empresa</div>
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon">💵</span><span>Financeiro</span></button>
+      <div class="nav-section">DMF Black</div>
+      <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon">⚡</span><span>Operações</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -529,6 +531,77 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
     </div>
+
+    <!-- BLACK OPERAÇÕES -->
+    <div class="view" id="view-black-operacoes">
+      <div class="page-header">
+        <div><div class="page-title">Operações DMF Black</div><div class="page-sub">Controle de operações com opções por cliente</div></div>
+        <button class="btn-primary" onclick="openBlackClienteSelector()">+ Adicionar Cliente</button>
+      </div>
+      <div class="page-content">
+        <!-- KPIs gerais -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-clientes">0</div><div class="kpi-label">Clientes Black</div></div><div class="kpi-icon">👥</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-acumulado">R$0</div><div class="kpi-label">Acumulado Total</div></div><div class="kpi-icon">💰</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-mes">R$0</div><div class="kpi-label">Saldo Mês Atual</div></div><div class="kpi-icon">📈</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-custos">R$0</div><div class="kpi-label">Custos Totais</div></div><div class="kpi-icon">📉</div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
+        </div>
+        <!-- Lista de clientes Black -->
+        <div id="black-clientes-list"></div>
+      </div>
+    </div>
+
+    <!-- BLACK CLIENTE DETALHE -->
+    <div class="view" id="view-black-detalhe">
+      <div class="page-header" style="padding-bottom:0">
+        <div>
+          <button class="back-btn" onclick="showView('black-operacoes',document.querySelectorAll('.nav-item')[5])">← Voltar para Operações</button>
+          <div class="page-title" id="black-detalhe-title">—</div>
+          <div class="page-sub" id="black-detalhe-sub">—</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="openModalBlackLanc('simplificado')">+ Simplificado</button>
+          <button class="btn-primary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
+        </div>
+      </div>
+      <div class="page-content" style="padding-top:20px">
+        <!-- KPIs do cliente -->
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-compras" style="font-size:20px">R$0</div><div class="kpi-label">Total Compras</div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
+          <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-vendas" style="font-size:20px">R$0</div><div class="kpi-label">Total Vendas</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+        </div>
+        <!-- Tabela mensal -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title">Histórico Mensal</div>
+          <div class="table-wrap" style="border:none">
+            <table>
+              <thead><tr>
+                <th>Mês/Ano</th>
+                <th>Compras</th>
+                <th>Vendas</th>
+                <th>Saldo</th>
+                <th>Custos</th>
+                <th>Líquido</th>
+                <th>Acumulado</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+              </tr></thead>
+              <tbody id="black-table-mensal"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Operações detalhadas -->
+        <div class="card" id="black-operacoes-detalhe-card" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="section-title" style="margin:0">Operações Detalhadas</div>
+          </div>
+          <div id="black-operacoes-detalhe-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
 
     <!-- ALERTAS -->
     <div class="view" id="view-alertas">
@@ -749,6 +822,135 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-lanc')">Cancelar</button>
       <button class="btn-primary" onclick="saveLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BLACK - SELECTOR CLIENTE -->
+<div class="modal-overlay" id="modal-black-selector" style="display:none" onclick="if(event.target===this)closeModal('modal-black-selector')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Selecionar Cliente Black</div>
+      <button class="modal-close" onclick="closeModal('modal-black-selector')">×</button>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Cliente</label>
+      <select class="form-input" id="black-sel-cliente"><option value="">Selecione...</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-black-selector')">Cancelar</button>
+      <button class="btn-primary" onclick="addBlackCliente()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BLACK - LANÇAMENTO SIMPLIFICADO -->
+<div class="modal-overlay" id="modal-black-simples" style="display:none" onclick="if(event.target===this)closeModal('modal-black-simples')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-bs-title">Lançamento Simplificado</div>
+      <button class="modal-close" onclick="closeModal('modal-black-simples')">×</button>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Mês de Referência</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bs-mes-grid"></div>
+      <input type="hidden" id="bs-mes">
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Resultados</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Total Compras (R$)</label><input class="form-input" id="bs-compras" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Total Vendas (R$)</label><input class="form-input" id="bs-vendas" type="number" step="0.01" placeholder="0,00"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Custos da Nota</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Emolumentos (R$)</label><input class="form-input" id="bs-emol" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Taxa Operacional (R$)</label><input class="form-input" id="bs-taxa-op" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Execução (R$)</label><input class="form-input" id="bs-exec" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Impostos / IRRF (R$)</label><input class="form-input" id="bs-impostos" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Taxa de Custódia (R$)</label><input class="form-input" id="bs-custodia" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="bs-outros" type="number" step="0.01" placeholder="0,00"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Observações</div>
+      <div class="form-group"><label>Notas</label><textarea class="form-input" id="bs-obs" placeholder="Ex: rolagem de posição BOVA11..."></textarea></div>
+    </div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Saldo (Vendas - Compras)</span>
+        <span style="font-family:DM Mono,monospace;color:#22c55e;font-weight:600" id="bs-preview-saldo">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:12px;color:var(--text2)">Líquido (Saldo - Custos)</span>
+        <span style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600" id="bs-preview-liquido">R$ 0,00</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-black-simples')">Cancelar</button>
+      <button class="btn-primary" onclick="saveBlackSimples()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BLACK - LANÇAMENTO DETALHADO -->
+<div class="modal-overlay" id="modal-black-det" style="display:none" onclick="if(event.target===this)closeModal('modal-black-det')">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-bd-title">Lançamento Detalhado</div>
+      <button class="modal-close" onclick="closeModal('modal-black-det')">×</button>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Informações da Operação</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mês de Referência</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="bd-mes-grid"></div>
+          <input type="hidden" id="bd-mes">
+        </div>
+        <div class="form-group"><label>Ativo Subjacente</label><input class="form-input" id="bd-ativo" placeholder="Ex: BOVA11, PETR4..."></div>
+        <div class="form-group form-full"><label>Descrição da Estrutura</label><input class="form-input" id="bd-estrutura" placeholder="Ex: Trava de Baixa de Call, Venda de Put..."></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Pernas da Operação</div>
+      <div id="bd-pernas-list"></div>
+      <button class="btn-secondary" style="width:100%;margin-top:10px;justify-content:center" onclick="addPerna()" type="button">+ Adicionar Perna</button>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Custos da Nota</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Emolumentos (R$)</label><input class="form-input" id="bd-emol" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Taxa Operacional (R$)</label><input class="form-input" id="bd-taxa-op" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Execução (R$)</label><input class="form-input" id="bd-exec" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Impostos / IRRF (R$)</label><input class="form-input" id="bd-impostos" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="bd-outros" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="form-group"><label>Observações</label><input class="form-input" id="bd-obs" placeholder="Ex: rolagem..."></div>
+      </div>
+    </div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Total Compras</span>
+        <span style="font-family:DM Mono,monospace;color:#ef4444;font-weight:600" id="bd-preview-compras">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Total Vendas</span>
+        <span style="font-family:DM Mono,monospace;color:#22c55e;font-weight:600" id="bd-preview-vendas">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--text2)">Saldo</span>
+        <span style="font-family:DM Mono,monospace;color:#22c55e;font-weight:600" id="bd-preview-saldo">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:12px;color:var(--text2)">Líquido</span>
+        <span style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600" id="bd-preview-liquido">R$ 0,00</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-black-det')">Cancelar</button>
+      <button class="btn-primary" onclick="saveBlackDetalhado()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1639,6 +1841,499 @@ function deleteLancamento(id){
       renderFinanceiro();
     }).catch(function(e){alert('Erro ao excluir: '+e.message);});
   });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// DMF BLACK
+// ═══════════════════════════════════════════════════════════
+var blackClientesAtivos = []; // lista de clienteIds com operações Black
+var currentBlackClienteId = null;
+var blackOps = []; // operações do cliente atual
+var pernaCount = 0;
+var editingBlackId = null;
+
+var MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// ── Load Black operações ──────────────────────────────────
+function loadBlackOperacoes(){
+  // Load all black operations to build the clients list
+  db.collection('black_operacoes').onSnapshot(function(snap){
+    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderBlackDashboard(ops);
+  });
+}
+
+// Override showView to load black when needed
+var _origShowView2 = showView;
+showView = function(v,btn){
+  _origShowView2(v,btn);
+  if(v==='black-operacoes') loadBlackOperacoes();
+};
+
+// ── Render Black Dashboard ────────────────────────────────
+function renderBlackDashboard(ops){
+  // Group by cliente
+  var byCliente = {};
+  ops.forEach(function(op){
+    if(!byCliente[op.clienteId]) byCliente[op.clienteId]={id:op.clienteId,nome:op.clienteNome,ops:[]};
+    byCliente[op.clienteId].ops.push(op);
+  });
+
+  var clientesList = Object.values(byCliente);
+  var now = new Date();
+  var curMes = now.getMonth()+1, curAno = now.getFullYear();
+
+  // KPIs
+  var totalAcumulado = 0, totalMes = 0, totalCustos = 0;
+  clientesList.forEach(function(c){
+    c.ops.forEach(function(op){
+      var saldo = (op.vendas||0)-(op.compras||0);
+      totalAcumulado += saldo;
+      totalCustos += op.custoTotal||0;
+      if(op.mes===curMes && op.ano===curAno) totalMes += saldo;
+    });
+  });
+
+  document.getElementById('black-kpi-clientes').textContent = clientesList.length;
+  document.getElementById('black-kpi-acumulado').textContent = fmt(totalAcumulado);
+  document.getElementById('black-kpi-mes').textContent = fmt(totalMes);
+  document.getElementById('black-kpi-custos').textContent = fmt(totalCustos);
+
+  // Render clients list
+  var el = document.getElementById('black-clientes-list');
+  el.innerHTML='';
+
+  if(!clientesList.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">⚡</div><div class="empty-title">Nenhum cliente Black ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Cliente" para começar</p></div>';
+    return;
+  }
+
+  clientesList.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
+    var acum = c.ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
+    var custos = c.ops.reduce(function(s,op){return s+(op.custoTotal||0);},0);
+    var liquido = acum - custos;
+    var meses = [...new Set(c.ops.map(function(op){return op.ano+'/'+String(op.mes).padStart(2,'0');}))].length;
+
+    var card = document.createElement('div');
+    card.style='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:12px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .2s';
+    card.onmouseover=function(){this.style.borderColor='var(--border2)';};
+    card.onmouseout=function(){this.style.borderColor='var(--border)';};
+
+    var av = document.createElement('div');
+    av.style='width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e8fff);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:#fff;flex-shrink:0';
+    av.textContent=initials(c.nome);
+
+    var info = document.createElement('div');
+    info.style='flex:1';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+c.nome+'</div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+meses+' meses de operação</div>';
+
+    var stats = document.createElement('div');
+    stats.style='display:flex;gap:32px;align-items:center';
+    stats.innerHTML='<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Acumulado</div><div style="font-family:DM Mono,monospace;color:#22c55e;font-size:16px;font-weight:700">'+fmtFull(acum)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Custos</div><div style="font-family:DM Mono,monospace;color:#ef4444;font-size:14px;font-weight:600">'+fmtFull(custos)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Líquido</div><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:700">'+fmtFull(liquido)+'</div></div>';
+
+    var arrow = document.createElement('div');
+    arrow.style='color:var(--text3);font-size:18px';
+    arrow.textContent='→';
+
+    (function(cid,cnome){ card.onclick=function(){ openBlackCliente(cid,cnome); }; })(c.id, c.nome);
+
+    card.appendChild(av);
+    card.appendChild(info);
+    card.appendChild(stats);
+    card.appendChild(arrow);
+    el.appendChild(card);
+  });
+}
+
+// ── Open cliente selector ─────────────────────────────────
+function openBlackClienteSelector(){
+  var sel = document.getElementById('black-sel-cliente');
+  sel.innerHTML='<option value="">Selecione...</option>';
+  clientes.forEach(function(c){
+    var o=document.createElement('option');
+    o.value=c.id; o.textContent=c.nome;
+    sel.appendChild(o);
+  });
+  openModal('modal-black-selector');
+}
+
+function addBlackCliente(){
+  var sel=document.getElementById('black-sel-cliente');
+  var id=sel.value, nome=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+  if(!id){alert('Selecione um cliente!');return;}
+  closeModal('modal-black-selector');
+  openBlackCliente(id, nome);
+}
+
+// ── Open cliente detalhe ──────────────────────────────────
+function openBlackCliente(clienteId, clienteNome){
+  currentBlackClienteId = clienteId;
+  document.getElementById('black-detalhe-title').textContent = clienteNome;
+  document.getElementById('black-detalhe-sub').textContent = 'Histórico de operações Black';
+  showView('black-detalhe', null);
+
+  db.collection('black_operacoes').where('clienteId','==',clienteId).onSnapshot(function(snap){
+    blackOps = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderBlackClienteDetalhe();
+  });
+}
+
+// ── Render cliente detalhe ────────────────────────────────
+function renderBlackClienteDetalhe(){
+  var ops = blackOps.sort(function(a,b){
+    if(a.ano!==b.ano) return b.ano-a.ano;
+    return b.mes-a.mes;
+  });
+
+  var totalCompras=0, totalVendas=0, acumulado=0;
+  ops.forEach(function(op){ totalCompras+=op.compras||0; totalVendas+=op.vendas||0; });
+  
+  document.getElementById('black-cli-compras').textContent = fmtFull(totalCompras);
+  document.getElementById('black-cli-vendas').textContent = fmtFull(totalVendas);
+  
+  // Build acumulado running total
+  var sorted = ops.slice().sort(function(a,b){ return a.ano!==b.ano?a.ano-b.ano:a.mes-b.mes; });
+  var acumMap = {};
+  var running = 0;
+  sorted.forEach(function(op){
+    var key = op.ano+'-'+op.mes;
+    running += (op.vendas||0)-(op.compras||0);
+    acumMap[key] = running;
+  });
+  acumulado = running;
+  document.getElementById('black-cli-acumulado').textContent = fmtFull(acumulado);
+
+  // Table
+  var tb = document.getElementById('black-table-mensal');
+  tb.innerHTML='';
+
+  if(!ops.length){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="9" style="text-align:center;padding:40px;color:var(--text3)">Nenhuma operação lançada</td>';
+    tb.appendChild(tr);
+    return;
+  }
+
+  ops.forEach(function(op){
+    var saldo=(op.vendas||0)-(op.compras||0);
+    var custoTotal=op.custoTotal||0;
+    var liquido=saldo-custoTotal;
+    var key=op.ano+'-'+op.mes;
+    var acumVal=acumMap[key]||0;
+
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
+      +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(op.compras||0)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;color:#22c55e;font-size:12px">'+fmtFull(op.vendas||0)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custoTotal)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:var(--blue)">'+fmtFull(liquido)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acumVal)+'</td>'
+      +'<td><span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+(op.tipo==='detalhado'?'#1e8fff22':'#c084fc22')+';color:'+(op.tipo==='detalhado'?'#1e8fff':'#c084fc')+';font-weight:700">'+(op.tipo==='detalhado'?'Detalhado':'Simplificado')+'</span></td>'
+      +'<td></td>';
+
+    // Add action buttons via DOM
+    var td = tr.lastElementChild;
+    var btnDiv = document.createElement('div');
+    btnDiv.style='display:flex;gap:6px';
+
+    if(op.tipo==='detalhado' && op.pernas && op.pernas.length){
+      var verBtn=document.createElement('button');
+      verBtn.className='btn-ghost';
+      verBtn.style='padding:4px 10px;font-size:11px';
+      verBtn.textContent='Pernas';
+      (function(o){ verBtn.onclick=function(){ showPernas(o); }; })(op);
+      btnDiv.appendChild(verBtn);
+    }
+
+    var editBtn=document.createElement('button');
+    editBtn.className='btn-ghost';
+    editBtn.style='padding:4px 8px;font-size:11px';
+    editBtn.innerHTML='✏️';
+    (function(o){ editBtn.onclick=function(){ editBlackOp(o); }; })(op);
+
+    var delBtn=document.createElement('button');
+    delBtn.className='btn-dsm';
+    delBtn.style='padding:4px 8px;font-size:11px';
+    delBtn.innerHTML='🗑';
+    (function(oid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('black_operacoes').doc(oid).delete(); }); }; })(op.id);
+
+    btnDiv.appendChild(editBtn);
+    btnDiv.appendChild(delBtn);
+    td.appendChild(btnDiv);
+    tb.appendChild(tr);
+  });
+}
+
+function showPernas(op){
+  if(!op.pernas||!op.pernas.length) return;
+  var html='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:4px">'+op.estrutura+'</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:16px">'+op.ativo+' · '+MESES[op.mes-1]+'/'+op.ano+'</div>'
+    +'<div class="table-wrap"><table><thead><tr><th>Cód.</th><th>C/V</th><th>Especificação</th><th>Venc.</th><th>Qtde.</th><th>Prêmio Unit.</th><th>Total</th></tr></thead><tbody>';
+  op.pernas.forEach(function(p){
+    var cv = p.cv==='V'?'Venda':'Compra';
+    var cor = p.cv==='V'?'#22c55e':'#ef4444';
+    html+='<tr><td style="font-family:DM Mono,monospace;font-size:12px">'+p.codigo+'</td>'
+      +'<td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+cor+'22;color:'+cor+';font-weight:700">'+cv+'</span></td>'
+      +'<td>'+p.especificacao+'</td>'
+      +'<td style="font-size:12px">'+fmtDate(p.vencimento)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+p.quantidade+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px">'+fmtFull(p.premio)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+cor+'">'+fmtFull(p.total)+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  var overlay=document.createElement('div');
+  overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+  var box=document.createElement('div');box.className='modal modal-lg';box.style.maxWidth='680px';
+  box.innerHTML=html;
+  var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
+  var btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Fechar';
+  btn.onclick=function(){overlay.parentNode.removeChild(overlay);};
+  overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+  footer.appendChild(btn);box.appendChild(footer);
+  overlay.appendChild(box);document.body.appendChild(overlay);
+}
+
+// ── Lançamento Simplificado ───────────────────────────────
+function openModalBlackLanc(tipo){
+  editingBlackId = null;
+  var now = new Date();
+  var mesVal = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  if(tipo==='simplificado'){
+    document.getElementById('modal-bs-title').textContent='Lançamento Simplificado';
+    ['bs-compras','bs-vendas','bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros','bs-obs'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value='';
+    });
+    buildBlackMesGrid('bs-mes-grid','bs-mes',mesVal);
+    updateBsPreview();
+    openModal('modal-black-simples');
+  } else {
+    document.getElementById('modal-bd-title').textContent='Lançamento Detalhado';
+    document.getElementById('bd-ativo').value='';
+    document.getElementById('bd-estrutura').value='';
+    ['bd-emol','bd-taxa-op','bd-exec','bd-impostos','bd-outros','bd-obs'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value='';
+    });
+    pernaCount=0;
+    document.getElementById('bd-pernas-list').innerHTML='';
+    buildBlackMesGrid('bd-mes-grid','bd-mes',mesVal);
+    addPerna();
+    updateBdPreview();
+    openModal('modal-black-det');
+  }
+}
+
+function buildBlackMesGrid(gridId, hiddenId, selectedVal){
+  var grid=document.getElementById(gridId);
+  if(!grid)return;
+  grid.innerHTML='';
+  var now=new Date(), curYear=now.getFullYear();
+  for(var yr=curYear-1;yr<=curYear+1;yr++){
+    var yrLabel=document.createElement('div');
+    yrLabel.style='width:100%;font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:'+(yr===curYear-1?'0':'8px');
+    yrLabel.textContent=yr; grid.appendChild(yrLabel);
+    var row=document.createElement('div'); row.style='display:flex;gap:4px;flex-wrap:wrap';
+    for(var m=1;m<=12;m++){
+      var val=yr+'-'+String(m).padStart(2,'0');
+      var btn=document.createElement('button');
+      btn.type='button'; btn.textContent=MESES[m-1];
+      btn.setAttribute('data-val',val);
+      btn.setAttribute('data-grid',gridId);
+      btn.setAttribute('data-hidden',hiddenId);
+      var isSel=val===selectedVal;
+      btn.style='padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid '+(isSel?'var(--blue)':'var(--border)')+';background:'+(isSel?'var(--blue)':'var(--card2)')+';color:'+(isSel?'#000':'var(--text2)')+'';
+      btn.onclick=function(){
+        var gid=this.getAttribute('data-grid');
+        document.querySelectorAll('#'+gid+' button').forEach(function(b){b.style.background='var(--card2)';b.style.color='var(--text2)';b.style.borderColor='var(--border)';});
+        this.style.background='var(--blue)';this.style.color='#000';this.style.borderColor='var(--blue)';
+        document.getElementById(this.getAttribute('data-hidden')).value=this.getAttribute('data-val');
+      };
+      row.appendChild(btn);
+    }
+    grid.appendChild(row);
+  }
+  if(selectedVal) document.getElementById(hiddenId).value=selectedVal;
+}
+
+function updateBsPreview(){
+  var c=Number(document.getElementById('bs-compras').value)||0;
+  var v=Number(document.getElementById('bs-vendas').value)||0;
+  var custos=(Number(document.getElementById('bs-emol').value)||0)
+    +(Number(document.getElementById('bs-taxa-op').value)||0)
+    +(Number(document.getElementById('bs-exec').value)||0)
+    +(Number(document.getElementById('bs-impostos').value)||0)
+    +(Number(document.getElementById('bs-custodia').value)||0)
+    +(Number(document.getElementById('bs-outros').value)||0);
+  var saldo=v-c;
+  document.getElementById('bs-preview-saldo').textContent=fmtFull(saldo);
+  document.getElementById('bs-preview-saldo').style.color=saldo>=0?'#22c55e':'#ef4444';
+  var liq=saldo-custos;
+  document.getElementById('bs-preview-liquido').textContent=fmtFull(liq);
+  document.getElementById('bs-preview-liquido').style.color=liq>=0?'var(--blue)':'#ef4444';
+}
+['bs-compras','bs-vendas','bs-emol','bs-taxa-op','bs-exec','bs-impostos','bs-custodia','bs-outros'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('input',updateBsPreview);
+});
+
+function saveBlackSimples(){
+  if(!currentBlackClienteId){alert('Nenhum cliente selecionado!');return;}
+  var mesStr=document.getElementById('bs-mes').value;
+  if(!mesStr){alert('Selecione o mês!');return;}
+  var parts=mesStr.split('-');
+  var c=Number(document.getElementById('bs-compras').value)||0;
+  var v=Number(document.getElementById('bs-vendas').value)||0;
+  var custoTotal=(Number(document.getElementById('bs-emol').value)||0)
+    +(Number(document.getElementById('bs-taxa-op').value)||0)
+    +(Number(document.getElementById('bs-exec').value)||0)
+    +(Number(document.getElementById('bs-impostos').value)||0)
+    +(Number(document.getElementById('bs-custodia').value)||0)
+    +(Number(document.getElementById('bs-outros').value)||0);
+  var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
+  var data={
+    clienteId:currentBlackClienteId,
+    clienteNome:cli?cli.nome:'',
+    ano:Number(parts[0]),mes:Number(parts[1]),
+    tipo:'simplificado',
+    compras:c,vendas:v,custoTotal:custoTotal,
+    custos:{emolumentos:Number(document.getElementById('bs-emol').value)||0,taxaOperacional:Number(document.getElementById('bs-taxa-op').value)||0,execucao:Number(document.getElementById('bs-exec').value)||0,impostos:Number(document.getElementById('bs-impostos').value)||0,custodia:Number(document.getElementById('bs-custodia').value)||0,outros:Number(document.getElementById('bs-outros').value)||0},
+    obs:document.getElementById('bs-obs').value,
+    criadoEm:new Date().toISOString()
+  };
+  if(editingBlackId) db.collection('black_operacoes').doc(editingBlackId).update(data);
+  else db.collection('black_operacoes').add(data);
+  closeModal('modal-black-simples');
+}
+
+// ── Pernas (Detalhado) ────────────────────────────────────
+function addPerna(){
+  pernaCount++;
+  var idx=pernaCount;
+  var list=document.getElementById('bd-pernas-list');
+  var perna=document.createElement('div');
+  perna.id='perna-'+idx;
+  perna.style='background:#030810;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative';
+  perna.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Perna '+idx+'</span>'
+    +(idx>1?'<button type="button" class="btn-dsm" style="padding:3px 8px;font-size:11px" onclick="removePerna('+idx+')">Remover</button>':'')
+    +'</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group"><label>C/V</label><select class="form-input" id="p'+idx+'-cv" onchange="updateBdPreview()"><option value="V">Venda</option><option value="C">Compra</option></select></div>'
+    +'<div class="form-group"><label>Código</label><input class="form-input" id="p'+idx+'-codigo" placeholder="Ex: GDMF A 250"></div>'
+    +'<div class="form-group form-full"><label>Especificação</label><input class="form-input" id="p'+idx+'-especificacao" placeholder="Ex: INVESTO LFTB F11"></div>'
+    +'<div class="form-group"><label>Vencimento</label><input class="form-input" id="p'+idx+'-vencimento" type="date"></div>'
+    +'<div class="form-group"><label>Quantidade</label><input class="form-input" id="p'+idx+'-qtde" type="number" placeholder="0" oninput="updateBdPreview()"></div>'
+    +'<div class="form-group"><label>Prêmio Unitário (R$)</label><input class="form-input" id="p'+idx+'-premio" type="number" step="0.01" placeholder="0,00" oninput="updateBdPreview()"></div>'
+    +'</div>';
+  list.appendChild(perna);
+  updateBdPreview();
+}
+
+function removePerna(idx){
+  var el=document.getElementById('perna-'+idx);
+  if(el) el.parentNode.removeChild(el);
+  updateBdPreview();
+}
+
+function updateBdPreview(){
+  var totalC=0,totalV=0;
+  for(var i=1;i<=pernaCount;i++){
+    var cvEl=document.getElementById('p'+i+'-cv');
+    var qtdeEl=document.getElementById('p'+i+'-qtde');
+    var premEl=document.getElementById('p'+i+'-premio');
+    if(!cvEl||!qtdeEl||!premEl) continue;
+    var total=(Number(qtdeEl.value)||0)*(Number(premEl.value)||0);
+    if(cvEl.value==='V') totalV+=total; else totalC+=total;
+  }
+  var custos=(Number(document.getElementById('bd-emol').value)||0)+(Number(document.getElementById('bd-taxa-op').value)||0)+(Number(document.getElementById('bd-exec').value)||0)+(Number(document.getElementById('bd-impostos').value)||0)+(Number(document.getElementById('bd-outros').value)||0);
+  var saldo=totalV-totalC, liquido=saldo-custos;
+  document.getElementById('bd-preview-compras').textContent=fmtFull(totalC);
+  document.getElementById('bd-preview-vendas').textContent=fmtFull(totalV);
+  document.getElementById('bd-preview-saldo').textContent=fmtFull(saldo);
+  document.getElementById('bd-preview-saldo').style.color=saldo>=0?'#22c55e':'#ef4444';
+  document.getElementById('bd-preview-liquido').textContent=fmtFull(liquido);
+}
+
+function saveBlackDetalhado(){
+  if(!currentBlackClienteId){alert('Nenhum cliente selecionado!');return;}
+  var mesStr=document.getElementById('bd-mes').value;
+  if(!mesStr){alert('Selecione o mês!');return;}
+  var parts=mesStr.split('-');
+  var pernas=[], totalC=0, totalV=0;
+  for(var i=1;i<=pernaCount;i++){
+    var cvEl=document.getElementById('p'+i+'-cv');
+    if(!cvEl)continue;
+    var qtde=Number(document.getElementById('p'+i+'-qtde').value)||0;
+    var premio=Number(document.getElementById('p'+i+'-premio').value)||0;
+    var total=qtde*premio;
+    var p={cv:cvEl.value,codigo:document.getElementById('p'+i+'-codigo').value,especificacao:document.getElementById('p'+i+'-especificacao').value,vencimento:document.getElementById('p'+i+'-vencimento').value,quantidade:qtde,premio:premio,total:total};
+    pernas.push(p);
+    if(p.cv==='V') totalV+=total; else totalC+=total;
+  }
+  var custoTotal=(Number(document.getElementById('bd-emol').value)||0)+(Number(document.getElementById('bd-taxa-op').value)||0)+(Number(document.getElementById('bd-exec').value)||0)+(Number(document.getElementById('bd-impostos').value)||0)+(Number(document.getElementById('bd-outros').value)||0);
+  var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
+  var data={
+    clienteId:currentBlackClienteId,clienteNome:cli?cli.nome:'',
+    ano:Number(parts[0]),mes:Number(parts[1]),
+    tipo:'detalhado',ativo:document.getElementById('bd-ativo').value,
+    estrutura:document.getElementById('bd-estrutura').value,
+    pernas:pernas,compras:totalC,vendas:totalV,
+    custoTotal:custoTotal,
+    custos:{emolumentos:Number(document.getElementById('bd-emol').value)||0,taxaOperacional:Number(document.getElementById('bd-taxa-op').value)||0,execucao:Number(document.getElementById('bd-exec').value)||0,impostos:Number(document.getElementById('bd-impostos').value)||0,outros:Number(document.getElementById('bd-outros').value)||0},
+    obs:document.getElementById('bd-obs').value,
+    criadoEm:new Date().toISOString()
+  };
+  if(editingBlackId) db.collection('black_operacoes').doc(editingBlackId).update(data);
+  else db.collection('black_operacoes').add(data);
+  closeModal('modal-black-det');
+}
+
+function editBlackOp(op){
+  editingBlackId=op.id;
+  if(op.tipo==='simplificado'){
+    var mesVal=op.ano+'-'+String(op.mes).padStart(2,'0');
+    document.getElementById('bs-compras').value=op.compras||'';
+    document.getElementById('bs-vendas').value=op.vendas||'';
+    document.getElementById('bs-emol').value=op.custos?op.custos.emolumentos||'':'';
+    document.getElementById('bs-taxa-op').value=op.custos?op.custos.taxaOperacional||'':'';
+    document.getElementById('bs-exec').value=op.custos?op.custos.execucao||'':'';
+    document.getElementById('bs-impostos').value=op.custos?op.custos.impostos||'':'';
+    document.getElementById('bs-custodia').value=op.custos?op.custos.custodia||'':'';
+    document.getElementById('bs-outros').value=op.custos?op.custos.outros||'':'';
+    document.getElementById('bs-obs').value=op.obs||'';
+    buildBlackMesGrid('bs-mes-grid','bs-mes',mesVal);
+    updateBsPreview();
+    openModal('modal-black-simples');
+  } else {
+    var mesVal2=op.ano+'-'+String(op.mes).padStart(2,'0');
+    document.getElementById('bd-ativo').value=op.ativo||'';
+    document.getElementById('bd-estrutura').value=op.estrutura||'';
+    pernaCount=0;
+    document.getElementById('bd-pernas-list').innerHTML='';
+    if(op.pernas) op.pernas.forEach(function(p){
+      addPerna();
+      var i=pernaCount;
+      document.getElementById('p'+i+'-cv').value=p.cv||'V';
+      document.getElementById('p'+i+'-codigo').value=p.codigo||'';
+      document.getElementById('p'+i+'-especificacao').value=p.especificacao||'';
+      document.getElementById('p'+i+'-vencimento').value=p.vencimento||'';
+      document.getElementById('p'+i+'-qtde').value=p.quantidade||'';
+      document.getElementById('p'+i+'-premio').value=p.premio||'';
+    });
+    document.getElementById('bd-emol').value=op.custos?op.custos.emolumentos||'':'';
+    document.getElementById('bd-taxa-op').value=op.custos?op.custos.taxaOperacional||'':'';
+    document.getElementById('bd-exec').value=op.custos?op.custos.execucao||'':'';
+    document.getElementById('bd-impostos').value=op.custos?op.custos.impostos||'':'';
+    document.getElementById('bd-outros').value=op.custos?op.custos.outros||'':'';
+    document.getElementById('bd-obs').value=op.obs||'';
+    buildBlackMesGrid('bd-mes-grid','bd-mes',mesVal2);
+    updateBdPreview();
+    openModal('modal-black-det');
+  }
 }
 
 </script>
