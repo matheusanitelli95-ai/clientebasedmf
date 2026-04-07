@@ -303,6 +303,11 @@ textarea.form-input{resize:vertical;min-height:80px}
 .empty-icon{font-size:44px;margin-bottom:12px;opacity:.6}
 .empty-title{font-size:14px;color:var(--text2);margin-bottom:4px;font-weight:500}
 
+.sim-rate-btn{padding:9px 24px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.sim-rate-btn.active{border-color:var(--blue);background:#1e8fff22;color:var(--blue);font-weight:700}
+.sim-rate-btn:hover:not(.active){border-color:var(--border2);color:var(--text)}
+.sim-cell{border-radius:8px;padding:12px 8px;text-align:center;border:1px solid var(--border);transition:transform .1s}
+.sim-cell:hover{transform:scale(1.03)}
 @media(max-width:900px){
   .sidebar{width:64px;min-width:64px}
   .sidebar-logo span:not(.dmf-logo-sm),.nav-item span:not(.icon),.user-email,.sidebar-tagline{display:none}
@@ -364,6 +369,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon">💵</span><span>Financeiro</span></button>
       <div class="nav-section">DMF Black</div>
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon">⚡</span><span>Operações</span></button>
+      <div class="nav-section">Ferramentas</div>
+      <button class="nav-item" onclick="showView('simulador',this)"><span class="icon">🎯</span><span>Simulador IF</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -612,7 +619,131 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
+    <div class="view" id="view-simulador">
+      <div class="page-header">
+        <div><div class="page-title">Simulador de Independência Financeira</div><div class="page-sub">Quantos anos para se aposentar? Cálculo em juro real — já descontada a inflação.</div></div>
+      </div>
+      <div class="page-content">
+
+        <!-- Inputs -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Renda Mensal Desejada (R$ de hoje)</label>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="color:var(--text3);font-size:14px">R$</span>
+                <input class="form-input" id="sim-renda" type="number" value="10000" oninput="calcSimulador()" style="font-size:20px;font-weight:700;max-width:180px">
+                <span style="color:var(--text3);font-size:13px">/mês</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Capital Necessário (perpetuidade)</label>
+              <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:#c084fc" id="sim-capital">R$ 0</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px" id="sim-formula">= R$ 0 / ano ÷ 8%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rate selector -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Cenário de Juro Real ao Ano</div>
+          <div style="display:flex;gap:8px">
+            <button class="sim-rate-btn active" data-rate="6" onclick="setSimRate(6,this)">6% a.a.</button>
+            <button class="sim-rate-btn" data-rate="8" onclick="setSimRate(8,this)">8% a.a.</button>
+            <button class="sim-rate-btn" data-rate="10" onclick="setSimRate(10,this)">10% a.a.</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:12px">
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#4ade80"></div>≤ 5 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#86efac"></div>≤ 10 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#fbbf24"></div>≤ 15 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#f97316"></div>≤ 20 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#ef4444"></div>≤ 30 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#fca5a5"></div>&gt; 30 anos</div>
+        </div>
+
+        <!-- Table -->
+        <div class="card" style="overflow-x:auto;margin-bottom:16px">
+          <div id="sim-table-wrap"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card" style="border-color:#1e3a5f">
+          <p style="font-size:13px;color:var(--text3);line-height:1.7">
+            <strong style="color:var(--text2)">Como ler:</strong> A meta de renda é em <strong style="color:#c084fc">R$ de hoje</strong> — o juro real já desconta a inflação.
+            O capital necessário é calculado pela fórmula de perpetuidade (<em>renda anual ÷ taxa real</em>), ou seja, você nunca consome o principal.
+            Aporte em % da meta facilita a comparação: se sua meta é R$ 10k/mês e você guarda 20%, são R$ 2k/mês independente do valor exato.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
+
+    <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
+    <div class="view" id="view-simulador">
+      <div class="page-header">
+        <div><div class="page-title">Simulador de Independência Financeira</div><div class="page-sub">Quantos anos para se aposentar? Cálculo em juro real — já descontada a inflação.</div></div>
+      </div>
+      <div class="page-content">
+
+        <!-- Inputs -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Renda Mensal Desejada (R$ de hoje)</label>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="color:var(--text3);font-size:14px">R$</span>
+                <input class="form-input" id="sim-renda" type="number" value="10000" oninput="calcSimulador()" style="font-size:20px;font-weight:700;max-width:180px">
+                <span style="color:var(--text3);font-size:13px">/mês</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Capital Necessário (perpetuidade)</label>
+              <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:#c084fc" id="sim-capital">R$ 0</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px" id="sim-formula">= R$ 0 / ano ÷ 8%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rate selector -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Cenário de Juro Real ao Ano</div>
+          <div style="display:flex;gap:8px">
+            <button class="sim-rate-btn active" data-rate="6" onclick="setSimRate(6,this)">6% a.a.</button>
+            <button class="sim-rate-btn" data-rate="8" onclick="setSimRate(8,this)">8% a.a.</button>
+            <button class="sim-rate-btn" data-rate="10" onclick="setSimRate(10,this)">10% a.a.</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:12px">
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#4ade80"></div>≤ 5 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#86efac"></div>≤ 10 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#fbbf24"></div>≤ 15 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#f97316"></div>≤ 20 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#ef4444"></div>≤ 30 anos</div>
+          <div style="display:flex;align-items:center;gap:6px;color:var(--text3)"><div style="width:12px;height:12px;border-radius:3px;background:#fca5a5"></div>&gt; 30 anos</div>
+        </div>
+
+        <!-- Table -->
+        <div class="card" style="overflow-x:auto;margin-bottom:16px">
+          <div id="sim-table-wrap"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card" style="border-color:#1e3a5f">
+          <p style="font-size:13px;color:var(--text3);line-height:1.7">
+            <strong style="color:var(--text2)">Como ler:</strong> A meta de renda é em <strong style="color:#c084fc">R$ de hoje</strong> — o juro real já desconta a inflação.
+            O capital necessário é calculado pela fórmula de perpetuidade (<em>renda anual ÷ taxa real</em>), ou seja, você nunca consome o principal.
+            Aporte em % da meta facilita a comparação: se sua meta é R$ 10k/mês e você guarda 20%, são R$ 2k/mês independente do valor exato.
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- ALERTAS -->
     <div class="view" id="view-alertas">
@@ -2504,6 +2635,123 @@ function editBlackOp(op){
     openModal('modal-black-det');
   }
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// SIMULADOR INDEPENDÊNCIA FINANCEIRA
+// ═══════════════════════════════════════════════════════════
+var simRate = 8;
+var STARTING_CAPITALS = [0, 50000, 100000, 200000, 500000, 1000000];
+var CONTRIBUTION_PCTS = [10, 20, 30, 40, 50];
+
+function fmtSim(v){
+  if(v>=1000000) return 'R$ '+(v/1000000).toFixed(1).replace('.',',')+' M';
+  if(v>=1000) return 'R$ '+(v/1000).toFixed(0)+'k';
+  return 'R$ '+v;
+}
+
+function calcYears(capital0, monthlyContrib, annualRealRate, targetCapital){
+  var rm=Math.pow(1+annualRealRate/100,1/12)-1;
+  if(capital0>=targetCapital) return 0;
+  if(monthlyContrib<=0&&capital0<=0) return null;
+  var num=targetCapital*rm+monthlyContrib;
+  var den=capital0*rm+monthlyContrib;
+  if(den<=0) return null;
+  var n=Math.log(num/den)/Math.log(1+rm);
+  if(!isFinite(n)||n<0) return null;
+  return n/12;
+}
+
+function getSimColor(years){
+  if(years===null) return {bg:'#0a1525',text:'#334155',label:'∞',sub:''};
+  if(years===0) return {bg:'#22c55e22',text:'#22c55e',label:'Já chegou!',sub:''};
+  var yrs=years.toFixed(1);
+  var sub=Math.floor(years)+' a '+Math.round((years%1)*12)+' m';
+  if(years<=5) return {bg:'#4ade8022',text:'#4ade80',label:yrs+' anos',sub:sub};
+  if(years<=10) return {bg:'#86efac22',text:'#86efac',label:yrs+' anos',sub:sub};
+  if(years<=15) return {bg:'#fbbf2422',text:'#fbbf24',label:yrs+' anos',sub:sub};
+  if(years<=20) return {bg:'#f9731622',text:'#f97316',label:yrs+' anos',sub:sub};
+  if(years<=30) return {bg:'#ef444422',text:'#ef4444',label:yrs+' anos',sub:sub};
+  return {bg:'#7f1d1d22',text:'#fca5a5',label:years.toFixed(0)+' anos',sub:sub};
+}
+
+function setSimRate(rate, btn){
+  simRate=rate;
+  document.querySelectorAll('.sim-rate-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcSimulador();
+}
+
+function calcSimulador(){
+  var renda=Number(document.getElementById('sim-renda').value)||10000;
+  var targetCapital=(renda*12)/(simRate/100);
+  
+  var capEl=document.getElementById('sim-capital');
+  var frmEl=document.getElementById('sim-formula');
+  if(capEl) capEl.textContent=fmtSim(targetCapital);
+  if(frmEl) frmEl.textContent='= R$ '+(renda*12).toLocaleString('pt-BR')+' / ano ÷ '+simRate+'%';
+
+  var wrap=document.getElementById('sim-table-wrap');
+  if(!wrap) return;
+
+  // Build table via DOM
+  wrap.innerHTML='';
+  var table=document.createElement('table');
+  table.style='width:100%;border-collapse:separate;border-spacing:4px';
+
+  // Header
+  var thead=document.createElement('thead');
+  var headerRow=document.createElement('tr');
+
+  var th0=document.createElement('th');
+  th0.style='background:var(--card2);border-radius:8px;padding:10px 14px;text-align:left;color:var(--text3);font-size:11px;font-weight:600;min-width:150px;border:1px solid var(--border)';
+  th0.innerHTML='Capital inicial →<br><span style="color:var(--text3);font-weight:400">Aporte (% meta) ↓</span>';
+  headerRow.appendChild(th0);
+
+  STARTING_CAPITALS.forEach(function(c){
+    var th=document.createElement('th');
+    th.style='background:var(--card2);border-radius:8px;padding:10px 12px;text-align:center;color:var(--text2);font-size:13px;font-weight:600;min-width:110px;border:1px solid var(--border)';
+    th.textContent=c===0?'Do zero':fmtSim(c);
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  // Body
+  var tbody=document.createElement('tbody');
+  CONTRIBUTION_PCTS.forEach(function(pct){
+    var monthlyContrib=(renda*pct)/100;
+    var row=document.createElement('tr');
+
+    // Row header
+    var td0=document.createElement('td');
+    td0.style='background:var(--card2);border-radius:8px;padding:10px 14px;border:1px solid var(--border)';
+    td0.innerHTML='<div style="font-weight:800;font-size:18px;color:#c084fc;font-family:DM Mono,monospace">'+pct+'%</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">= '+fmtSim(monthlyContrib)+'/mês</div>';
+    row.appendChild(td0);
+
+    STARTING_CAPITALS.forEach(function(capital){
+      var years=calcYears(capital, monthlyContrib, simRate, targetCapital);
+      var col=getSimColor(years);
+      var td=document.createElement('td');
+      td.className='sim-cell';
+      td.style='background:'+col.bg+';border:1px solid var(--border)';
+      td.innerHTML='<div style="font-weight:700;font-size:15px;color:'+col.text+'">'+col.label+'</div>'
+        +(col.sub?'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+col.sub+'</div>':'');
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
+// Init simulador when view is shown
+var _origShowViewSim = showView;
+showView = function(v, btn){
+  _origShowViewSim(v, btn);
+  if(v === 'simulador') setTimeout(calcSimulador, 50);
+};
 
 </script>
 </body>
