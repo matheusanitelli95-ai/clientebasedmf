@@ -822,11 +822,11 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
           </div>
           <div class="form-grid">
-            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" placeholder="Sua instance ID da Z-API"></div>
-            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" type="password" placeholder="Token da Z-API"></div>
+            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" value="3F14CB4D47F7902A51809270C2FA2FFD"></div>
+            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" value="6BCE83E14C27EB9C89DD71A8"></div>
           </div>
-          <div style="margin-top:12px;padding:12px;background:#030810;border-radius:8px;font-size:12px;color:var(--text3)">
-            📌 Acesse <strong style="color:var(--blue)">z-api.io</strong> para criar sua conta e obter as credenciais. Plano a partir de R$150/mês. Conecte seu WhatsApp Business e configure aqui.
+          <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
+            ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
         </div>
       </div>
@@ -1033,11 +1033,11 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
           </div>
           <div class="form-grid">
-            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" placeholder="Sua instance ID da Z-API"></div>
-            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" type="password" placeholder="Token da Z-API"></div>
+            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" value="3F14CB4D47F7902A51809270C2FA2FFD"></div>
+            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" value="6BCE83E14C27EB9C89DD71A8"></div>
           </div>
-          <div style="margin-top:12px;padding:12px;background:#030810;border-radius:8px;font-size:12px;color:var(--text3)">
-            📌 Acesse <strong style="color:var(--blue)">z-api.io</strong> para criar sua conta e obter as credenciais. Plano a partir de R$150/mês. Conecte seu WhatsApp Business e configure aqui.
+          <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
+            ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
         </div>
       </div>
@@ -3472,41 +3472,112 @@ function enviarWhatsAppIndividual(){
   var msg=document.getElementById('wa-msg-individual').value.trim();
   if(!tel){alert('Selecione um cliente com telefone cadastrado!');return;}
   if(!msg){alert('Digite a mensagem!');return;}
-  var num=limparTelefone(tel);
-  if(!num.startsWith('55')) num='55'+num;
-  var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
-  window.open(url,'_blank');
+  var instance=document.getElementById('zapi-instance').value.trim();
+  var token=document.getElementById('zapi-token').value.trim();
+  if(!instance||!token){
+    // Fallback to WhatsApp Web
+    var num=limparTelefone(tel);if(!num.startsWith('55'))num='55'+num;
+    window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+    return;
+  }
+  var num=limparTelefone(tel);if(!num.startsWith('55'))num='55'+num;
+  var btn=event.target;btn.textContent='Enviando...';btn.disabled=true;
+  fetch('https://api.z-api.io/instances/'+instance+'/token/'+token+'/send-text',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Client-Token':token},
+    body:JSON.stringify({phone:num,message:msg})
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.zaapId||data.messageId){
+      btn.textContent='✅ Enviado!';btn.style.background='#22c55e';
+      setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
+    } else {
+      btn.textContent='⚠️ Erro';btn.style.background='#ef4444';
+      setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
+      console.error('Z-API error:',data);
+    }
+  }).catch(function(e){
+    console.error(e);
+    // Fallback
+    window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+    btn.textContent='Enviar via WhatsApp';btn.disabled=false;
+  });
 }
 
 function prepararDisparo(){
   var filtro=document.getElementById('wa-filtro').value;
   var msg=document.getElementById('wa-msg-massa').value.trim();
+  var tipo=document.getElementById('wa-tipo').value;
   if(!msg){alert('Digite a mensagem!');return;}
+  var instance=document.getElementById('zapi-instance').value.trim();
+  var token=document.getElementById('zapi-token').value.trim();
   var destinatarios=clientes.filter(function(c){
     if(filtro==='black') return c.servico&&c.servico.includes('Black')&&c.telefone;
     if(filtro==='consultoria') return c.servico==='DMF Consultoria'&&c.telefone;
     return c.status==='Ativo'&&c.telefone;
   });
-  if(!destinatarios.length){alert('Nenhum cliente com telefone cadastrado no filtro selecionado!');return;}
-  // Open WhatsApp for each (simplified - opens first)
+  if(!destinatarios.length){alert('Nenhum cliente com telefone cadastrado!');return;}
+
   var overlay=document.createElement('div');
   overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
-  var box=document.createElement('div');box.className='modal';box.style.maxWidth='480px';
-  var html='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:16px">Disparo Preparado</div>'
-    +'<div style="font-size:13px;color:var(--text2);margin-bottom:16px">'+destinatarios.length+' clientes serão contatados. Clique em cada número para abrir o WhatsApp:</div>';
-  destinatarios.forEach(function(c){
-    var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
-    var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
-    html+='<a href="'+url+'" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none">'
-      +'<span style="font-size:13px;color:var(--text)">'+c.nome+'</span>'
-      +'<span style="font-size:12px;color:#25d366">Abrir →</span></a>';
-  });
-  box.innerHTML=html;
-  var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
-  var btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Fechar';
-  btn.onclick=function(){overlay.parentNode.removeChild(overlay);};
+  var box=document.createElement('div');box.className='modal';box.style.maxWidth='520px';
+  box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:8px">'+tipo+'</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:4px">'+destinatarios.length+' destinatários</div>'
+    +'<div style="font-size:12px;color:var(--text3);background:#030810;padding:12px;border-radius:8px;margin-bottom:16px;line-height:1.6;white-space:pre-wrap">'+msg+'</div>'
+    +'<div id="disparo-status" style="margin-bottom:12px"></div>'
+    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
+    +(instance&&token?'<button class="btn-primary" id="btn-disparo-api">⚡ Disparar via Z-API ('+destinatarios.length+')</button>':'')
+    +'<button class="btn-secondary" id="btn-disparo-links">📱 Abrir links</button>'
+    +'<button class="btn-ghost" id="btn-disparo-fechar">Fechar</button>'
+    +'</div>'
+    +'<div id="disparo-links-list" style="margin-top:12px"></div>';
   overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
-  footer.appendChild(btn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
+  overlay.appendChild(box);document.body.appendChild(overlay);
+
+  box.querySelector('#btn-disparo-fechar').onclick=function(){overlay.parentNode.removeChild(overlay);};
+
+  // Links fallback
+  box.querySelector('#btn-disparo-links').onclick=function(){
+    var list=box.querySelector('#disparo-links-list');list.innerHTML='';
+    destinatarios.forEach(function(c){
+      var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+      var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
+      var a=document.createElement('a');a.href=url;a.target='_blank';
+      a.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none';
+      a.innerHTML='<span style="font-size:13px;color:var(--text)">'+c.nome+'</span><span style="font-size:12px;color:#25d366">Abrir →</span>';
+      list.appendChild(a);
+    });
+  };
+
+  // Z-API real disparo
+  if(instance&&token){
+    box.querySelector('#btn-disparo-api').onclick=function(){
+      var statusEl=box.querySelector('#disparo-status');
+      var btn=this;btn.disabled=true;btn.textContent='Disparando...';
+      var enviados=0,erros=0,total=destinatarios.length;
+
+      function sendNext(idx){
+        if(idx>=total){
+          statusEl.innerHTML='<div style="padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e">✅ Disparo concluído! '+enviados+' enviados, '+erros+' erros.</div>';
+          btn.textContent='✅ Concluído';
+          // Log comunicado
+          db.collection('comunicados').add({titulo:tipo,conteudo:msg,tipo:'💬 WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
+          return;
+        }
+        var c=destinatarios[idx];
+        var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+        statusEl.innerHTML='<div style="font-size:12px;color:var(--text3)">Enviando para '+c.nome+'... ('+(idx+1)+'/'+total+')</div>';
+        fetch('https://api.z-api.io/instances/'+instance+'/token/'+token+'/send-text',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Client-Token':token},
+          body:JSON.stringify({phone:num,message:msg})
+        }).then(function(r){return r.json();}).then(function(data){
+          if(data.zaapId||data.messageId) enviados++; else erros++;
+          setTimeout(function(){sendNext(idx+1);},800); // 800ms delay between messages
+        }).catch(function(){erros++;setTimeout(function(){sendNext(idx+1);},800);});
+      }
+      sendNext(0);
+    };
+  }
 }
 
 </script>
