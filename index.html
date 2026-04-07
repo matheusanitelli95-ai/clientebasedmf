@@ -5084,78 +5084,58 @@ function showImportPreview(rows){
 
 function executarImportacao(rows, overlay, btn){
   var total = rows.length;
-  var done = 0;
-  var erros = 0;
-
-  // Find profissional by name
   function findProfId(nome){
-    var p = profissionais.find(function(x){ return x.nome === nome; });
+    var p = profissionais.find(function(x){ return x.nome === String(nome||'').trim(); });
     return p ? p.id : '';
   }
-
-  // Process in batches
   var batch = db.batch();
   var batchCount = 0;
   var promises = [];
-
   rows.forEach(function(r){
     var nome = String(r[0]||'').trim();
     if(!nome) return;
-
+    var consNome = String(r[6]||'').trim();
+    var blackNome = String(r[7]||'').trim();
+    var respPrincipal = consNome || blackNome;
+    var patrimonio = parseFloat(String(r[4]||'0').replace(/[^0-9.]/g,'')) || 0;
     var data = {
-      nome: nome,
-      tipo: String(r[1]||'PF').trim(),
-      cpf: String(r[2]||'').trim(),
-      nasc: parseDateBR(r[3]),
-      entrada: parseDateBR(r[4]) || new Date().toISOString().split('T')[0],
-      email: String(r[5]||'').trim(),
-      telefone: String(r[6]||'').trim(),
-      endereco: String(r[7]||'').trim(),
-      cidade: String(r[8]||'').trim(),
-      estado: String(r[9]||'').trim(),
-      banco: String(r[10]||'').trim(),
-      servico: String(r[11]||'DMF Consultoria').trim(),
-      nivel: String(r[12]||'').trim(),
-      perfil: String(r[13]||'Moderado').trim(),
-      segmentacao: String(r[14]||'Varejo').trim(),
-      objetivo: String(r[15]||'Acumulação').trim(),
-      status: String(r[16]||'Ativo').trim(),
-      custodiaRF: Number(String(r[17]||'0').replace(',','.')),
-      custodiaRV: Number(String(r[18]||'0').replace(',','.')),
-      responsavel: profNome,
-      responsavelId: findProfId(profNome),
-      obs: String(r[20]||'').trim(),
-      importadoEm: new Date().toISOString()
+      nome:nome, banco:String(r[1]||'').trim(),
+      servico:String(r[2]||'DMF Consultoria').trim(),
+      status:String(r[3]||'Ativo').trim(),
+      patrimonio:patrimonio, custodiaRF:patrimonio, custodiaRV:0, custodiaTotal:patrimonio,
+      nivel:String(r[5]||'').trim(),
+      responsavelConsultoria:consNome, responsavelConsId:findProfId(consNome),
+      responsavelBlack:blackNome, responsavelBlackId:findProfId(blackNome),
+      responsavel:respPrincipal, responsavelId:findProfId(respPrincipal),
+      cpf:String(r[8]||'').trim(), tipo:String(r[9]||'PF').trim(),
+      nasc:parseDateBR(r[10]),
+      entrada:parseDateBR(r[11])||new Date().toISOString().split('T')[0],
+      email:String(r[12]||'').trim(), telefone:String(r[13]||'').trim(),
+      endereco:String(r[14]||'').trim(), cidade:String(r[15]||'').trim(),
+      estado:String(r[16]||'').trim(), perfil:String(r[17]||'Moderado').trim(),
+      segmentacao:String(r[18]||'Varejo').trim(),
+      objetivo:String(r[19]||'Acumulacao').trim(),
+      obs:String(r[20]||'').trim(),
+      importadoEm:new Date().toISOString()
     };
-
     var ref = db.collection('clientes').doc();
     batch.set(ref, data);
     batchCount++;
-
-    if(batchCount >= 400){
-      promises.push(batch.commit());
-      batch = db.batch();
-      batchCount = 0;
-    }
+    if(batchCount >= 400){ promises.push(batch.commit()); batch = db.batch(); batchCount = 0; }
   });
-
   if(batchCount > 0) promises.push(batch.commit());
-
   Promise.all(promises).then(function(){
-    overlay.parentNode.removeChild(overlay);
-    // Show success
+    if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
     var s = document.createElement('div');
-    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999;box-shadow:0 8px 24px #22c55e44';
-    s.textContent = '✅ '+total+' clientes importados!';
+    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent = 'Importacao: '+total+' clientes cadastrados!';
     document.body.appendChild(s);
     setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 4000);
   }).catch(function(e){
-    btn.textContent = 'Importar';
-    btn.disabled = false;
-    alert('Erro na importação: '+e.message);
+    if(btn){ btn.textContent='Importar'; btn.disabled=false; }
+    alert('Erro: '+e.message);
   });
 }
-
 </script>
 </body>
 </html>
