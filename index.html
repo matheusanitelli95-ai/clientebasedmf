@@ -490,9 +490,7 @@ textarea.form-input{resize:vertical;min-height:80px}
               <th onclick="sortClientes('responsavel')">Profissional</th>
               <th onclick="sortClientes('objetivo')">Objetivo</th>
               <th onclick="sortClientes('perfil')">Perfil</th>
-              <th onclick="sortClientes('custodiaRF')">Cust. RF</th>
-              <th onclick="sortClientes('custodiaRV')">Cust. RV</th>
-              <th onclick="sortClientes('custodiaTotal')">Total ↕</th>
+              <th onclick="sortClientes('patrimonio')">Patrimônio em Ativos ↕</th>
               <th onclick="sortClientes('status')">Status</th>
               <th>Ações</th>
             </tr></thead>
@@ -2061,7 +2059,8 @@ function loadData(){
   db.collection('clientes').onSnapshot(function(snap){
     clientes=snap.docs.map(function(d){
       var c=Object.assign({id:d.id},d.data());
-      c.custodiaTotal=(c.custodiaRF||0)+(c.custodiaRV||0);
+      c.custodiaTotal=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
+      c.patrimonio=c.custodiaTotal;
       return c;
     });
     renderClientes();renderDashboard();renderCRM();renderAlertas();
@@ -2185,15 +2184,20 @@ function openClienteDetalhe(id){
   document.getElementById('btn-edit-cliente').onclick=function(){openModalCliente(id);};
   document.getElementById('btn-back-clientes').onclick=function(){showView('clientes',document.querySelectorAll('.nav-item')[1]);};
   db.collection('clientes').doc(id).update({ultimoContato:today()}).catch(function(){});
-  var rf=c.custodiaRF||0,rv=c.custodiaRV||0;
+  var patrimonio=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
+  var respCons=c.responsavelConsultoria||'';
+  var respBlack=c.responsavelBlack||'';
   document.getElementById('client-header-card').innerHTML='<div style="display:flex;align-items:center;gap:20px"><div class="client-avatar" style="background:'+avColor(c.nome)+'">'+initials(c.nome)+'</div><div style="flex:1"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><h2 style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;color:var(--white)">'+c.nome+'</h2>'+nivelBadge(c)+'</div><div style="display:flex;gap:16px;flex-wrap:wrap">'
-    +'<span class="client-meta-item">👤 '+(c.tipo||'PF')+'</span>'
-    +'<span class="client-meta-item">🏢 '+(c.responsavel||'N/A')+'</span>'
+    +(respCons?'<span class="client-meta-item">📋 Consultoria: '+respCons+'</span>':'')
+    +(respBlack&&respBlack!==respCons?'<span class="client-meta-item">⚡ Black: '+respBlack+'</span>':(!respCons&&c.responsavel?'<span class="client-meta-item">🏢 '+c.responsavel+'</span>':''))
     +'<span class="client-meta-item">🎯 '+(c.objetivo||'N/A')+'</span>'
     +'<span class="client-meta-item">📊 '+(c.perfil||'N/A')+'</span>'
     +'<span class="client-meta-item" style="color:var(--blue)">🏦 '+(c.banco||'N/A')+'</span>'
     +'</div></div>'
-    +'<div style="text-align:right;border-left:1px solid var(--border);padding-left:20px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.08em">RF</div><div style="font-family:DM Mono,monospace;color:#1e8fff;font-size:17px;font-weight:600">'+fmtFull(rf)+'</div><div style="font-size:10px;color:var(--text3);margin:8px 0 3px;text-transform:uppercase;letter-spacing:.08em">RV</div><div style="font-family:DM Mono,monospace;color:#c084fc;font-size:17px;font-weight:600">'+fmtFull(rv)+'</div><div style="font-size:10px;color:var(--text3);margin:8px 0 3px;text-transform:uppercase;letter-spacing:.08em">Total</div><div style="font-family:DM Mono,monospace;color:#22c55e;font-size:20px;font-weight:700">'+fmtFull(rf+rv)+'</div></div></div>';
+    +'<div style="text-align:right;border-left:1px solid var(--border);padding-left:20px">'
+    +'<div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Patrimônio em Ativos</div>'
+    +'<div style="font-family:DM Mono,monospace;color:#22c55e;font-size:24px;font-weight:700">'+fmtFull(patrimonio)+'</div>'
+    +'</div></div>';
   renderDadosCliente(c);
   document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
   document.getElementById('tab-dados').classList.add('active');
