@@ -371,6 +371,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon">⚡</span><span>Operações</span></button>
       <div class="nav-section">Ferramentas</div>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon">🎯</span><span>Simulador IF</span></button>
+      <button class="nav-item" onclick="showView('comunicados',this)"><span class="icon">📰</span><span>Comunicados</span></button>
+      <button class="nav-item" onclick="showView('glossario',this)"><span class="icon">📚</span><span>Glossário</span></button>
+      <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon">📅</span><span>Agendamento</span></button>
+      <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon">💬</span><span>WhatsApp</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -681,6 +685,153 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- COMUNICADOS -->
+    <div class="view" id="view-comunicados">
+      <div class="page-header">
+        <div><div class="page-title">Comunicados</div><div class="page-sub">Feed de notícias e comunicados para clientes</div></div>
+        <button class="btn-primary" onclick="openModalComunicado(null)">+ Novo Comunicado</button>
+      </div>
+      <div class="page-content">
+        <!-- Alertas de vencimento -->
+        <div class="card" style="margin-bottom:20px;border-color:#f59e0b44">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <div style="font-size:20px">⚠️</div>
+            <div class="section-title" style="margin:0">Alertas de Vencimento de Opções</div>
+          </div>
+          <div id="alertas-vencimento"></div>
+        </div>
+        <!-- Feed -->
+        <div id="comunicados-list"></div>
+      </div>
+    </div>
+
+    <!-- GLOSSÁRIO -->
+    <div class="view" id="view-glossario">
+      <div class="page-header">
+        <div><div class="page-title">Glossário</div><div class="page-sub">Termos e conceitos do mercado financeiro</div></div>
+        <button class="btn-primary" onclick="openModalGlossario(null)">+ Novo Termo</button>
+      </div>
+      <div class="page-content">
+        <div style="margin-bottom:16px">
+          <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
+        </div>
+        <div id="glossario-list"></div>
+      </div>
+    </div>
+
+    <!-- AGENDAMENTO -->
+    <div class="view" id="view-agendamento">
+      <div class="page-header">
+        <div><div class="page-title">Agendamento</div><div class="page-sub">Agende uma reunião com a equipe DMF</div></div>
+      </div>
+      <div class="page-content">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card" style="border-color:var(--blue);text-align:center;padding:32px">
+            <div style="font-size:48px;margin-bottom:16px">📅</div>
+            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Agendar Atendimento</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6">Clique abaixo para acessar o Calendly e escolher o melhor horário para sua reunião com Matheus Anitelli</div>
+            <a href="https://calendly.com/matheusanitelli-95/atendimento-dmf" target="_blank" style="text-decoration:none">
+              <button class="btn-primary" style="font-size:14px;padding:12px 28px;width:100%;justify-content:center">
+                Agendar pelo Calendly →
+              </button>
+            </a>
+          </div>
+          <div class="card">
+            <div class="section-title">Próximas Reuniões Agendadas</div>
+            <div id="reunioes-list">
+              <div class="empty" style="padding:30px">
+                <div class="empty-icon">📅</div>
+                <div class="empty-title">Nenhuma reunião cadastrada</div>
+                <p style="font-size:12px;margin-top:4px">As reuniões aparecerão aqui quando cadastradas</p>
+              </div>
+            </div>
+            <button class="btn-secondary" style="width:100%;margin-top:12px;justify-content:center" onclick="openModalReuniao()">+ Registrar Reunião</button>
+          </div>
+        </div>
+        <!-- Embed Calendly -->
+        <div class="card">
+          <div class="section-title">Calendly — Visualização Rápida</div>
+          <div style="border-radius:12px;overflow:hidden;min-height:600px;background:#fff">
+            <iframe src="https://calendly.com/matheusanitelli-95/atendimento-dmf" width="100%" height="600" frameborder="0" style="border-radius:12px"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="view" id="view-whatsapp">
+      <div class="page-header">
+        <div><div class="page-title">WhatsApp</div><div class="page-sub">Disparos e comunicação com clientes</div></div>
+      </div>
+      <div class="page-content">
+        <div class="grid-2" style="margin-bottom:20px">
+          <!-- Disparo individual -->
+          <div class="card">
+            <div class="section-title">Enviar Mensagem Individual</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Cliente</label>
+              <select class="form-input" id="wa-cliente-sel"></select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Mensagem</label>
+              <textarea class="form-input" id="wa-msg-individual" rows="4" placeholder="Digite a mensagem..."></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%;justify-content:center" onclick="enviarWhatsAppIndividual()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Enviar via WhatsApp
+            </button>
+            <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">Abre o WhatsApp Web com a mensagem pronta. Para disparo automático, configure a Z-API.</p>
+          </div>
+          <!-- Disparo em massa -->
+          <div class="card">
+            <div class="section-title">Comunicado em Massa</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Filtrar Destinatários</label>
+              <select class="form-input" id="wa-filtro">
+                <option value="todos">Todos os clientes ativos</option>
+                <option value="black">Apenas DMF Black</option>
+                <option value="consultoria">Apenas Consultoria</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Tipo de Comunicado</label>
+              <select class="form-input" id="wa-tipo">
+                <option>Abertura de Mercado</option>
+                <option>Fechamento de Mercado</option>
+                <option>Notícia / Análise</option>
+                <option>Lembrete de Reunião</option>
+                <option>Alerta de Operação</option>
+                <option>Mensagem Personalizada</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Mensagem</label>
+              <textarea class="form-input" id="wa-msg-massa" rows="4" placeholder="Digite o comunicado..."></textarea>
+            </div>
+            <div id="wa-destinatarios-count" style="font-size:12px;color:var(--text3);margin-bottom:10px"></div>
+            <button class="btn-primary" style="width:100%;justify-content:center" onclick="prepararDisparo()">
+              Preparar Disparo →
+            </button>
+          </div>
+        </div>
+
+        <!-- Z-API Config -->
+        <div class="card" style="border-color:#25d36622">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+            <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" placeholder="Sua instance ID da Z-API"></div>
+            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" type="password" placeholder="Token da Z-API"></div>
+          </div>
+          <div style="margin-top:12px;padding:12px;background:#030810;border-radius:8px;font-size:12px;color:var(--text3)">
+            📌 Acesse <strong style="color:var(--blue)">z-api.io</strong> para criar sua conta e obter as credenciais. Plano a partir de R$150/mês. Conecte seu WhatsApp Business e configure aqui.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
 
     <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
@@ -741,6 +892,153 @@ textarea.form-input{resize:vertical;min-height:80px}
             O capital necessário é calculado pela fórmula de perpetuidade (<em>renda anual ÷ taxa real</em>), ou seja, você nunca consome o principal.
             Aporte em % da meta facilita a comparação: se sua meta é R$ 10k/mês e você guarda 20%, são R$ 2k/mês independente do valor exato.
           </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMUNICADOS -->
+    <div class="view" id="view-comunicados">
+      <div class="page-header">
+        <div><div class="page-title">Comunicados</div><div class="page-sub">Feed de notícias e comunicados para clientes</div></div>
+        <button class="btn-primary" onclick="openModalComunicado(null)">+ Novo Comunicado</button>
+      </div>
+      <div class="page-content">
+        <!-- Alertas de vencimento -->
+        <div class="card" style="margin-bottom:20px;border-color:#f59e0b44">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <div style="font-size:20px">⚠️</div>
+            <div class="section-title" style="margin:0">Alertas de Vencimento de Opções</div>
+          </div>
+          <div id="alertas-vencimento"></div>
+        </div>
+        <!-- Feed -->
+        <div id="comunicados-list"></div>
+      </div>
+    </div>
+
+    <!-- GLOSSÁRIO -->
+    <div class="view" id="view-glossario">
+      <div class="page-header">
+        <div><div class="page-title">Glossário</div><div class="page-sub">Termos e conceitos do mercado financeiro</div></div>
+        <button class="btn-primary" onclick="openModalGlossario(null)">+ Novo Termo</button>
+      </div>
+      <div class="page-content">
+        <div style="margin-bottom:16px">
+          <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
+        </div>
+        <div id="glossario-list"></div>
+      </div>
+    </div>
+
+    <!-- AGENDAMENTO -->
+    <div class="view" id="view-agendamento">
+      <div class="page-header">
+        <div><div class="page-title">Agendamento</div><div class="page-sub">Agende uma reunião com a equipe DMF</div></div>
+      </div>
+      <div class="page-content">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card" style="border-color:var(--blue);text-align:center;padding:32px">
+            <div style="font-size:48px;margin-bottom:16px">📅</div>
+            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Agendar Atendimento</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6">Clique abaixo para acessar o Calendly e escolher o melhor horário para sua reunião com Matheus Anitelli</div>
+            <a href="https://calendly.com/matheusanitelli-95/atendimento-dmf" target="_blank" style="text-decoration:none">
+              <button class="btn-primary" style="font-size:14px;padding:12px 28px;width:100%;justify-content:center">
+                Agendar pelo Calendly →
+              </button>
+            </a>
+          </div>
+          <div class="card">
+            <div class="section-title">Próximas Reuniões Agendadas</div>
+            <div id="reunioes-list">
+              <div class="empty" style="padding:30px">
+                <div class="empty-icon">📅</div>
+                <div class="empty-title">Nenhuma reunião cadastrada</div>
+                <p style="font-size:12px;margin-top:4px">As reuniões aparecerão aqui quando cadastradas</p>
+              </div>
+            </div>
+            <button class="btn-secondary" style="width:100%;margin-top:12px;justify-content:center" onclick="openModalReuniao()">+ Registrar Reunião</button>
+          </div>
+        </div>
+        <!-- Embed Calendly -->
+        <div class="card">
+          <div class="section-title">Calendly — Visualização Rápida</div>
+          <div style="border-radius:12px;overflow:hidden;min-height:600px;background:#fff">
+            <iframe src="https://calendly.com/matheusanitelli-95/atendimento-dmf" width="100%" height="600" frameborder="0" style="border-radius:12px"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="view" id="view-whatsapp">
+      <div class="page-header">
+        <div><div class="page-title">WhatsApp</div><div class="page-sub">Disparos e comunicação com clientes</div></div>
+      </div>
+      <div class="page-content">
+        <div class="grid-2" style="margin-bottom:20px">
+          <!-- Disparo individual -->
+          <div class="card">
+            <div class="section-title">Enviar Mensagem Individual</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Cliente</label>
+              <select class="form-input" id="wa-cliente-sel"></select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Mensagem</label>
+              <textarea class="form-input" id="wa-msg-individual" rows="4" placeholder="Digite a mensagem..."></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%;justify-content:center" onclick="enviarWhatsAppIndividual()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Enviar via WhatsApp
+            </button>
+            <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">Abre o WhatsApp Web com a mensagem pronta. Para disparo automático, configure a Z-API.</p>
+          </div>
+          <!-- Disparo em massa -->
+          <div class="card">
+            <div class="section-title">Comunicado em Massa</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Filtrar Destinatários</label>
+              <select class="form-input" id="wa-filtro">
+                <option value="todos">Todos os clientes ativos</option>
+                <option value="black">Apenas DMF Black</option>
+                <option value="consultoria">Apenas Consultoria</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Tipo de Comunicado</label>
+              <select class="form-input" id="wa-tipo">
+                <option>Abertura de Mercado</option>
+                <option>Fechamento de Mercado</option>
+                <option>Notícia / Análise</option>
+                <option>Lembrete de Reunião</option>
+                <option>Alerta de Operação</option>
+                <option>Mensagem Personalizada</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Mensagem</label>
+              <textarea class="form-input" id="wa-msg-massa" rows="4" placeholder="Digite o comunicado..."></textarea>
+            </div>
+            <div id="wa-destinatarios-count" style="font-size:12px;color:var(--text3);margin-bottom:10px"></div>
+            <button class="btn-primary" style="width:100%;justify-content:center" onclick="prepararDisparo()">
+              Preparar Disparo →
+            </button>
+          </div>
+        </div>
+
+        <!-- Z-API Config -->
+        <div class="card" style="border-color:#25d36622">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+            <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Instance ID</label><input class="form-input" id="zapi-instance" placeholder="Sua instance ID da Z-API"></div>
+            <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" type="password" placeholder="Token da Z-API"></div>
+          </div>
+          <div style="margin-top:12px;padding:12px;background:#030810;border-radius:8px;font-size:12px;color:var(--text3)">
+            📌 Acesse <strong style="color:var(--blue)">z-api.io</strong> para criar sua conta e obter as credenciais. Plano a partir de R$150/mês. Conecte seu WhatsApp Business e configure aqui.
+          </div>
         </div>
       </div>
     </div>
@@ -1176,6 +1474,110 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-black-config')">Cancelar</button>
       <button class="btn-primary" onclick="saveBlackConfig()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMUNICADO -->
+<div class="modal-overlay" id="modal-comunicado" style="display:none" onclick="if(event.target===this)closeModal('modal-comunicado')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-com-title">Novo Comunicado</div>
+      <button class="modal-close" onclick="closeModal('modal-comunicado')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo</label>
+        <select class="form-input" id="com-tipo">
+          <option>📈 Abertura de Mercado</option>
+          <option>📉 Fechamento de Mercado</option>
+          <option>📰 Notícia / Análise</option>
+          <option>⚡ Operações DMF Black</option>
+          <option>📌 Comunicado Geral</option>
+          <option>🎓 Material Educacional</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Data</label><input class="form-input" id="com-data" type="date"></div>
+      <div class="form-group form-full"><label>Título *</label><input class="form-input" id="com-titulo" placeholder="Título do comunicado"></div>
+      <div class="form-group form-full"><label>Conteúdo *</label><textarea class="form-input" id="com-conteudo" rows="6" placeholder="Conteúdo do comunicado..."></textarea></div>
+      <div class="form-group"><label>Visível para</label>
+        <select class="form-input" id="com-visivel">
+          <option value="todos">Todos os clientes</option>
+          <option value="black">Apenas DMF Black</option>
+          <option value="consultoria">Apenas Consultoria</option>
+          <option value="interno">Interno (equipe)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Destaque</label>
+        <select class="form-input" id="com-destaque">
+          <option value="normal">Normal</option>
+          <option value="importante">⚠️ Importante</option>
+          <option value="urgente">🔴 Urgente</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-comunicado')">Cancelar</button>
+      <button class="btn-primary" onclick="saveComunicado()">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GLOSSÁRIO -->
+<div class="modal-overlay" id="modal-glossario" style="display:none" onclick="if(event.target===this)closeModal('modal-glossario')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-glo-title">Novo Termo</div>
+      <button class="modal-close" onclick="closeModal('modal-glossario')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Termo *</label><input class="form-input" id="glo-termo" placeholder="Ex: Trava de Alta"></div>
+      <div class="form-group"><label>Categoria</label>
+        <select class="form-input" id="glo-cat">
+          <option>Opções</option>
+          <option>Renda Fixa</option>
+          <option>Renda Variável</option>
+          <option>Derivativos</option>
+          <option>Planejamento</option>
+          <option>Geral</option>
+        </select>
+      </div>
+      <div class="form-group form-full"><label>Definição *</label><textarea class="form-input" id="glo-def" rows="4" placeholder="Explique o termo de forma clara e objetiva..."></textarea></div>
+      <div class="form-group form-full"><label>Exemplo (opcional)</label><input class="form-input" id="glo-ex" placeholder="Ex: Compra de Call 25 + Venda de Call 27..."></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-glossario')">Cancelar</button>
+      <button class="btn-primary" onclick="saveGlossario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REUNIÃO -->
+<div class="modal-overlay" id="modal-reuniao" style="display:none" onclick="if(event.target===this)closeModal('modal-reuniao')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Registrar Reunião</div>
+      <button class="modal-close" onclick="closeModal('modal-reuniao')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Cliente</label><select class="form-input" id="reu-cliente"></select></div>
+      <div class="form-group"><label>Data</label><input class="form-input" id="reu-data" type="date"></div>
+      <div class="form-group"><label>Horário</label><input class="form-input" id="reu-hora" type="time"></div>
+      <div class="form-group"><label>Tipo</label>
+        <select class="form-input" id="reu-tipo">
+          <option>Consultoria</option><option>Revisão de Carteira</option>
+          <option>Onboarding</option><option>Operações Black</option><option>Outros</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Formato</label>
+        <select class="form-input" id="reu-formato">
+          <option>Zoom</option><option>Presencial</option><option>Telefone</option><option>WhatsApp</option>
+        </select>
+      </div>
+      <div class="form-group form-full"><label>Observações</label><input class="form-input" id="reu-obs" placeholder="Pauta da reunião..."></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-reuniao')">Cancelar</button>
+      <button class="btn-primary" onclick="saveReuniao()">Salvar</button>
     </div>
   </div>
 </div>
@@ -2752,6 +3154,360 @@ showView = function(v, btn){
   _origShowViewSim(v, btn);
   if(v === 'simulador') setTimeout(calcSimulador, 50);
 };
+
+
+// ═══════════════════════════════════════════════════════════
+// COMUNICADOS
+// ═══════════════════════════════════════════════════════════
+var comunicados = [], glossarioTermos = [], reunioes = [];
+var editingComId = null, editingGloId = null;
+
+var _origShowViewComm = showView;
+showView = function(v,btn){
+  _origShowViewComm(v,btn);
+  if(v==='comunicados'){ loadComunicados(); checkAlertasVencimento(); }
+  if(v==='glossario') loadGlossario();
+  if(v==='agendamento') loadReunioes();
+  if(v==='whatsapp') populateWaClientes();
+};
+
+// ── Alertas de Vencimento ─────────────────────────────────
+function checkAlertasVencimento(){
+  var el = document.getElementById('alertas-vencimento');
+  if(!el) return;
+  var hoje = new Date();
+  var alertas = [];
+  // Scan all black ops for pernas with vencimento
+  db.collection('black_operacoes').get().then(function(snap){
+    snap.docs.forEach(function(d){
+      var op = Object.assign({id:d.id},d.data());
+      if(op.pernas) op.pernas.forEach(function(p){
+        if(p.mesVenc){
+          // Parse mes/ano from mesVenc string like "Junho/2026 (Call)"
+          var match = p.mesVenc.match(/(\w+)\/(\d{4})/);
+          if(match){
+            var mesIdx = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].indexOf(match[1]);
+            if(mesIdx>=0){
+              var venc = new Date(Number(match[2]), mesIdx+1, 0); // last day of month approx
+              var dias = Math.ceil((venc-hoje)/86400000);
+              if(dias>=0 && dias<=30){
+                alertas.push({cliente:op.clienteNome,codigo:p.codigo,mesVenc:p.mesVenc,dias:dias,cv:p.cv});
+              }
+            }
+          }
+        }
+      });
+    });
+    if(!alertas.length){
+      el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px">✅ Nenhuma operação vencendo nos próximos 30 dias</div>';
+      return;
+    }
+    alertas.sort(function(a,b){return a.dias-b.dias;});
+    el.innerHTML='';
+    alertas.forEach(function(a){
+      var cor = a.dias<=5?'#ef4444':a.dias<=15?'#f59e0b':'#1e8fff';
+      var row = document.createElement('div');
+      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px';
+      row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+a.cliente+' — '+a.codigo+'</div>'
+        +'<div style="font-size:11px;color:var(--text3)">'+a.mesVenc+' · '+(a.cv==='V'?'Venda':'Compra')+'</div></div>'
+        +'<span style="font-family:DM Mono,monospace;font-weight:700;font-size:14px;color:'+cor+'">'+a.dias+' dias</span>';
+      el.appendChild(row);
+    });
+  });
+}
+
+// ── Comunicados ───────────────────────────────────────────
+function loadComunicados(){
+  db.collection('comunicados').orderBy('data','desc').onSnapshot(function(snap){
+    comunicados = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderComunicados();
+  });
+}
+
+function renderComunicados(){
+  var el = document.getElementById('comunicados-list');
+  el.innerHTML='';
+  if(!comunicados.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📰</div><div class="empty-title">Nenhum comunicado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Novo Comunicado" para publicar</p></div>';
+    return;
+  }
+  comunicados.forEach(function(c){
+    var destColor = c.destaque==='urgente'?'#ef4444':c.destaque==='importante'?'#f59e0b':'var(--border)';
+    var card = document.createElement('div');
+    card.style='background:var(--card);border:1px solid '+destColor+';border-radius:14px;padding:20px 22px;margin-bottom:12px';
+    card.innerHTML='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">'
+      +'<div style="flex:1"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+      +'<span style="font-size:13px;color:var(--text3)">'+c.tipo+'</span>'
+      +'<span style="font-size:10px;color:var(--text3)">'+fmtDate(c.data)+'</span>'
+      +(c.destaque&&c.destaque!=='normal'?'<span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+destColor+'22;color:'+destColor+';font-weight:700">'+(c.destaque==='urgente'?'🔴 URGENTE':'⚠️ IMPORTANTE')+'</span>':'')
+      +'</div>'
+      +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px">'+c.titulo+'</div>'
+      +'<div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">'+c.conteudo+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:10px">Visível: '+(c.visivel||'todos')+'</div>'
+      +'</div>'
+      +'<div id="cact-placeholder" style="display:flex;gap:6px;flex-shrink:0;margin-left:16px"></div>'
+      +'</div>';
+    (function(cid){
+      var wrap=card.querySelector('[id="cact-placeholder"]');
+      if(wrap) wrap.id='cact-'+cid;
+      wrap=card.querySelector('#cact-'+cid);
+      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='✏️';
+      eb.onclick=function(){editComunicado(cid);};
+      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='🗑';
+      db.onclick=function(){deleteComunicado(cid);};
+      if(wrap){wrap.appendChild(eb);wrap.appendChild(db);}
+    })(c.id);
+    el.appendChild(card);
+  });
+}
+
+function openModalComunicado(id){
+  editingComId=id;
+  var c=id?comunicados.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-com-title').textContent=id?'Editar Comunicado':'Novo Comunicado';
+  document.getElementById('com-titulo').value=c?c.titulo||'':'';
+  document.getElementById('com-conteudo').value=c?c.conteudo||'':'';
+  document.getElementById('com-tipo').value=c?c.tipo||'📌 Comunicado Geral':'📌 Comunicado Geral';
+  document.getElementById('com-data').value=c?c.data||today():today();
+  document.getElementById('com-visivel').value=c?c.visivel||'todos':'todos';
+  document.getElementById('com-destaque').value=c?c.destaque||'normal':'normal';
+  openModal('modal-comunicado');
+}
+
+function saveComunicado(){
+  var titulo=document.getElementById('com-titulo').value.trim();
+  if(!titulo){alert('Título é obrigatório!');return;}
+  var data={titulo:titulo,conteudo:document.getElementById('com-conteudo').value,tipo:document.getElementById('com-tipo').value,data:document.getElementById('com-data').value,visivel:document.getElementById('com-visivel').value,destaque:document.getElementById('com-destaque').value,criadoEm:new Date().toISOString()};
+  if(editingComId) db.collection('comunicados').doc(editingComId).update(data);
+  else db.collection('comunicados').add(data);
+  closeModal('modal-comunicado');
+}
+
+function editComunicado(id){ openModalComunicado(id); }
+function deleteComunicado(id){ confirmDelete(function(){ db.collection('comunicados').doc(id).delete(); }); }
+
+// ── Glossário ─────────────────────────────────────────────
+var GLOSSARIO_DEFAULT = [
+  {termo:'Call',categoria:'Opções',def:'Opção de compra. Dá ao titular o direito de comprar o ativo por um preço determinado (strike) até a data de vencimento.',ex:'Compra de BOVAB250: direito de comprar BOVA11 a R$25 até fevereiro.'},
+  {termo:'Put',categoria:'Opções',def:'Opção de venda. Dá ao titular o direito de vender o ativo por um preço determinado (strike) até a data de vencimento.',ex:''},
+  {termo:'Strike',categoria:'Opções',def:'Preço de exercício de uma opção. É o preço pelo qual o ativo pode ser comprado ou vendido.',ex:'Strike de R$25,00 significa que a opção pode ser exercida nesse preço.'},
+  {termo:'Prêmio',categoria:'Opções',def:'Valor pago pelo comprador ao vendedor de uma opção. É o custo de adquirir o direito da opção.',ex:'Prêmio de R$0,50 por ação = R$500 por lote de 1.000.'},
+  {termo:'Trava de Alta',categoria:'Derivativos',def:'Estratégia que combina compra de Call com venda de Call de strike maior. Lucra com alta do ativo, com custo reduzido.',ex:'Compra Call 25 + Venda Call 27 = lucro máximo se ativo subir acima de R$27.'},
+  {termo:'Trava de Baixa',categoria:'Derivativos',def:'Estratégia que combina venda de Call com compra de Call de strike maior. Gera crédito e lucra se o ativo não subir além do strike vendido.',ex:'Venda Call 25 + Compra Call 27 = crédito recebido se ativo ficar abaixo de R$25.'},
+  {termo:'Vencimento',categoria:'Opções',def:'Data em que a opção expira. No Brasil, opções vencem na terceira sexta-feira do mês.',ex:'Opções com vencimento em fevereiro expiram na terceira sexta-feira de fevereiro.'},
+  {termo:'Delta',categoria:'Derivativos',def:'Mede a variação do prêmio da opção em relação à variação de R$1 no preço do ativo. Delta entre 0 e 1 para Calls.',ex:'Delta 0,5 = prêmio sobe R$0,50 para cada R$1 de alta no ativo.'},
+  {termo:'Rolagem',categoria:'Derivativos',def:'Operação de encerrar uma posição que vai vencer e abrir outra com novo strike e/ou vencimento.',ex:'Recomprar Call vendida e vender nova Call com vencimento no mês seguinte.'},
+  {termo:'Margem de Garantia',categoria:'Derivativos',def:'Valor exigido pela corretora como garantia para operações vendidas a descoberto ou alavancadas.',ex:'Venda de 1.000 Calls pode exigir R$10.000 de margem.'},
+  {termo:'Notional',categoria:'Derivativos',def:'Valor nocional ou teórico da posição. Representa a exposição total ao risco da operação.',ex:'Venda de 1.000 contratos de BOVA11 a R$25 = Notional de R$25.000.'},
+  {termo:'EBIT',categoria:'Geral',def:'Earnings Before Interest and Taxes — Lucro antes dos juros e impostos. Mede a rentabilidade operacional.',ex:'Receita R$100k - Custos R$60k = EBIT R$40k.'},
+  {termo:'Juro Real',categoria:'Renda Fixa',def:'Taxa de juros descontada a inflação. Representa o ganho de poder de compra real.',ex:'CDI 13% a.a. com inflação 5% = juro real aproximado de 7,6% a.a.'},
+  {termo:'Perpetuidade',categoria:'Planejamento',def:'Fluxo de pagamentos que dura indefinidamente. Valor = Renda anual ÷ Taxa real.',ex:'Para R$10k/mês com 8% a.a. real: capital = R$120k ÷ 8% = R$1,5M.'}
+];
+
+function loadGlossario(){
+  db.collection('glossario').get().then(function(snap){
+    if(snap.empty){
+      // Seed default glossario
+      var batch=db.batch();
+      GLOSSARIO_DEFAULT.forEach(function(t){
+        var ref=db.collection('glossario').doc();
+        batch.set(ref,Object.assign({},t,{criadoEm:new Date().toISOString()}));
+      });
+      batch.commit();
+    } else {
+      glossarioTermos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderGlossario();
+    }
+  });
+  db.collection('glossario').onSnapshot(function(snap){
+    glossarioTermos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).sort(function(a,b){return a.termo.localeCompare(b.termo);});
+    renderGlossario();
+  });
+}
+
+var CAT_COLORS={Opções:'#1e8fff',Derivativos:'#c084fc','Renda Fixa':'#22c55e','Renda Variável':'#f59e0b',Planejamento:'#ec4899',Geral:'#94a3b8'};
+
+function renderGlossario(){
+  var el=document.getElementById('glossario-list');if(!el)return;
+  var search=(document.getElementById('glossario-search')||{}).value||'';
+  var filtered=glossarioTermos.filter(function(t){return !search||(t.termo||'').toLowerCase().includes(search.toLowerCase())||(t.def||'').toLowerCase().includes(search.toLowerCase());});
+  el.innerHTML='';
+  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-title">Nenhum termo encontrado</div></div>';return;}
+  // Group by category
+  var cats={};
+  filtered.forEach(function(t){var c=t.categoria||'Geral';if(!cats[c])cats[c]=[];cats[c].push(t);});
+  Object.keys(cats).sort().forEach(function(cat){
+    var section=document.createElement('div');section.style='margin-bottom:20px';
+    var catHeader=document.createElement('div');
+    catHeader.style='display:flex;align-items:center;gap:8px;margin-bottom:10px';
+    catHeader.innerHTML='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:'+(CAT_COLORS[cat]||'#94a3b8')+'">'+cat+'</span><div style="flex:1;height:1px;background:var(--border)"></div>';
+    section.appendChild(catHeader);
+    cats[cat].forEach(function(t){
+      var card=document.createElement('div');
+      card.style='background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:8px;transition:border-color .2s';
+      card.onmouseover=function(){this.style.borderColor='var(--border2)';};
+      card.onmouseout=function(){this.style.borderColor='var(--border)';};
+      card.innerHTML='<div style="display:flex;align-items:flex-start;justify-content:space-between">'
+        +'<div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:6px">'+t.termo+'</div>'
+        +'<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:'+(t.ex?'8px':'0')+'">'+t.def+'</div>'
+        +(t.ex?'<div style="font-size:12px;color:var(--text3);background:#030810;padding:8px 12px;border-radius:8px;border-left:2px solid var(--blue)"><strong style="color:var(--blue)">Ex:</strong> '+t.ex+'</div>':'')
+        +'</div>'
+        +'<div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">'
+        +'<div id="glo-btns-'+t.id+'"></div>'
+        +'</div></div>';
+      var gbw=card.querySelector('#glo-btns-'+t.id);
+      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent='✏️';
+      (function(id){geb.onclick=function(){editGlossario(id);};})(t.id);
+      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent='🗑';
+      (function(id){gdb.onclick=function(){deleteGlossario(id);};})(t.id);
+      gbw.appendChild(geb);gbw.appendChild(gdb);
+      section.appendChild(card);
+    });
+    el.appendChild(section);
+  });
+}
+
+function openModalGlossario(id){
+  editingGloId=id;
+  var t=id?glossarioTermos.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-glo-title').textContent=id?'Editar Termo':'Novo Termo';
+  document.getElementById('glo-termo').value=t?t.termo||'':'';
+  document.getElementById('glo-cat').value=t?t.categoria||'Opções':'Opções';
+  document.getElementById('glo-def').value=t?t.def||'':'';
+  document.getElementById('glo-ex').value=t?t.ex||'':'';
+  openModal('modal-glossario');
+}
+
+function saveGlossario(){
+  var termo=document.getElementById('glo-termo').value.trim();
+  if(!termo){alert('Termo é obrigatório!');return;}
+  var data={termo:termo,categoria:document.getElementById('glo-cat').value,def:document.getElementById('glo-def').value,ex:document.getElementById('glo-ex').value,criadoEm:new Date().toISOString()};
+  if(editingGloId) db.collection('glossario').doc(editingGloId).update(data);
+  else db.collection('glossario').add(data);
+  closeModal('modal-glossario');
+}
+
+function editGlossario(id){ openModalGlossario(id); }
+function deleteGlossario(id){ confirmDelete(function(){ db.collection('glossario').doc(id).delete(); }); }
+
+// ── Reuniões ──────────────────────────────────────────────
+function loadReunioes(){
+  var sel=document.getElementById('reu-cliente');
+  if(sel){sel.innerHTML='<option value="">Selecione...</option>';clientes.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;sel.appendChild(o);});}
+  db.collection('reunioes').orderBy('data','asc').onSnapshot(function(snap){
+    reunioes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderReunioes();
+  });
+}
+
+function renderReunioes(){
+  var el=document.getElementById('reunioes-list');if(!el)return;
+  var hoje=today();
+  var proximas=reunioes.filter(function(r){return r.data>=hoje;}).slice(0,5);
+  if(!proximas.length){el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:28px">📅</div><div style="font-size:13px">Nenhuma reunião agendada</div></div>';return;}
+  el.innerHTML='';
+  proximas.forEach(function(r){
+    var row=document.createElement('div');
+    row.style='padding:10px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div><div style="font-size:13px;font-weight:600;color:var(--white)">'+r.clienteNome+'</div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+fmtDate(r.data)+(r.hora?' às '+r.hora:'')+' · '+r.tipo+' · '+r.formato+'</div></div>'
+      +'<div id="reu-del-'+r.id+'"></div>'
+      +'</div>';
+    (function(rid){
+      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent='🗑';
+      dbtn.onclick=function(){db.collection('reunioes').doc(rid).delete();};
+      var wrap=row.querySelector('#reu-del-'+rid);
+      if(wrap)wrap.appendChild(dbtn);
+    })(r.id);
+    el.appendChild(row);
+  });
+}
+
+function openModalReuniao(){
+  var sel=document.getElementById('reu-cliente');
+  if(sel){sel.innerHTML='<option value="">Selecione...</option>';clientes.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;sel.appendChild(o);});}
+  document.getElementById('reu-data').value=today();
+  document.getElementById('reu-hora').value='';
+  document.getElementById('reu-obs').value='';
+  openModal('modal-reuniao');
+}
+
+function saveReuniao(){
+  var sel=document.getElementById('reu-cliente');
+  var clienteId=sel.value;
+  var clienteNome=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+  if(!clienteId){alert('Selecione o cliente!');return;}
+  var data={clienteId:clienteId,clienteNome:clienteNome,data:document.getElementById('reu-data').value,hora:document.getElementById('reu-hora').value,tipo:document.getElementById('reu-tipo').value,formato:document.getElementById('reu-formato').value,obs:document.getElementById('reu-obs').value,criadoEm:new Date().toISOString()};
+  db.collection('reunioes').add(data);
+  closeModal('modal-reuniao');
+}
+
+// ── WhatsApp ──────────────────────────────────────────────
+function populateWaClientes(){
+  var sel=document.getElementById('wa-cliente-sel');
+  if(!sel)return;
+  sel.innerHTML='<option value="">Selecione...</option>';
+  clientes.forEach(function(c){var o=document.createElement('option');o.value=c.telefone||'';o.textContent=c.nome+(c.telefone?' ('+c.telefone+')':' — sem tel');sel.appendChild(o);});
+  updateWaCount();
+}
+
+function updateWaCount(){
+  var filtro=(document.getElementById('wa-filtro')||{}).value||'todos';
+  var count=clientes.filter(function(c){
+    if(filtro==='black') return c.servico&&c.servico.includes('Black');
+    if(filtro==='consultoria') return c.servico==='DMF Consultoria';
+    return c.status==='Ativo';
+  }).length;
+  var el=document.getElementById('wa-destinatarios-count');
+  if(el) el.textContent=count+' destinatário'+(count!==1?'s':'');
+}
+
+document.getElementById('wa-filtro')&&document.getElementById('wa-filtro').addEventListener('change',updateWaCount);
+
+function limparTelefone(tel){return (tel||'').replace(/\D/g,'');}
+
+function enviarWhatsAppIndividual(){
+  var tel=document.getElementById('wa-cliente-sel').value;
+  var msg=document.getElementById('wa-msg-individual').value.trim();
+  if(!tel){alert('Selecione um cliente com telefone cadastrado!');return;}
+  if(!msg){alert('Digite a mensagem!');return;}
+  var num=limparTelefone(tel);
+  if(!num.startsWith('55')) num='55'+num;
+  var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+function prepararDisparo(){
+  var filtro=document.getElementById('wa-filtro').value;
+  var msg=document.getElementById('wa-msg-massa').value.trim();
+  if(!msg){alert('Digite a mensagem!');return;}
+  var destinatarios=clientes.filter(function(c){
+    if(filtro==='black') return c.servico&&c.servico.includes('Black')&&c.telefone;
+    if(filtro==='consultoria') return c.servico==='DMF Consultoria'&&c.telefone;
+    return c.status==='Ativo'&&c.telefone;
+  });
+  if(!destinatarios.length){alert('Nenhum cliente com telefone cadastrado no filtro selecionado!');return;}
+  // Open WhatsApp for each (simplified - opens first)
+  var overlay=document.createElement('div');
+  overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+  var box=document.createElement('div');box.className='modal';box.style.maxWidth='480px';
+  var html='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:16px">Disparo Preparado</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:16px">'+destinatarios.length+' clientes serão contatados. Clique em cada número para abrir o WhatsApp:</div>';
+  destinatarios.forEach(function(c){
+    var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+    var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
+    html+='<a href="'+url+'" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#030810;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none">'
+      +'<span style="font-size:13px;color:var(--text)">'+c.nome+'</span>'
+      +'<span style="font-size:12px;color:#25d366">Abrir →</span></a>';
+  });
+  box.innerHTML=html;
+  var footer=document.createElement('div');footer.style='margin-top:16px;text-align:right';
+  var btn=document.createElement('button');btn.className='btn-secondary';btn.textContent='Fechar';
+  btn.onclick=function(){overlay.parentNode.removeChild(overlay);};
+  overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+  footer.appendChild(btn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
+}
 
 </script>
 </body>
