@@ -4917,16 +4917,20 @@ function saveCargo(){
 // IMPORTAÇÃO VIA EXCEL
 // ═══════════════════════════════════════════════════════════
 var TEMPLATE_COLS = [
-  'Nome','Tipo (PF/PJ)','CPF/CNPJ','Nascimento (DD/MM/AAAA)','Entrada (DD/MM/AAAA)',
+  'Nome *',
+  'Banco/Corretora *',
+  'Servico * (DMF Consultoria / DMF Black / DMF Consultoria + Black)',
+  'Status (Ativo / Inativo / Prospecto)',
+  'Patrimonio em Ativos R$ *',
+  'Nivel Black (N/A / Assinatura / Vitalicio / Socio)',
+  'Responsavel Consultoria',
+  'Responsavel Black',
+  'CPF/CNPJ','Tipo (PF/PJ)','Nascimento (DD/MM/AAAA)','Entrada (DD/MM/AAAA)',
   'Email','Telefone','Endereco','Cidade','Estado',
-  'Banco/Corretora','Servico (DMF Consultoria / DMF Black / DMF Consultoria + Black)',
-  'Nivel (N/A / Assinatura / Vitalicio / Socio)',
   'Perfil (Conservador / Moderado / Arrojado / Agressivo)',
   'Segmentacao (Varejo / Alta Renda / Private)',
   'Objetivo (Acumulacao / Sucessao / Usufruto / Protecao Patrimonial)',
-  'Status (Ativo / Inativo / Prospecto)',
-  'Custodia RF (R$)','Custodia RV (R$)',
-  'Profissional Responsavel','Observacoes'
+  'Observacoes'
 ];
 
 function downloadTemplate(){
@@ -4936,10 +4940,17 @@ function downloadTemplate(){
   var ws_data = [TEMPLATE_COLS];
   // Example row
   ws_data.push([
-    'João Silva','PF','123.456.789-00','15/03/1985','01/01/2024',
+    'João Silva',
+    'XP Investimentos',
+    'DMF Consultoria',
+    'Ativo',
+    600000,
+    'N/A',
+    'Matheus Anitelli',
+    '',
+    '123.456.789-00','PF','15/03/1985','01/01/2024',
     'joao@email.com','(11) 99999-9999','Rua das Flores, 123','São Paulo','SP',
-    'XP Investimentos','DMF Consultoria','N/A','Moderado','Alta Renda',
-    'Acumulação','Ativo','500000','100000','Matheus Anitelli',''
+    'Moderado','Alta Renda','Acumulação',''
   ]);
   var ws = XLSX.utils.aoa_to_sheet(ws_data);
   // Column widths
@@ -5035,11 +5046,12 @@ function showImportPreview(rows){
     var tr = document.createElement('tr');
     var rf = Number(String(r[17]||'0').replace(',','.'));
     var rv = Number(String(r[18]||'0').replace(',','.'));
-    tr.innerHTML = '<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text);font-weight:500">'+( r[0]||'—')+'</td>'
-      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[5]||'—')+'</td>'
-      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--blue);font-size:11px">'+(r[11]||'—')+'</td>'
-      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[16]||'Ativo')+'</td>'
-      +'<td style="padding:9px 10px;border-top:1px solid var(--border);font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtFull(rf+rv)+'</td>';
+    var pat = Number(String(r[4]||'0').replace(',','.'));
+    tr.innerHTML = '<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text);font-weight:500">'+(r[0]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[1]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--blue);font-size:11px">'+(r[2]||'—')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);color:var(--text3);font-size:11px">'+(r[3]||'Ativo')+'</td>'
+      +'<td style="padding:9px 10px;border-top:1px solid var(--border);font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtFull(pat)+'</td>';
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
@@ -5090,7 +5102,6 @@ function executarImportacao(rows, overlay, btn){
     var nome = String(r[0]||'').trim();
     if(!nome) return;
 
-    var profNome = String(r[19]||'').trim();
     var data = {
       nome: nome,
       tipo: String(r[1]||'PF').trim(),
