@@ -482,9 +482,29 @@ textarea.form-input{resize:vertical;min-height:80px}
           <select class="filter-input" id="filter-cli-prof" onchange="renderClientes()"><option value="">Todos os profissionais</option></select>
           <select class="filter-input" id="filter-cli-srv" onchange="renderClientes()"><option value="">Todos os serviços</option><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select>
         </div>
+        <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
+          <span style="font-size:13px;font-weight:700;color:#000" id="bulk-count">0 selecionados</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-input" id="bulk-campo" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff" onchange="updateBulkValores()">
+              <option value="">Selecionar campo...</option>
+              <option value="status">Status</option>
+              <option value="servico">Serviço</option>
+              <option value="objetivo">Objetivo</option>
+              <option value="perfil">Perfil</option>
+              <option value="segmentação">Segmentação</option>
+              <option value="nivel">Nível Black</option>
+            </select>
+            <select class="form-input" id="bulk-valor" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff">
+              <option value="">Selecionar valor...</option>
+            </select>
+            <button onclick="aplicarBulk()" style="background:#fff;color:#000;border:none;border-radius:8px;padding:6px 14px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer">Aplicar</button>
+            <button onclick="cancelarBulk()" style="background:transparent;color:#000;border:1px solid #00000044;border-radius:8px;padding:6px 14px;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">Cancelar</button>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
+              <th style="width:36px"><input type="checkbox" id="check-all" onclick="toggleAllClientes(this)" style="accent-color:var(--blue);cursor:pointer"></th>
               <th onclick="sortClientes('nome')">Nome ↕</th>
               <th>Nível</th>
               <th onclick="sortClientes('responsavel')">Profissional</th>
@@ -990,6 +1010,25 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div style="font-size:12px;color:var(--text3)" id="est-count"></div>
           </div>
         </div>
+        <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
+          <span style="font-size:13px;font-weight:700;color:#000" id="bulk-count">0 selecionados</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-input" id="bulk-campo" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff" onchange="updateBulkValores()">
+              <option value="">Selecionar campo...</option>
+              <option value="status">Status</option>
+              <option value="servico">Serviço</option>
+              <option value="objetivo">Objetivo</option>
+              <option value="perfil">Perfil</option>
+              <option value="segmentação">Segmentação</option>
+              <option value="nivel">Nível Black</option>
+            </select>
+            <select class="form-input" id="bulk-valor" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff">
+              <option value="">Selecionar valor...</option>
+            </select>
+            <button onclick="aplicarBulk()" style="background:#fff;color:#000;border:none;border-radius:8px;padding:6px 14px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer">Aplicar</button>
+            <button onclick="cancelarBulk()" style="background:transparent;color:#000;border:1px solid #00000044;border-radius:8px;padding:6px 14px;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">Cancelar</button>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
@@ -1319,6 +1358,25 @@ textarea.form-input{resize:vertical;min-height:80px}
               <option value="Lateralidade">Lateralidade</option>
             </select>
             <div style="font-size:12px;color:var(--text3)" id="est-count"></div>
+          </div>
+        </div>
+        <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
+          <span style="font-size:13px;font-weight:700;color:#000" id="bulk-count">0 selecionados</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-input" id="bulk-campo" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff" onchange="updateBulkValores()">
+              <option value="">Selecionar campo...</option>
+              <option value="status">Status</option>
+              <option value="servico">Serviço</option>
+              <option value="objetivo">Objetivo</option>
+              <option value="perfil">Perfil</option>
+              <option value="segmentação">Segmentação</option>
+              <option value="nivel">Nível Black</option>
+            </select>
+            <select class="form-input" id="bulk-valor" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff">
+              <option value="">Selecionar valor...</option>
+            </select>
+            <button onclick="aplicarBulk()" style="background:#fff;color:#000;border:none;border-radius:8px;padding:6px 14px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer">Aplicar</button>
+            <button onclick="cancelarBulk()" style="background:transparent;color:#000;border:1px solid #00000044;border-radius:8px;padding:6px 14px;font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer">Cancelar</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -2212,7 +2270,7 @@ function renderDadosCliente(c){
     html+='<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">'+f[0]+'</span><span style="font-size:13px;color:var(--text)">'+(f[1]||'—')+'</span></div>';
   });
   html+='</div><div class="card"><div class="section-title">Endereço & Perfil</div>';
-  [['Endereço',c.endereco],['Cidade',c.cidade],['Estado',c.estado],['Banco/Corretora',c.banco],['Segmentação',c.segmentacao],['Serviço',c.servico],['Nível',c.nivel],['Status',c.status]].forEach(function(f){
+  [['Endereço',c.endereco],['Cidade',c.cidade],['Estado',c.estado],['Banco/Corretora',c.banco],['Segmentação',c.segmentação],['Serviço',c.servico],['Nível',c.nivel],['Status',c.status]].forEach(function(f){
     html+='<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">'+f[0]+'</span><span style="font-size:13px;color:var(--text)">'+(f[1]||'—')+'</span></div>';
   });
   html+='</div></div>';
@@ -2302,7 +2360,7 @@ function openModalCliente(id){
   document.getElementById('fc-cidade').value=c?c.cidade||'':'';
   document.getElementById('fc-estado').value=c?c.estado||'':'';
   document.getElementById('fc-perfil').value=c?c.perfil||'Conservador':'Conservador';
-  document.getElementById('fc-seg').value=c?c.segmentacao||'Varejo':'Varejo';
+  document.getElementById('fc-seg').value=c?c.segmentação||'Varejo':'Varejo';
   document.getElementById('fc-obj').value=c?c.objetivo||'Acumulação':'Acumulação';
   document.getElementById('fc-obs').value=c?c.obs||'':'';
   updateProfSelect(c?c.responsavelConsId:'', c?c.responsavelBlackId:'');
@@ -2347,7 +2405,7 @@ function saveCliente(){
     cidade:document.getElementById('fc-cidade').value,
     estado:document.getElementById('fc-estado').value,
     perfil:document.getElementById('fc-perfil').value,
-    segmentacao:document.getElementById('fc-seg').value,
+    segmentação:document.getElementById('fc-seg').value,
     objetivo:document.getElementById('fc-obj').value,
     obs:document.getElementById('fc-obs').value
   };
@@ -4928,8 +4986,8 @@ var TEMPLATE_COLS = [
   'CPF/CNPJ','Tipo (PF/PJ)','Nascimento (DD/MM/AAAA)','Entrada (DD/MM/AAAA)',
   'Email','Telefone','Endereco','Cidade','Estado',
   'Perfil (Conservador / Moderado / Arrojado / Agressivo)',
-  'Segmentacao (Varejo / Alta Renda / Private)',
-  'Objetivo (Acumulacao / Sucessao / Usufruto / Protecao Patrimonial)',
+  'Segmentação (Varejo / Alta Renda / Private)',
+  'Objetivo (Acumulação / Sucessão / Usufruto / Proteção Patrimonial)',
   'Observacoes'
 ];
 
@@ -5113,8 +5171,8 @@ function executarImportacao(rows, overlay, btn){
       email:String(r[12]||'').trim(), telefone:String(r[13]||'').trim(),
       endereco:String(r[14]||'').trim(), cidade:String(r[15]||'').trim(),
       estado:String(r[16]||'').trim(), perfil:String(r[17]||'Moderado').trim(),
-      segmentacao:String(r[18]||'Varejo').trim(),
-      objetivo:String(r[19]||'Acumulacao').trim(),
+      segmentação:String(r[18]||'Varejo').trim(),
+      objetivo:String(r[19]||'Acumulação').trim(),
       obs:String(r[20]||'').trim(),
       importadoEm:new Date().toISOString()
     };
@@ -5136,6 +5194,89 @@ function executarImportacao(rows, overlay, btn){
     alert('Erro: '+e.message);
   });
 }
+
+// ═══════════════════════════════════════════════════════════
+// EDIÇÃO EM MASSA DE CLIENTES
+// ═══════════════════════════════════════════════════════════
+var BULK_OPCOES = {
+  status: ['Ativo','Inativo','Prospecto'],
+  servico: ['DMF Consultoria','DMF Black','DMF Consultoria + Black'],
+  objetivo: ['Acumulação','Sucessão','Usufruto','Proteção Patrimonial'],
+  perfil: ['Conservador','Moderado','Arrojado','Agressivo'],
+  'segmentação': ['Varejo','Alta Renda','Private'],
+  nivel: ['N/A','Assinatura','Vitalício','Sócio']
+};
+
+function getCheckedIds(){
+  return Array.from(document.querySelectorAll('.cli-check:checked')).map(function(el){
+    return el.getAttribute('data-id');
+  });
+}
+
+function toggleAllClientes(cb){
+  document.querySelectorAll('.cli-check').forEach(function(el){ el.checked = cb.checked; });
+  updateBulkToolbar();
+}
+
+function updateBulkToolbar(){
+  var ids = getCheckedIds();
+  var tb = document.getElementById('bulk-toolbar');
+  var countEl = document.getElementById('bulk-count');
+  var checkAll = document.getElementById('check-all');
+  var total = document.querySelectorAll('.cli-check').length;
+  if(tb) tb.style.display = ids.length > 0 ? 'flex' : 'none';
+  if(countEl) countEl.textContent = ids.length + ' cliente' + (ids.length!==1?'s':'') + ' selecionado' + (ids.length!==1?'s':'');
+  if(checkAll) checkAll.indeterminate = ids.length > 0 && ids.length < total;
+}
+
+function updateBulkValores(){
+  var campo = document.getElementById('bulk-campo').value;
+  var sel = document.getElementById('bulk-valor');
+  sel.innerHTML = '<option value="">Selecionar valor...</option>';
+  if(campo && BULK_OPCOES[campo]){
+    BULK_OPCOES[campo].forEach(function(v){
+      var o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+}
+
+function aplicarBulk(){
+  var ids = getCheckedIds();
+  var campo = document.getElementById('bulk-campo').value;
+  var valor = document.getElementById('bulk-valor').value;
+  if(!ids.length){ alert('Selecione ao menos um cliente!'); return; }
+  if(!campo){ alert('Selecione o campo!'); return; }
+  if(!valor){ alert('Selecione o valor!'); return; }
+  if(!confirm('Alterar "'+campo+'" para "'+valor+'" em '+ids.length+' clientes?')) return;
+
+  var batch = db.batch();
+  var update = {};
+  update[campo] = valor;
+  ids.forEach(function(id){
+    batch.update(db.collection('clientes').doc(id), update);
+  });
+  batch.commit().then(function(){
+    cancelarBulk();
+    var s = document.createElement('div');
+    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent = ids.length + ' clientes atualizados!';
+    document.body.appendChild(s);
+    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 3000);
+  }).catch(function(e){ alert('Erro: '+e.message); });
+}
+
+function cancelarBulk(){
+  document.querySelectorAll('.cli-check').forEach(function(el){ el.checked = false; });
+  var cb = document.getElementById('check-all');
+  if(cb){ cb.checked = false; cb.indeterminate = false; }
+  var tb = document.getElementById('bulk-toolbar');
+  if(tb) tb.style.display = 'none';
+  document.getElementById('bulk-campo').value = '';
+  document.getElementById('bulk-valor').innerHTML = '<option value="">Selecionar valor...</option>';
+}
+
 </script>
 </body>
 </html>
