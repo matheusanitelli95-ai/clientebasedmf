@@ -413,6 +413,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('profissionais',this)"><span class="icon">🏢</span><span>Profissionais</span></button>
       <div class="nav-section">Empresa</div>
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon">💵</span><span>Financeiro</span></button>
+      <button class="nav-item" onclick="showView('dre',this)"><span class="icon">📊</span><span>DRE</span></button>
+      <button class="nav-item" onclick="showView('balanco',this)"><span class="icon">🏦</span><span>Balanço</span></button>
       <button class="nav-item" onclick="showView('crm',this)"><span class="icon">✅</span><span>CRM & Tarefas</span></button>
       <button class="nav-item" onclick="showView('organograma',this)"><span class="icon">🗂️</span><span>Organograma</span></button>
       <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon">💬</span><span>WhatsApp</span></button>
@@ -1056,6 +1058,39 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- DRE -->
+    <div class="view" id="view-dre">
+      <div class="page-header">
+        <div><div class="page-title">DRE</div><div class="page-sub">Demonstração do Resultado do Exercício</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select class="filter-input" id="dre-ano"></select>
+          <button class="btn-primary" onclick="gerarDRE()">🔄 Gerar DRE</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="dre-content">
+          <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BALANÇO PATRIMONIAL -->
+    <div class="view" id="view-balanco">
+      <div class="page-header">
+        <div><div class="page-title">Balanço Patrimonial</div><div class="page-sub">Visão do patrimônio da empresa</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select class="filter-input" id="balanco-ano"></select>
+          <select class="filter-input" id="balanco-mes"></select>
+          <button class="btn-primary" onclick="openModalBalanco()">✏️ Editar Balanço</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="balanco-content">
+          <div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
 
     <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
@@ -1403,6 +1438,39 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div id="organograma-content"></div>
+      </div>
+    </div>
+
+    <!-- DRE -->
+    <div class="view" id="view-dre">
+      <div class="page-header">
+        <div><div class="page-title">DRE</div><div class="page-sub">Demonstração do Resultado do Exercício</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select class="filter-input" id="dre-ano"></select>
+          <button class="btn-primary" onclick="gerarDRE()">🔄 Gerar DRE</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="dre-content">
+          <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BALANÇO PATRIMONIAL -->
+    <div class="view" id="view-balanco">
+      <div class="page-header">
+        <div><div class="page-title">Balanço Patrimonial</div><div class="page-sub">Visão do patrimônio da empresa</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select class="filter-input" id="balanco-ano"></select>
+          <select class="filter-input" id="balanco-mes"></select>
+          <button class="btn-primary" onclick="openModalBalanco()">✏️ Editar Balanço</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="balanco-content">
+          <div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
+        </div>
       </div>
     </div>
 
@@ -2024,6 +2092,65 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-cargo')">Cancelar</button>
       <button class="btn-primary" onclick="saveCargo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BALANÇO -->
+<div class="modal-overlay" id="modal-balanco" style="display:none" onclick="if(event.target===this)closeModal('modal-balanco')">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-bal-title">Editar Balanço</div>
+      <button class="modal-close" onclick="closeModal('modal-balanco')">×</button>
+    </div>
+    <div class="form-grid" style="margin-bottom:16px">
+      <div class="form-group"><label>Ano</label><select class="form-input" id="bal-ano"></select></div>
+      <div class="form-group"><label>Mês</label><select class="form-input" id="bal-mes"></select></div>
+    </div>
+    <div class="grid-2">
+      <!-- ATIVO -->
+      <div>
+        <div class="form-section-title" style="color:#22c55e;margin-bottom:14px">ATIVO</div>
+        <div class="form-section">
+          <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase">Ativo Circulante</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Caixa / Conta Corrente (R$)</label><input class="form-input" id="bal-caixa" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Contas a Receber (R$)</label><input class="form-input" id="bal-receber" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Investimentos / Aplicações (R$)</label><input class="form-input" id="bal-investimentos" type="number" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase">Ativo Não Circulante</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Equipamentos (R$)</label><input class="form-input" id="bal-equipamentos" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Imobilizado / Outros (R$)</label><input class="form-input" id="bal-imobilizado" type="number" placeholder="0"></div>
+          </div>
+        </div>
+      </div>
+      <!-- PASSIVO + PL -->
+      <div>
+        <div class="form-section-title" style="color:#ef4444;margin-bottom:14px">PASSIVO</div>
+        <div class="form-section">
+          <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:10px;text-transform:uppercase">Passivo Circulante</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Contas a Pagar (R$)</label><input class="form-input" id="bal-pagar" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Impostos a Recolher (R$)</label><input class="form-input" id="bal-impostos-bal" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Pró-labore a Pagar (R$)</label><input class="form-input" id="bal-prolabore" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Outros Passivos (R$)</label><input class="form-input" id="bal-outros-pass" type="number" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title" style="color:#c084fc;margin-bottom:10px">PATRIMÔNIO LÍQUIDO</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Capital Social (R$)</label><input class="form-input" id="bal-capital" type="number" placeholder="0"></div>
+            <div class="form-group form-full"><label>Lucros Acumulados (R$)</label><input class="form-input" id="bal-lucros" type="number" placeholder="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-balanco')">Cancelar</button>
+      <button class="btn-primary" onclick="saveBalanco()">Salvar Balanço</button>
     </div>
   </div>
 </div>
@@ -5275,6 +5402,327 @@ function cancelarBulk(){
   if(tb) tb.style.display = 'none';
   document.getElementById('bulk-campo').value = '';
   document.getElementById('bulk-valor').innerHTML = '<option value="">Selecionar valor...</option>';
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// DRE + BALANÇO PATRIMONIAL
+// ═══════════════════════════════════════════════════════════
+
+// Init year selectors
+(function(){
+  var yr = new Date().getFullYear();
+  ['dre-ano','balanco-ano','bal-ano'].forEach(function(id){
+    var sel = document.getElementById(id);
+    if(!sel) return;
+    for(var y=yr;y>=yr-4;y--){
+      var o=document.createElement('option');o.value=y;o.textContent=y;
+      if(y===yr)o.selected=true;
+      sel.appendChild(o);
+    }
+  });
+  // Balanco mes selectors
+  ['balanco-mes','bal-mes'].forEach(function(id){
+    var sel=document.getElementById(id);
+    if(!sel) return;
+    MESES.forEach(function(m,i){
+      var o=document.createElement('option');o.value=i+1;o.textContent=m;
+      if(i+1===new Date().getMonth()+1)o.selected=true;
+      sel.appendChild(o);
+    });
+  });
+})();
+
+var _origShowViewDRE = showView;
+showView = function(v,btn){
+  _origShowViewDRE(v,btn);
+  if(v==='dre') initDREAno();
+  if(v==='balanco') loadBalanco();
+};
+
+// ── DRE ──────────────────────────────────────────────────
+function initDREAno(){
+  // Already initialized
+}
+
+function gerarDRE(){
+  var ano = Number(document.getElementById('dre-ano').value);
+  var el = document.getElementById('dre-content');
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Calculando...</div>';
+
+  db.collection('financeiro').where('ano','==',ano).get().then(function(snap){
+    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+
+    // Monthly data
+    var mesesData = Array.from({length:12},function(_,i){
+      return {mes:i+1,recTotal:0,custoTotal:0};
+    });
+
+    ops.forEach(function(op){
+      var idx = (op.mes||1)-1;
+      if(idx<0||idx>11) return;
+      if(op.tipo==='receita') mesesData[idx].recTotal += op.valor||0;
+      else mesesData[idx].custoTotal += op.valor||0;
+    });
+
+    var totRec = mesesData.reduce(function(s,m){return s+m.recTotal;},0);
+    var totCusto = mesesData.reduce(function(s,m){return s+m.custoTotal;},0);
+    var lucBruto = totRec - totCusto;
+    // Estimativa EBIT (sem depreciação pois é autônomo)
+    var ebit = lucBruto;
+    // Estimativa IR simples (Simples Nacional ~6%)
+    var ir = totRec * 0.06;
+    var lucLiquido = ebit - ir;
+    var margem = totRec ? (lucLiquido/totRec*100) : 0;
+
+    el.innerHTML = '';
+
+    // KPIs
+    var kpis = document.createElement('div');
+    kpis.className = 'kpi-grid';
+    kpis.style.gridTemplateColumns = 'repeat(4,1fr)';
+    kpis.style.marginBottom = '24px';
+    [
+      {label:'Receita Bruta',val:fmtFull(totRec),cor:'#22c55e',icon:'💰'},
+      {label:'Custos Totais',val:fmtFull(totCusto),cor:'#ef4444',icon:'📉'},
+      {label:'EBIT',val:fmtFull(ebit),cor:ebit>=0?'#1e8fff':'#ef4444',icon:'📊'},
+      {label:'Lucro Líquido Est.',val:fmtFull(lucLiquido),cor:lucLiquido>=0?'#22c55e':'#ef4444',icon:'✨'}
+    ].forEach(function(k){
+      var card = document.createElement('div');
+      card.className='kpi-card';
+      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">'
+        +'<div><div class="kpi-val" style="color:'+k.cor+'">'+k.val+'</div><div class="kpi-label">'+k.label+'</div></div>'
+        +'<div class="kpi-icon">'+k.icon+'</div></div>'
+        +'<div class="kpi-accent" style="background:'+k.cor+'"></div>';
+      kpis.appendChild(card);
+    });
+    el.appendChild(kpis);
+
+    // DRE Table
+    var dreCard = document.createElement('div');
+    dreCard.className='card';
+    dreCard.style.marginBottom='20px';
+
+    var dreTitle = document.createElement('div');
+    dreTitle.style='display:flex;justify-content:space-between;align-items:center;margin-bottom:20px';
+    dreTitle.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px">DRE — '+ano+'</div>'
+      +'<div style="font-size:12px;color:var(--text3)">*IR estimado pelo Simples Nacional (6% sobre receita)</div>';
+    dreCard.appendChild(dreTitle);
+
+    function dreRow(label, valor, nivel, destaque, cor){
+      var row = document.createElement('div');
+      row.style='display:flex;justify-content:space-between;align-items:center;padding:'+(destaque?'14px 16px':'10px 16px')+';margin-bottom:6px;border-radius:10px;background:'+(destaque?'var(--card2)':'transparent')+(destaque?';border:1px solid var(--border)':'');
+      row.innerHTML='<div style="display:flex;align-items:center;gap:8px">'
+        +(nivel>0?'<div style="width:'+(nivel*16)+'px"></div>':'')
+        +'<span style="font-size:'+(destaque?'14px':'13px')+';color:'+(destaque?'var(--white)':'var(--text2)')+';font-weight:'+(destaque?'700':'400')+'">'+label+'</span>'
+        +'</div>'
+        +'<span style="font-family:DM Mono,monospace;font-size:'+(destaque?'16px':'13px')+';font-weight:'+(destaque?'700':'400')+';color:'+(cor||(destaque?'var(--white)':'var(--text2)'))+'">'+fmtFull(valor)+'</span>';
+      return row;
+    }
+
+    dreCard.appendChild(dreRow('(+) Receita Bruta', totRec, 0, true, '#22c55e'));
+    dreCard.appendChild(dreRow('(-) Custos Operacionais', totCusto, 1, false, '#ef4444'));
+    dreCard.appendChild(dreRow('(=) Lucro Bruto', lucBruto, 0, true, lucBruto>=0?'#22c55e':'#ef4444'));
+    dreCard.appendChild(dreRow('(-) Depreciação', 0, 1, false, null));
+    dreCard.appendChild(dreRow('(=) EBIT', ebit, 0, true, ebit>=0?'#1e8fff':'#ef4444'));
+    dreCard.appendChild(dreRow('(-) IR / Simples Nacional est. (6%)', ir, 1, false, '#ef4444'));
+    dreCard.appendChild(dreRow('(=) Lucro Líquido Estimado', lucLiquido, 0, true, lucLiquido>=0?'#22c55e':'#ef4444'));
+
+    // Margem row
+    var margemRow = document.createElement('div');
+    margemRow.style='margin-top:16px;padding:14px 16px;background:'+(margem>=0?'#22c55e11':'#ef444411')+';border:1px solid '+(margem>=0?'#22c55e33':'#ef444433')+';border-radius:10px;display:flex;justify-content:space-between';
+    margemRow.innerHTML='<span style="font-size:13px;color:var(--text2)">Margem Líquida</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:'+(margem>=0?'#22c55e':'#ef4444')+'">'+margem.toFixed(1)+'%</span>';
+    dreCard.appendChild(margemRow);
+    el.appendChild(dreCard);
+
+    // Monthly breakdown
+    var monthCard = document.createElement('div');
+    monthCard.className='card';
+    monthCard.innerHTML='<div class="section-title">Resultado Mensal</div>';
+    var tableWrap = document.createElement('div');
+    tableWrap.className='table-wrap';tableWrap.style.border='none';
+    var table = document.createElement('table');
+    table.innerHTML='<thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Lucro Bruto</th><th>Margem</th></tr></thead>';
+    var tbody = document.createElement('tbody');
+    mesesData.forEach(function(m){
+      var lb=m.recTotal-m.custoTotal;
+      var mg=m.recTotal?(lb/m.recTotal*100):0;
+      var hasData=m.recTotal>0||m.custoTotal>0;
+      var tr=document.createElement('tr');
+      tr.style.opacity=hasData?'1':'0.35';
+      tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[m.mes-1]+'</td>'
+        +'<td style="font-family:DM Mono,monospace;color:#22c55e;font-size:12px">'+fmtFull(m.recTotal)+'</td>'
+        +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(m.custoTotal)+'</td>'
+        +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+(lb>=0?'#22c55e':'#ef4444')+'">'+fmtFull(lb)+'</td>'
+        +'<td style="color:'+(mg>=0?'#22c55e':'#ef4444')+';font-size:12px">'+mg.toFixed(1)+'%</td>';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+    monthCard.appendChild(tableWrap);
+    el.appendChild(monthCard);
+  }).catch(function(e){
+    el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div>Erro ao carregar dados: '+e.message+'</div></div>';
+  });
+}
+
+// ── BALANÇO ───────────────────────────────────────────────
+function loadBalanco(){
+  var ano = document.getElementById('balanco-ano').value;
+  var mes = document.getElementById('balanco-mes').value;
+  if(!ano||!mes) return;
+  db.collection('balanco').doc(ano+'-'+mes).get().then(function(doc){
+    if(doc.exists) renderBalanco(doc.data(), Number(ano), Number(mes));
+    else renderBalancoVazio();
+  });
+}
+
+document.getElementById('balanco-ano').addEventListener('change', loadBalanco);
+document.getElementById('balanco-mes').addEventListener('change', loadBalanco);
+
+function renderBalancoVazio(){
+  var el=document.getElementById('balanco-content');
+  el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado para este período</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalBalanco()">✏️ Lançar Balanço</button></div></div>';
+}
+
+function renderBalanco(d, ano, mes){
+  var el=document.getElementById('balanco-content');
+  el.innerHTML='';
+
+  // Calcular totais
+  var ativoCirc=(d.caixa||0)+(d.receber||0)+(d.investimentos||0);
+  var ativoNaoCirc=(d.equipamentos||0)+(d.imobilizado||0);
+  var totalAtivo=ativoCirc+ativoNaoCirc;
+  var passivoCirc=(d.pagar||0)+(d.impostosBal||0)+(d.prolabore||0)+(d.outrosPass||0);
+  var pl=(d.capital||0)+(d.lucros||0);
+  var totalPassPL=passivoCirc+pl;
+
+  // Header
+  var header=document.createElement('div');
+  header.style='text-align:center;margin-bottom:24px';
+  header.innerHTML='<div style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;color:var(--white)">Balanço Patrimonial</div>'
+    +'<div style="font-size:13px;color:var(--text3);margin-top:4px">'+MESES[mes-1]+' / '+ano+'</div>';
+  el.appendChild(header);
+
+  // KPIs
+  var kpis=document.createElement('div');
+  kpis.className='grid-3';kpis.style.marginBottom='20px';
+  [
+    {label:'Total Ativo',val:fmtFull(totalAtivo),cor:'#22c55e'},
+    {label:'Total Passivo',val:fmtFull(passivoCirc),cor:'#ef4444'},
+    {label:'Patrimônio Líquido',val:fmtFull(pl),cor:'#c084fc'}
+  ].forEach(function(k){
+    var c=document.createElement('div');c.className='kpi-card';
+    c.innerHTML='<div class="kpi-val" style="color:'+k.cor+'">'+k.val+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-accent" style="background:'+k.cor+';margin-top:14px"></div>';
+    kpis.appendChild(c);
+  });
+  el.appendChild(kpis);
+
+  // Grid ativo/passivo
+  var grid=document.createElement('div');grid.className='grid-2';
+
+  function bSection(titulo, cor, items, total){
+    var card=document.createElement('div');card.className='card';
+    card.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:'+cor+';margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)">'+titulo+'</div>';
+    items.forEach(function(item){
+      if(!item.subtitulo){
+        var row=document.createElement('div');
+        row.style='display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)';
+        row.innerHTML='<span style="font-size:13px;color:var(--text2)">'+item.label+'</span>'
+          +'<span style="font-family:DM Mono,monospace;font-size:13px;color:var(--text)">'+fmtFull(item.val)+'</span>';
+        card.appendChild(row);
+      } else {
+        var sub=document.createElement('div');
+        sub.style='font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px';
+        sub.textContent=item.label;
+        card.appendChild(sub);
+      }
+    });
+    var total_row=document.createElement('div');
+    total_row.style='display:flex;justify-content:space-between;padding:12px 14px;background:var(--card2);border-radius:10px;margin-top:12px;border:1px solid var(--border)';
+    total_row.innerHTML='<span style="font-family:Syne,sans-serif;font-weight:700;color:var(--white)">TOTAL</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:'+cor+'">'+fmtFull(total)+'</span>';
+    card.appendChild(total_row);
+    return card;
+  }
+
+  grid.appendChild(bSection('ATIVO','#22c55e',[
+    {subtitulo:true,label:'Circulante'},
+    {label:'Caixa / Conta Corrente',val:d.caixa||0},
+    {label:'Contas a Receber',val:d.receber||0},
+    {label:'Investimentos / Aplicações',val:d.investimentos||0},
+    {subtitulo:true,label:'Não Circulante'},
+    {label:'Equipamentos',val:d.equipamentos||0},
+    {label:'Imobilizado / Outros',val:d.imobilizado||0}
+  ], totalAtivo));
+
+  var passCard=bSection('PASSIVO + PL','#c084fc',[
+    {subtitulo:true,label:'Passivo Circulante'},
+    {label:'Contas a Pagar',val:d.pagar||0},
+    {label:'Impostos a Recolher',val:d.impostosBal||0},
+    {label:'Pró-labore a Pagar',val:d.prolabore||0},
+    {label:'Outros Passivos',val:d.outrosPass||0},
+    {subtitulo:true,label:'Patrimônio Líquido'},
+    {label:'Capital Social',val:d.capital||0},
+    {label:'Lucros Acumulados',val:d.lucros||0}
+  ], totalPassPL);
+  grid.appendChild(passCard);
+  el.appendChild(grid);
+
+  // Equação contábil
+  var eq=document.createElement('div');
+  eq.style='margin-top:16px;padding:16px;background:var(--card2);border:1px solid '+(Math.abs(totalAtivo-totalPassPL)<1?'#22c55e33':'#ef444433')+';border-radius:12px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap';
+  eq.innerHTML='<span style="font-size:13px;color:var(--text2)">Ativo <strong style="color:#22c55e">'+fmtFull(totalAtivo)+'</strong></span>'
+    +'<span style="color:var(--text3)">=</span>'
+    +'<span style="font-size:13px;color:var(--text2)">Passivo <strong style="color:#ef4444">'+fmtFull(passivoCirc)+'</strong></span>'
+    +'<span style="color:var(--text3)">+</span>'
+    +'<span style="font-size:13px;color:var(--text2)">PL <strong style="color:#c084fc">'+fmtFull(pl)+'</strong></span>'
+    +(Math.abs(totalAtivo-totalPassPL)<1
+      ?'<span style="color:#22c55e;font-size:12px;font-weight:700">✅ Balanceado</span>'
+      :'<span style="color:#ef4444;font-size:12px;font-weight:700">⚠️ Diferença: '+fmtFull(Math.abs(totalAtivo-totalPassPL))+'</span>');
+  el.appendChild(eq);
+}
+
+function openModalBalanco(){
+  var ano=document.getElementById('balanco-ano').value;
+  var mes=document.getElementById('balanco-mes').value;
+  document.getElementById('bal-ano').value=ano;
+  document.getElementById('bal-mes').value=mes;
+  // Load existing
+  db.collection('balanco').doc(ano+'-'+mes).get().then(function(doc){
+    var d=doc.exists?doc.data():{};
+    ['caixa','receber','investimentos','equipamentos','imobilizado',
+     'pagar','impostosBal','prolabore','outrosPass','capital','lucros'].forEach(function(f){
+      var el=document.getElementById('bal-'+f);
+      if(el) el.value=d[f]||'';
+    });
+    openModal('modal-balanco');
+  });
+}
+
+function saveBalanco(){
+  var ano=document.getElementById('bal-ano').value;
+  var mes=document.getElementById('bal-mes').value;
+  var data={
+    ano:Number(ano),mes:Number(mes),
+    caixa:Number(document.getElementById('bal-caixa').value)||0,
+    receber:Number(document.getElementById('bal-receber').value)||0,
+    investimentos:Number(document.getElementById('bal-investimentos').value)||0,
+    equipamentos:Number(document.getElementById('bal-equipamentos').value)||0,
+    imobilizado:Number(document.getElementById('bal-imobilizado').value)||0,
+    pagar:Number(document.getElementById('bal-pagar').value)||0,
+    impostosBal:Number(document.getElementById('bal-impostos-bal').value)||0,
+    prolabore:Number(document.getElementById('bal-prolabore').value)||0,
+    outrosPass:Number(document.getElementById('bal-outros-pass').value)||0,
+    capital:Number(document.getElementById('bal-capital').value)||0,
+    lucros:Number(document.getElementById('bal-lucros').value)||0,
+    atualizadoEm:new Date().toISOString()
+  };
+  db.collection('balanco').doc(ano+'-'+mes).set(data).then(function(){
+    closeModal('modal-balanco');
+    loadBalanco();
+  });
 }
 
 </script>
