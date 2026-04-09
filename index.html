@@ -2444,6 +2444,18 @@ auth.onAuthStateChanged(function(user){
   }
 });
 
+function loadClienteData(){
+  if(!currentClienteVinculado) return;
+  db.collection('clientes').doc(currentClienteVinculado).onSnapshot(function(doc){
+    if(doc.exists){
+      clientes = [Object.assign({id:doc.id},doc.data())];
+      clientes[0].custodiaTotal = clientes[0].patrimonio||(clientes[0].custodiaRF||0)+(clientes[0].custodiaRV||0);
+      clientes[0].patrimonio = clientes[0].custodiaTotal;
+    }
+    showClientePortal();
+  });
+}
+
 function loadData(){
   db.collection('profissionais').onSnapshot(function(snap){
     profissionais=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
@@ -5989,25 +6001,41 @@ var PERFIL_LABEL = {adm:'ADM', gestor:'Gestor', cliente:'Cliente'};
 auth.onAuthStateChanged(function(user){
   if(user){
     document.getElementById('login-screen').style.display='none';
+    // Show loading state — don't show app yet
     document.getElementById('app-screen').style.display='block';
+    document.getElementById('main-content').style.visibility='hidden';
     document.getElementById('user-email-badge').textContent=user.email;
     currentUser = user;
-    // Load perfil from Firestore
+    // Load perfil from Firestore FIRST
     db.collection('usuarios').doc(user.email).get().then(function(doc){
       if(doc.exists){
         var data = doc.data();
         currentPerfil = data.perfil || 'adm';
         currentClienteVinculado = data.clienteId || null;
       } else {
-        // First user = ADM
         currentPerfil = 'adm';
       }
+      // Check if pending
+      if(currentPerfil !== 'adm' && currentPerfil !== 'gestor' && currentPerfil !== 'cliente'){
+        auth.signOut();
+        return;
+      }
+      // Apply perfil BEFORE showing content
       applyPerfil();
-      loadData();
+      // Only load full data for adm/gestor
+      if(currentPerfil === 'cliente'){
+        // Cliente: only load own data
+        loadClienteData();
+      } else {
+        loadData();
+      }
+      // Now show content
+      document.getElementById('main-content').style.visibility='visible';
     }).catch(function(){
       currentPerfil = 'adm';
       applyPerfil();
       loadData();
+      document.getElementById('main-content').style.visibility='visible';
     });
   } else {
     document.getElementById('login-screen').style.display='flex';
@@ -6019,8 +6047,9 @@ function applyPerfil(){
   var menus = PERFIL_MENUS[currentPerfil] || PERFIL_MENUS.adm;
 
   if(currentPerfil === 'cliente'){
-    // Show cliente portal
-    showClientePortal();
+    // Hide all views immediately for security
+    document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
+    // Don't call showClientePortal here - it's called after data loads
     return;
   }
 
