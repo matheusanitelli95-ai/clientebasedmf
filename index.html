@@ -6013,6 +6013,7 @@ auth.onAuthStateChanged(function(user){
         currentPerfil = data.perfil || 'adm';
         currentClienteVinculado = data.clienteId || null;
       } else {
+        // No user doc found — default to adm (first user)
         currentPerfil = 'adm';
       }
       // Check if pending
@@ -6066,6 +6067,9 @@ function applyPerfil(){
   // Hide nav-config from non-ADM
   var navConfig = document.getElementById('nav-config');
   if(navConfig) navConfig.style.display = currentPerfil === 'adm' ? '' : 'none';
+
+  // Hide badge for clientes — they have their own portal
+  if(currentPerfil === 'cliente') return;
 
   // Show perfil badge in sidebar
   var chip = document.getElementById('user-chip-perfil');
