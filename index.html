@@ -1747,14 +1747,33 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-grid">
       <div class="form-group form-full"><label>Nome do Ativo *</label><input class="form-input" id="fa-nome" placeholder="Ex: PETR4, CDB BTG, KNRI11..."></div>
-      <div class="form-group"><label>Tipo</label><select class="form-input" id="fa-tipo"><option>Renda Fixa</option><option>Ação</option><option>FII</option><option>ETF</option><option>BDR</option><option>Fundo</option><option>Previdência</option><option>Cripto</option><option>Internacional</option><option>Outro</option></select></div>
-      <div class="form-group"><label>Valor Investido (R$)</label><input class="form-input" id="fa-valor" type="number" placeholder="0"></div>
+      <div class="form-group">
+        <label>Categoria *</label>
+        <select class="form-input" id="fa-categoria" onchange="updateSubcategoria()">
+          <option value="Renda Fixa">Renda Fixa</option>
+          <option value="Renda Variável">Renda Variável</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Subcategoria *</label>
+        <select class="form-input" id="fa-tipo"></select>
+      </div>
+      <div class="form-group">
+        <label>Moeda</label>
+        <select class="form-input" id="fa-moeda">
+          <option value="BRL">R$ Real</option>
+          <option value="USD">$ Dólar</option>
+          <option value="EUR">€ Euro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Quantidade</label><input class="form-input" id="fa-qtde" type="number" placeholder="Ex: 100"></div>
+      <div class="form-group"><label>Preço Médio</label><input class="form-input" id="fa-valor" type="number" step="0.01" placeholder="0,00"></div>
       <div class="form-group"><label>Data de Aplicação</label><input class="form-input" id="fa-data" type="date"></div>
       <div class="form-group form-full"><label>Observação (vencimento, taxa...)</label><input class="form-input" id="fa-obs" placeholder="Opcional"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-ativo')">Cancelar</button>
-      <button class="btn-primary" onclick="saveAtivo()">Salvar Ativo</button>
+      <button class="btn-primary" id="fa-save-btn" onclick="saveAtivo()">Salvar Ativo</button>
     </div>
   </div>
 </div>
@@ -1929,14 +1948,6 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="form-group"><label>Impostos / IRRF (R$)</label><input class="form-input" id="bs-impostos" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Taxa de Custódia (R$)</label><input class="form-input" id="bs-custodia" type="number" step="0.01" placeholder="0,00"></div>
         <div class="form-group"><label>Outros (R$)</label><input class="form-input" id="bs-outros" type="number" step="0.01" placeholder="0,00"></div>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">Benchmarks do Mês (%)</div>
-      <div class="form-grid">
-        <div class="form-group"><label>IBOV % no mês</label><input class="form-input" id="bs-ibov" type="number" step="0.01" placeholder="Ex: 1,50"></div>
-        <div class="form-group"><label>CDI % no mês</label><input class="form-input" id="bs-cdi" type="number" step="0.01" placeholder="Ex: 0,92"></div>
-        <div class="form-group"><label>Carteira DI / Saldo F.M. (R$)</label><input class="form-input" id="bs-carteira-di" type="number" step="0.01" placeholder="0,00"></div>
       </div>
     </div>
     <div class="form-section">
@@ -2801,12 +2812,32 @@ function saveProfissional(){
 function deleteProfissional(id){db.collection('profissionais').doc(id).delete();}
 
 // ATIVOS
+var SUBCATEGORIAS = {
+  'Renda Fixa': ['CDB','LCI','LCA','Tesouro Direto','Debênture','CRI','CRA','Previdência','ETF de RF','Fundo DI','Outro'],
+  'Renda Variável': ['Ação','FII','ETF','BDR','Cripto','Internacional','Previdência','Fundo','Outro']
+};
+
+function updateSubcategoria(){
+  var cat = document.getElementById('fa-categoria').value;
+  var sel = document.getElementById('fa-tipo');
+  sel.innerHTML = '';
+  (SUBCATEGORIAS[cat]||[]).forEach(function(s){
+    var o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);
+  });
+}
+
 function openModalAtivo(){
   document.getElementById('fa-nome').value='';
-  document.getElementById('fa-tipo').value='Renda Fixa';
+  document.getElementById('fa-categoria').value='Renda Fixa';
+  updateSubcategoria();
+  document.getElementById('fa-moeda').value='BRL';
+  document.getElementById('fa-qtde')&&(document.getElementById('fa-qtde').value='');
   document.getElementById('fa-valor').value='';
   document.getElementById('fa-data').value=today();
   document.getElementById('fa-obs').value='';
+  // Restore default save button
+  var btn=document.getElementById('fa-save-btn');
+  if(btn) btn.onclick=saveAtivo;
   openModal('modal-ativo');
 }
 
@@ -2814,7 +2845,20 @@ function saveAtivo(){
   if(!currentClienteId)return;
   var nome=document.getElementById('fa-nome').value.trim();
   if(!nome){alert('Nome do ativo é obrigatório!');return;}
-  var data={nome:nome,tipo:document.getElementById('fa-tipo').value,valor:Number(document.getElementById('fa-valor').value)||0,dataAplicacao:document.getElementById('fa-data').value,obs:document.getElementById('fa-obs').value};
+  var qtde=Number((document.getElementById('fa-qtde')||{value:0}).value)||0;
+  var pm=Number(document.getElementById('fa-valor').value)||0;
+  var data={
+    nome:nome,
+    categoria:document.getElementById('fa-categoria').value,
+    tipo:document.getElementById('fa-tipo').value,
+    moeda:(document.getElementById('fa-moeda')||{value:'BRL'}).value||'BRL',
+    quantidade:qtde,
+    precoMedio:pm,
+    valor:pm, // backwards compat
+    valorTotal:qtde*pm,
+    dataAplicacao:document.getElementById('fa-data').value,
+    obs:document.getElementById('fa-obs').value
+  };
   db.collection('clientes').doc(currentClienteId).collection('ativos').add(data);
   closeModal('modal-ativo');
   setTimeout(renderCarteira,600);
@@ -3594,7 +3638,7 @@ function addPerna(){
     +'<div class="form-grid">'
     +'<div class="form-group"><label>C/V</label><select class="form-input" id="p'+idx+'-cv" onchange="updateBdPreview()"><option value="V">Venda</option><option value="C">Compra</option></select></div>'
     +'<div class="form-group"><label>Código da Opção</label><input class="form-input" id="p'+idx+'-codigo" placeholder="Ex: BOVAB250" oninput="autoVencimento('+idx+')"></div>'
-    +'<div class="form-group form-full"><label>Especificação / Estrutura</label><input class="form-input" id="p'+idx+'-especificacao" placeholder="Ex: INVESTO LFTB F11"></div>'
+
     +'<div class="form-group"><label>Mês Venc. (auto)</label><input class="form-input" id="p'+idx+'-mes-venc" readonly style="background:#030810;color:var(--blue)" placeholder="Automático pelo código"></div>'
     +'<div class="form-group"><label>Ano Venc.</label><select class="form-input" id="p'+idx+'-ano-venc" onchange="autoVencimento('+idx+')"></select></div>'
     +'<div class="form-group"><label>Quantidade</label><input class="form-input" id="p'+idx+'-qtde" type="number" placeholder="0" oninput="updateBdPreview()"></div>'
