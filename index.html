@@ -388,10 +388,92 @@ textarea.form-input{resize:vertical;min-height:80px}
 </div>
     <button class="btn-login" id="btn-entrar">ENTRAR</button>
     <div class="login-err" id="login-err"></div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <button onclick="showCadastro()" type="button" style="width:100%;background:none;border:1px solid var(--border2);border-radius:12px;padding:12px;color:var(--text2);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">
+        Primeiro acesso? <strong>Criar conta</strong>
+      </button>
+    </div>
   </div>
 </div>
 
 <!-- ─── APP ─────────────────────────────── -->
+<!-- TELA DE CADASTRO -->
+<div id="cadastro-screen" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse 80% 50% at 50% -10%,#0a2040 0%,var(--bg) 60%);padding:20px">
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:40px 44px;width:100%;max-width:480px;box-shadow:0 40px 80px #00000088">
+      <!-- Logo -->
+      <div style="text-align:center;margin-bottom:24px">
+        <img src="https://raw.githubusercontent.com/matheusanitelli95-ai/clientebasedmf/main/LOGO.DMF.PNG.png" alt="DMF" class="dmf-logo-img" style="height:56px;width:auto;object-fit:contain">
+      </div>
+      <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:4px;text-align:center">Criar sua conta</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:28px;text-align:center">Portal DMF Black · Preencha seus dados</div>
+
+      <!-- Steps indicator -->
+      <div style="display:flex;gap:8px;margin-bottom:28px" id="cad-steps">
+        <div style="flex:1;height:3px;border-radius:2px;background:var(--blue)" id="cad-step1-bar"></div>
+        <div style="flex:1;height:3px;border-radius:2px;background:var(--border)" id="cad-step2-bar"></div>
+      </div>
+
+      <!-- Step 1: Dados pessoais -->
+      <div id="cad-step1">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Passo 1 de 2 — Dados Pessoais</div>
+        <input class="login-input" id="cad-nome" placeholder="Nome completo *" style="margin-bottom:10px">
+        <input class="login-input" id="cad-cpf" placeholder="CPF *" style="margin-bottom:10px" oninput="mascaraCPF(this)">
+        <input class="login-input" id="cad-email" type="email" placeholder="E-mail *" style="margin-bottom:10px">
+        <input class="login-input" id="cad-tel" placeholder="Telefone / WhatsApp" style="margin-bottom:10px">
+        <select class="login-input" id="cad-banco" style="margin-bottom:10px">
+          <option value="">Banco / Corretora...</option>
+          <option>BTG Pactual</option><option>XP Investimentos</option>
+          <option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option>
+          <option>Santander</option><option>Nubank</option><option>Inter</option>
+          <option>Clear</option><option>Rico</option><option>Genial</option>
+          <option>Órama</option><option>Modal</option><option>Warren</option><option>Outro</option>
+        </select>
+        <button onclick="cadStep2()" class="btn-login" style="margin-top:6px">Continuar →</button>
+        <div style="margin-top:16px;text-align:center">
+          <button onclick="showLogin()" type="button" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif">← Voltar ao login</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Senha e confirmação -->
+      <div id="cad-step2" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Passo 2 de 2 — Acesso</div>
+        <div style="position:relative;margin-bottom:10px">
+          <input class="login-input" id="cad-senha" type="password" placeholder="Senha * (mínimo 6 caracteres)" style="margin-bottom:0;padding-right:44px">
+          <button onclick="toggleSenhaCad('cad-senha',this)" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4a6080;display:flex;align-items:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div style="position:relative;margin-bottom:16px">
+          <input class="login-input" id="cad-senha2" type="password" placeholder="Confirmar senha *" style="margin-bottom:0;padding-right:44px">
+          <button onclick="toggleSenhaCad('cad-senha2',this)" type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4a6080;display:flex;align-items:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <!-- Resumo -->
+        <div style="background:#030810;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px">
+          <div style="color:var(--text3);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Resumo do cadastro</div>
+          <div id="cad-resumo" style="color:var(--text2);line-height:1.8"></div>
+        </div>
+        <button onclick="finalizarCadastro()" class="btn-login">Criar Conta</button>
+        <div class="login-err" id="cad-err" style="margin-top:10px"></div>
+        <div style="margin-top:12px;text-align:center">
+          <button onclick="cadVoltarStep1()" type="button" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:DM Sans,sans-serif">← Voltar</button>
+        </div>
+      </div>
+
+      <!-- Sucesso -->
+      <div id="cad-sucesso" style="display:none;text-align:center">
+        <div style="font-size:56px;margin-bottom:16px">✅</div>
+        <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Cadastro enviado!</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">Verifique seu email e clique no link de confirmação.</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:24px">Após confirmar, aguarde a aprovação da equipe DMF. Você receberá um aviso quando seu acesso for liberado.</div>
+        <button onclick="showLogin()" class="btn-login">Voltar ao Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="app-screen">
 <div class="app-layout">
 
@@ -1106,14 +1188,23 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div>
               <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:6px">Como funciona</div>
               <div style="font-size:13px;color:var(--text2);line-height:1.6">
-                Cadastre aqui os usuários do sistema com seus perfis de acesso.<br>
-                <strong style="color:#1e8fff">ADM</strong> — acesso total a tudo.<br>
-                <strong style="color:#22c55e">Gestor</strong> — acesso a clientes, CRM, Black. Não vê Financeiro, DRE e Balanço.<br>
-                <strong style="color:#c084fc">Cliente</strong> — vê apenas sua própria carteira, operações Black, agendamento e glossário.
+                <strong style="color:#1e8fff">ADM</strong> — acesso total.<br>
+                <strong style="color:#22c55e">Gestor</strong> — sem Financeiro, DRE e Balanço.<br>
+                <strong style="color:#c084fc">Cliente</strong> — só dados próprios, operações Black, agendamento e glossário.
               </div>
             </div>
           </div>
         </div>
+        <!-- Pendentes -->
+        <div id="pendentes-section" style="display:none;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px">⏳ Aguardando Aprovação</div>
+            <span id="pendentes-count" style="background:#f59e0b22;color:#f59e0b;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700"></span>
+          </div>
+          <div id="pendentes-list"></div>
+        </div>
+        <!-- Usuários aprovados -->
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:12px">Usuários Ativos</div>
         <div id="usuarios-list"></div>
       </div>
     </div>
@@ -1514,14 +1605,23 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div>
               <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:6px">Como funciona</div>
               <div style="font-size:13px;color:var(--text2);line-height:1.6">
-                Cadastre aqui os usuários do sistema com seus perfis de acesso.<br>
-                <strong style="color:#1e8fff">ADM</strong> — acesso total a tudo.<br>
-                <strong style="color:#22c55e">Gestor</strong> — acesso a clientes, CRM, Black. Não vê Financeiro, DRE e Balanço.<br>
-                <strong style="color:#c084fc">Cliente</strong> — vê apenas sua própria carteira, operações Black, agendamento e glossário.
+                <strong style="color:#1e8fff">ADM</strong> — acesso total.<br>
+                <strong style="color:#22c55e">Gestor</strong> — sem Financeiro, DRE e Balanço.<br>
+                <strong style="color:#c084fc">Cliente</strong> — só dados próprios, operações Black, agendamento e glossário.
               </div>
             </div>
           </div>
         </div>
+        <!-- Pendentes -->
+        <div id="pendentes-section" style="display:none;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px">⏳ Aguardando Aprovação</div>
+            <span id="pendentes-count" style="background:#f59e0b22;color:#f59e0b;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700"></span>
+          </div>
+          <div id="pendentes-list"></div>
+        </div>
+        <!-- Usuários aprovados -->
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:12px">Usuários Ativos</div>
         <div id="usuarios-list"></div>
       </div>
     </div>
@@ -6127,6 +6227,213 @@ function saveUsuario(){
   // Use email as document ID for easy lookup on login
   db.collection('usuarios').doc(email).set(data).then(function(){
     closeModal('modal-usuario');
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// CADASTRO DE CLIENTE
+// ═══════════════════════════════════════════════════════════
+
+function showCadastro(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('cadastro-screen').style.display='block';
+  // Reset
+  ['cad-nome','cad-cpf','cad-email','cad-tel','cad-senha','cad-senha2'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('cad-banco').value='';
+  document.getElementById('cad-step1').style.display='block';
+  document.getElementById('cad-step2').style.display='none';
+  document.getElementById('cad-sucesso').style.display='none';
+  document.getElementById('cad-err').textContent='';
+  document.getElementById('cad-step1-bar').style.background='var(--blue)';
+  document.getElementById('cad-step2-bar').style.background='var(--border)';
+}
+
+function showLogin(){
+  document.getElementById('cadastro-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+function mascaraCPF(input){
+  var v=input.value.replace(/\D/g,'').substring(0,11);
+  v=v.replace(/(\d{3})(\d)/,'$1.$2');
+  v=v.replace(/(\d{3})(\d)/,'$1.$2');
+  v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  input.value=v;
+}
+
+function cadStep2(){
+  var nome=document.getElementById('cad-nome').value.trim();
+  var cpf=document.getElementById('cad-cpf').value.trim();
+  var email=document.getElementById('cad-email').value.trim();
+  if(!nome){alert('Nome é obrigatório!');return;}
+  if(!cpf||cpf.replace(/\D/g,'').length!==11){alert('CPF inválido!');return;}
+  if(!email||!email.includes('@')){alert('Email inválido!');return;}
+  // Show step 2
+  document.getElementById('cad-step1').style.display='none';
+  document.getElementById('cad-step2').style.display='block';
+  document.getElementById('cad-step2-bar').style.background='var(--blue)';
+  // Fill resumo
+  document.getElementById('cad-resumo').innerHTML=
+    '<div>👤 '+nome+'</div>'
+    +'<div>📋 CPF: '+cpf+'</div>'
+    +'<div>📧 '+email+'</div>'
+    +(document.getElementById('cad-tel').value?'<div>📱 '+document.getElementById('cad-tel').value+'</div>':'')
+    +(document.getElementById('cad-banco').value?'<div>🏦 '+document.getElementById('cad-banco').value+'</div>':'');
+}
+
+function cadVoltarStep1(){
+  document.getElementById('cad-step2').style.display='none';
+  document.getElementById('cad-step1').style.display='block';
+  document.getElementById('cad-step2-bar').style.background='var(--border)';
+}
+
+function toggleSenhaCad(inputId, btn){
+  var input=document.getElementById(inputId);
+  input.type=input.type==='password'?'text':'password';
+  var isVisible=input.type==='text';
+  btn.innerHTML=isVisible
+    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
+
+function finalizarCadastro(){
+  var nome=document.getElementById('cad-nome').value.trim();
+  var cpf=document.getElementById('cad-cpf').value.trim();
+  var email=document.getElementById('cad-email').value.trim().toLowerCase();
+  var tel=document.getElementById('cad-tel').value.trim();
+  var banco=document.getElementById('cad-banco').value;
+  var senha=document.getElementById('cad-senha').value;
+  var senha2=document.getElementById('cad-senha2').value;
+  var errEl=document.getElementById('cad-err');
+
+  if(senha.length<6){errEl.textContent='Senha deve ter no mínimo 6 caracteres.';return;}
+  if(senha!==senha2){errEl.textContent='As senhas não coincidem.';return;}
+  errEl.textContent='Criando conta...';
+
+  // Create Firebase Auth user
+  auth.createUserWithEmailAndPassword(email, senha).then(function(result){
+    var user=result.user;
+    // Send email verification
+    user.sendEmailVerification();
+    // Save to pendentes collection
+    return db.collection('pendentes').doc(email).set({
+      nome:nome, cpf:cpf, email:email,
+      telefone:tel, banco:banco,
+      uid:user.uid,
+      status:'pendente',
+      criadoEm:new Date().toISOString()
+    });
+  }).then(function(){
+    // Sign out — wait for approval
+    auth.signOut();
+    document.getElementById('cad-step2').style.display='none';
+    document.getElementById('cad-sucesso').style.display='block';
+  }).catch(function(e){
+    var msg='Erro ao criar conta.';
+    if(e.code==='auth/email-already-in-use') msg='Este email já está cadastrado.';
+    if(e.code==='auth/invalid-email') msg='Email inválido.';
+    if(e.code==='auth/weak-password') msg='Senha muito fraca.';
+    errEl.textContent=msg;
+  });
+}
+
+// ── Pendentes na tela de Configurações ───────────────────
+function loadUsuarios(){
+  // Load pendentes
+  db.collection('pendentes').where('status','==','pendente').onSnapshot(function(snap){
+    var pendentes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderPendentes(pendentes);
+  });
+  // Load usuarios ativos
+  db.collection('usuarios').onSnapshot(function(snap){
+    usuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderUsuarios();
+  });
+}
+
+function renderPendentes(pendentes){
+  var section=document.getElementById('pendentes-section');
+  var list=document.getElementById('pendentes-list');
+  var count=document.getElementById('pendentes-count');
+  if(!section||!list) return;
+  section.style.display=pendentes.length?'block':'none';
+  if(count) count.textContent=pendentes.length+' pendente'+(pendentes.length!==1?'s':'');
+  list.innerHTML='';
+  pendentes.forEach(function(p){
+    var card=document.createElement('div');
+    card.style='background:#f59e0b11;border:1px solid #f59e0b33;border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px';
+    var info=document.createElement('div');info.style='flex:1';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:3px">'+p.nome+'</div>'
+      +'<div style="font-size:12px;color:var(--text3)">'+p.email+' · CPF: '+p.cpf+(p.banco?' · '+p.banco:'')+'</div>'
+      +'<div style="font-size:11px;color:#f59e0b;margin-top:3px">Aguardando aprovação · '+new Date(p.criadoEm).toLocaleDateString('pt-BR')+'</div>';
+    var aprovarBtn=document.createElement('button');
+    aprovarBtn.className='btn-primary';aprovarBtn.style='padding:8px 16px;font-size:12px;flex-shrink:0';
+    aprovarBtn.textContent='✅ Aprovar';
+    (function(pend){
+      aprovarBtn.onclick=function(){aprovarCliente(pend);};
+    })(p);
+    var rejBtn=document.createElement('button');
+    rejBtn.className='btn-dsm';rejBtn.style='padding:8px 12px;font-size:12px;flex-shrink:0';
+    rejBtn.textContent='❌';
+    (function(pid){
+      rejBtn.onclick=function(){confirmDelete(function(){db.collection('pendentes').doc(pid).delete();});};
+    })(p.id);
+    card.appendChild(info);card.appendChild(aprovarBtn);card.appendChild(rejBtn);
+    list.appendChild(card);
+  });
+}
+
+function aprovarCliente(p){
+  // Create usuario doc
+  db.collection('usuarios').doc(p.email).set({
+    email:p.email, nome:p.nome, cpf:p.cpf,
+    telefone:p.telefone, banco:p.banco,
+    perfil:'cliente', uid:p.uid,
+    clienteId:'', clienteNome:'',
+    aprovadoEm:new Date().toISOString()
+  }).then(function(){
+    // Also create/update clientes doc
+    return db.collection('clientes').add({
+      nome:p.nome, cpf:p.cpf, email:p.email,
+      telefone:p.telefone, banco:p.banco,
+      servico:'DMF Black', status:'Ativo',
+      patrimonio:0, custodiaRF:0, custodiaRV:0,
+      criadoEm:new Date().toISOString()
+    });
+  }).then(function(clienteRef){
+    // Link clienteId back to usuario
+    return db.collection('usuarios').doc(p.email).update({
+      clienteId:clienteRef.id
+    });
+  }).then(function(){
+    // Remove from pendentes
+    return db.collection('pendentes').doc(p.id).delete();
+  }).then(function(){
+    var s=document.createElement('div');
+    s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent='✅ '+p.nome+' aprovado!';
+    document.body.appendChild(s);
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},3000);
+  }).catch(function(e){alert('Erro: '+e.message);});
+}
+
+// Check if approved on login (for pending users)
+var _origAuthState = null;
+// Override onAuthStateChanged to check pending status
+function checkPendingStatus(user){
+  if(!user) return;
+  db.collection('pendentes').doc(user.email).get().then(function(doc){
+    if(doc.exists && doc.data().status==='pendente'){
+      // Still pending - show message and sign out
+      auth.signOut();
+      document.getElementById('login-screen').style.display='flex';
+      document.getElementById('app-screen').style.display='none';
+      document.getElementById('login-err').textContent='Sua conta está aguardando aprovação da equipe DMF. Em breve você receberá o acesso!';
+      document.getElementById('login-err').style.color='#f59e0b';
+    }
   });
 }
 
