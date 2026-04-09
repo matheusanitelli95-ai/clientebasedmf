@@ -2215,22 +2215,34 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="modal-close" onclick="closeModal('modal-usuario')">×</button>
     </div>
     <div class="form-grid">
-      <div class="form-group form-full"><label>Email *</label><input class="form-input" id="usr-email" type="email" placeholder="email@dmfinvestimentos.com"></div>
-      <div class="form-group form-full"><label>Nome</label><input class="form-input" id="usr-nome" placeholder="Nome completo"></div>
       <div class="form-group form-full">
         <label>Perfil de Acesso *</label>
-        <select class="form-input" id="usr-perfil" onchange="toggleUsrCliente()">
+        <select class="form-input" id="usr-perfil" onchange="toggleUsrPerfil()">
           <option value="adm">ADM — Acesso total</option>
           <option value="gestor">Gestor — Sem financeiro</option>
           <option value="cliente">Cliente — Só dados próprios</option>
         </select>
       </div>
-      <div class="form-group form-full" id="usr-cliente-wrap" style="display:none">
-        <label>Cliente vinculado</label>
-        <select class="form-input" id="usr-cliente-id">
+      <!-- ADM / Gestor: puxa da lista de profissionais -->
+      <div class="form-group form-full" id="usr-prof-wrap">
+        <label>Profissional</label>
+        <select class="form-input" id="usr-prof-sel" onchange="preencherUsrDeProfissional()">
+          <option value="">Selecione ou preencha manualmente...</option>
+        </select>
+      </div>
+      <!-- Cliente: puxa da lista de clientes -->
+      <div class="form-group form-full" id="usr-cli-wrap" style="display:none">
+        <label>Cliente</label>
+        <select class="form-input" id="usr-cli-sel" onchange="preencherUsrDeCliente()">
           <option value="">Selecione o cliente...</option>
         </select>
-        <div style="font-size:11px;color:var(--text3);margin-top:5px">Selecione qual cliente este login representa</div>
+      </div>
+      <!-- Campos preenchidos automaticamente -->
+      <div class="form-group form-full"><label>Nome</label><input class="form-input" id="usr-nome" placeholder="Preenchido automaticamente ou digite"></div>
+      <div class="form-group form-full"><label>Email *</label><input class="form-input" id="usr-email" type="email" placeholder="email@dmfinvestimentos.com"></div>
+      <div class="form-group form-full" id="usr-cliente-id-wrap" style="display:none">
+        <input type="hidden" id="usr-cliente-id">
+        <div style="font-size:11px;color:#22c55e;padding:8px 12px;background:#22c55e11;border-radius:8px">✅ Cliente vinculado automaticamente ao selecionar acima</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -6031,29 +6043,69 @@ function renderUsuarios(){
   });
 }
 
-function toggleUsrCliente(){
-  var perfil=document.getElementById('usr-perfil').value;
-  var wrap=document.getElementById('usr-cliente-wrap');
-  if(wrap) wrap.style.display = perfil==='cliente'?'flex':'none';
+function toggleUsrPerfil(){
+  var perfil = document.getElementById('usr-perfil').value;
+  var profWrap = document.getElementById('usr-prof-wrap');
+  var cliWrap = document.getElementById('usr-cli-wrap');
+  var cliIdWrap = document.getElementById('usr-cliente-id-wrap');
+  if(profWrap) profWrap.style.display = perfil!=='cliente' ? 'flex' : 'none';
+  if(cliWrap) cliWrap.style.display = perfil==='cliente' ? 'flex' : 'none';
+  if(cliIdWrap) cliIdWrap.style.display = perfil==='cliente' ? 'flex' : 'none';
+  // Clear fields when switching
+  document.getElementById('usr-nome').value = '';
+  document.getElementById('usr-email').value = '';
+  document.getElementById('usr-cliente-id').value = '';
+}
+
+function preencherUsrDeProfissional(){
+  var sel = document.getElementById('usr-prof-sel');
+  var profId = sel.value;
+  if(!profId) return;
+  var prof = profissionais.find(function(p){ return p.id === profId; });
+  if(!prof) return;
+  document.getElementById('usr-nome').value = prof.nome || '';
+  document.getElementById('usr-email').value = prof.email || '';
+  document.getElementById('usr-cliente-id').value = '';
+}
+
+function preencherUsrDeCliente(){
+  var sel = document.getElementById('usr-cli-sel');
+  var cliId = sel.value;
+  if(!cliId) return;
+  var cli = clientes.find(function(c){ return c.id === cliId; });
+  if(!cli) return;
+  document.getElementById('usr-nome').value = cli.nome || '';
+  document.getElementById('usr-email').value = cli.email || '';
+  document.getElementById('usr-cliente-id').value = cliId;
 }
 
 function openModalUsuario(id){
   editingUsrId=id;
   var u=id?usuarios.find(function(x){return x.id===id;}):null;
   document.getElementById('modal-usr-title').textContent=id?'Editar Usuário':'Novo Usuário';
-  document.getElementById('usr-email').value=u?u.email||'':'';
-  document.getElementById('usr-email').disabled=!!id; // cant change email
-  document.getElementById('usr-nome').value=u?u.nome||'':'';
   document.getElementById('usr-perfil').value=u?u.perfil||'gestor':'gestor';
-  // Populate clientes
-  var sel=document.getElementById('usr-cliente-id');
-  sel.innerHTML='<option value="">Selecione o cliente...</option>';
-  clientes.forEach(function(c){
-    var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;
-    if(u&&u.clienteId===c.id)o.selected=true;
-    sel.appendChild(o);
+  document.getElementById('usr-nome').value=u?u.nome||'':'';
+  document.getElementById('usr-email').value=u?u.email||'':'';
+  document.getElementById('usr-cliente-id').value=u?u.clienteId||'':'';
+
+  // Populate profissionais select
+  var profSel=document.getElementById('usr-prof-sel');
+  profSel.innerHTML='<option value="">Selecione ou preencha manualmente...</option>';
+  profissionais.forEach(function(p){
+    var o=document.createElement('option');o.value=p.id;o.textContent=p.nome+(p.email?' ('+p.email+')':'');
+    profSel.appendChild(o);
   });
-  toggleUsrCliente();
+
+  // Populate clientes select
+  var cliSel=document.getElementById('usr-cli-sel');
+  cliSel.innerHTML='<option value="">Selecione o cliente...</option>';
+  clientes.forEach(function(c){
+    var o=document.createElement('option');o.value=c.id;o.textContent=c.nome+(c.email?' ('+c.email+')':'');
+    if(u&&u.clienteId===c.id)o.selected=true;
+    cliSel.appendChild(o);
+  });
+
+  toggleUsrPerfil();
   openModal('modal-usuario');
 }
 
