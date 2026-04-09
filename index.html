@@ -432,6 +432,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="user-dot"></div>
         <div class="user-email" id="user-email-badge">—</div>
       </div>
+      <button class="nav-item" id="nav-config" onclick="showView('configuracoes',this)" style="margin-bottom:8px"><span class="icon">⚙️</span><span>Configurações</span></button>
       <button class="btn-ghost" id="theme-toggle" onclick="toggleTheme()" style="width:100%;margin-bottom:8px;justify-content:center;display:flex;align-items:center;gap:6px;font-size:12px">
         <span id="theme-icon">☀️</span><span id="theme-label">Modo Claro</span>
       </button>
@@ -1091,6 +1092,31 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
+    <!-- CONFIGURAÇÕES -->
+    <div class="view" id="view-configuracoes">
+      <div class="page-header">
+        <div><div class="page-title">Configurações</div><div class="page-sub">Gerenciamento de usuários e perfis de acesso</div></div>
+        <button class="btn-primary" onclick="openModalUsuario(null)">+ Novo Usuário</button>
+      </div>
+      <div class="page-content">
+        <div class="card" style="margin-bottom:20px;border-color:#1e8fff33">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">ℹ️</div>
+            <div>
+              <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:6px">Como funciona</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">
+                Cadastre aqui os usuários do sistema com seus perfis de acesso.<br>
+                <strong style="color:#1e8fff">ADM</strong> — acesso total a tudo.<br>
+                <strong style="color:#22c55e">Gestor</strong> — acesso a clientes, CRM, Black. Não vê Financeiro, DRE e Balanço.<br>
+                <strong style="color:#c084fc">Cliente</strong> — vê apenas sua própria carteira, operações Black, agendamento e glossário.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="usuarios-list"></div>
+      </div>
+    </div>
+
     <!-- ALERTAS -->
 
     <!-- SIMULADOR INDEPENDÊNCIA FINANCEIRA -->
@@ -1471,6 +1497,31 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div id="balanco-content">
           <div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
         </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div class="view" id="view-configuracoes">
+      <div class="page-header">
+        <div><div class="page-title">Configurações</div><div class="page-sub">Gerenciamento de usuários e perfis de acesso</div></div>
+        <button class="btn-primary" onclick="openModalUsuario(null)">+ Novo Usuário</button>
+      </div>
+      <div class="page-content">
+        <div class="card" style="margin-bottom:20px;border-color:#1e8fff33">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">ℹ️</div>
+            <div>
+              <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:6px">Como funciona</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">
+                Cadastre aqui os usuários do sistema com seus perfis de acesso.<br>
+                <strong style="color:#1e8fff">ADM</strong> — acesso total a tudo.<br>
+                <strong style="color:#22c55e">Gestor</strong> — acesso a clientes, CRM, Black. Não vê Financeiro, DRE e Balanço.<br>
+                <strong style="color:#c084fc">Cliente</strong> — vê apenas sua própria carteira, operações Black, agendamento e glossário.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="usuarios-list"></div>
       </div>
     </div>
 
@@ -2151,6 +2202,39 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-balanco')">Cancelar</button>
       <button class="btn-primary" onclick="saveBalanco()">Salvar Balanço</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL USUARIO -->
+<div class="modal-overlay" id="modal-usuario" style="display:none" onclick="if(event.target===this)closeModal('modal-usuario')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-usr-title">Novo Usuário</div>
+      <button class="modal-close" onclick="closeModal('modal-usuario')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Email *</label><input class="form-input" id="usr-email" type="email" placeholder="email@dmfinvestimentos.com"></div>
+      <div class="form-group form-full"><label>Nome</label><input class="form-input" id="usr-nome" placeholder="Nome completo"></div>
+      <div class="form-group form-full">
+        <label>Perfil de Acesso *</label>
+        <select class="form-input" id="usr-perfil" onchange="toggleUsrCliente()">
+          <option value="adm">ADM — Acesso total</option>
+          <option value="gestor">Gestor — Sem financeiro</option>
+          <option value="cliente">Cliente — Só dados próprios</option>
+        </select>
+      </div>
+      <div class="form-group form-full" id="usr-cliente-wrap" style="display:none">
+        <label>Cliente vinculado</label>
+        <select class="form-input" id="usr-cliente-id">
+          <option value="">Selecione o cliente...</option>
+        </select>
+        <div style="font-size:11px;color:var(--text3);margin-top:5px">Selecione qual cliente este login representa</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn-primary" onclick="saveUsuario()">Salvar</button>
     </div>
   </div>
 </div>
@@ -5722,6 +5806,274 @@ function saveBalanco(){
   db.collection('balanco').doc(ano+'-'+mes).set(data).then(function(){
     closeModal('modal-balanco');
     loadBalanco();
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// PERFIS DE ACESSO
+// ═══════════════════════════════════════════════════════════
+var currentUser = null;
+var currentPerfil = null;
+var currentClienteVinculado = null;
+var usuarios = [];
+var editingUsrId = null;
+
+var PERFIL_MENUS = {
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario'],
+  cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias']
+};
+
+var PERFIL_COR = {adm:'#1e8fff', gestor:'#22c55e', cliente:'#c084fc'};
+var PERFIL_LABEL = {adm:'ADM', gestor:'Gestor', cliente:'Cliente'};
+
+// Override auth to apply perfil
+auth.onAuthStateChanged(function(user){
+  if(user){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    document.getElementById('user-email-badge').textContent=user.email;
+    currentUser = user;
+    // Load perfil from Firestore
+    db.collection('usuarios').doc(user.email).get().then(function(doc){
+      if(doc.exists){
+        var data = doc.data();
+        currentPerfil = data.perfil || 'adm';
+        currentClienteVinculado = data.clienteId || null;
+      } else {
+        // First user = ADM
+        currentPerfil = 'adm';
+      }
+      applyPerfil();
+      loadData();
+    }).catch(function(){
+      currentPerfil = 'adm';
+      applyPerfil();
+      loadData();
+    });
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app-screen').style.display='none';
+  }
+});
+
+function applyPerfil(){
+  var menus = PERFIL_MENUS[currentPerfil] || PERFIL_MENUS.adm;
+
+  if(currentPerfil === 'cliente'){
+    // Show cliente portal
+    showClientePortal();
+    return;
+  }
+
+  // Show/hide nav items based on perfil
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    var onclick = btn.getAttribute('onclick') || '';
+    var viewMatch = onclick.match(/showView\('([^']+)'/);
+    if(viewMatch){
+      var viewName = viewMatch[1];
+      btn.style.display = menus.indexOf(viewName) >= 0 ? '' : 'none';
+    }
+  });
+
+  // Hide nav-config from non-ADM
+  var navConfig = document.getElementById('nav-config');
+  if(navConfig) navConfig.style.display = currentPerfil === 'adm' ? '' : 'none';
+
+  // Show perfil badge in sidebar
+  var chip = document.getElementById('user-chip-perfil');
+  if(!chip){
+    chip = document.createElement('div');
+    chip.id = 'user-chip-perfil';
+    chip.style = 'font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:auto;flex-shrink:0';
+    document.getElementById('user-email-badge').parentNode.appendChild(chip);
+  }
+  chip.textContent = PERFIL_LABEL[currentPerfil];
+  chip.style.background = PERFIL_COR[currentPerfil]+'22';
+  chip.style.color = PERFIL_COR[currentPerfil];
+}
+
+// ── Portal do Cliente ─────────────────────────────────────
+function showClientePortal(){
+  // Hide all nav sections except cliente menus
+  document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display='none'; });
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    var onclick = btn.getAttribute('onclick') || '';
+    var viewMatch = onclick.match(/showView\('([^']+)'/);
+    if(viewMatch){
+      var menus = PERFIL_MENUS.cliente;
+      btn.style.display = menus.indexOf(viewMatch[1]) >= 0 ? '' : 'none';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+
+  // Show minha carteira view
+  if(!document.getElementById('view-minha-carteira')){
+    buildMinhaCarteiraView();
+  }
+  showView('minha-carteira', null);
+  loadMinhaCarteira();
+}
+
+function buildMinhaCarteiraView(){
+  var mainContent = document.getElementById('main-content');
+  var div = document.createElement('div');
+  div.className = 'view';
+  div.id = 'view-minha-carteira';
+  div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Carteira</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div></div>'
+    +'<div class="page-content">'
+    +'<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-patrimonio" style="font-size:20px">R$0</div><div class="kpi-label">Patrimônio em Ativos</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado Black</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-retorno" style="font-size:20px">0%</div><div class="kpi-label">Retorno Black</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>'
+    +'</div>'
+    +'<div id="mc-dados"></div>'
+    +'</div>';
+  mainContent.appendChild(div);
+}
+
+function loadMinhaCarteira(){
+  if(!currentClienteVinculado) return;
+  var c = clientes.find(function(x){ return x.id === currentClienteVinculado; });
+  if(!c) return;
+
+  var el = document.getElementById('mc-sub');
+  if(el) el.textContent = 'Olá, '+c.nome+'!';
+
+  var pat = c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
+  document.getElementById('mc-patrimonio').textContent = fmtFull(pat);
+
+  // Load Black ops
+  db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
+    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    var acum = ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
+    var retorno = pat ? (acum/pat*100).toFixed(2) : 0;
+    document.getElementById('mc-acumulado').textContent = fmtFull(acum);
+    document.getElementById('mc-retorno').textContent = retorno+'%';
+
+    // Show operations table
+    var el = document.getElementById('mc-dados');
+    if(!ops.length){
+      el.innerHTML='<div class="card"><div class="empty" style="padding:30px"><div class="empty-icon">⚡</div><div class="empty-title">Nenhuma operação registrada</div></div></div>';
+      return;
+    }
+    var sorted = ops.sort(function(a,b){return b.ano!==a.ano?b.ano-a.ano:b.mes-a.mes;});
+    var acumRun=0;
+    el.innerHTML='<div class="card"><div class="section-title">Histórico de Operações</div><div class="table-wrap" style="border:none"><table><thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>Acumulado</th></tr></thead><tbody>'
+      +sorted.map(function(op){
+        var saldo=(op.vendas||0)-(op.compras||0);
+        var custos=op.custoTotal||0;
+        var liq=saldo-custos;
+        acumRun+=saldo;
+        return'<tr><td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custos)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumRun>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acumRun)+'</td></tr>';
+      }).join('')
+      +'</tbody></table></div></div>';
+  });
+}
+
+// ── Gerenciar Usuários ────────────────────────────────────
+var _origShowViewCfg = showView;
+showView = function(v,btn){
+  _origShowViewCfg(v,btn);
+  if(v==='configuracoes') loadUsuarios();
+};
+
+function loadUsuarios(){
+  db.collection('usuarios').onSnapshot(function(snap){
+    usuarios = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderUsuarios();
+  });
+}
+
+function renderUsuarios(){
+  var el = document.getElementById('usuarios-list');
+  if(!el) return;
+  el.innerHTML='';
+  if(!usuarios.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-title">Nenhum usuário cadastrado</div><p style="font-size:13px;margin-top:4px">Adicione usuários e defina seus perfis de acesso</p></div>';
+    return;
+  }
+  usuarios.forEach(function(u){
+    var cor = PERFIL_COR[u.perfil]||'#94a3b8';
+    var card = document.createElement('div');
+    card.style='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;transition:border-color .2s';
+    card.onmouseover=function(){this.style.borderColor='var(--border2)';};
+    card.onmouseout=function(){this.style.borderColor='var(--border)';};
+
+    var av=document.createElement('div');
+    av.style='width:42px;height:42px;border-radius:11px;background:'+cor+'22;border:1px solid '+cor+'44;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0';
+    av.textContent=u.perfil==='adm'?'🔑':u.perfil==='gestor'?'👔':'👤';
+
+    var info=document.createElement('div');info.style='flex:1';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:3px">'+(u.nome||u.email)+'</div>'
+      +'<div style="font-size:12px;color:var(--text3)">'+u.email+(u.clienteNome?' · Cliente: '+u.clienteNome:'')+'</div>';
+
+    var badge=document.createElement('span');
+    badge.style='font-size:11px;padding:3px 12px;border-radius:20px;font-weight:700;background:'+cor+'22;color:'+cor+';border:1px solid '+cor+'33';
+    badge.textContent=PERFIL_LABEL[u.perfil]||u.perfil;
+
+    var actions=document.createElement('div');actions.style='display:flex;gap:6px';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';eb.textContent='✏️';
+    (function(uid){eb.onclick=function(){openModalUsuario(uid);};})(u.id);
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';db2.textContent='🗑';
+    (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
+    actions.appendChild(eb);actions.appendChild(db2);
+
+    card.appendChild(av);card.appendChild(info);card.appendChild(badge);card.appendChild(actions);
+    el.appendChild(card);
+  });
+}
+
+function toggleUsrCliente(){
+  var perfil=document.getElementById('usr-perfil').value;
+  var wrap=document.getElementById('usr-cliente-wrap');
+  if(wrap) wrap.style.display = perfil==='cliente'?'flex':'none';
+}
+
+function openModalUsuario(id){
+  editingUsrId=id;
+  var u=id?usuarios.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-usr-title').textContent=id?'Editar Usuário':'Novo Usuário';
+  document.getElementById('usr-email').value=u?u.email||'':'';
+  document.getElementById('usr-email').disabled=!!id; // cant change email
+  document.getElementById('usr-nome').value=u?u.nome||'':'';
+  document.getElementById('usr-perfil').value=u?u.perfil||'gestor':'gestor';
+  // Populate clientes
+  var sel=document.getElementById('usr-cliente-id');
+  sel.innerHTML='<option value="">Selecione o cliente...</option>';
+  clientes.forEach(function(c){
+    var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;
+    if(u&&u.clienteId===c.id)o.selected=true;
+    sel.appendChild(o);
+  });
+  toggleUsrCliente();
+  openModal('modal-usuario');
+}
+
+function saveUsuario(){
+  var email=document.getElementById('usr-email').value.trim().toLowerCase();
+  if(!email){alert('Email é obrigatório!');return;}
+  var perfil=document.getElementById('usr-perfil').value;
+  var clienteSel=document.getElementById('usr-cliente-id');
+  var clienteId=clienteSel.value||'';
+  var clienteNome=clienteId&&clienteSel.selectedIndex>0?clienteSel.options[clienteSel.selectedIndex].text:'';
+  var data={
+    email:email,
+    nome:document.getElementById('usr-nome').value,
+    perfil:perfil,
+    clienteId:clienteId,
+    clienteNome:clienteNome,
+    atualizadoEm:new Date().toISOString()
+  };
+  // Use email as document ID for easy lookup on login
+  db.collection('usuarios').doc(email).set(data).then(function(){
+    closeModal('modal-usuario');
   });
 }
 
