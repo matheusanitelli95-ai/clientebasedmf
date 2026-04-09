@@ -6009,25 +6009,62 @@ function applyPerfil(){
 
 // ── Portal do Cliente ─────────────────────────────────────
 function showClientePortal(){
-  // Hide all nav sections except cliente menus
-  document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display='none'; });
-  document.querySelectorAll('.nav-item').forEach(function(btn){
-    var onclick = btn.getAttribute('onclick') || '';
-    var viewMatch = onclick.match(/showView\('([^']+)'/);
-    if(viewMatch){
-      var menus = PERFIL_MENUS.cliente;
-      btn.style.display = menus.indexOf(viewMatch[1]) >= 0 ? '' : 'none';
-    } else {
-      btn.style.display = 'none';
-    }
+  // Hide ALL existing nav items and sections
+  document.querySelectorAll('.nav-item, .nav-section').forEach(function(el){
+    el.style.display='none';
   });
 
-  // Show minha carteira view
-  if(!document.getElementById('view-minha-carteira')){
-    buildMinhaCarteiraView();
+  // Build cliente nav dynamically
+  var nav = document.querySelector('.sidebar-nav');
+  if(!document.getElementById('cliente-nav')){
+    var clienteNav = document.createElement('div');
+    clienteNav.id = 'cliente-nav';
+
+    function makeNavBtn(id, view, icon, label, active){
+      var btn = document.createElement('button');
+      btn.className = 'nav-item' + (active?' active':'');
+      btn.id = id;
+      btn.innerHTML = '<span class="icon">'+icon+'</span><span>'+label+'</span>';
+      btn.onclick = function(){ showClienteView(view, btn); };
+      return btn;
+    }
+    var s1=document.createElement('div');s1.className='nav-section';s1.textContent='Minha Conta';
+    var s2=document.createElement('div');s2.className='nav-section';s2.textContent='DMF Black';
+    var s3=document.createElement('div');s3.className='nav-section';s3.textContent='DMF';
+    clienteNav.appendChild(s1);
+    clienteNav.appendChild(makeNavBtn('cnav-carteira','minha-carteira','🏠','Minha Carteira',true));
+    clienteNav.appendChild(s2);
+    clienteNav.appendChild(makeNavBtn('cnav-operacoes','minhas-operacoes','⚡','Minhas Operações',false));
+    clienteNav.appendChild(s3);
+    clienteNav.appendChild(makeNavBtn('cnav-agendamento','agendamento','📅','Agendamento',false));
+    clienteNav.appendChild(makeNavBtn('cnav-comunicados','comunicados','📰','Comunicados',false));
+    clienteNav.appendChild(makeNavBtn('cnav-glossario','glossario','📚','Glossário',false));
+    clienteNav.appendChild(makeNavBtn('cnav-estrategias','estrategias','♟️','Estratégias',false));
+    nav.appendChild(clienteNav);
   }
-  showView('minha-carteira', null);
+
+  // Build views if needed
+  if(!document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
+  if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
+
+  showClienteView('minha-carteira', document.getElementById('cnav-carteira'));
   loadMinhaCarteira();
+}
+
+function showClienteView(viewId, btn){
+  // Hide all views
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('active'); });
+  // Deactivate all cliente nav items
+  document.querySelectorAll('#cliente-nav .nav-item').forEach(function(el){ el.classList.remove('active'); });
+  // Show target view
+  var view = document.getElementById('view-'+viewId);
+  if(view) view.classList.add('active');
+  if(btn) btn.classList.add('active');
+  // Load data if needed
+  if(viewId==='minhas-operacoes') loadMinhasOperacoes();
+  if(viewId==='comunicados') loadComunicados();
+  if(viewId==='glossario') loadGlossario();
+  if(viewId==='estrategias') setTimeout(renderEst, 50);
 }
 
 function buildMinhaCarteiraView(){
@@ -6045,6 +6082,104 @@ function buildMinhaCarteiraView(){
     +'<div id="mc-dados"></div>'
     +'</div>';
   mainContent.appendChild(div);
+}
+
+function buildMinhasOperacoesView(){
+  var mainContent = document.getElementById('main-content');
+  var div = document.createElement('div');
+  div.className = 'view';
+  div.id = 'view-minhas-operacoes';
+  div.innerHTML = '<div class="page-header"><div><div class="page-title">Minhas Operações</div><div class="page-sub">Histórico de operações com opções — DMF Black</div></div></div>'
+    +'<div class="page-content">'
+    +'<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado Total</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-media" style="font-size:20px">R$0</div><div class="kpi-label">Média Mensal</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-retorno" style="font-size:20px">0%</div><div class="kpi-label">Retorno s/ Patrimônio</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>'
+    +'</div>'
+    +'<div class="card" style="margin-bottom:20px"><div class="section-title">Acumulado DMF vs Benchmarks</div><canvas id="mo-chart" height="120"></canvas></div>'
+    +'<div class="card"><div class="section-title">Histórico Mensal</div>'
+    +'<div class="table-wrap" style="border:none"><table>'
+    +'<thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>% Mês</th><th>Acumulado</th></tr></thead>'
+    +'<tbody id="mo-tbody"></tbody></table></div></div>'
+    +'</div>';
+  mainContent.appendChild(div);
+}
+
+var moChart = null;
+
+function loadMinhasOperacoes(){
+  if(!currentClienteVinculado) return;
+  var pat = 0;
+  var cli = clientes.find(function(x){ return x.id === currentClienteVinculado; });
+  if(cli) pat = cli.patrimonio||(cli.custodiaRF||0)+(cli.custodiaRV||0);
+
+  db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
+    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    ops.sort(function(a,b){ return a.ano!==b.ano?a.ano-b.ano:a.mes-b.mes; });
+
+    var acum=0, totalMeses=ops.length;
+    var acumArr=[],ibovArr=[],cdiArr=[],labels=[];
+    var acumIbov=0,acumCdi=0;
+
+    var tbody = document.getElementById('mo-tbody');
+    if(tbody) tbody.innerHTML='';
+
+    ops.forEach(function(op){
+      var saldo=(op.vendas||0)-(op.compras||0);
+      var custos=op.custoTotal||0;
+      var liq=saldo-custos;
+      acum+=saldo;
+      acumIbov+=op.ibov||0;
+      acumCdi+=op.cdi||0;
+      var pctMes=pat?(saldo/pat*100).toFixed(2)+'%':'—';
+      labels.push(MESES[op.mes-1]+'/'+op.ano);
+      acumArr.push(Number(acum.toFixed(2)));
+      ibovArr.push(Number(acumIbov.toFixed(2)));
+      cdiArr.push(Number(acumCdi.toFixed(2)));
+
+      if(tbody){
+        var tr=document.createElement('tr');
+        tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custos)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
+          +'<td style="font-size:12px;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+pctMes+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acum>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acum)+'</td>';
+        tbody.appendChild(tr);
+      }
+    });
+
+    // KPIs
+    var media = totalMeses?acum/totalMeses:0;
+    var retorno = pat?(acum/pat*100).toFixed(2):0;
+    var moAcum=document.getElementById('mo-acumulado');
+    var moMedia=document.getElementById('mo-media');
+    var moRet=document.getElementById('mo-retorno');
+    if(moAcum){moAcum.textContent=fmtFull(acum);moAcum.style.color=acum>=0?'#22c55e':'#ef4444';}
+    if(moMedia) moMedia.textContent=fmtFull(media);
+    if(moRet){moRet.textContent=retorno+'%';moRet.style.color=Number(retorno)>=0?'#c084fc':'#ef4444';}
+
+    // Chart
+    if(moChart) moChart.destroy();
+    var ctx=document.getElementById('mo-chart');
+    if(ctx&&labels.length){
+      moChart=new Chart(ctx.getContext('2d'),{
+        type:'line',
+        data:{labels:labels,datasets:[
+          {label:'DMF Black (R$)',data:acumArr,borderColor:'#1e8fff',backgroundColor:'#1e8fff22',tension:.4,pointRadius:3,fill:true},
+          {label:'IBOV acum. %',data:ibovArr,borderColor:'#22c55e',tension:.4,pointRadius:3,borderDash:[4,4]},
+          {label:'CDI acum. %',data:cdiArr,borderColor:'#f59e0b',tension:.4,pointRadius:3,borderDash:[2,4]}
+        ]},
+        options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#4a6080',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#4a6080',font:{size:10}},grid:{color:'#0e2040'}}}}
+      });
+    }
+
+    if(!ops.length && tbody){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">Nenhuma operação registrada ainda</td>';
+      tbody.appendChild(tr);
+    }
+  });
 }
 
 function loadMinhaCarteira(){
