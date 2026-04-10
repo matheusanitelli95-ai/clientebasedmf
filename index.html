@@ -6884,6 +6884,96 @@ function renderLeadsCRM(){
   });
 }
 
+
+// ── Payoff Calculator ─────────────────────────────────────
+function getPernasData(){
+  return payoffPernas.map(function(id){
+    var cv=(document.getElementById('perna-'+id+'-cv')||{value:'C'}).value;
+    var tipo=(document.getElementById('perna-'+id+'-tipo')||{value:'call'}).value;
+    var strike=parseFloat((document.getElementById('perna-'+id+'-strike')||{value:30}).value)||0;
+    var qtde=parseFloat((document.getElementById('perna-'+id+'-qtde')||{value:1000}).value)||0;
+    var premio=parseFloat((document.getElementById('perna-'+id+'-premio')||{value:0}).value)||0;
+    return {cv:cv,tipo:tipo,strike:strike,qtde:qtde,premio:premio};
+  }).filter(function(p){return p.strike>0;});
+}
+
+function calcPayoffAtPrice(pernas,spot){
+  var total=0;
+  pernas.forEach(function(p){
+    var intrinsic=p.tipo==='call'?Math.max(0,spot-p.strike):Math.max(0,p.strike-spot);
+    if(p.cv==='C') total+=(intrinsic-p.premio)*p.qtde;
+    else total+=(p.premio-intrinsic)*p.qtde;
+  });
+  return Number(total.toFixed(2));
+}
+
+function calcPayoff(){
+  var pernas=getPernasData();
+  var canvas=document.getElementById('payoff-chart');
+  var emptyEl=document.getElementById('payoff-empty');
+  var statsEl=document.getElementById('payoff-stats');
+  if(!pernas.length){
+    if(payoffChart){payoffChart.destroy();payoffChart=null;}
+    if(canvas) canvas.style.display='none';
+    if(emptyEl) emptyEl.style.display='block';
+    if(statsEl) statsEl.style.display='none';
+    return;
+  }
+  var spot=parseFloat((document.getElementById('payoff-spot')||{value:30}).value)||30;
+  var rangePct=parseFloat((document.getElementById('payoff-range')||{value:20}).value)||20;
+  var minPrice=spot*(1-rangePct/100);
+  var maxPrice=spot*(1+rangePct/100);
+  var steps=100;
+  var labels=[],data=[],breakevens=[];
+  var maxLucro=-Infinity,maxPerda=Infinity;
+  for(var i=0;i<=steps;i++){
+    var price=minPrice+i*(maxPrice-minPrice)/steps;
+    var pnl=calcPayoffAtPrice(pernas,price);
+    labels.push(price.toFixed(2));
+    data.push(pnl);
+    if(pnl>maxLucro) maxLucro=pnl;
+    if(pnl<maxPerda) maxPerda=pnl;
+    if(i>0&&((data[i-1]<0&&data[i]>=0)||(data[i-1]>=0&&data[i]<0))){
+      breakevens.push((minPrice+(i-0.5)*(maxPrice-minPrice)/steps).toFixed(2));
+    }
+  }
+  // Stats
+  if(statsEl) statsEl.style.display='grid';
+  var hasNakedCall=pernas.some(function(p){return p.cv==='V'&&p.tipo==='call';});
+  var ml=document.getElementById('payoff-max-lucro');
+  var mp=document.getElementById('payoff-max-perda');
+  var be=document.getElementById('payoff-breakeven');
+  if(ml) ml.textContent=hasNakedCall?'Ilimitado':fmtFull(maxLucro);
+  if(mp) mp.textContent=hasNakedCall?'Ilimitado':fmtFull(Math.abs(maxPerda));
+  if(be) be.textContent=breakevens.length?'R$'+breakevens.join(' / R$'):'N/A';
+  // Chart
+  if(emptyEl) emptyEl.style.display='none';
+  if(canvas) canvas.style.display='block';
+  if(payoffChart){payoffChart.destroy();}
+  payoffChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{labels:labels,datasets:[{
+      label:'P&L (R$)',data:data,
+      segment:{borderColor:function(ctx){return ctx.p1.parsed.y>=0?'#22c55e':'#ef4444';}},
+      backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,tension:0
+    }]},
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          label:function(ctx){return 'P&L: '+fmtFull(ctx.parsed.y);},
+          title:function(ctx){return 'Ativo: R$'+ctx[0].label;}
+        }}
+      },
+      scales:{
+        x:{ticks:{color:'#4a6080',font:{size:10},maxTicksLimit:8,callback:function(v){return 'R$'+this.getLabelForValue(v);}},grid:{color:'#0e2040'}},
+        y:{ticks:{color:'#4a6080',font:{size:10},callback:function(v){return fmtFull(v);}},grid:{color:function(ctx){return ctx.tick.value===0?'#ffffff44':'#0e2040';},lineWidth:function(ctx){return ctx.tick.value===0?2:1;}}}
+      }
+    }
+  });
+}
+
 </script>
 </body>
 </html>
