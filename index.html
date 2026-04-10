@@ -1126,7 +1126,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <div class="section-title" style="margin:0;font-size:13px">Simulador de Payoff</div>
             <div style="display:flex;gap:8px;align-items:center">
-              <input class="filter-input" id="payoff-spot" type="number" value="30" style="width:90px;font-size:12px;padding:5px 8px" placeholder="Spot R$">
+              <input class="filter-input" id="payoff-spot" type="number" value="30" style="width:90px;font-size:12px;padding:5px 8px" placeholder="Spot R$" oninput="calcPayoff()" onchange="calcPayoff()">
               <select class="filter-input" id="payoff-range" onchange="calcPayoff()" style="width:80px;font-size:12px;padding:5px 8px">
                 <option value="10">±10%</option>
                 <option value="20" selected>±20%</option>
@@ -4772,7 +4772,27 @@ function renderTarefas(){
       if(t.cliente){var cliEl=document.createElement('div');cliEl.style='font-size:11px;color:var(--blue);margin-bottom:4px';cliEl.textContent=t.cliente;card.appendChild(cliEl);}
       if(t.responsavel){var respEl=document.createElement('div');respEl.style='font-size:11px;color:var(--text3);margin-bottom:4px';respEl.textContent=t.responsavel;card.appendChild(respEl);}
       if(t.prazo){var prazoEl=document.createElement('div');prazoEl.style='font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)');prazoEl.textContent=fmtDate(t.prazo);card.appendChild(prazoEl);}
-      if(t.descricao){var descEl=document.createElement('div');descEl.style='font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5;border-top:1px solid var(--border);padding-top:6px';descEl.textContent=t.descricao;card.appendChild(descEl);}
+      // Show respostas if lead
+      if(isLead && t.respostas){
+        var respDiv=document.createElement('div');
+        respDiv.style='margin-top:8px;border-top:1px solid var(--border);padding-top:8px';
+        var LABELS={carteira:'Carteira',deixandoDinheiro:'Deixando dinheiro',situacao:'Situação',objetivo:'Objetivo',comprometimento:'Comprometimento',patrimonio:'Patrimônio',modeloPagamento:'Modelo',eficiencia:'Eficiência'};
+        Object.keys(LABELS).forEach(function(k){
+          if(t.respostas[k]){
+            var row=document.createElement('div');
+            row.style='font-size:10px;color:var(--text3);margin-bottom:3px;line-height:1.4';
+            row.innerHTML='<span style="color:var(--text2);font-weight:600">'+LABELS[k]+':</span> '+t.respostas[k];
+            respDiv.appendChild(row);
+          }
+        });
+        if(t.contato){
+          if(t.contato.horario){var h=document.createElement('div');h.style='font-size:10px;color:var(--text3);margin-bottom:3px';h.innerHTML='<span style="color:var(--text2);font-weight:600">Horário:</span> '+t.contato.horario;respDiv.appendChild(h);}
+          if(t.contato.origem){var o=document.createElement('div');o.style='font-size:10px;color:var(--text3);margin-bottom:3px';o.innerHTML='<span style="color:var(--text2);font-weight:600">Origem:</span> '+t.contato.origem;respDiv.appendChild(o);}
+        }
+        card.appendChild(respDiv);
+      } else if(t.descricao && t.descricao !== 'Lead via formulário de captação'){
+        var descEl=document.createElement('div');descEl.style='font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5;border-top:1px solid var(--border);padding-top:6px';descEl.textContent=t.descricao;card.appendChild(descEl);
+      }
 
       if(isLead){
         var iaBtn=document.createElement('button');
@@ -6634,333 +6654,88 @@ function corrigirAcumulacaoFirestore(){
 function gerarAbordagemIA(tarefaId){
   var t = tarefas.find(function(x){ return x.id===tarefaId; });
   if(!t) return;
-  db.collection('leads').where('nome','==',t.cliente).limit(1).get().then(function(snap){
-    var lead = snap.empty ? null : snap.docs[0].data();
-    var linhas = [];
-    if(lead){
-      if(lead.carteira) linhas.push('Carteira: '+lead.carteira);
-      if(lead.deixandoDinheiro) linhas.push('Deixando dinheiro na mesa: '+lead.deixandoDinheiro);
-      if(lead.situacao) linhas.push('Situacao: '+lead.situacao);
-      if(lead.objetivo) linhas.push('Objetivo: '+lead.objetivo);
-      if(lead.comprometimento) linhas.push('Comprometimento: '+lead.comprometimento);
-      if(lead.patrimonio) linhas.push('Patrimonio: '+lead.patrimonio);
-      if(lead.modeloPagamento) linhas.push('Modelo: '+lead.modeloPagamento);
-      if(lead.horario) linhas.push('Melhor horario: '+lead.horario);
-      if(lead.origem) linhas.push('Origem: '+lead.origem);
-    }
-    var perfil = linhas.length ? linhas.join(', ') : 'Lead sem dados de formulario.';
-    var prompt = 'Voce e especialista comercial da DMF Investimentos, assessoria focada em opcoes (DMF Black). '
-      +'Com base no perfil abaixo de um lead que preencheu nossa triagem estrategica, escreva uma mensagem de primeiro contato via WhatsApp. '
-      +'Seja direto, sofisticado, pessoal, sem cliches. Maximo 4 linhas. Nao use emojis excessivos. Assine como equipe DMF.'
-      +' PERFIL: '+perfil;
 
-    var btn = document.querySelector('[data-ia="'+tarefaId+'"]');
-    if(btn){ btn.textContent='Gerando...'; btn.disabled=true; }
+  var r = t.respostas || {};
+  var c = t.contato || {};
+  var linhas = [];
+  if(r.carteira) linhas.push('Carteira hoje: '+r.carteira);
+  if(r.deixandoDinheiro) linhas.push('Deixando dinheiro: '+r.deixandoDinheiro);
+  if(r.situacao) linhas.push('Situação: '+r.situacao);
+  if(r.objetivo) linhas.push('Objetivo: '+r.objetivo);
+  if(r.comprometimento) linhas.push('Comprometimento: '+r.comprometimento);
+  if(r.patrimonio) linhas.push('Patrimônio: '+r.patrimonio);
+  if(r.modeloPagamento) linhas.push('Modelo preferido: '+r.modeloPagamento);
+  if(c.horario) linhas.push('Melhor horário: '+c.horario);
+  if(c.origem) linhas.push('Como conheceu: '+c.origem);
+  var perfil = linhas.length ? linhas.join(' | ') : 'Lead sem dados detalhados.';
 
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        messages:[{role:'user',content:prompt}]
-      })
-    }).then(function(r){return r.json();}).then(function(data){
-      var texto = data.content&&data.content[0]?data.content[0].text:'Nao foi possivel gerar a sugestao.';
-      var overlay=document.createElement('div');
-      overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
-      overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
-      var box=document.createElement('div');box.className='modal modal-sm';
-      var mh=document.createElement('div');mh.className='modal-header';
-      mh.innerHTML='<div class="modal-title">Sugestao de Abordagem</div>';
-      var mc=document.createElement('button');mc.className='modal-close';mc.textContent='x';
-      mc.onclick=function(){overlay.parentNode.removeChild(overlay);};
-      mh.appendChild(mc);box.appendChild(mh);
-      var body=document.createElement('div');body.style='padding:16px';
-      if(lead && linhas.length){
-        var summary=document.createElement('div');
-        summary.style='background:#030810;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:1.8;color:var(--text2)';
-        summary.innerHTML='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Perfil do Lead</div>'
-          +(lead.patrimonio?'<div>Patrimonio: <strong style="color:var(--white)">'+lead.patrimonio+'</strong></div>':'')
-          +(lead.objetivo?'<div>Objetivo: <strong style="color:var(--white)">'+lead.objetivo+'</strong></div>':'')
-          +(lead.situacao?'<div>Situacao: <strong style="color:var(--white)">'+lead.situacao+'</strong></div>':'')
-          +(lead.modeloPagamento?'<div>Modelo: <strong style="color:var(--white)">'+lead.modeloPagamento+'</strong></div>':'')
-          +(lead.horario?'<div>Horario: <strong style="color:var(--white)">'+lead.horario+'</strong></div>':'');
-        body.appendChild(summary);
-      }
-      var sugestao=document.createElement('div');
-      sugestao.style='background:#1e8fff11;border:1px solid #1e8fff33;border-radius:10px;padding:16px;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;margin-bottom:16px';
-      sugestao.textContent=texto;
-      body.appendChild(sugestao);
-      var copyBtn=document.createElement('button');copyBtn.className='btn-primary';copyBtn.style='width:100%';
-      copyBtn.textContent='Copiar mensagem';
-      copyBtn.onclick=function(){
-        navigator.clipboard.writeText(texto).then(function(){
-          copyBtn.textContent='Copiado!';
-          setTimeout(function(){copyBtn.textContent='Copiar mensagem';},2000);
-        });
-      };
-      body.appendChild(copyBtn);
-      box.appendChild(body);
-      overlay.appendChild(box);
-      document.body.appendChild(overlay);
-      if(btn){btn.textContent='Gerar sugestao de abordagem';btn.disabled=false;}
-    }).catch(function(e){
-      if(btn){btn.textContent='Gerar sugestao de abordagem';btn.disabled=false;}
-      alert('Erro: '+e.message);
-    });
-  });
-}
+  var prompt = 'Voce e especialista comercial da DMF Investimentos, assessoria focada em opcoes (DMF Black). '
+    +'Com base no perfil abaixo de um lead que preencheu nossa triagem estrategica, escreva uma mensagem de primeiro contato via WhatsApp. '
+    +'Seja direto, sofisticado, pessoal, sem cliches. Maximo 4 linhas. Nao use emojis excessivos. Assine como equipe DMF.'
+    +' PERFIL DO LEAD - '+t.cliente+': '+perfil;
 
+  var btn = document.querySelector('[data-ia="'+tarefaId+'"]');
+  if(btn){ btn.textContent='Gerando...'; btn.disabled=true; }
 
-// ═══════════════════════════════════════════════════════════
-// SIMULADOR DE PAYOFF
-// ═══════════════════════════════════════════════════════════
-var payoffPernas = [];
-var payoffChart = null;
-var payoffPernaId = 0;
-
-function addPerna(dados){
-  payoffPernaId++;
-  var id = payoffPernaId;
-  var d = dados || {tipo:'call', cv:'C', strike:30, qtde:1000, premio:1.00};
-
-  var row = document.createElement('div');
-  row.id = 'perna-'+id;
-  row.style = 'display:grid;grid-template-columns:90px 80px 90px 90px 90px 28px;gap:6px;align-items:end;margin-bottom:6px';
-
-  function makeField(label, id_suffix, type, opts, val){
-    var wrap = document.createElement('div');
-    var lbl = document.createElement('label');
-    lbl.style = 'font-size:10px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:700';
-    lbl.textContent = label;
-    wrap.appendChild(lbl);
-    var input;
-    if(type === 'select'){
-      input = document.createElement('select');
-      input.className = 'filter-input';
-      input.style = 'width:100%;font-size:11px;padding:5px 7px';
-      opts.forEach(function(o){
-        var opt = document.createElement('option');
-        opt.value = o.v; opt.textContent = o.l;
-        if(o.v === val) opt.selected = true;
-        input.appendChild(opt);
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:300,
+      messages:[{role:'user',content:prompt}]
+    })
+  }).then(function(res){return res.json();}).then(function(data){
+    var texto = data.content&&data.content[0]?data.content[0].text:'Não foi possível gerar a sugestão.';
+    var overlay=document.createElement('div');
+    overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
+    overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
+    var box=document.createElement('div');box.className='modal modal-sm';
+    var mh=document.createElement('div');mh.className='modal-header';
+    var mt=document.createElement('div');mt.className='modal-title';mt.textContent='Sugestão · '+t.cliente;
+    var mc=document.createElement('button');mc.className='modal-close';mc.textContent='×';
+    mc.onclick=function(){overlay.parentNode.removeChild(overlay);};
+    mh.appendChild(mt);mh.appendChild(mc);box.appendChild(mh);
+    var body=document.createElement('div');body.style='padding:16px';
+    // Perfil summary
+    if(linhas.length){
+      var summary=document.createElement('div');
+      summary.style='background:#030810;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:1.8;color:var(--text2)';
+      var sh=document.createElement('div');
+      sh.style='font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px';
+      sh.textContent='Perfil do Lead';
+      summary.appendChild(sh);
+      linhas.forEach(function(l){
+        var d=document.createElement('div');
+        var parts=l.split(': ');
+        d.innerHTML='<span style="color:var(--text3)">'+parts[0]+':</span> <strong style="color:var(--white)">'+parts.slice(1).join(': ')+'</strong>';
+        summary.appendChild(d);
       });
-    } else {
-      input = document.createElement('input');
-      input.type = type;
-      input.className = 'filter-input';
-      input.style = 'width:100%;font-size:11px;padding:5px 7px';
-      input.value = val;
-      if(type === 'number') input.step = '0.01';
+      body.appendChild(summary);
     }
-    input.id = 'perna-'+id+'-'+id_suffix;
-    input.oninput = calcPayoff;
-    wrap.appendChild(input);
-    return wrap;
-  }
-
-  row.appendChild(makeField('C / V', 'cv', 'select', [{v:'C',l:'Compra (C)'},{v:'V',l:'Venda (V)'}], d.cv));
-  row.appendChild(makeField('Tipo', 'tipo', 'select', [{v:'call',l:'CALL'},{v:'put',l:'PUT'}], d.tipo));
-  row.appendChild(makeField('Strike (R$)', 'strike', 'number', [], d.strike));
-  row.appendChild(makeField('Qtde', 'qtde', 'number', [], d.qtde));
-  row.appendChild(makeField('Prêmio (R$)', 'premio', 'number', [], d.premio));
-
-  var delWrap = document.createElement('div');
-  var delBtn = document.createElement('button');
-  delBtn.className = 'btn-dsm';
-  delBtn.style = 'width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;padding:0';
-  delBtn.textContent = '×';
-  (function(pid){ delBtn.onclick = function(){ removePerna(pid); }; })(id);
-  delWrap.appendChild(delBtn);
-  row.appendChild(delWrap);
-
-  document.getElementById('payoff-pernas').appendChild(row);
-  payoffPernas.push(id);
-  calcPayoff();
-}
-
-function removePerna(id){
-  var el = document.getElementById('perna-'+id);
-  if(el) el.parentNode.removeChild(el);
-  payoffPernas = payoffPernas.filter(function(x){ return x !== id; });
-  calcPayoff();
-}
-
-function limparPayoff(){
-  payoffPernas.forEach(function(id){
-    var el = document.getElementById('perna-'+id);
-    if(el) el.parentNode.removeChild(el);
+    // IA suggestion
+    var sugestao=document.createElement('div');
+    sugestao.style='background:#1e8fff11;border:1px solid #1e8fff33;border-radius:10px;padding:16px;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;margin-bottom:16px';
+    sugestao.textContent=texto;
+    body.appendChild(sugestao);
+    var copyBtn=document.createElement('button');copyBtn.className='btn-primary';copyBtn.style='width:100%';
+    copyBtn.textContent='Copiar mensagem';
+    copyBtn.onclick=function(){
+      navigator.clipboard.writeText(texto).then(function(){
+        copyBtn.textContent='Copiado!';
+        setTimeout(function(){copyBtn.textContent='Copiar mensagem';},2000);
+      });
+    };
+    body.appendChild(copyBtn);
+    box.appendChild(body);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    if(btn){btn.textContent='Gerar sugestão de abordagem';btn.disabled=false;}
+  }).catch(function(e){
+    if(btn){btn.textContent='Gerar sugestão de abordagem';btn.disabled=false;}
+    alert('Erro: '+e.message);
   });
-  payoffPernas = [];
-  payoffPernaId = 0;
-  if(payoffChart){ payoffChart.destroy(); payoffChart = null; }
-  document.getElementById('payoff-chart').style.display = 'none';
-  document.getElementById('payoff-empty').style.display = 'block';
-  document.getElementById('payoff-stats').style.display = 'none';
-  document.getElementById('payoff-max-lucro').textContent = '—';
-  document.getElementById('payoff-max-perda').textContent = '—';
-  document.getElementById('payoff-breakeven').textContent = '—';
 }
-
-function getPernasData(){
-  return payoffPernas.map(function(id){
-    var cv = (document.getElementById('perna-'+id+'-cv')||{value:'C'}).value;
-    var tipo = (document.getElementById('perna-'+id+'-tipo')||{value:'call'}).value;
-    var strike = parseFloat((document.getElementById('perna-'+id+'-strike')||{value:30}).value)||0;
-    var qtde = parseFloat((document.getElementById('perna-'+id+'-qtde')||{value:1000}).value)||0;
-    var premio = parseFloat((document.getElementById('perna-'+id+'-premio')||{value:0}).value)||0;
-    return {cv:cv, tipo:tipo, strike:strike, qtde:qtde, premio:premio};
-  }).filter(function(p){ return p.strike > 0; });
-}
-
-function calcPayoffAtPrice(pernas, spot){
-  var total = 0;
-  pernas.forEach(function(p){
-    var intrinsic = 0;
-    if(p.tipo === 'call') intrinsic = Math.max(0, spot - p.strike);
-    else intrinsic = Math.max(0, p.strike - spot);
-
-    if(p.cv === 'C'){
-      // Compra: paga prêmio, recebe intrínseco
-      total += (intrinsic - p.premio) * p.qtde;
-    } else {
-      // Venda: recebe prêmio, paga intrínseco
-      total += (p.premio - intrinsic) * p.qtde;
-    }
-  });
-  return total;
-}
-
-function calcPayoff(){
-  var pernas = getPernasData();
-  if(!pernas.length){
-    if(payoffChart){ payoffChart.destroy(); payoffChart = null; }
-    document.getElementById('payoff-chart').style.display = 'none';
-    document.getElementById('payoff-empty').style.display = 'block';
-    document.getElementById('payoff-stats').style.display = 'none';
-    return;
-  }
-
-  var spot = parseFloat(document.getElementById('payoff-spot').value)||30;
-  var rangePct = parseFloat(document.getElementById('payoff-range').value)||20;
-  var minPrice = spot * (1 - rangePct/100);
-  var maxPrice = spot * (1 + rangePct/100);
-  var steps = 100;
-  var step = (maxPrice - minPrice) / steps;
-
-  var labels = [], data = [];
-  var maxLucro = -Infinity, maxPerda = Infinity;
-  var breakevens = [];
-
-  for(var i = 0; i <= steps; i++){
-    var price = minPrice + i * step;
-    var pnl = calcPayoffAtPrice(pernas, price);
-    labels.push(price.toFixed(2));
-    data.push(parseFloat(pnl.toFixed(2)));
-    if(pnl > maxLucro) maxLucro = pnl;
-    if(pnl < maxPerda) maxPerda = pnl;
-    // Detect break-even crossings
-    if(i > 0 && ((data[i-1] < 0 && data[i] >= 0) || (data[i-1] >= 0 && data[i] < 0))){
-      var be = minPrice + (i - 0.5) * step;
-      breakevens.push(be.toFixed(2));
-    }
-  }
-
-  // Update stats
-  document.getElementById('payoff-stats').style.display = 'grid';
-  document.getElementById('payoff-max-lucro').textContent = maxLucro === Infinity ? 'Ilimitado' : fmtFull(maxLucro);
-  document.getElementById('payoff-max-perda').textContent = maxPerda === -Infinity ? 'Ilimitado' : fmtFull(maxPerda);
-  document.getElementById('payoff-breakeven').textContent = breakevens.length ? 'R$'+breakevens.join(' / R$') : 'N/A';
-
-  // Colors per point
-  var pointColors = data.map(function(v){ return v >= 0 ? '#22c55e' : '#ef4444'; });
-  var borderColors = data.map(function(v){ return v >= 0 ? '#22c55e' : '#ef4444'; });
-
-  // Draw chart
-  document.getElementById('payoff-empty').style.display = 'none';
-  var canvas = document.getElementById('payoff-chart');
-  canvas.style.display = 'block';
-
-  if(payoffChart){ payoffChart.destroy(); }
-  payoffChart = new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'P&L (R$)',
-        data: data,
-        borderColor: function(ctx){
-          var idx = ctx.dataIndex;
-          return idx !== undefined ? borderColors[idx] : '#1e8fff';
-        },
-        segment: {
-          borderColor: function(ctx){
-            return ctx.p1.parsed.y >= 0 ? '#22c55e' : '#ef4444';
-          }
-        },
-        backgroundColor: 'transparent',
-        borderWidth: 2.5,
-        pointRadius: 0,
-        tension: 0,
-        fill: false
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx){ return 'P&L: '+fmtFull(ctx.parsed.y); },
-            title: function(ctx){ return 'Ativo: R$'+ctx[0].label; }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#4a6080',
-            font: { size: 10 },
-            maxTicksLimit: 10,
-            callback: function(val, idx){ return 'R$'+this.getLabelForValue(val); }
-          },
-          grid: { color: '#0e2040' }
-        },
-        y: {
-          ticks: {
-            color: '#4a6080',
-            font: { size: 10 },
-            callback: function(val){ return fmtFull(val); }
-          },
-          grid: {
-            color: function(ctx){
-              return ctx.tick.value === 0 ? '#ffffff33' : '#0e2040';
-            },
-            lineWidth: function(ctx){ return ctx.tick.value === 0 ? 2 : 1; }
-          }
-        }
-      }
-    }
-  });
-
-  // Spot price vertical line annotation
-  var spotLabel = spot.toFixed(2);
-  var spotIdx = labels.indexOf(spotLabel);
-}
-
-// Init with one perna example
-var _origShowViewPay = showView;
-showView = function(v, btn){
-  _origShowViewPay(v, btn);
-  if(v === 'estrategias'){
-    setTimeout(function(){
-      renderEst();
-      if(!payoffPernas.length) addPerna({tipo:'call', cv:'C', strike:30, qtde:1000, premio:1.50});
-    }, 50);
-  }
-};
-
 </script>
 </body>
 </html>
