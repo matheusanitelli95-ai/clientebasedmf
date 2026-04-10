@@ -464,7 +464,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 
       <!-- Sucesso -->
       <div id="cad-sucesso" style="display:none;text-align:center">
-        <div style="font-size:56px;margin-bottom:16px">✅</div>
+        <div style="font-size:56px;margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Cadastro enviado!</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">Verifique seu email e clique no link de confirmação.</div>
         <div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:24px">Após confirmar, aguarde a aprovação da equipe DMF. Você receberá um aviso quando seu acesso for liberado.</div>
@@ -517,7 +517,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <button class="nav-item" id="nav-config" onclick="showView('configuracoes',this)" style="margin-bottom:8px"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span>Configurações</span></button>
       <button class="btn-ghost" id="theme-toggle" onclick="toggleTheme()" style="width:100%;margin-bottom:8px;justify-content:center;display:flex;align-items:center;gap:6px;font-size:12px">
-        <span id="theme-icon">☀️</span><span id="theme-label">Modo Claro</span>
+        <span id="theme-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span id="theme-label">Claro</span>
       </button>
       <button class="btn-sair" onclick="firebase.auth().signOut()">↩ Sair</button>
     </div>
@@ -533,10 +533,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div class="kpi-grid">
-          <div class="kpi-card" style="--c:#1e8fff"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-total">0</div><div class="kpi-label">Total Clientes</div></div><div class="kpi-icon">👥</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-custodia">R$0</div><div class="kpi-label">AuM</div></div><div class="kpi-icon">💼</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-ativos">0</div><div class="kpi-label">Clientes Ativos</div></div><div class="kpi-icon">✅</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-alertas">0</div><div class="kpi-label">Sem Contato 30d</div></div><div class="kpi-icon">⚠️</div></div><div class="kpi-accent" style="background:var(--warn)"></div></div>
+          <div class="kpi-card" style="--c:#1e8fff"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-total">0</div><div class="kpi-label">Total Clientes</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-custodia">R$0</div><div class="kpi-label">AuM</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-ativos">0</div><div class="kpi-label">Clientes Ativos</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="kpi-alertas">0</div><div class="kpi-label">Sem Contato 30d</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="kpi-accent" style="background:var(--warn)"></div></div>
         </div>
         <div class="charts-grid">
           <div class="card"><div class="section-title">Custódia por Objetivo</div><canvas id="chart-pie" height="200"></canvas></div>
@@ -555,8 +555,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-header">
         <div><div class="page-title">Clientes</div><div class="page-sub" id="clientes-sub">—</div></div>
         <div style="display:flex;gap:10px">
-          <button class="btn-secondary" onclick="downloadTemplate()">⬇️ Template Excel</button>
-          <button class="btn-secondary" onclick="document.getElementById('import-excel-input').click()">📂 Importar Excel</button>
+          <button class="btn-secondary" onclick="downloadTemplate()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Template Excel</button>
+          <button class="btn-secondary" onclick="document.getElementById('import-excel-input').click()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Importar Excel</button>
           <input type="file" id="import-excel-input" accept=".xlsx,.xls" style="display:none" onchange="importarExcel(event)">
           <button class="btn-primary" onclick="openModalCliente(null)">+ Novo Cliente</button>
         </div>
@@ -614,7 +614,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="page-title" id="detalhe-title">—</div>
         </div>
         <div style="display:flex;gap:10px">
-          <button class="btn-secondary" id="btn-edit-cliente">✏️ Editar</button>
+          <button class="btn-secondary" id="btn-edit-cliente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
           <button class="btn-primary" onclick="openModalAtivo(null)">+ Adicionar Ativo</button>
         </div>
       </div>
@@ -652,9 +652,9 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div class="tabs" style="margin-bottom:20px">
-          <button class="tab active" onclick="showCRMTab('agenda',this)">📅 Agenda</button>
-          <button class="tab" onclick="showCRMTab('tarefas',this)">✅ Tarefas</button>
-          <button class="tab" onclick="showCRMTab('alertas-crm',this)">🔔 Alertas</button>
+          <button class="tab active" onclick="showCRMTab('agenda',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Agenda</button>
+          <button class="tab" onclick="showCRMTab('tarefas',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Tarefas</button>
+          <button class="tab" onclick="showCRMTab('alertas-crm',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Alertas</button>
         </div>
         <div id="crm-tab-agenda" class="tab-content active"><div id="crm-content"></div></div>
         <div id="crm-tab-tarefas" class="tab-content"><div id="crm-tarefas-content"></div></div>
@@ -674,10 +674,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <!-- KPIs -->
         <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-receita">R/bin/sh</div><div class="kpi-label">Receita no Ano</div></div><div class="kpi-icon">💰</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-custo">R/bin/sh</div><div class="kpi-label">Custo no Ano</div></div><div class="kpi-icon">📉</div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-ebit">R/bin/sh</div><div class="kpi-label">EBIT no Ano</div></div><div class="kpi-icon">📊</div></div><div class="kpi-accent" style="background:#1e8fff"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-margem">0%</div><div class="kpi-label">Margem EBIT</div></div><div class="kpi-icon">📈</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-receita">R/bin/sh</div><div class="kpi-label">Receita no Ano</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-custo">R/bin/sh</div><div class="kpi-label">Custo no Ano</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-ebit">R/bin/sh</div><div class="kpi-label">EBIT no Ano</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div></div><div class="kpi-accent" style="background:#1e8fff"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="fin-kpi-margem">0%</div><div class="kpi-label">Margem EBIT</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
         </div>
 
         <!-- Charts -->
@@ -723,10 +723,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <!-- KPIs gerais -->
         <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-clientes">0</div><div class="kpi-label">Clientes Black</div></div><div class="kpi-icon">👥</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-acumulado">R$0</div><div class="kpi-label">Acumulado Total</div></div><div class="kpi-icon">💰</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-mes">R$0</div><div class="kpi-label">Saldo Mês Atual</div></div><div class="kpi-icon">📈</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
-          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-custos">R$0</div><div class="kpi-label">Custos Totais</div></div><div class="kpi-icon">📉</div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-clientes">0</div><div class="kpi-label">Clientes Black</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-acumulado">R$0</div><div class="kpi-label">Acumulado Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-mes">R$0</div><div class="kpi-label">Saldo Mês Atual</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="black-kpi-custos">R$0</div><div class="kpi-label">Custos Totais</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div></div><div class="kpi-accent" style="background:#ef4444"></div></div>
         </div>
         <!-- Lista de clientes Black -->
         <div id="black-clientes-list"></div>
@@ -744,7 +744,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;gap:8px">
           <button class="btn-secondary" onclick="openModalBlackLanc('simplificado')">+ Simplificado</button>
           <button class="btn-secondary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
-          <button class="btn-primary" onclick="openModalBlackNota()">📄 Nota de Corretagem</button>
+          <button class="btn-primary" onclick="openModalBlackNota()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nota de Corretagem</button>
         </div>
       </div>
       <div class="page-content" style="padding-top:20px">
@@ -755,10 +755,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-retorno" style="font-size:18px">0%</div><div class="kpi-label">Retorno s/ Patrim.</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
           <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-patrimonio" style="font-size:18px">R$0</div><div class="kpi-label">Patrimônio</div></div><div class="kpi-accent" style="background:#94a3b8"></div></div>
           <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
-            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-margem" style="font-size:18px">R$0</div><div class="kpi-label">Margem Utilizada ✏️</div></div><div class="kpi-accent" style="background:#f59e0b"></div>
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-margem" style="font-size:18px">R$0</div><div class="kpi-label">Margem Utilizada <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div><div class="kpi-accent" style="background:#f59e0b"></div>
           </div>
           <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
-            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-notional" style="font-size:18px">R$0</div><div class="kpi-label">Notional ✏️</div></div><div class="kpi-accent" style="background:#ec4899"></div>
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-notional" style="font-size:18px">R$0</div><div class="kpi-label">Notional <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div><div class="kpi-accent" style="background:#ec4899"></div>
           </div>
         </div>
 
@@ -866,7 +866,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Alertas de vencimento -->
         <div class="card" style="margin-bottom:20px;border-color:#f59e0b44">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <div style="font-size:20px">⚠️</div>
+            <div style="font-size:20px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <div class="section-title" style="margin:0">Alertas de Vencimento de Opções</div>
           </div>
           <div id="alertas-vencimento"></div>
@@ -885,7 +885,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
           <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
-          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px">🔄 Restaurar termos padrão</button>
+          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Restaurar termos padrão</button>
         </div>
         <div id="glossario-list"></div>
       </div>
@@ -899,7 +899,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card" style="border-color:var(--blue);text-align:center;padding:32px">
-            <div style="font-size:48px;margin-bottom:16px">📅</div>
+            <div style="font-size:48px;margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
             <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Agendar Atendimento</div>
             <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6">Clique abaixo para acessar o Calendly e escolher o melhor horário para sua reunião com Matheus Anitelli</div>
             <a href="https://calendly.com/matheusanitelli-95/atendimento-dmf" target="_blank" style="text-decoration:none">
@@ -912,7 +912,7 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="section-title">Próximas Reuniões Agendadas</div>
             <div id="reunioes-list">
               <div class="empty" style="padding:30px">
-                <div class="empty-icon">📅</div>
+                <div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
                 <div class="empty-title">Nenhuma reunião cadastrada</div>
                 <p style="font-size:12px;margin-top:4px">As reuniões aparecerão aqui quando cadastradas</p>
               </div>
@@ -937,8 +937,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div class="tabs" style="margin-bottom:20px">
-          <button class="tab active" onclick="showWaTab('disparos',this)">📤 Disparos</button>
-          <button class="tab" onclick="showWaTab('grupos',this)">👥 Grupos</button>
+          <button class="tab active" onclick="showWaTab('disparos',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Disparos</button>
+          <button class="tab" onclick="showWaTab('grupos',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Grupos</button>
           <button class="tab" onclick="showWaTab('config',this)">⚙️ Configuração</button>
         </div>
 
@@ -998,7 +998,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Z-API Config -->
         <div class="card" style="border-color:#25d36622">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
             <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
           </div>
           <div class="form-grid">
@@ -1006,7 +1006,7 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" value="6BCE83E14C27EB9C89DD71A8"></div>
           </div>
           <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
-            ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
         </div>
         </div><!-- end tab disparos -->
@@ -1016,7 +1016,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <div class="section-title" style="margin:0">Grupos cadastrados</div>
             <div style="display:flex;gap:10px">
-              <button class="btn-secondary" onclick="buscarGruposZAPI()">🔄 Buscar grupos da Z-API</button>
+              <button class="btn-secondary" onclick="buscarGruposZAPI()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API</button>
               <button class="btn-primary" onclick="openModalGrupo(null)">+ Adicionar Grupo</button>
             </div>
           </div>
@@ -1032,7 +1032,7 @@ textarea.form-input{resize:vertical;min-height:80px}
               <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token-cfg" value="6BCE83E14C27EB9C89DD71A8"></div>
             </div>
             <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
-              ✅ Z-API Conectada — Instância ativa. Status: Multi Device
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Z-API Conectada — Instância ativa. Status: Multi Device
             </div>
             <button class="btn-primary" style="margin-top:16px" onclick="testarZAPI()">Testar Conexão</button>
             <div id="zapi-test-result" style="margin-top:10px;font-size:13px"></div>
@@ -1047,7 +1047,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-header">
         <div><div class="page-title">Notícias</div><div class="page-sub">Feed de notícias do mercado financeiro em tempo real</div></div>
         <div style="display:flex;gap:10px">
-          <button class="btn-secondary" onclick="loadNoticias()">🔄 Atualizar</button>
+          <button class="btn-secondary" onclick="loadNoticias()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Atualizar</button>
         </div>
       </div>
       <div class="page-content">
@@ -1055,19 +1055,19 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="card" style="margin-bottom:16px">
           <div class="section-title">Temas</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap" id="noticias-temas">
-            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)">📈 Mercado</button>
-            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)">📊 Ibovespa</button>
-            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)">⚡ Opções</button>
-            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)">🏦 Renda Fixa</button>
-            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)">🇧🇷 Economia</button>
-            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)">💵 Câmbio</button>
-            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)">🛢️ Ações</button>
+            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Mercado</button>
+            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Ibovespa</button>
+            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Opções</button>
+            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Renda Fixa</button>
+            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)"> Economia</button>
+            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Câmbio</button>
+            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Ações</button>
             <button class="noticia-tema-btn" data-tema="bitcoin cripto" onclick="setNoticiaTema(this)">₿ Cripto</button>
           </div>
         </div>
         <!-- Feed -->
         <div id="noticias-feed">
-          <div class="empty"><div class="empty-icon">🌐</div><div class="empty-title">Carregando notícias...</div></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="empty-title">Carregando notícias...</div></div>
         </div>
       </div>
     </div>
@@ -1080,7 +1080,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="🔍 Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -1148,12 +1148,12 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title">DRE</div><div class="page-sub">Demonstração do Resultado do Exercício</div></div>
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="dre-ano"></select>
-          <button class="btn-primary" onclick="gerarDRE()">🔄 Gerar DRE</button>
+          <button class="btn-primary" onclick="gerarDRE()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar DRE</button>
         </div>
       </div>
       <div class="page-content">
         <div id="dre-content">
-          <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
         </div>
       </div>
     </div>
@@ -1165,12 +1165,12 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="balanco-ano"></select>
           <select class="filter-input" id="balanco-mes"></select>
-          <button class="btn-primary" onclick="openModalBalanco()">✏️ Editar Balanço</button>
+          <button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar Balanço</button>
         </div>
       </div>
       <div class="page-content">
         <div id="balanco-content">
-          <div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
         </div>
       </div>
     </div>
@@ -1198,7 +1198,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Pendentes -->
         <div id="pendentes-section" style="display:none;margin-bottom:20px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px">⏳ Aguardando Aprovação</div>
+            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Aguardando Aprovação</div>
             <span id="pendentes-count" style="background:#f59e0b22;color:#f59e0b;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700"></span>
           </div>
           <div id="pendentes-list"></div>
@@ -1283,7 +1283,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Alertas de vencimento -->
         <div class="card" style="margin-bottom:20px;border-color:#f59e0b44">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <div style="font-size:20px">⚠️</div>
+            <div style="font-size:20px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <div class="section-title" style="margin:0">Alertas de Vencimento de Opções</div>
           </div>
           <div id="alertas-vencimento"></div>
@@ -1302,7 +1302,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
           <input class="filter-input" id="glossario-search" placeholder="Buscar termo..." oninput="renderGlossario()" style="min-width:280px">
-          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px">🔄 Restaurar termos padrão</button>
+          <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Restaurar termos padrão</button>
         </div>
         <div id="glossario-list"></div>
       </div>
@@ -1316,7 +1316,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card" style="border-color:var(--blue);text-align:center;padding:32px">
-            <div style="font-size:48px;margin-bottom:16px">📅</div>
+            <div style="font-size:48px;margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
             <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Agendar Atendimento</div>
             <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.6">Clique abaixo para acessar o Calendly e escolher o melhor horário para sua reunião com Matheus Anitelli</div>
             <a href="https://calendly.com/matheusanitelli-95/atendimento-dmf" target="_blank" style="text-decoration:none">
@@ -1329,7 +1329,7 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="section-title">Próximas Reuniões Agendadas</div>
             <div id="reunioes-list">
               <div class="empty" style="padding:30px">
-                <div class="empty-icon">📅</div>
+                <div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
                 <div class="empty-title">Nenhuma reunião cadastrada</div>
                 <p style="font-size:12px;margin-top:4px">As reuniões aparecerão aqui quando cadastradas</p>
               </div>
@@ -1354,8 +1354,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div class="tabs" style="margin-bottom:20px">
-          <button class="tab active" onclick="showWaTab('disparos',this)">📤 Disparos</button>
-          <button class="tab" onclick="showWaTab('grupos',this)">👥 Grupos</button>
+          <button class="tab active" onclick="showWaTab('disparos',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Disparos</button>
+          <button class="tab" onclick="showWaTab('grupos',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Grupos</button>
           <button class="tab" onclick="showWaTab('config',this)">⚙️ Configuração</button>
         </div>
 
@@ -1415,7 +1415,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Z-API Config -->
         <div class="card" style="border-color:#25d36622">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+            <div style="width:36px;height:36px;background:#25d36622;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
             <div><div style="font-weight:700;color:var(--white)">Z-API — Disparo Automático</div><div style="font-size:12px;color:var(--text3)">Configure para disparos automáticos sem abrir o WhatsApp</div></div>
           </div>
           <div class="form-grid">
@@ -1423,7 +1423,7 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token" value="6BCE83E14C27EB9C89DD71A8"></div>
           </div>
           <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
-            ✅ Z-API Conectada — Instância ativa e pronta para envio automático!
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Z-API Conectada — Instância ativa e pronta para envio automático!
           </div>
         </div>
         </div><!-- end tab disparos -->
@@ -1433,7 +1433,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <div class="section-title" style="margin:0">Grupos cadastrados</div>
             <div style="display:flex;gap:10px">
-              <button class="btn-secondary" onclick="buscarGruposZAPI()">🔄 Buscar grupos da Z-API</button>
+              <button class="btn-secondary" onclick="buscarGruposZAPI()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API</button>
               <button class="btn-primary" onclick="openModalGrupo(null)">+ Adicionar Grupo</button>
             </div>
           </div>
@@ -1449,7 +1449,7 @@ textarea.form-input{resize:vertical;min-height:80px}
               <div class="form-group"><label>Token</label><input class="form-input" id="zapi-token-cfg" value="6BCE83E14C27EB9C89DD71A8"></div>
             </div>
             <div style="margin-top:12px;padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:12px;color:#22c55e">
-              ✅ Z-API Conectada — Instância ativa. Status: Multi Device
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Z-API Conectada — Instância ativa. Status: Multi Device
             </div>
             <button class="btn-primary" style="margin-top:16px" onclick="testarZAPI()">Testar Conexão</button>
             <div id="zapi-test-result" style="margin-top:10px;font-size:13px"></div>
@@ -1464,7 +1464,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-header">
         <div><div class="page-title">Notícias</div><div class="page-sub">Feed de notícias do mercado financeiro em tempo real</div></div>
         <div style="display:flex;gap:10px">
-          <button class="btn-secondary" onclick="loadNoticias()">🔄 Atualizar</button>
+          <button class="btn-secondary" onclick="loadNoticias()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Atualizar</button>
         </div>
       </div>
       <div class="page-content">
@@ -1472,19 +1472,19 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="card" style="margin-bottom:16px">
           <div class="section-title">Temas</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap" id="noticias-temas">
-            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)">📈 Mercado</button>
-            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)">📊 Ibovespa</button>
-            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)">⚡ Opções</button>
-            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)">🏦 Renda Fixa</button>
-            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)">🇧🇷 Economia</button>
-            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)">💵 Câmbio</button>
-            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)">🛢️ Ações</button>
+            <button class="noticia-tema-btn active" data-tema="mercado financeiro brasil" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Mercado</button>
+            <button class="noticia-tema-btn" data-tema="ibovespa bolsa" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Ibovespa</button>
+            <button class="noticia-tema-btn" data-tema="opções derivativos" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Opções</button>
+            <button class="noticia-tema-btn" data-tema="renda fixa juros selic" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Renda Fixa</button>
+            <button class="noticia-tema-btn" data-tema="economia brasil" onclick="setNoticiaTema(this)"> Economia</button>
+            <button class="noticia-tema-btn" data-tema="dólar câmbio" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Câmbio</button>
+            <button class="noticia-tema-btn" data-tema="petrobras vale" onclick="setNoticiaTema(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Ações</button>
             <button class="noticia-tema-btn" data-tema="bitcoin cripto" onclick="setNoticiaTema(this)">₿ Cripto</button>
           </div>
         </div>
         <!-- Feed -->
         <div id="noticias-feed">
-          <div class="empty"><div class="empty-icon">🌐</div><div class="empty-title">Carregando notícias...</div></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="empty-title">Carregando notícias...</div></div>
         </div>
       </div>
     </div>
@@ -1497,7 +1497,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="🔍 Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -1565,12 +1565,12 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title">DRE</div><div class="page-sub">Demonstração do Resultado do Exercício</div></div>
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="dre-ano"></select>
-          <button class="btn-primary" onclick="gerarDRE()">🔄 Gerar DRE</button>
+          <button class="btn-primary" onclick="gerarDRE()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar DRE</button>
         </div>
       </div>
       <div class="page-content">
         <div id="dre-content">
-          <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="empty-title">Selecione o ano e clique em Gerar DRE</div></div>
         </div>
       </div>
     </div>
@@ -1582,12 +1582,12 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="balanco-ano"></select>
           <select class="filter-input" id="balanco-mes"></select>
-          <button class="btn-primary" onclick="openModalBalanco()">✏️ Editar Balanço</button>
+          <button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar Balanço</button>
         </div>
       </div>
       <div class="page-content">
         <div id="balanco-content">
-          <div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
+          <div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="empty-title">Nenhum balanço lançado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "Editar Balanço" para lançar os dados</p></div>
         </div>
       </div>
     </div>
@@ -1615,7 +1615,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <!-- Pendentes -->
         <div id="pendentes-section" style="display:none;margin-bottom:20px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px">⏳ Aguardando Aprovação</div>
+            <div style="font-family:Syne,sans-serif;font-weight:700;color:#f59e0b;font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Aguardando Aprovação</div>
             <span id="pendentes-count" style="background:#f59e0b22;color:#f59e0b;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700"></span>
           </div>
           <div id="pendentes-list"></div>
@@ -1672,7 +1672,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <!-- COMPLEMENTARES (recolhidos) -->
     <details style="margin-bottom:16px">
       <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px">
-        <span>▶</span> Dados Complementares (opcional — cliente pode preencher depois)
+        <span>›</span> Dados Complementares (opcional — cliente pode preencher depois)
       </summary>
       <div style="margin-top:16px">
         <div class="form-section">
@@ -2049,7 +2049,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <input type="hidden" id="nota-mes">
     </div>
     <div style="border:2px dashed var(--border2);border-radius:12px;padding:32px;text-align:center;margin-bottom:16px;cursor:pointer;transition:border-color .2s" id="nota-drop-area" onclick="document.getElementById('nota-file-input').click()">
-      <div style="font-size:40px;margin-bottom:10px">📄</div>
+      <div style="font-size:40px;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
       <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Clique para selecionar a imagem da nota</div>
       <div style="font-size:12px;color:var(--text3)">JPG, PNG ou PDF — a IA vai extrair os dados automaticamente</div>
       <input type="file" id="nota-file-input" accept="image/*,.pdf" style="display:none" onchange="handleNotaUpload(event)">
@@ -2107,12 +2107,12 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="form-grid">
       <div class="form-group"><label>Tipo</label>
         <select class="form-input" id="com-tipo">
-          <option>📈 Abertura de Mercado</option>
-          <option>📉 Fechamento de Mercado</option>
-          <option>📰 Notícia / Análise</option>
-          <option>⚡ Operações DMF Black</option>
-          <option>📌 Comunicado Geral</option>
-          <option>🎓 Material Educacional</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Abertura de Mercado</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg> Fechamento de Mercado</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Notícia / Análise</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Operações DMF Black</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Comunicado Geral</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Material Educacional</option>
         </select>
       </div>
       <div class="form-group"><label>Data</label><input class="form-input" id="com-data" type="date"></div>
@@ -2129,8 +2129,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="form-group"><label>Destaque</label>
         <select class="form-input" id="com-destaque">
           <option value="normal">Normal</option>
-          <option value="importante">⚠️ Importante</option>
-          <option value="urgente">🔴 Urgente</option>
+          <option value="importante"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Importante</option>
+          <option value="urgente"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span> Urgente</option>
         </select>
       </div>
     </div>
@@ -2353,7 +2353,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="form-group form-full"><label>Email *</label><input class="form-input" id="usr-email" type="email" placeholder="email@dmfinvestimentos.com"></div>
       <div class="form-group form-full" id="usr-cliente-id-wrap" style="display:none">
         <input type="hidden" id="usr-cliente-id">
-        <div style="font-size:11px;color:#22c55e;padding:8px 12px;background:#22c55e11;border-radius:8px">✅ Cliente vinculado automaticamente ao selecionar acima</div>
+        <div style="font-size:11px;color:#22c55e;padding:8px 12px;background:#22c55e11;border-radius:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Cliente vinculado automaticamente ao selecionar acima</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -2366,7 +2366,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- MODAL DELETE -->
 <div class="modal-overlay" id="modal-del" style="display:none" onclick="if(event.target===this)closeModal('modal-del')">
   <div class="modal modal-sm" style="text-align:center;padding:40px">
-    <div style="font-size:44px;margin-bottom:16px">⚠️</div>
+    <div style="font-size:44px;margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
     <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px">Confirmar exclusão?</div>
     <div style="font-size:13px;color:var(--text3);margin-bottom:28px">Esta ação não pode ser desfeita.</div>
     <div style="display:flex;gap:10px;justify-content:center">
@@ -2538,10 +2538,10 @@ function renderDashboard(){
   clientes.forEach(function(c){var k=c.responsavel||'N/A';if(!rm[k])rm[k]={name:k,custodia:0,clientes:0};rm[k].custodia+=c.custodiaTotal||0;rm[k].clientes++;});
   var ranked=Object.values(rm).sort(function(a,b){return b.custodia-a.custodia;});
   var max=ranked[0]?ranked[0].custodia:1;
-  var medals=['🥇','🥈','🥉'];
+  var medals=['01','02','03'];
   document.getElementById('dash-ranking').innerHTML=ranked.map(function(r,i){
     return'<div class="rank-card"><div style="display:flex;align-items:center;gap:16px"><div style="font-size:20px;width:28px">'+( medals[i]||'#'+(i+1))+'</div><div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px">'+r.name+'</span><div style="display:flex;gap:16px;align-items:center"><span style="font-size:11px;color:var(--text3)">'+r.clientes+' clientes</span><span style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600;font-size:14px">'+fmt(r.custodia)+'</span></div></div><div class="rank-bar-track"><div class="rank-bar-fill" style="width:'+Math.round(r.custodia/max*100)+'%"></div></div></div></div></div>';
-  }).join('')||'<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Nenhum dado ainda</div></div>';
+  }).join('')||'<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="empty-title">Nenhum dado ainda</div></div>';
 }
 
 // CLIENTES
@@ -2572,11 +2572,11 @@ function renderClientes(){
     return typeof va==='number'?(cliSortAsc?va-vb:vb-va):(cliSortAsc?String(va||'').localeCompare(String(vb||'')):String(vb||'').localeCompare(String(va||'')));
   });
   var tb=document.getElementById('table-clientes');
-  if(!f.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4">👥</div>Nenhum cliente encontrado</td></tr>';return;}
+  if(!f.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Nenhum cliente encontrado</td></tr>';return;}
   tb.innerHTML=f.map(function(c){
     var sc=STATUS_C[c.status]||'#334155';
     var rf=c.custodiaRF||0,rv=c.custodiaRV||0;
-    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+( c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#334155')+'22;color:'+(OBJ_C[c.objetivo]||'#94a3b8')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(rf)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(rv)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e;font-weight:500">'+fmtFull(rf+rv)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">✏️</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">🗑</button></div></td></tr>';
+    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+( c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#334155')+'22;color:'+(OBJ_C[c.objetivo]||'#94a3b8')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(rf)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(rv)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e;font-weight:500">'+fmtFull(rf+rv)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td></tr>';
   }).join('');
 }
 
@@ -2593,11 +2593,11 @@ function openClienteDetalhe(id){
   var respCons=c.responsavelConsultoria||'';
   var respBlack=c.responsavelBlack||'';
   document.getElementById('client-header-card').innerHTML='<div style="display:flex;align-items:center;gap:20px"><div class="client-avatar" style="background:'+avColor(c.nome)+'">'+initials(c.nome)+'</div><div style="flex:1"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><h2 style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;color:var(--white)">'+c.nome+'</h2>'+nivelBadge(c)+'</div><div style="display:flex;gap:16px;flex-wrap:wrap">'
-    +(respCons?'<span class="client-meta-item">📋 Consultoria: '+respCons+'</span>':'')
-    +(respBlack&&respBlack!==respCons?'<span class="client-meta-item">⚡ Black: '+respBlack+'</span>':(!respCons&&c.responsavel?'<span class="client-meta-item">🏢 '+c.responsavel+'</span>':''))
-    +'<span class="client-meta-item">🎯 '+(c.objetivo||'N/A')+'</span>'
-    +'<span class="client-meta-item">📊 '+(c.perfil||'N/A')+'</span>'
-    +'<span class="client-meta-item" style="color:var(--blue)">🏦 '+(c.banco||'N/A')+'</span>'
+    +(respCons?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Consultoria: '+respCons+'</span>':'')
+    +(respBlack&&respBlack!==respCons?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Black: '+respBlack+'</span>':(!respCons&&c.responsavel?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg> '+c.responsavel+'</span>':''))
+    +'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> '+(c.objetivo||'N/A')+'</span>'
+    +'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> '+(c.perfil||'N/A')+'</span>'
+    +'<span class="client-meta-item" style="color:var(--blue)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> '+(c.banco||'N/A')+'</span>'
     +'</div></div>'
     +'<div style="text-align:right;border-left:1px solid var(--border);padding-left:20px">'
     +'<div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Patrimônio em Ativos</div>'
@@ -2631,14 +2631,14 @@ function renderCarteira(){
   el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Carregando...</div>';
   db.collection('clientes').doc(currentClienteId).collection('ativos').get().then(function(snap){
     var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    if(!ativos.length){el.innerHTML='<div class="empty"><div class="empty-icon">💼</div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para incluir posições</p></div>';return;}
+    if(!ativos.length){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para incluir posições</p></div>';return;}
     var byType={},total=0;
     ativos.forEach(function(a){byType[a.tipo]=(byType[a.tipo]||0)+(a.valor||0);total+=a.valor||0;});
     var html='<div class="grid-3" style="margin-bottom:20px">';
     Object.keys(byType).forEach(function(t,i){html+='<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" style="font-size:18px">'+fmt(byType[t])+'</div><div class="kpi-label">'+t+'</div></div><div class="kpi-accent" style="background:'+COLORS[i%COLORS.length]+'"></div></div>';});
     html+='</div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Posição Atual</div><div style="font-family:DM Mono,monospace;color:#22c55e;font-weight:600;font-size:14px">Total: '+fmtFull(total)+'</div></div>';
     ativos.sort(function(a,b){return(b.valor||0)-(a.valor||0);}).forEach(function(a){
-      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a.valor||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')">🗑</button></div></div>';
+      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a.valor||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
     });
     html+='</div>';
     el.innerHTML=html;
@@ -2659,9 +2659,9 @@ function renderCRMCliente(){
   html+='</div><div class="card"><div class="section-title">Próximo Contato</div>';
   if(c.proximoContato){
     var d=daysDiff(c.proximoContato),color=d<0?'var(--danger)':d<3?'var(--warn)':'var(--success)';
-    html+='<div style="text-align:center;padding:24px"><div style="font-size:40px;margin-bottom:14px">'+(d<0?'🔴':d<3?'🟡':'🟢')+'</div><div style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:'+color+'">'+fmtDate(c.proximoContato)+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+(d<0?Math.abs(d)+'d em atraso':d===0?'Hoje!':d+' dias restantes')+'</div></div>';
+    html+='<div style="text-align:center;padding:24px"><div style="font-size:40px;margin-bottom:14px">'+(d<0?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>':d<3?'🟡':'🟢')+'</div><div style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:'+color+'">'+fmtDate(c.proximoContato)+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+(d<0?Math.abs(d)+'d em atraso':d===0?'Hoje!':d+' dias restantes')+'</div></div>';
   }else{
-    html+='<div class="empty" style="padding:30px"><div class="empty-icon">📅</div><div style="font-size:13px">Nenhum contato agendado</div></div>';
+    html+='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div style="font-size:13px">Nenhum contato agendado</div></div>';
   }
   html+='<button class="btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="openModalContato()">+ Registrar Contato</button></div></div>';
   document.getElementById('tab-crm-cli').innerHTML=html;
@@ -2672,11 +2672,11 @@ function renderHistorico(){
   var el=document.getElementById('tab-historico');
   el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Carregando...</div>';
   db.collection('clientes').doc(currentClienteId).collection('contatos').orderBy('data','desc').get().then(function(snap){
-    if(!snap.docs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📝</div><div class="empty-title">Sem histórico</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalContato()">+ Registrar Primeiro Contato</button></div></div>';return;}
+    if(!snap.docs.length){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div class="empty-title">Sem histórico</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalContato()">+ Registrar Primeiro Contato</button></div></div>';return;}
     var html='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Histórico de Contatos</div><button class="btn-primary" style="font-size:11px;padding:8px 14px" onclick="openModalContato()">+ Registrar</button></div>';
-    snap.docs.forEach(function(d){var ct=d.data();html+='<div class="contact-item"><div class="contact-date">'+fmtDate(ct.data)+' · '+ct.tipo+'</div><div class="contact-text">'+ct.texto+'</div>'+(ct.proximoContato?'<div style="font-size:11px;color:var(--blue);margin-top:5px">📅 Próximo: '+fmtDate(ct.proximoContato)+'</div>':'')+'</div>';});
+    snap.docs.forEach(function(d){var ct=d.data();html+='<div class="contact-item"><div class="contact-date">'+fmtDate(ct.data)+' · '+ct.tipo+'</div><div class="contact-text">'+ct.texto+'</div>'+(ct.proximoContato?'<div style="font-size:11px;color:var(--blue);margin-top:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Próximo: '+fmtDate(ct.proximoContato)+'</div>':'')+'</div>';});
     el.innerHTML=html+'</div>';
-  }).catch(function(){el.innerHTML='<div class="empty"><div class="empty-icon">📝</div><div>Erro ao carregar histórico</div></div>';});
+  }).catch(function(){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div>Erro ao carregar histórico</div></div>';});
 }
 
 function toggleCheck(key,val){
@@ -2790,12 +2790,12 @@ function updateProfSelect(selConsId, selBlackId){
 
 function renderProfissionais(){
   var grid=document.getElementById('prof-grid');if(!grid)return;
-  if(!profissionais.length){grid.innerHTML='<div class="empty"><div class="empty-icon">🏢</div><div class="empty-title">Nenhum profissional</div><p style="font-size:13px;margin-top:4px">Adicione os membros da equipe DMF</p></div>';return;}
+  if(!profissionais.length){grid.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><div class="empty-title">Nenhum profissional</div><p style="font-size:13px;margin-top:4px">Adicione os membros da equipe DMF</p></div>';return;}
   grid.innerHTML=profissionais.map(function(p){
     var clis=clientes.filter(function(c){return c.responsavelId===p.id;});
     var cust=clis.reduce(function(s,c){return s+(c.custodiaTotal||0);},0);
     var pct=p.meta&&cust?Math.min(Math.round(cust/p.meta*100),100):0;
-    return'<div class="prof-card"><div class="prof-avatar">'+initials(p.nome)+'</div><div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:2px">'+p.nome+'</div><div style="font-size:11px;color:var(--text3)">'+(p.email||'')+(p.cert?' · '+p.cert:'')+(p.ancord?' · ANCORD: '+p.ancord:'')+'</div>'+(p.meta?'<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text3)">Meta: '+fmt(p.meta)+'</span><span style="font-size:10px;color:var(--blue)">'+pct+'%</span></div><div class="pb-track" style="height:3px"><div class="pb-fill" style="width:'+pct+'%;background:var(--blue)"></div></div></div>':'')+'</div><div style="text-align:right;margin-left:16px"><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:600">'+fmt(cust)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+clis.length+' clientes</div></div><div style="display:flex;gap:6px;margin-left:12px"><button class="btn-ghost" onclick="openModalProfissional(\''+p.id+'\')">✏️</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteProfissional(\''+p.id+'\')})">🗑</button></div></div>';
+    return'<div class="prof-card"><div class="prof-avatar">'+initials(p.nome)+'</div><div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:2px">'+p.nome+'</div><div style="font-size:11px;color:var(--text3)">'+(p.email||'')+(p.cert?' · '+p.cert:'')+(p.ancord?' · ANCORD: '+p.ancord:'')+'</div>'+(p.meta?'<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text3)">Meta: '+fmt(p.meta)+'</span><span style="font-size:10px;color:var(--blue)">'+pct+'%</span></div><div class="pb-track" style="height:3px"><div class="pb-fill" style="width:'+pct+'%;background:var(--blue)"></div></div></div>':'')+'</div><div style="text-align:right;margin-left:16px"><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:600">'+fmt(cust)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+clis.length+' clientes</div></div><div style="display:flex;gap:6px;margin-left:12px"><button class="btn-ghost" onclick="openModalProfissional(\''+p.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-dsm" onclick="confirmDelete(function(){deleteProfissional(\''+p.id+'\')})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
 }
 
@@ -2911,11 +2911,11 @@ function renderCRM(){
   var comAgenda=clientes.filter(function(c){return c.proximoContato;}).sort(function(a,b){return a.proximoContato.localeCompare(b.proximoContato);});
   var html='<div class="grid-2">';
   html+='<div class="card"><div class="section-title">Próximos Contatos Agendados</div>';
-  if(!comAgenda.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">📅</div><div style="font-size:13px">Nenhum contato agendado</div></div>';
-  else comAgenda.forEach(function(c){var d=daysDiff(c.proximoContato),color=d<0?'var(--danger)':d<3?'var(--warn)':'var(--success)';html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">📅</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub" style="color:'+color+'">'+fmtDate(c.proximoContato)+(d<0?' · '+Math.abs(d)+'d atrasado':d===0?' · Hoje!':' · em '+d+'d')+'</div></div></div>';});
+  if(!comAgenda.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div style="font-size:13px">Nenhum contato agendado</div></div>';
+  else comAgenda.forEach(function(c){var d=daysDiff(c.proximoContato),color=d<0?'var(--danger)':d<3?'var(--warn)':'var(--success)';html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub" style="color:'+color+'">'+fmtDate(c.proximoContato)+(d<0?' · '+Math.abs(d)+'d atrasado':d===0?' · Hoje!':' · em '+d+'d')+'</div></div></div>';});
   html+='</div><div class="card"><div class="section-title">Sem Contato há +30 dias</div>';
-  if(!semContato.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">✅</div><div style="font-size:13px">Todos em dia!</div></div>';
-  else semContato.forEach(function(c){var d=daysDiff(c.ultimoContato);html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon">⚠️</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+(d>8000?'Nunca contatado':d+'d sem contato')+' · '+(c.responsavel||'N/A')+'</div></div></div>';});
+  if(!semContato.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px">Todos em dia!</div></div>';
+  else semContato.forEach(function(c){var d=daysDiff(c.ultimoContato);html+='<div class="alert-card" style="cursor:pointer" onclick="openClienteDetalhe(\''+c.id+'\')"><div class="alert-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+(d>8000?'Nunca contatado':d+'d sem contato')+' · '+(c.responsavel||'N/A')+'</div></div></div>';});
   el.innerHTML=html+'</div></div>';
 }
 
@@ -2925,10 +2925,10 @@ function renderAlertas(){
   var prospecto=clientes.filter(function(c){return c.status==='Prospecto';});
   var html='<div class="grid-2">';
   html+='<div class="card"><div class="section-title">Sem Contato +30 dias · '+semContato.length+'</div>';
-  if(!semContato.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">✅</div></div>';
-  semContato.forEach(function(c){html+='<div class="alert-card" onclick="openClienteDetalhe(\''+c.id+'\')" style="cursor:pointer"><div class="alert-icon">🔴</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+daysDiff(c.ultimoContato)+'d · '+(c.responsavel||'N/A')+'</div></div></div>';});
+  if(!semContato.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
+  semContato.forEach(function(c){html+='<div class="alert-card" onclick="openClienteDetalhe(\''+c.id+'\')" style="cursor:pointer"><div class="alert-icon"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span></div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">'+daysDiff(c.ultimoContato)+'d · '+(c.responsavel||'N/A')+'</div></div></div>';});
   html+='</div><div class="card"><div class="section-title">Prospectos em aberto · '+prospecto.length+'</div>';
-  if(!prospecto.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon">✅</div></div>';
+  if(!prospecto.length)html+='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>';
   prospecto.forEach(function(c){html+='<div class="alert-card" onclick="openClienteDetalhe(\''+c.id+'\')" style="cursor:pointer"><div class="alert-icon">🟡</div><div><div class="alert-text">'+c.nome+'</div><div class="alert-sub">Prospecto · '+(c.responsavel||'N/A')+'</div></div></div>';});
   el.innerHTML=html+'</div></div>';
 }
@@ -3065,7 +3065,7 @@ function renderFinanceiro(){
       items.forEach(function(l){
         var catLabel = l.tipo==='receita'
           ? (l.catReceita==='consultoria'?'Consultoria':l.catReceita==='black'?'DMF Black':'Outros')+(l.cliente?' · '+l.cliente:'')
-          : (CUSTO_CAT[l.catCusto]||l.catCusto)+(l.diaVencimento?' · venc. dia '+l.diaVencimento:'')+(l.recorrente?' 🔁':'');
+          : (CUSTO_CAT[l.catCusto]||l.catCusto)+(l.diaVencimento?' · venc. dia '+l.diaVencimento:'')+(l.recorrente?' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>':'');
 
         var row = document.createElement('div');
         row.style='display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)';
@@ -3428,7 +3428,7 @@ function renderBlackDashboard(ops){
   var el=document.getElementById('black-clientes-list');
   el.innerHTML='';
   if(!list.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">⚡</div><div class="empty-title">Nenhum cliente Black ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Cliente" para começar</p></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="empty-title">Nenhum cliente Black ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Cliente" para começar</p></div>';
     return;
   }
   list.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
@@ -3573,9 +3573,9 @@ function renderBlackDetalhe(){
       var vb=document.createElement('button');vb.className='btn-ghost';vb.style='padding:4px 8px;font-size:11px';vb.textContent='Pernas';
       (function(o){vb.onclick=function(){showPernas(o);};})(op);div.appendChild(vb);
     }
-    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML='✏️';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     (function(o){eb.onclick=function(){editBlackOp(o);};})(op);
-    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML='🗑';
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     (function(oid){db2.onclick=function(){confirmDelete(function(){db.collection('black_operacoes').doc(oid).delete();});};})(op.id);
     div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
@@ -3775,12 +3775,12 @@ function handleNotaUpload(event){
         document.getElementById('nota-impostos').value=parsed.impostos||0;
         document.getElementById('nota-outros').value=parsed.outros||0;
         document.getElementById('nota-liquido').value=parsed.liquido||0;
-        document.getElementById('nota-status').textContent='✅ Dados extraídos! Confira e salve.';
+        document.getElementById('nota-status').textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Dados extraídos! Confira e salve.';
         document.getElementById('nota-resultado').style.display='block';
         document.getElementById('nota-save-btn').style.display='inline-flex';
-      }catch(e){document.getElementById('nota-status').textContent='⚠️ Não foi possível extrair automaticamente. Preencha manualmente.';document.getElementById('nota-resultado').style.display='block';document.getElementById('nota-save-btn').style.display='inline-flex';}
+      }catch(e){document.getElementById('nota-status').textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Não foi possível extrair automaticamente. Preencha manualmente.';document.getElementById('nota-resultado').style.display='block';document.getElementById('nota-save-btn').style.display='inline-flex';}
     }).catch(function(){
-      document.getElementById('nota-status').textContent='⚠️ Erro na IA. Preencha manualmente.';
+      document.getElementById('nota-status').textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro na IA. Preencha manualmente.';
       document.getElementById('nota-resultado').style.display='block';
       document.getElementById('nota-save-btn').style.display='inline-flex';
     });
@@ -4066,7 +4066,7 @@ function checkAlertasVencimento(){
       });
     });
     if(!alertas.length){
-      el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px">✅ Nenhuma operação vencendo nos próximos 30 dias</div>';
+      el.innerHTML='<div style="font-size:13px;color:var(--text3);text-align:center;padding:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Nenhuma operação vencendo nos próximos 30 dias</div>';
       return;
     }
     alertas.sort(function(a,b){return a.dias-b.dias;});
@@ -4095,7 +4095,7 @@ function renderComunicados(){
   var el = document.getElementById('comunicados-list');
   el.innerHTML='';
   if(!comunicados.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📰</div><div class="empty-title">Nenhum comunicado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Novo Comunicado" para publicar</p></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div class="empty-title">Nenhum comunicado ainda</div><p style="font-size:13px;margin-top:4px">Clique em "+ Novo Comunicado" para publicar</p></div>';
     return;
   }
   comunicados.forEach(function(c){
@@ -4106,7 +4106,7 @@ function renderComunicados(){
       +'<div style="flex:1"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
       +'<span style="font-size:13px;color:var(--text3)">'+c.tipo+'</span>'
       +'<span style="font-size:10px;color:var(--text3)">'+fmtDate(c.data)+'</span>'
-      +(c.destaque&&c.destaque!=='normal'?'<span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+destColor+'22;color:'+destColor+';font-weight:700">'+(c.destaque==='urgente'?'🔴 URGENTE':'⚠️ IMPORTANTE')+'</span>':'')
+      +(c.destaque&&c.destaque!=='normal'?'<span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+destColor+'22;color:'+destColor+';font-weight:700">'+(c.destaque==='urgente'?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span> URGENTE':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> IMPORTANTE')+'</span>':'')
       +'</div>'
       +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px">'+c.titulo+'</div>'
       +'<div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">'+c.conteudo+'</div>'
@@ -4118,9 +4118,9 @@ function renderComunicados(){
       var wrap=card.querySelector('[id="cact-placeholder"]');
       if(wrap) wrap.id='cact-'+cid;
       wrap=card.querySelector('#cact-'+cid);
-      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='✏️';
+      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
       eb.onclick=function(){editComunicado(cid);};
-      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='🗑';
+      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
       db.onclick=function(){deleteComunicado(cid);};
       if(wrap){wrap.appendChild(eb);wrap.appendChild(db);}
     })(c.id);
@@ -4134,7 +4134,7 @@ function openModalComunicado(id){
   document.getElementById('modal-com-title').textContent=id?'Editar Comunicado':'Novo Comunicado';
   document.getElementById('com-titulo').value=c?c.titulo||'':'';
   document.getElementById('com-conteudo').value=c?c.conteudo||'':'';
-  document.getElementById('com-tipo').value=c?c.tipo||'📌 Comunicado Geral':'📌 Comunicado Geral';
+  document.getElementById('com-tipo').value=c?c.tipo||'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Comunicado Geral':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Comunicado Geral';
   document.getElementById('com-data').value=c?c.data||today():today();
   document.getElementById('com-visivel').value=c?c.visivel||'todos':'todos';
   document.getElementById('com-destaque').value=c?c.destaque||'normal':'normal';
@@ -4238,7 +4238,7 @@ function renderGlossario(){
   var search=(document.getElementById('glossario-search')||{}).value||'';
   var filtered=glossarioTermos.filter(function(t){return !search||(t.termo||'').toLowerCase().includes(search.toLowerCase())||(t.def||'').toLowerCase().includes(search.toLowerCase());});
   el.innerHTML='';
-  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-title">Nenhum termo encontrado</div></div>';return;}
+  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div class="empty-title">Nenhum termo encontrado</div></div>';return;}
   // Group by category
   var cats={};
   filtered.forEach(function(t){var c=t.categoria||'Geral';if(!cats[c])cats[c]=[];cats[c].push(t);});
@@ -4262,9 +4262,9 @@ function renderGlossario(){
         +'<div id="glo-btns-'+t.id+'"></div>'
         +'</div></div>';
       var gbw=card.querySelector('#glo-btns-'+t.id);
-      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent='✏️';
+      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
       (function(id){geb.onclick=function(){editGlossario(id);};})(t.id);
-      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent='🗑';
+      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
       (function(id){gdb.onclick=function(){deleteGlossario(id);};})(t.id);
       gbw.appendChild(geb);gbw.appendChild(gdb);
       section.appendChild(card);
@@ -4319,7 +4319,7 @@ function restaurarGlossarioPadrao(){
     promises.push(batch.commit());
     return Promise.all(promises);
   }).then(function(){
-    alert('✅ Glossário restaurado com '+GLOSSARIO_DEFAULT.length+' termos!');
+    alert('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Glossário restaurado com '+GLOSSARIO_DEFAULT.length+' termos!');
   }).catch(function(e){
     alert('Erro: '+e.message);
   });
@@ -4340,7 +4340,7 @@ function renderReunioes(){
   var el=document.getElementById('reunioes-list');if(!el)return;
   var hoje=today();
   var proximas=reunioes.filter(function(r){return r.data>=hoje;}).slice(0,5);
-  if(!proximas.length){el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:28px">📅</div><div style="font-size:13px">Nenhuma reunião agendada</div></div>';return;}
+  if(!proximas.length){el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:28px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div style="font-size:13px">Nenhuma reunião agendada</div></div>';return;}
   el.innerHTML='';
   proximas.forEach(function(r){
     var row=document.createElement('div');
@@ -4351,7 +4351,7 @@ function renderReunioes(){
       +'<div id="reu-del-'+r.id+'"></div>'
       +'</div>';
     (function(rid){
-      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent='🗑';
+      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
       dbtn.onclick=function(){db.collection('reunioes').doc(rid).delete();};
       var wrap=row.querySelector('#reu-del-'+rid);
       if(wrap)wrap.appendChild(dbtn);
@@ -4424,10 +4424,10 @@ function enviarWhatsAppIndividual(){
     body:JSON.stringify({phone:num,message:msg})
   }).then(function(r){return r.json();}).then(function(data){
     if(data.zaapId||data.messageId){
-      btn.textContent='✅ Enviado!';btn.style.background='#22c55e';
+      btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';btn.style.background='#22c55e';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
     } else {
-      btn.textContent='⚠️ Erro';btn.style.background='#ef4444';
+      btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro';btn.style.background='#ef4444';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
       console.error('Z-API error:',data);
     }
@@ -4461,8 +4461,8 @@ function prepararDisparo(){
     +'<div style="font-size:12px;color:var(--text3);background:#030810;padding:12px;border-radius:8px;margin-bottom:16px;line-height:1.6;white-space:pre-wrap">'+msg+'</div>'
     +'<div id="disparo-status" style="margin-bottom:12px"></div>'
     +'<div style="display:flex;gap:10px;justify-content:flex-end">'
-    +(instance&&token?'<button class="btn-primary" id="btn-disparo-api">⚡ Disparar via Z-API ('+destinatarios.length+')</button>':'')
-    +'<button class="btn-secondary" id="btn-disparo-links">📱 Abrir links</button>'
+    +(instance&&token?'<button class="btn-primary" id="btn-disparo-api"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Disparar via Z-API ('+destinatarios.length+')</button>':'')
+    +'<button class="btn-secondary" id="btn-disparo-links"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Abrir links</button>'
     +'<button class="btn-ghost" id="btn-disparo-fechar">Fechar</button>'
     +'</div>'
     +'<div id="disparo-links-list" style="margin-top:12px"></div>';
@@ -4493,10 +4493,10 @@ function prepararDisparo(){
 
       function sendNext(idx){
         if(idx>=total){
-          statusEl.innerHTML='<div style="padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e">✅ Disparo concluído! '+enviados+' enviados, '+erros+' erros.</div>';
-          btn.textContent='✅ Concluído';
+          statusEl.innerHTML='<div style="padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Disparo concluído! '+enviados+' enviados, '+erros+' erros.</div>';
+          btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluído';
           // Log comunicado
-          db.collection('comunicados').add({titulo:tipo,conteudo:msg,tipo:'💬 WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
+          db.collection('comunicados').add({titulo:tipo,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
           return;
         }
         var c=destinatarios[idx];
@@ -4552,7 +4552,7 @@ function renderGrupos(){
   if(!el) return;
   el.innerHTML = '';
   if(!grupos.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Nenhum grupo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "Buscar grupos da Z-API" ou "+ Adicionar Grupo"</p></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="empty-title">Nenhum grupo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "Buscar grupos da Z-API" ou "+ Adicionar Grupo"</p></div>';
     return;
   }
   grupos.forEach(function(g){
@@ -4561,7 +4561,7 @@ function renderGrupos(){
     
     var icon = document.createElement('div');
     icon.style='width:44px;height:44px;border-radius:12px;background:#25d36622;border:1px solid #25d36633;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0';
-    icon.textContent='👥';
+    icon.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
     var info = document.createElement('div');
     info.style='flex:1';
@@ -4575,19 +4575,19 @@ function renderGrupos(){
     var sendBtn = document.createElement('button');
     sendBtn.className='btn-primary';
     sendBtn.style='padding:8px 14px;font-size:12px';
-    sendBtn.textContent='💬 Disparar';
+    sendBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Disparar';
     (function(gr){ sendBtn.onclick=function(){ openDisparoGrupo(gr); }; })(g);
 
     var editBtn = document.createElement('button');
     editBtn.className='btn-ghost';
     editBtn.style='padding:8px 10px;font-size:12px';
-    editBtn.textContent='✏️';
+    editBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     (function(gid){ editBtn.onclick=function(){ openModalGrupo(gid); }; })(g.id);
 
     var delBtn = document.createElement('button');
     delBtn.className='btn-dsm';
     delBtn.style='padding:8px 10px;font-size:12px';
-    delBtn.textContent='🗑';
+    delBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     (function(gid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('wa_grupos').doc(gid).delete(); }); }; })(g.id);
 
     actions.appendChild(sendBtn);
@@ -4629,7 +4629,7 @@ function buscarGruposZAPI(){
     method:'GET',
     headers:{'Content-Type':'application/json','Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
-    btn.textContent='🔄 Buscar grupos da Z-API';btn.disabled=false;
+    btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
     // Z-API returns array directly or nested
     var grpChats = Array.isArray(data)?data:(data.groups||data.value||[]);
     if(!grpChats.length){
@@ -4672,7 +4672,7 @@ function buscarGruposZAPI(){
     overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
     footer.appendChild(fbtn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
   }).catch(function(e){
-    btn.textContent='🔄 Buscar grupos da Z-API';btn.disabled=false;
+    btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
     alert('Erro ao buscar grupos: '+e.message);
   });
 }
@@ -4682,18 +4682,18 @@ function openDisparoGrupo(grupo){
   overlay.className='modal-overlay';overlay.style.cssText='display:flex;z-index:300';
   var box=document.createElement('div');box.className='modal';box.style.maxWidth='480px';
   box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:4px">Disparar para grupo</div>'
-    +'<div style="font-size:13px;color:var(--blue);margin-bottom:16px">👥 '+grupo.nome+'</div>'
+    +'<div style="font-size:13px;color:var(--blue);margin-bottom:16px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+grupo.nome+'</div>'
     +'<div class="form-group" style="margin-bottom:16px"><label>Tipo</label>'
     +'<select class="form-input" id="gru-tipo-msg">'
-    +'<option>📈 Abertura de Mercado</option><option>📉 Fechamento de Mercado</option>'
-    +'<option>📰 Notícia / Análise</option><option>⚡ Alerta de Operação</option>'
-    +'<option>📌 Comunicado Geral</option><option>Mensagem Personalizada</option>'
+    +'<option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Abertura de Mercado</option><option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg> Fechamento de Mercado</option>'
+    +'<option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Notícia / Análise</option><option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Alerta de Operação</option>'
+    +'<option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Comunicado Geral</option><option>Mensagem Personalizada</option>'
     +'</select></div>'
     +'<div class="form-group" style="margin-bottom:16px"><label>Mensagem</label>'
     +'<textarea class="form-input" id="gru-msg" rows="5" placeholder="Digite a mensagem para o grupo..."></textarea></div>'
     +'<div id="gru-send-status" style="margin-bottom:10px"></div>'
     +'<div style="display:flex;gap:10px;justify-content:flex-end">'
-    +'<button class="btn-primary" id="gru-send-btn">💬 Enviar para grupo</button>'
+    +'<button class="btn-primary" id="gru-send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar para grupo</button>'
     +'<button class="btn-secondary" id="gru-fechar-btn">Fechar</button>'
     +'</div>';
   overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
@@ -4712,16 +4712,16 @@ function openDisparoGrupo(grupo){
       body:JSON.stringify({phone:grupo.grupoId,message:msg})
     }).then(function(r){return r.json();}).then(function(data){
       if(data.zaapId||data.messageId){
-        statusEl.innerHTML='<div style="padding:10px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e">✅ Mensagem enviada para o grupo!</div>';
-        btn.textContent='✅ Enviado!';
+        statusEl.innerHTML='<div style="padding:10px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mensagem enviada para o grupo!</div>';
+        btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
         // Log comunicado
-        db.collection('comunicados').add({titulo:box.querySelector('#gru-tipo-msg').value,conteudo:msg,tipo:'💬 WhatsApp Grupo',data:today(),visivel:'interno',destaque:'normal',grupo:grupo.nome,criadoEm:new Date().toISOString()});
+        db.collection('comunicados').add({titulo:box.querySelector('#gru-tipo-msg').value,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp Grupo',data:today(),visivel:'interno',destaque:'normal',grupo:grupo.nome,criadoEm:new Date().toISOString()});
       } else {
-        statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border:1px solid #ef444422;border-radius:8px;font-size:13px;color:#ef4444">⚠️ Erro ao enviar. Verifique o ID do grupo.</div>';
+        statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border:1px solid #ef444422;border-radius:8px;font-size:13px;color:#ef4444"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro ao enviar. Verifique o ID do grupo.</div>';
         btn.textContent='Enviar para grupo';btn.disabled=false;
       }
     }).catch(function(){
-      statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border-radius:8px;font-size:13px;color:#ef4444">⚠️ Erro de conexão com a Z-API.</div>';
+      statusEl.innerHTML='<div style="padding:10px;background:#ef444411;border-radius:8px;font-size:13px;color:#ef4444"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro de conexão com a Z-API.</div>';
       btn.textContent='Enviar para grupo';btn.disabled=false;
     });
   };
@@ -4735,11 +4735,11 @@ function testarZAPI(){
     headers:{'Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
     if(data.connected||data.status==='CONNECTED'){
-      el.innerHTML='<span style="color:#22c55e">✅ Conectado! Número: '+(data.phone||data.connectedPhone||'OK')+'</span>';
+      el.innerHTML='<span style="color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Conectado! Número: '+(data.phone||data.connectedPhone||'OK')+'</span>';
     } else {
-      el.innerHTML='<span style="color:#f59e0b">⚠️ Status: '+(data.status||JSON.stringify(data))+'</span>';
+      el.innerHTML='<span style="color:#f59e0b"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Status: '+(data.status||JSON.stringify(data))+'</span>';
     }
-  }).catch(function(e){el.innerHTML='<span style="color:#ef4444">❌ Erro: '+e.message+'</span>';});
+  }).catch(function(e){el.innerHTML='<span style="color:#ef4444"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Erro: '+e.message+'</span>';});
 }
 
 // Also update zapi-instance/token from config tab
@@ -5041,8 +5041,8 @@ function toggleTheme(){
 function updateThemeBtn(isLight){
   var icon = document.getElementById('theme-icon');
   var label = document.getElementById('theme-label');
-  if(icon) icon.textContent = isLight ? '🌙' : '☀️';
-  if(label) label.textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
+  if(icon) icon.textContent = isLight ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  if(label) label.textContent = isLight ? 'Escuro' : 'Claro';
 }
 // Apply saved theme on load
 (function(){
@@ -5118,9 +5118,9 @@ function renderTarefas(){
         +'<div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.3;flex:1">'+t.titulo+'</div>'
         +'<span style="font-size:9px;padding:2px 7px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700;flex-shrink:0;margin-left:8px">'+prio+'</span>'
         +'</div>'
-        +(t.cliente?'<div style="font-size:11px;color:var(--blue);margin-bottom:4px">👤 '+t.cliente+'</div>':'')
-        +(t.responsavel?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">🏢 '+t.responsavel+'</div>':'')
-        +(t.prazo?'<div style="font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)')+'">📅 '+fmtDate(t.prazo)+'</div>':'')
+        +(t.cliente?'<div style="font-size:11px;color:var(--blue);margin-bottom:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+t.cliente+'</div>':'')
+        +(t.responsavel?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg> '+t.responsavel+'</div>':'')
+        +(t.prazo?'<div style="font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)')+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> '+fmtDate(t.prazo)+'</div>':'')
         +'<div style="display:flex;gap:6px;margin-top:10px">';
       
       // Status buttons
@@ -5130,19 +5130,19 @@ function renderTarefas(){
         var advBtn = document.createElement('button');
         advBtn.className = 'btn-ghost';
         advBtn.style = 'padding:3px 8px;font-size:10px;flex:1';
-        advBtn.textContent = status === 'Aberta' ? '▶ Iniciar' : '✓ Concluir';
+        advBtn.textContent = status === 'Aberta' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Iniciar' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluir';
         (function(id, ns){ advBtn.onclick = function(e){ e.stopPropagation(); db.collection('tarefas').doc(id).update({status:ns}); }; })(t.id, nextStatus);
         btnDiv.appendChild(advBtn);
       }
       var editBtn = document.createElement('button');
       editBtn.className = 'btn-ghost';
       editBtn.style = 'padding:3px 8px;font-size:10px';
-      editBtn.textContent = '✏️';
+      editBtn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
       (function(tid){ editBtn.onclick = function(e){ e.stopPropagation(); openModalTarefaEdit(tid); }; })(t.id);
       var delBtn = document.createElement('button');
       delBtn.className = 'btn-dsm';
       delBtn.style = 'padding:3px 8px;font-size:10px';
-      delBtn.textContent = '🗑';
+      delBtn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
       (function(tid){ delBtn.onclick = function(e){ e.stopPropagation(); confirmDelete(function(){ db.collection('tarefas').doc(tid).delete(); }); }; })(t.id);
       btnDiv.appendChild(editBtn);
       btnDiv.appendChild(delBtn);
@@ -5252,7 +5252,7 @@ function renderOrganograma(){
   el.innerHTML = '';
 
   if(!cargos.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">Organograma vazio</div><p style="font-size:13px;margin-top:4px">Adicione os membros e seus cargos</p></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div class="empty-title">Organograma vazio</div><p style="font-size:13px;margin-top:4px">Adicione os membros e seus cargos</p></div>';
     return;
   }
 
@@ -5299,9 +5299,9 @@ function renderOrganograma(){
         +'<div style="display:flex;gap:6px;margin-top:12px" id="org-act-'+c.id+'"></div>';
       
       var actWrap = card.querySelector('#org-act-'+c.id);
-      var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';eb.textContent='✏️ Editar';
+      var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar';
       (function(cid){eb.onclick=function(){openModalCargo(cid);};})(c.id);
-      var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent='🗑';
+      var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
       (function(cid){db2.onclick=function(){confirmDelete(function(){db.collection('organograma').doc(cid).delete();});};})(c.id);
       actWrap.appendChild(eb);actWrap.appendChild(db2);
       grid.appendChild(card);
@@ -5736,10 +5736,10 @@ function gerarDRE(){
     kpis.style.gridTemplateColumns = 'repeat(4,1fr)';
     kpis.style.marginBottom = '24px';
     [
-      {label:'Receita Bruta',val:fmtFull(totRec),cor:'#22c55e',icon:'💰'},
-      {label:'Custos Totais',val:fmtFull(totCusto),cor:'#ef4444',icon:'📉'},
-      {label:'EBIT',val:fmtFull(ebit),cor:ebit>=0?'#1e8fff':'#ef4444',icon:'📊'},
-      {label:'Lucro Líquido Est.',val:fmtFull(lucLiquido),cor:lucLiquido>=0?'#22c55e':'#ef4444',icon:'✨'}
+      {label:'Receita Bruta',val:fmtFull(totRec),cor:'#22c55e',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'},
+      {label:'Custos Totais',val:fmtFull(totCusto),cor:'#ef4444',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>'},
+      {label:'EBIT',val:fmtFull(ebit),cor:ebit>=0?'#1e8fff':'#ef4444',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
+      {label:'Lucro Líquido Est.',val:fmtFull(lucLiquido),cor:lucLiquido>=0?'#22c55e':'#ef4444',icon:''}
     ].forEach(function(k){
       var card = document.createElement('div');
       card.className='kpi-card';
@@ -5816,7 +5816,7 @@ function gerarDRE(){
     monthCard.appendChild(tableWrap);
     el.appendChild(monthCard);
   }).catch(function(e){
-    el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div>Erro ao carregar dados: '+e.message+'</div></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div>Erro ao carregar dados: '+e.message+'</div></div>';
   });
 }
 
@@ -5836,7 +5836,7 @@ document.getElementById('balanco-mes').addEventListener('change', loadBalanco);
 
 function renderBalancoVazio(){
   var el=document.getElementById('balanco-content');
-  el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><div class="empty-title">Nenhum balanço lançado para este período</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalBalanco()">✏️ Lançar Balanço</button></div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="empty-title">Nenhum balanço lançado para este período</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Lançar Balanço</button></div></div>';
 }
 
 function renderBalanco(d, ano, mes){
@@ -5932,8 +5932,8 @@ function renderBalanco(d, ano, mes){
     +'<span style="color:var(--text3)">+</span>'
     +'<span style="font-size:13px;color:var(--text2)">PL <strong style="color:#c084fc">'+fmtFull(pl)+'</strong></span>'
     +(Math.abs(totalAtivo-totalPassPL)<1
-      ?'<span style="color:#22c55e;font-size:12px;font-weight:700">✅ Balanceado</span>'
-      :'<span style="color:#ef4444;font-size:12px;font-weight:700">⚠️ Diferença: '+fmtFull(Math.abs(totalAtivo-totalPassPL))+'</span>');
+      ?'<span style="color:#22c55e;font-size:12px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Balanceado</span>'
+      :'<span style="color:#ef4444;font-size:12px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Diferença: '+fmtFull(Math.abs(totalAtivo-totalPassPL))+'</span>');
   el.appendChild(eq);
 }
 
@@ -6109,15 +6109,15 @@ function showClientePortal(){
     var s2=document.createElement('div');s2.className='nav-section';s2.textContent='DMF Black';
     var s3=document.createElement('div');s3.className='nav-section';s3.textContent='DMF';
     clienteNav.appendChild(s1);
-    clienteNav.appendChild(makeNavBtn('cnav-carteira','minha-carteira','🏠','Minha Carteira',true));
-    clienteNav.appendChild(makeNavBtn('cnav-conta','minha-conta','👤','Minha Conta',false));
+    clienteNav.appendChild(makeNavBtn('cnav-carteira','minha-carteira','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>','Minha Carteira',true));
+    clienteNav.appendChild(makeNavBtn('cnav-conta','minha-conta','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','Minha Conta',false));
     clienteNav.appendChild(s2);
-    clienteNav.appendChild(makeNavBtn('cnav-operacoes','minhas-operacoes','⚡','Minhas Operações',false));
+    clienteNav.appendChild(makeNavBtn('cnav-operacoes','minhas-operacoes','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>','Minhas Operações',false));
     clienteNav.appendChild(s3);
-    clienteNav.appendChild(makeNavBtn('cnav-agendamento','agendamento','📅','Agendamento',false));
-    clienteNav.appendChild(makeNavBtn('cnav-comunicados','comunicados','📰','Comunicados',false));
-    clienteNav.appendChild(makeNavBtn('cnav-glossario','glossario','📚','Glossário',false));
-    clienteNav.appendChild(makeNavBtn('cnav-estrategias','estrategias','♟️','Estratégias',false));
+    clienteNav.appendChild(makeNavBtn('cnav-agendamento','agendamento','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>','Agendamento',false));
+    clienteNav.appendChild(makeNavBtn('cnav-comunicados','comunicados','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>','Comunicados',false));
+    clienteNav.appendChild(makeNavBtn('cnav-glossario','glossario','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>','Glossário',false));
+    clienteNav.appendChild(makeNavBtn('cnav-estrategias','estrategias','<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>','Estratégias',false));
     nav.appendChild(clienteNav);
   }
 
@@ -6172,7 +6172,7 @@ function buildMinhaContaView(){
   div.className = 'view';
   div.id = 'view-minha-conta';
   div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Conta</div><div class="page-sub">Seus dados cadastrais</div></div>'
-    +'<button class="btn-primary" onclick="salvarMinhaConta()">💾 Salvar</button></div>'
+    +'<button class="btn-primary" onclick="salvarMinhaConta()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar</button></div>'
     +'<div class="page-content"><div class="card">'
     +'<div class="form-section-title">Dados Pessoais</div>'
     +'<div class="form-grid">'
@@ -6190,7 +6190,7 @@ function buildMinhaContaView(){
     +'<div class="form-group"><label>Estado</label><select class="form-input" id="mc-estado"><option value="">UF</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>'
     +'<div class="form-group"><label>CEP</label><input class="form-input" id="mc-cep" placeholder="00000-000"></div>'
     +'</div>'
-    +'<div id="mc-save-msg" style="margin-top:16px;font-size:13px;color:#22c55e;display:none">✅ Dados salvos com sucesso!</div>'
+    +'<div id="mc-save-msg" style="margin-top:16px;font-size:13px;color:#22c55e;display:none">Dados salvos com sucesso</div>'
     +'</div></div>';
   mainContent.appendChild(div);
 }
@@ -6204,7 +6204,7 @@ function buildMinhasOperacoesView(){
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-secondary" onclick="abrirLancamentoCliente(\'simplificado\')" style="font-size:12px">+ Simplificado</button>'
     +'<button class="btn-secondary" onclick="abrirLancamentoCliente(\'detalhado\')" style="font-size:12px">+ Detalhado</button>'
-    +'<button class="btn-primary" onclick="abrirLancamentoCliente(\'nota\')" style="font-size:12px">📄 Nota de Corretagem</button>'
+    +'<button class="btn-primary" onclick="abrirLancamentoCliente(\'nota\')" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nota de Corretagem</button>'
     +'</div></div>'
     +'<div class="page-content">'
     +'<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">'
@@ -6320,7 +6320,7 @@ function loadMinhaCarteira(){
     // Show operations table
     var el = document.getElementById('mc-dados');
     if(!ops.length){
-      el.innerHTML='<div class="card"><div class="empty" style="padding:30px"><div class="empty-icon">⚡</div><div class="empty-title">Nenhuma operação registrada</div></div></div>';
+      el.innerHTML='<div class="card"><div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="empty-title">Nenhuma operação registrada</div></div></div>';
       return;
     }
     var sorted = ops.sort(function(a,b){return b.ano!==a.ano?b.ano-a.ano:b.mes-a.mes;});
@@ -6360,7 +6360,7 @@ function renderUsuarios(){
   if(!el) return;
   el.innerHTML='';
   if(!usuarios.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-title">Nenhum usuário cadastrado</div><p style="font-size:13px;margin-top:4px">Adicione usuários e defina seus perfis de acesso</p></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="empty-title">Nenhum usuário cadastrado</div><p style="font-size:13px;margin-top:4px">Adicione usuários e defina seus perfis de acesso</p></div>';
     return;
   }
   usuarios.forEach(function(u){
@@ -6372,7 +6372,7 @@ function renderUsuarios(){
 
     var av=document.createElement('div');
     av.style='width:42px;height:42px;border-radius:11px;background:'+cor+'22;border:1px solid '+cor+'44;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0';
-    av.textContent=u.perfil==='adm'?'🔑':u.perfil==='gestor'?'👔':'👤';
+    av.textContent=u.perfil==='adm'?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>':u.perfil==='gestor'?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
     var info=document.createElement('div');info.style='flex:1';
     info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:3px">'+(u.nome||u.email)+'</div>'
@@ -6383,9 +6383,9 @@ function renderUsuarios(){
     badge.textContent=PERFIL_LABEL[u.perfil]||u.perfil;
 
     var actions=document.createElement('div');actions.style='display:flex;gap:6px';
-    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';eb.textContent='✏️';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     (function(uid){eb.onclick=function(){openModalUsuario(uid);};})(u.id);
-    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';db2.textContent='🗑';
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';db2.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
     actions.appendChild(eb);actions.appendChild(db2);
 
@@ -6528,11 +6528,11 @@ function cadStep2(){
   document.getElementById('cad-step2-bar').style.background='var(--blue)';
   // Fill resumo
   document.getElementById('cad-resumo').innerHTML=
-    '<div>👤 '+nome+'</div>'
-    +'<div>📋 CPF: '+cpf+'</div>'
-    +'<div>📧 '+email+'</div>'
-    +(document.getElementById('cad-tel').value?'<div>📱 '+document.getElementById('cad-tel').value+'</div>':'')
-    +(document.getElementById('cad-banco').value?'<div>🏦 '+document.getElementById('cad-banco').value+'</div>':'');
+    '<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+nome+'</div>'
+    +'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> CPF: '+cpf+'</div>'
+    +'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> '+email+'</div>'
+    +(document.getElementById('cad-tel').value?'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> '+document.getElementById('cad-tel').value+'</div>':'')
+    +(document.getElementById('cad-banco').value?'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> '+document.getElementById('cad-banco').value+'</div>':'');
 }
 
 function cadVoltarStep1(){
@@ -6632,14 +6632,14 @@ function renderPendentes(pendentes){
     });
     var aprovarBtn=document.createElement('button');
     aprovarBtn.className='btn-primary';aprovarBtn.style='padding:8px 16px;font-size:12px;flex-shrink:0';
-    aprovarBtn.textContent='✅ Aprovar';
+    aprovarBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Aprovar';
     (function(pend, sel){
       aprovarBtn.onclick=function(){ aprovarCliente(pend, sel.value); };
     })(p, linkSel);
     card.appendChild(info);card.appendChild(linkSel);
     var rejBtn=document.createElement('button');
     rejBtn.className='btn-dsm';rejBtn.style='padding:8px 12px;font-size:12px;flex-shrink:0';
-    rejBtn.textContent='❌';
+    rejBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     (function(pid){
       rejBtn.onclick=function(){confirmDelete(function(){db.collection('pendentes').doc(pid).delete();});};
     })(p.id);
@@ -6715,7 +6715,7 @@ function _old_aprovarCliente(p){
   }).then(function(){
     var s=document.createElement('div');
     s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
-    s.textContent='✅ '+p.nome+' aprovado!';
+    s.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> '+p.nome+' aprovado!';
     document.body.appendChild(s);
     setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},3000);
   }).catch(function(e){alert('Erro: '+e.message);});
@@ -6819,7 +6819,7 @@ function renderAtivosCliente(ativos){
   var el=document.getElementById('mc-ativos-list');if(!el)return;
   el.innerHTML='';
   if(!ativos.length){
-    el.innerHTML='<div class="empty" style="padding:30px"><div class="empty-icon">💼</div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para registrar sua carteira</p></div>';
+    el.innerHTML='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para registrar sua carteira</p></div>';
     return;
   }
   var total=ativos.reduce(function(s,a){return s+(a.valorTotal||0);},0);
@@ -6835,7 +6835,7 @@ function renderAtivosCliente(ativos){
       +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(a.tipo||'')+(a.quantidade?' · Qtd: '+a.quantidade:'')+(a.precoMedio?' · PM: '+fmtFull(a.precoMedio):'')+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:14px;font-weight:600">'+fmtFull(valorTotal)+'</div>';
-    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='🗑';
+    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     (function(aid){delBtn.onclick=function(){
       confirmDelete(function(){
         db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
