@@ -3864,42 +3864,69 @@ var CAT_COLORS={Opções:'#1e8fff',Derivativos:'#c084fc','Renda Fixa':'#22c55e',
 function renderGlossario(){
   var el=document.getElementById('glossario-list');if(!el)return;
   var search=(document.getElementById('glossario-search')||{}).value||'';
-  var filtered=glossarioTermos.filter(function(t){return !search||(t.termo||'').toLowerCase().includes(search.toLowerCase())||(t.def||'').toLowerCase().includes(search.toLowerCase());});
+  var filtered=glossarioTermos.filter(function(t){
+    return !search||(t.termo||'').toLowerCase().includes(search.toLowerCase())||(t.def||'').toLowerCase().includes(search.toLowerCase());
+  });
   el.innerHTML='';
-  if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div class="empty-title">Nenhum termo encontrado</div></div>';return;}
-  // Group by category
+  if(!filtered.length){
+    var empty=document.createElement('div');empty.className='empty';
+    empty.innerHTML='<div class="empty-title">Nenhum termo encontrado</div>';
+    el.appendChild(empty);return;
+  }
+  // Group by categoria
   var cats={};
-  filtered.forEach(function(t){var c=t.categoria||'Geral';if(!cats[c])cats[c]=[];cats[c].push(t);});
+  filtered.forEach(function(t){
+    var c=t.categoria||'Geral';
+    if(!cats[c])cats[c]=[];
+    cats[c].push(t);
+  });
   Object.keys(cats).sort().forEach(function(cat){
-    var section=document.createElement('div');section.style='margin-bottom:20px';
+    var section=document.createElement('div');section.style='margin-bottom:24px';
     var catHeader=document.createElement('div');
-    catHeader.style='display:flex;align-items:center;gap:8px;margin-bottom:10px';
-    catHeader.innerHTML='<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:'+(CAT_COLORS[cat]||'#94a3b8')+'">'+cat+'</span><div style="flex:1;height:1px;background:var(--border)"></div>';
+    catHeader.style='font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)';
+    catHeader.textContent=cat;
     section.appendChild(catHeader);
     cats[cat].forEach(function(t){
       var card=document.createElement('div');
-      card.style='background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:8px;transition:border-color .2s';
+      card.style='background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;transition:border-color .2s;cursor:pointer';
       card.onmouseover=function(){this.style.borderColor='var(--border2)';};
       card.onmouseout=function(){this.style.borderColor='var(--border)';};
-      card.innerHTML='<div style="display:flex;align-items:flex-start;justify-content:space-between">'
-        +'<div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:6px">'+t.termo+'</div>'
-        +'<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:'+(t.ex?'8px':'0')+'">'+t.def+'</div>'
-        +(t.ex?'<div style="font-size:12px;color:var(--text3);background:#030810;padding:8px 12px;border-radius:8px;border-left:2px solid var(--blue)"><strong style="color:var(--blue)">Ex:</strong> '+t.ex+'</div>':'')
-        +'</div>'
-        +'<div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">'
-        +'<div id="glo-btns-'+t.id+'"></div>'
-        +'</div></div>';
-      var gbw=card.querySelector('#glo-btns-'+t.id);
-      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent=''+icon('edit')+'';
-      (function(id){geb.onclick=function(){editGlossario(id);};})(t.id);
-      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent=''+icon('trash')+'';
-      (function(id){gdb.onclick=function(){deleteGlossario(id);};})(t.id);
-      gbw.appendChild(geb);gbw.appendChild(gdb);
+      // Title row
+      var titleRow=document.createElement('div');
+      titleRow.style='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px';
+      var title=document.createElement('div');
+      title.style='font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px';
+      title.textContent=t.termo||'';
+      var actions=document.createElement('div');actions.style='display:flex;gap:6px';
+      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:3px 8px;font-size:11px';eb.textContent='Editar';
+      (function(tid){eb.onclick=function(e){e.stopPropagation();editGlossario(tid);};})(t.id);
+      var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:3px 8px;font-size:11px';db2.textContent='Excluir';
+      (function(tid){db2.onclick=function(e){e.stopPropagation();confirmDelete(function(){db.collection('glossario').doc(tid).delete();});};})(t.id);
+      actions.appendChild(eb);actions.appendChild(db2);
+      titleRow.appendChild(title);titleRow.appendChild(actions);
+      card.appendChild(titleRow);
+      // Definição
+      if(t.def){
+        var def=document.createElement('div');
+        def.style='font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:t.ex?8px:0';
+        def.textContent=t.def;
+        card.appendChild(def);
+      }
+      // Exemplo
+      if(t.ex){
+        var ex=document.createElement('div');
+        ex.style='font-size:12px;color:var(--text3);background:#030810;border-radius:8px;padding:8px 10px;margin-top:8px;border-left:2px solid var(--blue)';
+        var exLabel=document.createElement('span');exLabel.style='font-weight:700;color:var(--blue);margin-right:6px';exLabel.textContent='Ex:';
+        var exText=document.createTextNode(t.ex);
+        ex.appendChild(exLabel);ex.appendChild(exText);
+        card.appendChild(ex);
+      }
       section.appendChild(card);
     });
     el.appendChild(section);
   });
 }
+
 
 function openModalGlossario(id){
   editingGloId=id;
