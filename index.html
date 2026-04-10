@@ -366,6 +366,28 @@ textarea.form-input{resize:vertical;min-height:80px}
 </style>
 </head>
 <body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ic-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+  <symbol id="ic-trend-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></symbol>
+  <symbol id="ic-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="ic-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+</svg>
 
 <!-- ─── LOGIN ─────────────────────────────── -->
 <div id="login-screen">
@@ -614,7 +636,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="page-title" id="detalhe-title">—</div>
         </div>
         <div style="display:flex;gap:10px">
-          <button class="btn-secondary" id="btn-edit-cliente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
+          <button class="btn-secondary" id="btn-edit-cliente">'+icon('edit')+' Editar</button>
           <button class="btn-primary" onclick="openModalAtivo(null)">+ Adicionar Ativo</button>
         </div>
       </div>
@@ -755,10 +777,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-retorno" style="font-size:18px">0%</div><div class="kpi-label">Retorno s/ Patrim.</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>
           <div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-patrimonio" style="font-size:18px">R$0</div><div class="kpi-label">Patrimônio</div></div><div class="kpi-accent" style="background:#94a3b8"></div></div>
           <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
-            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-margem" style="font-size:18px">R$0</div><div class="kpi-label">Margem Utilizada <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div><div class="kpi-accent" style="background:#f59e0b"></div>
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-margem" style="font-size:18px">R$0</div><div class="kpi-label">Margem Utilizada '+icon('edit')+'</div></div><div class="kpi-accent" style="background:#f59e0b"></div>
           </div>
           <div class="kpi-card" style="cursor:pointer" onclick="openModalBlackConfig()" title="Clique para editar">
-            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-notional" style="font-size:18px">R$0</div><div class="kpi-label">Notional <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div></div><div class="kpi-accent" style="background:#ec4899"></div>
+            <div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-notional" style="font-size:18px">R$0</div><div class="kpi-label">Notional '+icon('edit')+'</div></div><div class="kpi-accent" style="background:#ec4899"></div>
           </div>
         </div>
 
@@ -1165,7 +1187,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="balanco-ano"></select>
           <select class="filter-input" id="balanco-mes"></select>
-          <button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar Balanço</button>
+          <button class="btn-primary" onclick="openModalBalanco()">'+icon('edit')+' Editar Balanço</button>
         </div>
       </div>
       <div class="page-content">
@@ -1582,7 +1604,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;gap:10px;align-items:center">
           <select class="filter-input" id="balanco-ano"></select>
           <select class="filter-input" id="balanco-mes"></select>
-          <button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar Balanço</button>
+          <button class="btn-primary" onclick="openModalBalanco()">'+icon('edit')+' Editar Balanço</button>
         </div>
       </div>
       <div class="page-content">
@@ -2576,7 +2598,7 @@ function renderClientes(){
   tb.innerHTML=f.map(function(c){
     var sc=STATUS_C[c.status]||'#334155';
     var rf=c.custodiaRF||0,rv=c.custodiaRV||0;
-    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+( c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#334155')+'22;color:'+(OBJ_C[c.objetivo]||'#94a3b8')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(rf)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(rv)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e;font-weight:500">'+fmtFull(rf+rv)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></td></tr>';
+    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+( c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#334155')+'22;color:'+(OBJ_C[c.objetivo]||'#94a3b8')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#1e8fff">'+fmtFull(rf)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(rv)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e;font-weight:500">'+fmtFull(rf+rv)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
   }).join('');
 }
 
@@ -2638,7 +2660,7 @@ function renderCarteira(){
     Object.keys(byType).forEach(function(t,i){html+='<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" style="font-size:18px">'+fmt(byType[t])+'</div><div class="kpi-label">'+t+'</div></div><div class="kpi-accent" style="background:'+COLORS[i%COLORS.length]+'"></div></div>';});
     html+='</div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Posição Atual</div><div style="font-family:DM Mono,monospace;color:#22c55e;font-weight:600;font-size:14px">Total: '+fmtFull(total)+'</div></div>';
     ativos.sort(function(a,b){return(b.valor||0)-(a.valor||0);}).forEach(function(a){
-      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a.valor||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
+      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a.valor||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')">'+icon('trash')+'</button></div></div>';
     });
     html+='</div>';
     el.innerHTML=html;
@@ -2795,7 +2817,7 @@ function renderProfissionais(){
     var clis=clientes.filter(function(c){return c.responsavelId===p.id;});
     var cust=clis.reduce(function(s,c){return s+(c.custodiaTotal||0);},0);
     var pct=p.meta&&cust?Math.min(Math.round(cust/p.meta*100),100):0;
-    return'<div class="prof-card"><div class="prof-avatar">'+initials(p.nome)+'</div><div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:2px">'+p.nome+'</div><div style="font-size:11px;color:var(--text3)">'+(p.email||'')+(p.cert?' · '+p.cert:'')+(p.ancord?' · ANCORD: '+p.ancord:'')+'</div>'+(p.meta?'<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text3)">Meta: '+fmt(p.meta)+'</span><span style="font-size:10px;color:var(--blue)">'+pct+'%</span></div><div class="pb-track" style="height:3px"><div class="pb-fill" style="width:'+pct+'%;background:var(--blue)"></div></div></div>':'')+'</div><div style="text-align:right;margin-left:16px"><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:600">'+fmt(cust)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+clis.length+' clientes</div></div><div style="display:flex;gap:6px;margin-left:12px"><button class="btn-ghost" onclick="openModalProfissional(\''+p.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-dsm" onclick="confirmDelete(function(){deleteProfissional(\''+p.id+'\')})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
+    return'<div class="prof-card"><div class="prof-avatar">'+initials(p.nome)+'</div><div style="flex:1"><div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:2px">'+p.nome+'</div><div style="font-size:11px;color:var(--text3)">'+(p.email||'')+(p.cert?' · '+p.cert:'')+(p.ancord?' · ANCORD: '+p.ancord:'')+'</div>'+(p.meta?'<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text3)">Meta: '+fmt(p.meta)+'</span><span style="font-size:10px;color:var(--blue)">'+pct+'%</span></div><div class="pb-track" style="height:3px"><div class="pb-fill" style="width:'+pct+'%;background:var(--blue)"></div></div></div>':'')+'</div><div style="text-align:right;margin-left:16px"><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:600">'+fmt(cust)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+clis.length+' clientes</div></div><div style="display:flex;gap:6px;margin-left:12px"><button class="btn-ghost" onclick="openModalProfissional(\''+p.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteProfissional(\''+p.id+'\')})">'+icon('trash')+'</button></div></div>';
   }).join('');
 }
 
@@ -3573,9 +3595,9 @@ function renderBlackDetalhe(){
       var vb=document.createElement('button');vb.className='btn-ghost';vb.style='padding:4px 8px;font-size:11px';vb.textContent='Pernas';
       (function(o){vb.onclick=function(){showPernas(o);};})(op);div.appendChild(vb);
     }
-    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML=''+icon('edit')+'';
     (function(o){eb.onclick=function(){editBlackOp(o);};})(op);
-    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML=''+icon('trash')+'';
     (function(oid){db2.onclick=function(){confirmDelete(function(){db.collection('black_operacoes').doc(oid).delete();});};})(op.id);
     div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
@@ -4118,9 +4140,9 @@ function renderComunicados(){
       var wrap=card.querySelector('[id="cact-placeholder"]');
       if(wrap) wrap.id='cact-'+cid;
       wrap=card.querySelector('#cact-'+cid);
-      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent=''+icon('edit')+'';
       eb.onclick=function(){editComunicado(cid);};
-      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent=''+icon('trash')+'';
       db.onclick=function(){deleteComunicado(cid);};
       if(wrap){wrap.appendChild(eb);wrap.appendChild(db);}
     })(c.id);
@@ -4262,9 +4284,9 @@ function renderGlossario(){
         +'<div id="glo-btns-'+t.id+'"></div>'
         +'</div></div>';
       var gbw=card.querySelector('#glo-btns-'+t.id);
-      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      var geb=document.createElement('button');geb.className='btn-ghost';geb.style='padding:4px 8px;font-size:11px';geb.textContent=''+icon('edit')+'';
       (function(id){geb.onclick=function(){editGlossario(id);};})(t.id);
-      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      var gdb=document.createElement('button');gdb.className='btn-dsm';gdb.style='padding:4px 8px;font-size:11px';gdb.textContent=''+icon('trash')+'';
       (function(id){gdb.onclick=function(){deleteGlossario(id);};})(t.id);
       gbw.appendChild(geb);gbw.appendChild(gdb);
       section.appendChild(card);
@@ -4351,7 +4373,7 @@ function renderReunioes(){
       +'<div id="reu-del-'+r.id+'"></div>'
       +'</div>';
     (function(rid){
-      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent=''+icon('trash')+'';
       dbtn.onclick=function(){db.collection('reunioes').doc(rid).delete();};
       var wrap=row.querySelector('#reu-del-'+rid);
       if(wrap)wrap.appendChild(dbtn);
@@ -4581,13 +4603,13 @@ function renderGrupos(){
     var editBtn = document.createElement('button');
     editBtn.className='btn-ghost';
     editBtn.style='padding:8px 10px;font-size:12px';
-    editBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    editBtn.textContent=''+icon('edit')+'';
     (function(gid){ editBtn.onclick=function(){ openModalGrupo(gid); }; })(g.id);
 
     var delBtn = document.createElement('button');
     delBtn.className='btn-dsm';
     delBtn.style='padding:8px 10px;font-size:12px';
-    delBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    delBtn.textContent=''+icon('trash')+'';
     (function(gid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('wa_grupos').doc(gid).delete(); }); }; })(g.id);
 
     actions.appendChild(sendBtn);
@@ -5137,12 +5159,12 @@ function renderTarefas(){
       var editBtn = document.createElement('button');
       editBtn.className = 'btn-ghost';
       editBtn.style = 'padding:3px 8px;font-size:10px';
-      editBtn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      editBtn.textContent = ''+icon('edit')+'';
       (function(tid){ editBtn.onclick = function(e){ e.stopPropagation(); openModalTarefaEdit(tid); }; })(t.id);
       var delBtn = document.createElement('button');
       delBtn.className = 'btn-dsm';
       delBtn.style = 'padding:3px 8px;font-size:10px';
-      delBtn.textContent = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      delBtn.textContent = ''+icon('trash')+'';
       (function(tid){ delBtn.onclick = function(e){ e.stopPropagation(); confirmDelete(function(){ db.collection('tarefas').doc(tid).delete(); }); }; })(t.id);
       btnDiv.appendChild(editBtn);
       btnDiv.appendChild(delBtn);
@@ -5299,9 +5321,9 @@ function renderOrganograma(){
         +'<div style="display:flex;gap:6px;margin-top:12px" id="org-act-'+c.id+'"></div>';
       
       var actWrap = card.querySelector('#org-act-'+c.id);
-      var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar';
+      var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';eb.textContent=''+icon('edit')+' Editar';
       (function(cid){eb.onclick=function(){openModalCargo(cid);};})(c.id);
-      var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent=''+icon('trash')+'';
       (function(cid){db2.onclick=function(){confirmDelete(function(){db.collection('organograma').doc(cid).delete();});};})(c.id);
       actWrap.appendChild(eb);actWrap.appendChild(db2);
       grid.appendChild(card);
@@ -5836,7 +5858,7 @@ document.getElementById('balanco-mes').addEventListener('change', loadBalanco);
 
 function renderBalancoVazio(){
   var el=document.getElementById('balanco-content');
-  el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="empty-title">Nenhum balanço lançado para este período</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalBalanco()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Lançar Balanço</button></div></div>';
+  el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="empty-title">Nenhum balanço lançado para este período</div><div style="margin-top:16px"><button class="btn-primary" onclick="openModalBalanco()">'+icon('edit')+' Lançar Balanço</button></div></div>';
 }
 
 function renderBalanco(d, ano, mes){
@@ -6383,9 +6405,9 @@ function renderUsuarios(){
     badge.textContent=PERFIL_LABEL[u.perfil]||u.perfil;
 
     var actions=document.createElement('div');actions.style='display:flex;gap:6px';
-    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';eb.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';eb.textContent=''+icon('edit')+'';
     (function(uid){eb.onclick=function(){openModalUsuario(uid);};})(u.id);
-    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';db2.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';db2.textContent=''+icon('trash')+'';
     (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
     actions.appendChild(eb);actions.appendChild(db2);
 
@@ -6835,7 +6857,7 @@ function renderAtivosCliente(ativos){
       +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(a.tipo||'')+(a.quantidade?' · Qtd: '+a.quantidade:'')+(a.precoMedio?' · PM: '+fmtFull(a.precoMedio):'')+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:14px;font-weight:600">'+fmtFull(valorTotal)+'</div>';
-    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent=''+icon('trash')+'';
     (function(aid){delBtn.onclick=function(){
       confirmDelete(function(){
         db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
@@ -6919,6 +6941,13 @@ document.addEventListener('click', function(e){
     closeMobileMenu();
   }
 });
+
+
+// ── Icon helper ───────────────────────────────────────────
+function icon(id, size){
+  size = size||14;
+  return '<svg width="'+size+'" height="'+size+'" style="display:inline-block;vertical-align:middle;flex-shrink:0"><use href="#ic-'+id+'"/></svg>';
+}
 
 </script>
 </body>
