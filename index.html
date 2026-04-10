@@ -1103,7 +1103,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..."14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -1520,7 +1520,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..."14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -5105,7 +5105,6 @@ function renderTarefas(){
   if(!el) return;
   el.innerHTML = '';
 
-  // Kanban-style columns
   var cols = ['Aberta','Em andamento','Concluída'];
   var grid = document.createElement('div');
   grid.style = 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px';
@@ -5114,13 +5113,21 @@ function renderTarefas(){
     var items = tarefas.filter(function(t){return t.status===status;});
     var col = document.createElement('div');
     col.style = 'background:#030810;border:1px solid var(--border);border-radius:14px;padding:16px';
-    
+
     var header = document.createElement('div');
     header.style = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px';
-    header.innerHTML = '<div style="display:flex;align-items:center;gap:8px">'
-      +'<div style="width:8px;height:8px;border-radius:50%;background:'+STATUS_T_C[status]+'"></div>'
-      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">'+status+'</span>'
-      +'</div><span style="font-size:11px;color:var(--text3)">'+items.length+'</span>';
+    var leftDiv = document.createElement('div');
+    leftDiv.style = 'display:flex;align-items:center;gap:8px';
+    var dot = document.createElement('div');
+    dot.style = 'width:8px;height:8px;border-radius:50%;background:'+STATUS_T_C[status];
+    var lbl = document.createElement('span');
+    lbl.style = 'font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)';
+    lbl.textContent = status;
+    var cnt = document.createElement('span');
+    cnt.style = 'font-size:11px;color:var(--text3)';
+    cnt.textContent = items.length;
+    leftDiv.appendChild(dot);leftDiv.appendChild(lbl);
+    header.appendChild(leftDiv);header.appendChild(cnt);
     col.appendChild(header);
 
     if(!items.length){
@@ -5132,49 +5139,80 @@ function renderTarefas(){
 
     items.forEach(function(t){
       var card = document.createElement('div');
-      card.style = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s';
-      card.onmouseover = function(){this.style.borderColor='var(--border2)';};
-      card.onmouseout = function(){this.style.borderColor='var(--border)';};
-      
+      card.style = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;transition:border-color .2s';
+      card.onmouseover=function(){this.style.borderColor='var(--border2)';};
+      card.onmouseout=function(){this.style.borderColor='var(--border)';};
+
       var prio = t.prioridade||'Média';
-      card.innerHTML = '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">'
-        +'<div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.3;flex:1">'+t.titulo+'</div>'
-        +'<span style="font-size:9px;padding:2px 7px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700;flex-shrink:0;margin-left:8px">'+prio+'</span>'
-        +'</div>'
-        +(t.cliente?'<div style="font-size:11px;color:var(--blue);margin-bottom:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+t.cliente+'</div>':'')
-        +(t.responsavel?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg> '+t.responsavel+'</div>':'')
-        +(t.prazo?'<div style="font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)')+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> '+fmtDate(t.prazo)+'</div>':'')
-        +'<div style="display:flex;gap:6px;margin-top:10px">';
-      
-      // Status buttons
-      var btnDiv = card.querySelector('div:last-child');
-      if(status !== 'Concluída'){
-        var nextStatus = status === 'Aberta' ? 'Em andamento' : 'Concluída';
-        var advBtn = document.createElement('button');
-        advBtn.className = 'btn-ghost';
-        advBtn.style = 'padding:3px 8px;font-size:10px;flex:1';
-        advBtn.textContent = status === 'Aberta' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Iniciar' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluir';
-        (function(id, ns){ advBtn.onclick = function(e){ e.stopPropagation(); db.collection('tarefas').doc(id).update({status:ns}); }; })(t.id, nextStatus);
-        btnDiv.appendChild(advBtn);
+      var isLead = t.descricao && t.descricao.indexOf('Lead via') >= 0;
+
+      // Title + badges
+      var titleRow = document.createElement('div');
+      titleRow.style = 'display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px';
+      var titleEl = document.createElement('div');
+      titleEl.style = 'font-size:13px;font-weight:600;color:var(--white);line-height:1.3;flex:1';
+      titleEl.textContent = t.titulo;
+      var badges = document.createElement('div');
+      badges.style = 'display:flex;gap:4px;flex-shrink:0;margin-left:8px';
+      if(isLead){
+        var lb=document.createElement('span');
+        lb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:#c084fc22;color:#c084fc;font-weight:700';
+        lb.textContent='Lead';badges.appendChild(lb);
       }
-      var editBtn = document.createElement('button');
-      editBtn.className = 'btn-ghost';
-      editBtn.style = 'padding:3px 8px;font-size:10px';
-      editBtn.textContent = ''+icon('edit')+'';
-      (function(tid){ editBtn.onclick = function(e){ e.stopPropagation(); openModalTarefaEdit(tid); }; })(t.id);
-      var delBtn = document.createElement('button');
-      delBtn.className = 'btn-dsm';
-      delBtn.style = 'padding:3px 8px;font-size:10px';
-      delBtn.textContent = ''+icon('trash')+'';
-      (function(tid){ delBtn.onclick = function(e){ e.stopPropagation(); confirmDelete(function(){ db.collection('tarefas').doc(tid).delete(); }); }; })(t.id);
-      btnDiv.appendChild(editBtn);
-      btnDiv.appendChild(delBtn);
+      var pb=document.createElement('span');
+      pb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700';
+      pb.textContent=prio;badges.appendChild(pb);
+      titleRow.appendChild(titleEl);titleRow.appendChild(badges);
+      card.appendChild(titleRow);
+
+      if(t.cliente){var cliEl=document.createElement('div');cliEl.style='font-size:11px;color:var(--blue);margin-bottom:4px';cliEl.textContent=t.cliente;card.appendChild(cliEl);}
+      if(t.responsavel){var respEl=document.createElement('div');respEl.style='font-size:11px;color:var(--text3);margin-bottom:4px';respEl.textContent=t.responsavel;card.appendChild(respEl);}
+      if(t.prazo){var prazoEl=document.createElement('div');prazoEl.style='font-size:11px;color:'+(t.prazo<today()?'#ef4444':'var(--text3)');prazoEl.textContent=fmtDate(t.prazo);card.appendChild(prazoEl);}
+      if(t.descricao){var descEl=document.createElement('div');descEl.style='font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5;border-top:1px solid var(--border);padding-top:6px';descEl.textContent=t.descricao;card.appendChild(descEl);}
+
+      if(isLead){
+        var iaBtn=document.createElement('button');
+        iaBtn.style='margin-top:8px;width:100%;background:#c084fc22;border:1px solid #c084fc33;border-radius:8px;padding:5px;color:#c084fc;font-size:11px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif';
+        iaBtn.textContent='Gerar sugestão de abordagem';
+        (function(tid){iaBtn.onclick=function(){gerarAbordagemIA(tid);};})(t.id);
+        card.appendChild(iaBtn);
+      }
+
+      // Action buttons
+      var btnRow=document.createElement('div');
+      btnRow.style='display:flex;gap:6px;margin-top:10px';
+
+      if(status!=='Concluída'){
+        var nextStatus=status==='Aberta'?'Em andamento':'Concluída';
+        var advBtn=document.createElement('button');
+        advBtn.className='btn-ghost';
+        advBtn.style='padding:4px 8px;font-size:11px;flex:1';
+        advBtn.textContent=status==='Aberta'?'Iniciar':'Concluir';
+        (function(id,ns){advBtn.onclick=function(e){e.stopPropagation();db.collection('tarefas').doc(id).update({status:ns});};})(t.id,nextStatus);
+        btnRow.appendChild(advBtn);
+      }
+
+      var editBtn=document.createElement('button');
+      editBtn.className='btn-ghost';
+      editBtn.style='padding:4px 8px;font-size:11px';
+      editBtn.textContent='Editar';
+      (function(tid){editBtn.onclick=function(e){e.stopPropagation();openModalTarefaEdit(tid);};})(t.id);
+
+      var delBtn=document.createElement('button');
+      delBtn.className='btn-dsm';
+      delBtn.style='padding:4px 8px;font-size:11px';
+      delBtn.textContent='Excluir';
+      (function(tid){delBtn.onclick=function(e){e.stopPropagation();confirmDelete(function(){db.collection('tarefas').doc(tid).delete();});};})(t.id);
+
+      btnRow.appendChild(editBtn);btnRow.appendChild(delBtn);
+      card.appendChild(btnRow);
       col.appendChild(card);
     });
     grid.appendChild(col);
   });
   el.appendChild(grid);
 }
+
 
 function openModalTarefa(){
   editingTarefaId = null;
