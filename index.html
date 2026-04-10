@@ -1123,46 +1123,40 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <!-- PAYOFF SIMULATOR -->
         <div class="card" style="margin-bottom:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <div class="section-title" style="margin:0">Simulador de Payoff</div>
-            <button class="btn-secondary" onclick="addPerna()" style="font-size:12px">+ Adicionar Perna</button>
-          </div>
-          <div id="payoff-pernas" style="margin-bottom:16px"></div>
-          <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
-            <div class="form-group" style="margin:0">
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Preço atual do ativo (R$)</label>
-              <input class="filter-input" id="payoff-spot" type="number" value="30" style="width:140px" oninput="calcPayoff()">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Range do gráfico</label>
-              <select class="filter-input" id="payoff-range" onchange="calcPayoff()" style="width:140px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="section-title" style="margin:0;font-size:13px">Simulador de Payoff</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="filter-input" id="payoff-spot" type="number" value="30" style="width:90px;font-size:12px;padding:5px 8px" placeholder="Spot R$">
+              <select class="filter-input" id="payoff-range" onchange="calcPayoff()" style="width:80px;font-size:12px;padding:5px 8px">
                 <option value="10">±10%</option>
                 <option value="20" selected>±20%</option>
                 <option value="30">±30%</option>
                 <option value="50">±50%</option>
               </select>
+              <button class="btn-secondary" onclick="addPerna()" style="font-size:11px;padding:5px 10px">+ Perna</button>
+              <button class="btn-primary" onclick="calcPayoff()" style="font-size:11px;padding:5px 10px">Calcular</button>
+              <button class="btn-ghost" onclick="limparPayoff()" style="font-size:11px;padding:5px 10px">Limpar</button>
             </div>
-            <button class="btn-primary" onclick="calcPayoff()" style="font-size:12px;align-self:flex-end">Calcular</button>
-            <button class="btn-secondary" onclick="limparPayoff()" style="font-size:12px;align-self:flex-end">Limpar</button>
           </div>
+          <div id="payoff-pernas" style="margin-bottom:10px"></div>
           <!-- Stats -->
-          <div id="payoff-stats" style="display:none;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div style="background:#22c55e11;border:1px solid #22c55e33;border-radius:10px;padding:12px;text-align:center">
+          <div id="payoff-stats" style="display:none;margin-bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;padding:8px;text-align:center">
               <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Lucro Máximo</div>
-              <div style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:#22c55e" id="payoff-max-lucro">—</div>
+              <div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:#22c55e" id="payoff-max-lucro">—</div>
             </div>
-            <div style="background:#ef444411;border:1px solid #ef444433;border-radius:10px;padding:12px;text-align:center">
+            <div style="background:#ef444411;border:1px solid #ef444433;border-radius:8px;padding:8px;text-align:center">
               <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Prejuízo Máximo</div>
-              <div style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:#ef4444" id="payoff-max-perda">—</div>
+              <div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:#ef4444" id="payoff-max-perda">—</div>
             </div>
-            <div style="background:#1e8fff11;border:1px solid #1e8fff33;border-radius:10px;padding:12px;text-align:center">
+            <div style="background:#1e8fff11;border:1px solid #1e8fff33;border-radius:8px;padding:8px;text-align:center">
               <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Break-even</div>
-              <div style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:#1e8fff" id="payoff-breakeven">—</div>
+              <div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:#1e8fff" id="payoff-breakeven">—</div>
             </div>
           </div>
           <!-- Chart -->
-          <canvas id="payoff-chart" height="120" style="display:none"></canvas>
-          <div id="payoff-empty" style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Adicione as pernas da operação e clique em Calcular</div>
+          <canvas id="payoff-chart" height="80" style="display:none"></canvas>
+          <div id="payoff-empty" style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Adicione as pernas da operação e clique em Calcular</div>
         </div>
 
         <div class="table-wrap">
@@ -6733,7 +6727,7 @@ function addPerna(dados){
 
   var row = document.createElement('div');
   row.id = 'perna-'+id;
-  row.style = 'display:grid;grid-template-columns:100px 100px 110px 110px 110px 36px;gap:8px;align-items:end;margin-bottom:10px';
+  row.style = 'display:grid;grid-template-columns:90px 80px 90px 90px 90px 28px;gap:6px;align-items:end;margin-bottom:6px';
 
   function makeField(label, id_suffix, type, opts, val){
     var wrap = document.createElement('div');
@@ -6745,7 +6739,7 @@ function addPerna(dados){
     if(type === 'select'){
       input = document.createElement('select');
       input.className = 'filter-input';
-      input.style = 'width:100%;font-size:12px;padding:7px 10px';
+      input.style = 'width:100%;font-size:11px;padding:5px 7px';
       opts.forEach(function(o){
         var opt = document.createElement('option');
         opt.value = o.v; opt.textContent = o.l;
@@ -6756,7 +6750,7 @@ function addPerna(dados){
       input = document.createElement('input');
       input.type = type;
       input.className = 'filter-input';
-      input.style = 'width:100%;font-size:12px;padding:7px 10px';
+      input.style = 'width:100%;font-size:11px;padding:5px 7px';
       input.value = val;
       if(type === 'number') input.step = '0.01';
     }
