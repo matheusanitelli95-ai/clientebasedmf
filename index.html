@@ -1103,7 +1103,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..."14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -1520,7 +1520,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <input class="filter-input" id="est-busca" placeholder="<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
+            <input class="filter-input" id="est-busca" placeholder="Buscar estratégia ou operação..."14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar estratégia ou operação..." oninput="filtrarEst()" style="min-width:260px">
             <select class="filter-input" id="est-fin" onchange="filtrarEst()">
               <option value="">Todos — Financeiro</option>
               <option value="Débito">Débito</option>
@@ -2699,7 +2699,7 @@ function renderHistorico(){
     var html='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Histórico de Contatos</div><button class="btn-primary" style="font-size:11px;padding:8px 14px" onclick="openModalContato()">+ Registrar</button></div>';
     snap.docs.forEach(function(d){var ct=d.data();html+='<div class="contact-item"><div class="contact-date">'+fmtDate(ct.data)+' · '+ct.tipo+'</div><div class="contact-text">'+ct.texto+'</div>'+(ct.proximoContato?'<div style="font-size:11px;color:var(--blue);margin-top:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Próximo: '+fmtDate(ct.proximoContato)+'</div>':'')+'</div>';});
     el.innerHTML=html+'</div>';
-  }).catch(function(){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><div>Erro ao carregar histórico</div></div>';});
+  }).catch(function(){el.innerHTML='<div class="empty"><div class="empty-icon"></div><div>Erro ao carregar histórico</div></div>';});
 }
 
 function toggleCheck(key,val){
@@ -3109,7 +3109,7 @@ function renderFinanceiro(){
         editBtn.className='btn-ghost';
         editBtn.style='padding:5px 10px;font-size:12px';
         editBtn.title='Editar';
-        editBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+        editBtn.innerHTML='';
         editBtn.type='button';
         (function(id){ editBtn.onclick=function(e){ e.stopPropagation(); openModalLancamento(id); }; })(l.id);
 
@@ -3117,7 +3117,7 @@ function renderFinanceiro(){
         copyBtn.className='btn-ghost';
         copyBtn.style='padding:5px 10px;font-size:12px';
         copyBtn.title='Copiar';
-        copyBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+        copyBtn.innerHTML='';
         copyBtn.type='button';
         (function(id){ copyBtn.onclick=function(e){ e.stopPropagation(); copyLancamento(id); }; })(l.id);
 
@@ -3125,7 +3125,7 @@ function renderFinanceiro(){
         delBtn.className='btn-dsm';
         delBtn.style='padding:5px 10px;font-size:12px';
         delBtn.title='Excluir';
-        delBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+        delBtn.innerHTML='';
         delBtn.type='button';
         (function(id){ delBtn.onclick=function(e){ e.stopPropagation(); deleteLancamento(id); }; })(l.id);
 
@@ -4447,10 +4447,10 @@ function enviarWhatsAppIndividual(){
     body:JSON.stringify({phone:num,message:msg})
   }).then(function(r){return r.json();}).then(function(data){
     if(data.zaapId||data.messageId){
-      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';btn.style.background='#22c55e';
+      btn.innerHTML=' Enviado!';btn.style.background='#22c55e';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
     } else {
-      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro';btn.style.background='#ef4444';
+      btn.innerHTML=' Erro';btn.style.background='#ef4444';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
       console.error('Z-API error:',data);
     }
@@ -4517,7 +4517,7 @@ function prepararDisparo(){
       function sendNext(idx){
         if(idx>=total){
           statusEl.innerHTML='<div style="padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Disparo concluído! '+enviados+' enviados, '+erros+' erros.</div>';
-          btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluído';
+          btn.innerHTML=' Concluído';
           // Log comunicado
           db.collection('comunicados').add({titulo:tipo,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
           return;
@@ -4584,7 +4584,7 @@ function renderGrupos(){
     
     var icon = document.createElement('div');
     icon.style='width:44px;height:44px;border-radius:12px;background:#25d36622;border:1px solid #25d36633;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0';
-    icon.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    icon.innerHTML='';
 
     var info = document.createElement('div');
     info.style='flex:1';
@@ -4598,7 +4598,7 @@ function renderGrupos(){
     var sendBtn = document.createElement('button');
     sendBtn.className='btn-primary';
     sendBtn.style='padding:8px 14px;font-size:12px';
-    sendBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Disparar';
+    sendBtn.innerHTML=' Disparar';
     (function(gr){ sendBtn.onclick=function(){ openDisparoGrupo(gr); }; })(g);
 
     var editBtn = document.createElement('button');
@@ -4652,7 +4652,7 @@ function buscarGruposZAPI(){
     method:'GET',
     headers:{'Content-Type':'application/json','Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
-    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
+    btn.innerHTML=' Buscar grupos da Z-API';btn.disabled=false;
     // Z-API returns array directly or nested
     var grpChats = Array.isArray(data)?data:(data.groups||data.value||[]);
     if(!grpChats.length){
@@ -4695,7 +4695,7 @@ function buscarGruposZAPI(){
     overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
     footer.appendChild(fbtn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
   }).catch(function(e){
-    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
+    btn.innerHTML=' Buscar grupos da Z-API';btn.disabled=false;
     alert('Erro ao buscar grupos: '+e.message);
   });
 }
@@ -4736,7 +4736,7 @@ function openDisparoGrupo(grupo){
     }).then(function(r){return r.json();}).then(function(data){
       if(data.zaapId||data.messageId){
         statusEl.innerHTML='<div style="padding:10px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mensagem enviada para o grupo!</div>';
-        btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
+        btn.innerHTML=' Enviado!';
         // Log comunicado
         db.collection('comunicados').add({titulo:box.querySelector('#gru-tipo-msg').value,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp Grupo',data:today(),visivel:'interno',destaque:'normal',grupo:grupo.nome,criadoEm:new Date().toISOString()});
       } else {
@@ -4758,11 +4758,11 @@ function testarZAPI(){
     headers:{'Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
     if(data.connected||data.status==='CONNECTED'){
-      el.innerHTML='<span style="color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Conectado! Número: '+(data.phone||data.connectedPhone||'OK')+'</span>';
+      el.innerHTML='<span style="color:#22c55e"> Conectado! Número: '+(data.phone||data.connectedPhone||'OK')+'</span>';
     } else {
-      el.innerHTML='<span style="color:#f59e0b"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Status: '+(data.status||JSON.stringify(data))+'</span>';
+      el.innerHTML='<span style="color:#f59e0b"> Status: '+(data.status||JSON.stringify(data))+'</span>';
     }
-  }).catch(function(e){el.innerHTML='<span style="color:#ef4444"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Erro: '+e.message+'</span>';});
+  }).catch(function(e){el.innerHTML='<span style="color:#ef4444"> Erro: '+e.message+'</span>';});
 }
 
 // Also update zapi-instance/token from config tab
@@ -5064,7 +5064,7 @@ function toggleTheme(){
 function updateThemeBtn(isLight){
   var icon = document.getElementById('theme-icon');
   var label = document.getElementById('theme-label');
-  if(icon) icon.textContent = isLight ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  if(icon) icon.textContent = isLight ? '◑' : '○';
   if(label) label.textContent = isLight ? 'Escuro' : 'Claro';
 }
 // Apply saved theme on load
@@ -5323,10 +5323,10 @@ function renderOrganograma(){
       
       var actWrap = card.querySelector('#org-act-'+c.id);
       var eb = document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px;flex:1';
-      eb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar';
+      eb.textContent='Editar';
       (function(cid){eb.onclick=function(){openModalCargo(cid);};})(c.id);
       var db2 = document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';
-      db2.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+      db2.textContent='Excluir';
       (function(cid){db2.onclick=function(){confirmDelete(function(){db.collection('organograma').doc(cid).delete();});};})(c.id);
       actWrap.appendChild(eb);actWrap.appendChild(db2);
       grid.appendChild(card);
@@ -5841,7 +5841,7 @@ function gerarDRE(){
     monthCard.appendChild(tableWrap);
     el.appendChild(monthCard);
   }).catch(function(e){
-    el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div>Erro ao carregar dados: '+e.message+'</div></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon"></div><div>Erro ao carregar dados: '+e.message+'</div></div>';
   });
 }
 
@@ -6409,10 +6409,10 @@ function renderUsuarios(){
 
     var actions=document.createElement('div');actions.style='display:flex;gap:6px';
     var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';
-    eb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    eb.textContent='Editar';
     (function(uid){eb.onclick=function(){openModalUsuario(uid);};})(u.id);
     var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';
-    db2.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    db2.textContent='Excluir';
     (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
     actions.appendChild(eb);actions.appendChild(db2);
 
@@ -6555,7 +6555,7 @@ function cadStep2(){
   document.getElementById('cad-step2-bar').style.background='var(--blue)';
   // Fill resumo
   document.getElementById('cad-resumo').innerHTML=
-    '<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> '+nome+'</div>'
+    '<div> '+nome+'</div>'
     +'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> CPF: '+cpf+'</div>'
     +'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> '+email+'</div>'
     +(document.getElementById('cad-tel').value?'<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> '+document.getElementById('cad-tel').value+'</div>':'')
@@ -6659,14 +6659,14 @@ function renderPendentes(pendentes){
     });
     var aprovarBtn=document.createElement('button');
     aprovarBtn.className='btn-primary';aprovarBtn.style='padding:8px 16px;font-size:12px;flex-shrink:0';
-    aprovarBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Aprovar';
+    aprovarBtn.textContent='Aprovar';
     (function(pend, sel){
       aprovarBtn.onclick=function(){ aprovarCliente(pend, sel.value); };
     })(p, linkSel);
     card.appendChild(info);card.appendChild(linkSel);
     var rejBtn=document.createElement('button');
     rejBtn.className='btn-dsm';rejBtn.style='padding:8px 12px;font-size:12px;flex-shrink:0';
-    rejBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    rejBtn.textContent='Recusar';
     (function(pid){
       rejBtn.onclick=function(){confirmDelete(function(){db.collection('pendentes').doc(pid).delete();});};
     })(p.id);
@@ -6742,7 +6742,7 @@ function _old_aprovarCliente(p){
   }).then(function(){
     var s=document.createElement('div');
     s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
-    s.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> '+p.nome+' aprovado!';
+    s.innerHTML=' '+p.nome+' aprovado!';
     document.body.appendChild(s);
     setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},3000);
   }).catch(function(e){alert('Erro: '+e.message);});
