@@ -510,11 +510,28 @@ function enviarFormulario(){
     // Create tarefa no CRM
     return db.collection('tarefas').add({
       titulo: 'Contatar prospecto: ' + nome,
-      descricao: 'Lead via formulário · Patrimônio: '+(respostas.q6||'não informado')+' · Origem: '+(document.getElementById('c-origem').value||'não informado')+' · Melhor horário: '+(document.getElementById('c-horario').value||'qualquer'),
+      descricao: 'Lead via formulário de captação',
       cliente: nome,
       clienteId: cliRef.id,
+      leadId: leadRef.id,
       status: 'Aberta',
       prioridade: 'Alta',
+      respostas: {
+        carteira: respostas.q1||'',
+        deixandoDinheiro: respostas.q2||'',
+        situacao: respostas.q3||'',
+        objetivo: respostas.q4||'',
+        comprometimento: respostas.q5||'',
+        patrimonio: respostas.q6||'',
+        modeloPagamento: respostas.q7||'',
+        eficiencia: respostas.q8||''
+      },
+      contato: {
+        telefone: tel,
+        email: data.email,
+        horario: document.getElementById('c-horario').value||'',
+        origem: document.getElementById('c-origem').value||''
+      },
       criadoEm: new Date().toISOString()
     });
   }).then(function(){
