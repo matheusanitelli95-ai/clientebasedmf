@@ -4447,10 +4447,10 @@ function enviarWhatsAppIndividual(){
     body:JSON.stringify({phone:num,message:msg})
   }).then(function(r){return r.json();}).then(function(data){
     if(data.zaapId||data.messageId){
-      btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';btn.style.background='#22c55e';
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';btn.style.background='#22c55e';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
     } else {
-      btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro';btn.style.background='#ef4444';
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Erro';btn.style.background='#ef4444';
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
       console.error('Z-API error:',data);
     }
@@ -4517,7 +4517,7 @@ function prepararDisparo(){
       function sendNext(idx){
         if(idx>=total){
           statusEl.innerHTML='<div style="padding:12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Disparo concluído! '+enviados+' enviados, '+erros+' erros.</div>';
-          btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluído';
+          btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Concluído';
           // Log comunicado
           db.collection('comunicados').add({titulo:tipo,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
           return;
@@ -4584,7 +4584,7 @@ function renderGrupos(){
     
     var icon = document.createElement('div');
     icon.style='width:44px;height:44px;border-radius:12px;background:#25d36622;border:1px solid #25d36633;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0';
-    icon.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    icon.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
     var info = document.createElement('div');
     info.style='flex:1';
@@ -4598,7 +4598,7 @@ function renderGrupos(){
     var sendBtn = document.createElement('button');
     sendBtn.className='btn-primary';
     sendBtn.style='padding:8px 14px;font-size:12px';
-    sendBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Disparar';
+    sendBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Disparar';
     (function(gr){ sendBtn.onclick=function(){ openDisparoGrupo(gr); }; })(g);
 
     var editBtn = document.createElement('button');
@@ -4652,7 +4652,7 @@ function buscarGruposZAPI(){
     method:'GET',
     headers:{'Content-Type':'application/json','Client-Token':creds.token}
   }).then(function(r){return r.json();}).then(function(data){
-    btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
     // Z-API returns array directly or nested
     var grpChats = Array.isArray(data)?data:(data.groups||data.value||[]);
     if(!grpChats.length){
@@ -4695,7 +4695,7 @@ function buscarGruposZAPI(){
     overlay.onclick=function(e){if(e.target===overlay)overlay.parentNode.removeChild(overlay);};
     footer.appendChild(fbtn);box.appendChild(footer);overlay.appendChild(box);document.body.appendChild(overlay);
   }).catch(function(e){
-    btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Buscar grupos da Z-API';btn.disabled=false;
     alert('Erro ao buscar grupos: '+e.message);
   });
 }
@@ -4736,7 +4736,7 @@ function openDisparoGrupo(grupo){
     }).then(function(r){return r.json();}).then(function(data){
       if(data.zaapId||data.messageId){
         statusEl.innerHTML='<div style="padding:10px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;font-size:13px;color:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mensagem enviada para o grupo!</div>';
-        btn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
+        btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
         // Log comunicado
         db.collection('comunicados').add({titulo:box.querySelector('#gru-tipo-msg').value,conteudo:msg,tipo:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> WhatsApp Grupo',data:today(),visivel:'interno',destaque:'normal',grupo:grupo.nome,criadoEm:new Date().toISOString()});
       } else {
@@ -6659,14 +6659,14 @@ function renderPendentes(pendentes){
     });
     var aprovarBtn=document.createElement('button');
     aprovarBtn.className='btn-primary';aprovarBtn.style='padding:8px 16px;font-size:12px;flex-shrink:0';
-    aprovarBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Aprovar';
+    aprovarBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Aprovar';
     (function(pend, sel){
       aprovarBtn.onclick=function(){ aprovarCliente(pend, sel.value); };
     })(p, linkSel);
     card.appendChild(info);card.appendChild(linkSel);
     var rejBtn=document.createElement('button');
     rejBtn.className='btn-dsm';rejBtn.style='padding:8px 12px;font-size:12px;flex-shrink:0';
-    rejBtn.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    rejBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     (function(pid){
       rejBtn.onclick=function(){confirmDelete(function(){db.collection('pendentes').doc(pid).delete();});};
     })(p.id);
@@ -6742,7 +6742,7 @@ function _old_aprovarCliente(p){
   }).then(function(){
     var s=document.createElement('div');
     s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
-    s.textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> '+p.nome+' aprovado!';
+    s.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> '+p.nome+' aprovado!';
     document.body.appendChild(s);
     setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},3000);
   }).catch(function(e){alert('Erro: '+e.message);});
