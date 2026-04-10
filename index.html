@@ -681,6 +681,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <div id="crm-tab-agenda" class="tab-content active"><div id="crm-content"></div></div>
         <div id="crm-tab-tarefas" class="tab-content"><div id="crm-tarefas-content"></div></div>
+        <div id="crm-tab-leads-crm" class="tab-content"><div id="leads-crm-content"></div></div>
         <div id="crm-tab-alertas-crm" class="tab-content"><div id="alertas-content"></div></div>
       </div>
     </div>
@@ -4694,6 +4695,7 @@ function showCRMTab(tab, btn){
   document.getElementById('crm-tab-'+tab).classList.add('active');
   if(btn) btn.classList.add('active');
   if(tab==='tarefas') loadTarefas();
+  if(tab==='leads-crm') loadLeadsCRM();
   if(tab==='alertas-crm') renderAlertas();
 }
 
@@ -6736,6 +6738,124 @@ function gerarAbordagemIA(tarefaId){
     alert('Erro: '+e.message);
   });
 }
+
+// ═══════════════════════════════════════════════════════════
+// LEADS CRM
+// ═══════════════════════════════════════════════════════════
+var leadsData = [];
+
+function loadLeadsCRM(){
+  db.collection('leads').orderBy('criadoEm','desc').onSnapshot(function(snap){
+    leadsData = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    renderLeadsCRM();
+  });
+}
+
+var LABELS_TRIAGEM = {
+  carteira: 'Como descreve sua carteira',
+  deixandoDinheiro: 'Deixando dinheiro na mesa',
+  situacao: 'Situação atual',
+  objetivo: 'O que busca',
+  comprometimento: 'Comprometimento',
+  patrimonio: 'Faixa de patrimônio',
+  modeloPagamento: 'Modelo preferido',
+  eficiencia: 'Eficiência sem risco'
+};
+
+function renderLeadsCRM(){
+  var el = document.getElementById('leads-crm-content');
+  if(!el) return;
+  el.innerHTML = '';
+
+  if(!leadsData.length){
+    el.innerHTML = '<div class="empty"><div class="empty-title">Nenhum lead ainda</div><p style="font-size:13px;margin-top:4px">Compartilhe o link do formulário de captação para receber leads</p></div>';
+    return;
+  }
+
+  // Header com link
+  var header = document.createElement('div');
+  header.style = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:16px';
+  header.innerHTML = '<div style="font-size:13px;color:var(--text3)">'+leadsData.length+' lead'+(leadsData.length!==1?'s':'')+' recebido'+(leadsData.length!==1?'s':'')+' via formulário</div>'
+    +'<a href="/captacao.html" target="_blank" style="font-size:12px;color:var(--blue);text-decoration:none;background:#1e8fff11;border:1px solid #1e8fff33;padding:5px 12px;border-radius:8px">Ver formulário</a>';
+  el.appendChild(header);
+
+  leadsData.forEach(function(lead){
+    var card = document.createElement('div');
+    card.style = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;transition:border-color .2s';
+    card.onmouseover = function(){ this.style.borderColor='var(--border2)'; };
+    card.onmouseout = function(){ this.style.borderColor='var(--border)'; };
+
+    // Header do card
+    var ch = document.createElement('div');
+    ch.style = 'display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)';
+    
+    var nameBlock = document.createElement('div');
+    nameBlock.innerHTML = '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+(lead.nome||'—')+'</div>'
+      +'<div style="display:flex;gap:12px;flex-wrap:wrap">'
+      +(lead.telefone?'<span style="font-size:12px;color:var(--blue)">'+lead.telefone+'</span>':'')
+      +(lead.email?'<span style="font-size:12px;color:var(--text3)">'+lead.email+'</span>':'')
+      +(lead.horario?'<span style="font-size:12px;color:var(--text3)">Melhor horário: '+lead.horario+'</span>':'')
+      +(lead.origem?'<span style="font-size:12px;color:var(--text3)">Via: '+lead.origem+'</span>':'')
+      +'</div>';
+
+    var meta = document.createElement('div');
+    meta.style = 'text-align:right;flex-shrink:0';
+    meta.innerHTML = '<div style="font-size:11px;color:var(--text3)">'+new Date(lead.criadoEm).toLocaleDateString('pt-BR')+'</div>'
+      +(lead.patrimonio?'<div style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e;margin-top:4px;font-weight:600">'+lead.patrimonio+'</div>':'');
+
+    ch.appendChild(nameBlock);ch.appendChild(meta);
+    card.appendChild(ch);
+
+    // Respostas da triagem
+    var grid = document.createElement('div');
+    grid.style = 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px';
+
+    var campos = ['carteira','deixandoDinheiro','situacao','objetivo','comprometimento','patrimonio','modeloPagamento','eficiencia'];
+    campos.forEach(function(k){
+      if(!lead[k]) return;
+      var item = document.createElement('div');
+      item.style = 'background:#030810;border-radius:8px;padding:10px 12px';
+      item.innerHTML = '<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+LABELS_TRIAGEM[k]+'</div>'
+        +'<div style="font-size:12px;color:var(--text);line-height:1.4">'+lead[k]+'</div>';
+      grid.appendChild(item);
+    });
+    card.appendChild(grid);
+
+    // Actions
+    var actions = document.createElement('div');
+    actions.style = 'display:flex;gap:8px';
+    
+    var waBtn = document.createElement('button');
+    waBtn.className = 'btn-primary';
+    waBtn.style = 'font-size:12px;padding:7px 14px';
+    waBtn.textContent = 'WhatsApp';
+    if(lead.telefone){
+      var tel = lead.telefone.replace(/\D/g,'');
+      waBtn.onclick = function(){ window.open('https://wa.me/55'+tel,'_blank'); };
+    } else {
+      waBtn.disabled = true;
+    }
+
+    var convBtn = document.createElement('button');
+    convBtn.className = 'btn-secondary';
+    convBtn.style = 'font-size:12px;padding:7px 14px';
+    convBtn.textContent = 'Ver cliente';
+    (function(l){
+      convBtn.onclick = function(){
+        // Find client in clientes list
+        var cli = clientes.find(function(c){ return c.leadId === l.id || c.nome === l.nome; });
+        if(cli) openClienteDetalhe(cli.id);
+        else alert('Cliente não encontrado na base. Pode ter sido criado antes da integração.');
+      };
+    })(lead);
+
+    actions.appendChild(waBtn);
+    actions.appendChild(convBtn);
+    card.appendChild(actions);
+    el.appendChild(card);
+  });
+}
+
 </script>
 </body>
 </html>
