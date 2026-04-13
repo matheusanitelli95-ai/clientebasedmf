@@ -8090,20 +8090,25 @@ function lerAbaSelecionada(){
   statusEl.textContent = 'Lendo aba "'+aba+'"...';
   statusEl.style.color = '#f59e0b';
 
-  var url = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(aba);
+  // Use CSV export - works without auth for public sheets
+  var csvUrl = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/export?format=csv&sheet='+encodeURIComponent(aba);
 
-  fetch(url).then(function(r){ return r.text(); }).then(function(text){
-    // Remove Google's wrapper: google.visualization.Query.setResponse(...)
-    var jsonStr = text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
-    var data = JSON.parse(jsonStr);
-    var rows = data.table ? data.table.rows : [];
-    var cols = data.table ? data.table.cols : [];
-
-    processarLinhasSheet(rows, cols, aba);
+  fetch(csvUrl).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.text();
+  }).then(function(csv){
+    processarCSV(csv, aba);
     statusEl.textContent = '';
   }).catch(function(e){
-    statusEl.textContent = 'Erro ao ler aba: '+e.message;
-    statusEl.style.color = '#ef4444';
+    // Fallback: try gviz
+    var gvizUrl = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(aba);
+    fetch(gvizUrl).then(function(r){ return r.text(); }).then(function(csv){
+      processarCSV(csv, aba);
+      statusEl.textContent = '';
+    }).catch(function(e2){
+      statusEl.textContent = 'Erro: '+e2.message+'. Verifique se a planilha está compartilhada como pública.';
+      statusEl.style.color = '#ef4444';
+    });
   });
 }
 
@@ -8133,6 +8138,24 @@ function parseMoney(val){
   var s = String(val).replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
   var n = parseFloat(s);
   return isNaN(n) ? 0 : n;
+}
+
+function processarCSV(csv, abaNome){
+  var lines = csv.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
+  var rows = lines.map(function(line){
+    // Parse CSV line handling quoted fields
+    var cells = [];
+    var inQuote = false, cur = '';
+    for(var i=0;i<line.length;i++){
+      var ch = line[i];
+      if(ch==='"'){ inQuote=!inQuote; }
+      else if(ch===','&&!inQuote){ cells.push(cur.trim()); cur=''; }
+      else { cur+=ch; }
+    }
+    cells.push(cur.trim());
+    return {c: cells.map(function(v){ return {v:v}; })};
+  });
+  processarLinhasSheet(rows, [], abaNome);
 }
 
 function processarLinhasSheet(rows, cols, abaNome){
