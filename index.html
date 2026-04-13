@@ -411,9 +411,12 @@ textarea.form-input{resize:vertical;min-height:80px}
 </div>
     <button class="btn-login" id="btn-entrar">ENTRAR</button>
     <div class="login-err" id="login-err"></div>
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px">
       <button onclick="showCadastro()" type="button" style="width:100%;background:none;border:1px solid var(--border2);border-radius:12px;padding:12px;color:var(--text2);font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">
         Primeiro acesso? <strong>Criar conta</strong>
+      </button>
+      <button onclick="esqueceuSenha()" type="button" style="width:100%;background:none;border:none;color:var(--text3);font-family:DM Sans,sans-serif;font-size:12px;cursor:pointer;padding:4px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--text3)'">
+        Esqueci minha senha
       </button>
     </div>
   </div>
@@ -6176,11 +6179,21 @@ function renderUsuarios(){
     var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:5px 10px;font-size:12px';
     eb.textContent='Editar';
     (function(uid){eb.onclick=function(){openModalUsuario(uid);};})(u.id);
+    var rb=document.createElement('button');rb.className='btn-ghost';rb.style='padding:5px 10px;font-size:12px;color:#f59e0b;border-color:#f59e0b44';
+    rb.textContent='Reenviar acesso';
+    (function(uemail){rb.onclick=function(){reenviarAcesso(uemail);};})(u.email);
     var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';
     db2.textContent='Excluir';
     (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
-    actions.appendChild(eb);actions.appendChild(db2);
+    actions.appendChild(eb);actions.appendChild(rb);actions.appendChild(db2);
 
+    // Reenviar senha button
+    var reenvBtn = document.createElement('button');
+    reenvBtn.className = 'btn-ghost';
+    reenvBtn.style = 'padding:5px 10px;font-size:11px;color:var(--blue)';
+    reenvBtn.textContent = 'Reenviar acesso';
+    (function(email){ reenvBtn.onclick = function(){ reenviarAcesso(email); }; })(u.email);
+    actions.insertBefore(reenvBtn, actions.firstChild);
     card.appendChild(av);card.appendChild(info);card.appendChild(badge);card.appendChild(actions);
     el.appendChild(card);
   });
@@ -7309,6 +7322,121 @@ function abrirChamado(){
     setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},4000);
     loadChamados();
   }).catch(function(e){ alert('Erro: '+e.message); });
+}
+
+
+// ── Recuperação de Senha ──────────────────────────────────
+function esqueceuSenha(){
+  var email = document.getElementById('login-email').value.trim();
+  if(!email){
+    // Show input for email
+    var emailInput = prompt('Digite seu email cadastrado:');
+    if(!emailInput) return;
+    email = emailInput.trim();
+  }
+  if(!email){ alert('Digite seu email primeiro.'); return; }
+  auth.sendPasswordResetEmail(email).then(function(){
+    var err = document.getElementById('login-err');
+    if(err){
+      err.textContent = 'Email de redefinição enviado para ' + email + '. Verifique sua caixa de entrada.';
+      err.style.color = '#22c55e';
+    }
+  }).catch(function(e){
+    var msg = 'Erro ao enviar email.';
+    if(e.code==='auth/user-not-found') msg = 'Email não encontrado. Verifique se está correto.';
+    if(e.code==='auth/invalid-email') msg = 'Email inválido.';
+    var err = document.getElementById('login-err');
+    if(err){ err.textContent = msg; err.style.color = '#ef4444'; }
+  });
+}
+
+function reenviarAcesso(email){
+  if(!confirm('Enviar email de redefinição de senha para ' + email + '?')) return;
+  auth.sendPasswordResetEmail(email).then(function(){
+    var s = document.createElement('div');
+    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent = 'Email de acesso enviado para ' + email;
+    document.body.appendChild(s);
+    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 4000);
+  }).catch(function(e){
+    alert('Erro: ' + e.message);
+  });
+}
+
+
+// ── Esqueci minha senha ───────────────────────────────────
+function esqueciSenha(){
+  var email = document.getElementById('login-email').value.trim();
+  if(!email){
+    // Show inline input for email
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.cssText = 'display:flex;z-index:300';
+    overlay.onclick = function(e){ if(e.target===overlay) overlay.parentNode.removeChild(overlay); };
+    var box = document.createElement('div');
+    box.className = 'modal modal-sm';
+    var mh = document.createElement('div');mh.className='modal-header';
+    var mt = document.createElement('div');mt.className='modal-title';mt.textContent='Redefinir Senha';
+    var mc = document.createElement('button');mc.className='modal-close';mc.textContent='×';
+    mc.onclick=function(){overlay.parentNode.removeChild(overlay);};
+    mh.appendChild(mt);mh.appendChild(mc);box.appendChild(mh);
+    var body = document.createElement('div');body.style='padding:16px';
+    var desc = document.createElement('p');
+    desc.style='font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5';
+    desc.textContent='Informe o email cadastrado e enviaremos um link para redefinir sua senha.';
+    body.appendChild(desc);
+    var input = document.createElement('input');
+    input.type='email';input.className='login-input';input.placeholder='Seu email...';
+    input.style='margin-bottom:12px';
+    body.appendChild(input);
+    var errEl = document.createElement('div');
+    errEl.style='font-size:12px;color:#ef4444;margin-bottom:12px;display:none';
+    body.appendChild(errEl);
+    var sendBtn = document.createElement('button');
+    sendBtn.className='btn-login';sendBtn.textContent='Enviar link';
+    sendBtn.onclick=function(){
+      var e=input.value.trim();
+      if(!e){errEl.textContent='Informe seu email.';errEl.style.display='block';return;}
+      sendBtn.textContent='Enviando...';sendBtn.disabled=true;
+      auth.sendPasswordResetEmail(e).then(function(){
+        body.innerHTML='<div style="text-align:center;padding:20px">'
+          +'<div style="font-size:40px;margin-bottom:12px">✉️</div>'
+          +'<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);margin-bottom:8px">Email enviado!</div>'
+          +'<div style="font-size:13px;color:var(--text2);line-height:1.5">Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.</div></div>';
+      }).catch(function(err){
+        sendBtn.textContent='Enviar link';sendBtn.disabled=false;
+        if(err.code==='auth/user-not-found') errEl.textContent='Email não encontrado.';
+        else errEl.textContent='Erro: '+err.message;
+        errEl.style.display='block';
+      });
+    };
+    body.appendChild(sendBtn);
+    box.appendChild(body);overlay.appendChild(box);document.body.appendChild(overlay);
+  } else {
+    // Email already filled in login form
+    auth.sendPasswordResetEmail(email).then(function(){
+      var err = document.getElementById('login-err');
+      err.style.color='#22c55e';
+      err.textContent='Email de redefinição enviado para '+email+'. Verifique sua caixa de entrada.';
+    }).catch(function(e){
+      var err = document.getElementById('login-err');
+      err.textContent = e.code==='auth/user-not-found' ? 'Email não encontrado.' : 'Erro: '+e.message;
+    });
+  }
+}
+
+// ── Reenviar acesso (ADM) ─────────────────────────────────
+function reenviarAcesso(email){
+  if(!confirm('Enviar email de redefinição de senha para '+email+'?')) return;
+  auth.sendPasswordResetEmail(email).then(function(){
+    var s=document.createElement('div');
+    s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent='Email enviado para '+email+'!';
+    document.body.appendChild(s);
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},4000);
+  }).catch(function(e){
+    alert('Erro: '+e.message);
+  });
 }
 
 </script>
