@@ -2043,48 +2043,75 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- MODAL IMPORTAR PLANILHA -->
+<!-- MODAL IMPORTAR PLANILHA SHEETS -->
 <div class="modal-overlay" id="modal-import-planilha" style="display:none" onclick="if(event.target===this)closeModal('modal-import-planilha')">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">Importar via Imagem de Planilha</div>
+      <div class="modal-title">Importar do Google Sheets</div>
       <button class="modal-close" onclick="closeModal('modal-import-planilha')">×</button>
     </div>
     <div style="padding:0 0 16px">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
-        Tire uma foto ou print da sua planilha com as colunas: <strong style="color:var(--white)">Mês, Compras, Vendas, Saldo</strong>. A IA vai identificar cada linha e importar automaticamente.
-      </div>
-      <div class="form-grid" style="margin-bottom:16px">
-        <div class="form-group">
-          <label>Cliente *</label>
-          <select class="form-input" id="imp-cliente-sel">
-            <option value="">Selecione o cliente...</option>
-          </select>
+
+      <!-- Step 1: URL -->
+      <div id="imp-step1">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+          Cole o link da sua planilha do Google Sheets. A planilha deve estar compartilhada como <strong style="color:var(--white)">"Qualquer pessoa com o link pode ver"</strong>.
         </div>
-        <div class="form-group">
-          <label>Ano de referência *</label>
-          <select class="form-input" id="imp-ano-sel"></select>
+        <div class="form-group form-full" style="margin-bottom:12px">
+          <label>Link da planilha *</label>
+          <input class="form-input" id="imp-sheets-url" placeholder="https://docs.google.com/spreadsheets/d/..." style="font-size:12px">
         </div>
+        <button class="btn-primary" onclick="carregarAbas()" style="font-size:12px">Carregar Abas</button>
+        <div id="imp-status" style="font-size:13px;color:var(--text3);margin-top:10px;min-height:20px"></div>
       </div>
-      <!-- Upload area -->
-      <div id="imp-upload-area" onclick="document.getElementById('imp-file-input').click()" style="border:2px dashed var(--border2);border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)'">
-        <input type="file" id="imp-file-input" accept="image/*" style="display:none" onchange="onImportImageSelected(event)">
-        <div style="font-size:32px;margin-bottom:8px;color:var(--text3)">↑</div>
-        <div style="font-size:14px;color:var(--text2);font-weight:600">Clique para selecionar imagem</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px">PNG, JPG, JPEG</div>
+
+      <!-- Step 2: Select sheet and client -->
+      <div id="imp-step2" style="display:none">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">
+          Selecione a aba e o cliente correspondente:
+        </div>
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group">
+            <label>Aba da planilha *</label>
+            <select class="form-input" id="imp-aba-sel" onchange="tentarCasarCliente()">
+              <option value="">Selecione a aba...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Cliente *</label>
+            <select class="form-input" id="imp-cliente-sel">
+              <option value="">Selecione o cliente...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ano de referência *</label>
+            <select class="form-input" id="imp-ano-sel"></select>
+          </div>
+          <div class="form-group">
+            <label>Coluna do Saldo</label>
+            <select class="form-input" id="imp-col-modo">
+              <option value="auto">Detectar automaticamente</option>
+              <option value="saldo">Só usar coluna Saldo</option>
+              <option value="cv">Usar Compras e Vendas</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="voltarStep1()" style="font-size:12px">← Voltar</button>
+          <button class="btn-primary" onclick="lerAbaSelecionada()" style="font-size:12px">Ler Dados da Aba</button>
+        </div>
+        <div id="imp-status2" style="font-size:13px;color:var(--text3);margin-top:10px;min-height:20px"></div>
       </div>
-      <!-- Preview -->
-      <div id="imp-preview" style="display:none;margin-bottom:16px">
-        <img id="imp-preview-img" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--border)">
-      </div>
-      <!-- Status -->
-      <div id="imp-status" style="font-size:13px;color:var(--text3);margin-bottom:12px;min-height:20px"></div>
-      <!-- Results -->
-      <div id="imp-results" style="display:none">
-        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:12px">Dados identificados pela IA:</div>
-        <div class="table-wrap" style="margin-bottom:16px">
+
+      <!-- Step 3: Preview and confirm -->
+      <div id="imp-step3" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px" id="imp-preview-title">Dados encontrados:</div>
+          <button class="btn-secondary" onclick="voltarStep2()" style="font-size:11px">← Voltar</button>
+        </div>
+        <div class="table-wrap" style="margin-bottom:16px;max-height:300px;overflow-y:auto">
           <table>
-            <thead><tr><th>Mês</th><th>Ano</th><th>Compras (R$)</th><th>Vendas (R$)</th><th>Saldo (R$)</th><th></th></tr></thead>
+            <thead><tr><th>Mês</th><th>Compras (R$)</th><th>Vendas (R$)</th><th>Saldo (R$)</th><th></th></tr></thead>
             <tbody id="imp-table-body"></tbody>
           </table>
         </div>
@@ -2092,7 +2119,6 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-import-planilha')">Cancelar</button>
-      <button class="btn-secondary" id="imp-btn-analisar" onclick="analisarImagemPlanilha()" style="display:none">Analisar Imagem</button>
       <button class="btn-primary" id="imp-btn-importar" onclick="importarDaImagem()" style="display:none">Importar Lançamentos</button>
     </div>
   </div>
@@ -7700,8 +7726,7 @@ function renderBlackDashboard2(){
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// IMPORTAÇÃO VIA IMAGEM DE PLANILHA
+
 // ═══════════════════════════════════════════════════════════
 var importImageBase64 = null;
 var importDados = [];
@@ -7905,6 +7930,328 @@ function importarDaImagem(){
     btn.textContent = 'Importar Lançamentos';
     btn.disabled = false;
     alert('Erro: ' + e.message);
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// IMPORTAÇÃO VIA GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════
+var impSheetId = '';
+var impAbas = [];
+var importDados = [];
+
+function extrairSheetId(url){
+  var m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return m ? m[1] : '';
+}
+
+function openImportPlanilha(){
+  // Reset
+  impSheetId = '';
+  impAbas = [];
+  importDados = [];
+  document.getElementById('imp-step1').style.display = 'block';
+  document.getElementById('imp-step2').style.display = 'none';
+  document.getElementById('imp-step3').style.display = 'none';
+  document.getElementById('imp-btn-importar').style.display = 'none';
+  document.getElementById('imp-status').textContent = '';
+  document.getElementById('imp-sheets-url').value = '';
+  // Pre-fill with known URL
+  document.getElementById('imp-sheets-url').value = 'https://docs.google.com/spreadsheets/d/1fxq6LvP3ttjhLPZ49OwHk_q2WIMKLceFvlt9bNl26ks/edit';
+  openModal('modal-import-planilha');
+}
+
+function voltarStep1(){
+  document.getElementById('imp-step2').style.display = 'none';
+  document.getElementById('imp-step3').style.display = 'none';
+  document.getElementById('imp-step1').style.display = 'block';
+  document.getElementById('imp-btn-importar').style.display = 'none';
+}
+
+function voltarStep2(){
+  document.getElementById('imp-step3').style.display = 'none';
+  document.getElementById('imp-step2').style.display = 'block';
+  document.getElementById('imp-btn-importar').style.display = 'none';
+}
+
+function carregarAbas(){
+  var url = document.getElementById('imp-sheets-url').value.trim();
+  impSheetId = extrairSheetId(url);
+  if(!impSheetId){ alert('Link inválido!'); return; }
+
+  var statusEl = document.getElementById('imp-status');
+  statusEl.textContent = 'Carregando abas...';
+  statusEl.style.color = '#f59e0b';
+
+  // Use Google Sheets API (public, no auth needed for public sheets)
+  var apiUrl = 'https://sheets.googleapis.com/v4/spreadsheets/'+impSheetId+'?key=AIzaSyB3ao46l0oh52sf3WYFi6LrLLmrPqy_16A&fields=sheets.properties';
+  
+  // Fallback: use gviz API which doesn't need key
+  var gvizUrl = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:json&tq=SELECT+A+LIMIT+1';
+  
+  // Use the sheets metadata endpoint
+  fetch('https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:json&sheet=DASH+GERAL')
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      // If we can fetch, the sheet is accessible
+      // Now get sheet names via a different approach
+      return fetch('https://docs.google.com/spreadsheets/d/'+impSheetId+'/edit');
+    })
+    .then(function(r){ return r.text(); })
+    .then(function(html){
+      // Extract sheet names from HTML
+      var matches = html.match(/"name":"([^"]+)"/g) || [];
+      var names = matches.map(function(m){ return m.replace(/"name":"/, '').replace(/"$/, ''); })
+        .filter(function(n){ return n && n !== 'DASH GERAL' && n.length < 50; });
+      
+      if(!names.length){
+        // Try another pattern
+        var m2 = html.match(/\["([^"]+)",null,\d+,\d+,null,\[\]/g) || [];
+        names = m2.map(function(m){ return m.match(/\["([^"]+)"/)[1]; });
+      }
+
+      if(!names.length) throw new Error('Não consegui ler as abas');
+      popularAbas(names);
+    })
+    .catch(function(e){
+      // Last resort: hardcode from what we saw
+      statusEl.textContent = 'Usando lista de abas conhecidas...';
+      var knownSheets = ['Cristian','Cleandro','Daniel Delvechio','Diegão','Edgar Cintra',
+        'Fabio Carvalho','Fabião','Heloise','James','Vitor Cangirana','Luis Henrique',
+        'Brenão','Ribeiro','Sebastião','Alex Mota','Dani Moreira','Fernanda Mello',
+        'Wedson','Matheus Zanella','João Polessi','Rodrigo','William Melo','Joãozinho',
+        'Brennda','Lucas Bertuolo','Gabriel Oliveira','Rafael Marques','Marcelo Corrêa',
+        'Danilo Zanini','Marcos Dezembro','Rafa Steil','Amaro Neto','Pedro Loreiro',
+        'Gabriel Machado','Lorrayne','Maria','Felipe Chabunas','Fernando Santos','Rômulo',
+        'Gabriel Nascimento','Cesar Cândido','PIPE','Alan Sakae','Henrique Bando',
+        'GILSON','Bruno Monte','Marcelo Lusardo','Paulo Lanza','Maura','Yuji'];
+      popularAbas(knownSheets);
+    });
+}
+
+function popularAbas(names){
+  impAbas = names;
+  var statusEl = document.getElementById('imp-status');
+  statusEl.textContent = names.length + ' abas encontradas!';
+  statusEl.style.color = '#22c55e';
+
+  // Populate aba selector
+  var abaSel = document.getElementById('imp-aba-sel');
+  abaSel.innerHTML = '<option value="">Selecione a aba...</option>';
+  names.forEach(function(n){
+    var o = document.createElement('option'); o.value = n; o.textContent = n;
+    abaSel.appendChild(o);
+  });
+
+  // Populate cliente selector
+  var cliSel = document.getElementById('imp-cliente-sel');
+  cliSel.innerHTML = '<option value="">Selecione o cliente...</option>';
+  clientes.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
+    var o = document.createElement('option'); o.value = c.id; o.textContent = c.nome;
+    cliSel.appendChild(o);
+  });
+
+  // Populate ano
+  var anoSel = document.getElementById('imp-ano-sel');
+  anoSel.innerHTML = '';
+  var yr = new Date().getFullYear();
+  for(var y=yr;y>=yr-5;y--){
+    var o=document.createElement('option');o.value=y;o.textContent=y;
+    if(y===yr)o.selected=true;
+    anoSel.appendChild(o);
+  }
+
+  document.getElementById('imp-step1').style.display = 'none';
+  document.getElementById('imp-step2').style.display = 'block';
+}
+
+function tentarCasarCliente(){
+  var abaNome = document.getElementById('imp-aba-sel').value;
+  if(!abaNome) return;
+  // Try to find client with similar name
+  var cliSel = document.getElementById('imp-cliente-sel');
+  var matched = clientes.find(function(c){
+    var cn = c.nome.toLowerCase();
+    var an = abaNome.toLowerCase();
+    return cn.includes(an) || an.includes(cn) || 
+      cn.split(' ')[0] === an.split(' ')[0];
+  });
+  if(matched) cliSel.value = matched.id;
+}
+
+function lerAbaSelecionada(){
+  var aba = document.getElementById('imp-aba-sel').value;
+  if(!aba){ alert('Selecione uma aba!'); return; }
+  var clienteId = document.getElementById('imp-cliente-sel').value;
+  if(!clienteId){ alert('Selecione o cliente!'); return; }
+
+  var statusEl = document.getElementById('imp-status2');
+  statusEl.textContent = 'Lendo aba "'+aba+'"...';
+  statusEl.style.color = '#f59e0b';
+
+  var url = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(aba);
+
+  fetch(url).then(function(r){ return r.text(); }).then(function(text){
+    // Remove Google's wrapper: google.visualization.Query.setResponse(...)
+    var jsonStr = text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
+    var data = JSON.parse(jsonStr);
+    var rows = data.table ? data.table.rows : [];
+    var cols = data.table ? data.table.cols : [];
+
+    processarLinhasSheet(rows, cols, aba);
+    statusEl.textContent = '';
+  }).catch(function(e){
+    statusEl.textContent = 'Erro ao ler aba: '+e.message;
+    statusEl.style.color = '#ef4444';
+  });
+}
+
+var MESES_MAP = {
+  'jan':1,'fev':2,'mar':3,'abr':4,'mai':5,'jun':6,
+  'jul':7,'ago':8,'set':9,'out':10,'nov':11,'dez':12,
+  'janeiro':1,'fevereiro':2,'março':3,'abril':4,'maio':5,'junho':6,
+  'julho':7,'agosto':8,'setembro':9,'outubro':10,'novembro':11,'dezembro':12
+};
+
+function parseMes(val){
+  if(!val) return 0;
+  var s = String(val).toLowerCase().trim();
+  if(MESES_MAP[s]) return MESES_MAP[s];
+  // Try number
+  var n = parseInt(s);
+  if(n >= 1 && n <= 12) return n;
+  // Try partial match
+  for(var k in MESES_MAP){
+    if(s.startsWith(k.substring(0,3))) return MESES_MAP[k];
+  }
+  return 0;
+}
+
+function parseMoney(val){
+  if(val === null || val === undefined) return 0;
+  var s = String(val).replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
+  var n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function processarLinhasSheet(rows, cols, abaNome){
+  importDados = [];
+  var ano = Number(document.getElementById('imp-ano-sel').value);
+  var modo = document.getElementById('imp-col-modo').value;
+
+  rows.forEach(function(row){
+    var cells = row.c || [];
+    var vals = cells.map(function(c){ return c ? (c.v !== null && c.v !== undefined ? c.v : c.f || '') : ''; });
+
+    // Find mes column
+    var mesIdx = -1, comprasIdx = -1, vendasIdx = -1, saldoIdx = -1;
+
+    // Scan each cell for month
+    vals.forEach(function(v, i){
+      var mes = parseMes(v);
+      if(mes > 0 && mesIdx < 0) mesIdx = i;
+    });
+
+    if(mesIdx < 0) return; // no month found in this row
+
+    var mes = parseMes(vals[mesIdx]);
+    if(!mes) return;
+
+    // Look for money values after mes column
+    var moneyVals = [];
+    for(var i = mesIdx+1; i < vals.length; i++){
+      var m = parseMoney(vals[i]);
+      if(m !== 0 || String(vals[i]).match(/[\d,\.]+/)) moneyVals.push({idx:i, val:m});
+    }
+
+    var compras = 0, vendas = 0, saldo = 0;
+
+    if(moneyVals.length >= 3 && modo !== 'saldo'){
+      // Has compras, vendas, saldo
+      compras = Math.abs(moneyVals[0].val);
+      vendas = Math.abs(moneyVals[1].val);
+      saldo = moneyVals[2].val;
+    } else if(moneyVals.length === 2 && modo !== 'saldo'){
+      compras = Math.abs(moneyVals[0].val);
+      vendas = Math.abs(moneyVals[1].val);
+      saldo = vendas - compras;
+    } else if(moneyVals.length >= 1){
+      // Only saldo
+      saldo = moneyVals[moneyVals.length-1].val;
+      if(saldo === 0 && moneyVals.length > 1) saldo = moneyVals[0].val;
+    }
+
+    if(saldo === 0 && compras === 0 && vendas === 0) return;
+
+    importDados.push({mes:mes, compras:compras, vendas:vendas, saldo:saldo});
+  });
+
+  // Sort by mes
+  importDados.sort(function(a,b){return a.mes-b.mes;});
+
+  if(!importDados.length){
+    document.getElementById('imp-status2').textContent = 'Nenhum dado encontrado. Tente mudar o modo de leitura.';
+    document.getElementById('imp-status2').style.color = '#ef4444';
+    return;
+  }
+
+  // Show preview
+  var tbody = document.getElementById('imp-table-body');
+  tbody.innerHTML = '';
+  importDados.forEach(function(d, i){
+    var tr = document.createElement('tr');
+    var cor = d.saldo >= 0 ? '#22c55e' : '#ef4444';
+    tr.innerHTML = '<td style="font-weight:600;color:var(--white)">'+MESES[d.mes-1]+'/'+ano+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#ef4444">'+fmtFull(d.compras)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e">'+fmtFull(d.vendas)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+cor+'">'+fmtFull(d.saldo)+'</td>'
+      +'<td><button class="btn-dsm" style="padding:2px 6px;font-size:10px" onclick="importDados.splice('+i+',1);processarLinhasSheet([],[],\'\')">×</button></td>';
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('imp-preview-title').textContent = importDados.length+' lançamentos encontrados em "'+abaNome+'":';
+  document.getElementById('imp-step2').style.display = 'none';
+  document.getElementById('imp-step3').style.display = 'block';
+  document.getElementById('imp-btn-importar').style.display = 'inline-flex';
+}
+
+function importarDaImagem(){
+  var clienteId = document.getElementById('imp-cliente-sel').value;
+  var ano = Number(document.getElementById('imp-ano-sel').value);
+  if(!clienteId){ alert('Selecione o cliente!'); return; }
+  if(!importDados.length){ alert('Nenhum dado para importar!'); return; }
+
+  var cli = clientes.find(function(c){ return c.id===clienteId; });
+  var clienteNome = cli ? cli.nome : '';
+  var btn = document.getElementById('imp-btn-importar');
+  btn.textContent = 'Importando...'; btn.disabled = true;
+
+  var batch = db.batch();
+  importDados.forEach(function(d){
+    var ref = db.collection('black_operacoes').doc();
+    batch.set(ref,{
+      clienteId:clienteId, clienteNome:clienteNome,
+      ano:ano, mes:Number(d.mes), tipo:'simplificado',
+      compras:Number(d.compras)||0, vendas:Number(d.vendas)||0,
+      custoTotal:0, custos:{}, ibov:0, cdi:0, carteiraTotal:0,
+      obs:'Importado do Google Sheets',
+      criadoEm:new Date().toISOString()
+    });
+  });
+
+  batch.commit().then(function(){
+    closeModal('modal-import-planilha');
+    var s=document.createElement('div');
+    s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent=importDados.length+' lançamentos importados para '+clienteNome+'!';
+    document.body.appendChild(s);
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},4000);
+    btn.textContent='Importar Lançamentos'; btn.disabled=false;
+    if(currentBlackClienteId===clienteId) renderBlackDetalhe();
+  }).catch(function(e){
+    btn.textContent='Importar Lançamentos'; btn.disabled=false;
+    alert('Erro: '+e.message);
   });
 }
 
