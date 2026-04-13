@@ -3236,9 +3236,9 @@ function renderBlackDetalhe(){
       var vb=document.createElement('button');vb.className='btn-ghost';vb.style='padding:4px 8px;font-size:11px';vb.textContent='Pernas';
       (function(o){vb.onclick=function(){showPernas(o);};})(op);div.appendChild(vb);
     }
-    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.innerHTML=''+icon('edit')+'';
+    var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='Editar';
     (function(o){eb.onclick=function(){editBlackOp(o);};})(op);
-    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.innerHTML=''+icon('trash')+'';
+    var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:4px 8px;font-size:11px';db2.textContent='Excluir';
     (function(oid){db2.onclick=function(){confirmDelete(function(){db.collection('black_operacoes').doc(oid).delete();});};})(op.id);
     div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
@@ -3557,7 +3557,7 @@ function editBlackOp(op){
       addPerna();var i=pernaCount;
       document.getElementById('p'+i+'-cv').value=p.cv||'V';
       document.getElementById('p'+i+'-codigo').value=p.codigo||'';
-      document.getElementById('p'+i+'-especificacao').value=p.especificacao||'';
+      // especificacao removed
       document.getElementById('p'+i+'-mes-venc').value=p.mesVenc||'';
       document.getElementById('p'+i+'-qtde').value=p.quantidade||'';
       document.getElementById('p'+i+'-premio').value=p.premio||'';
@@ -3792,9 +3792,9 @@ function renderComunicados(){
       var wrap=card.querySelector('[id="cact-placeholder"]');
       if(wrap) wrap.id='cact-'+cid;
       wrap=card.querySelector('#cact-'+cid);
-      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent=''+icon('edit')+'';
+      var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='Editar';
       eb.onclick=function(){editComunicado(cid);};
-      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent=''+icon('trash')+'';
+      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='Excluir';
       db.onclick=function(){deleteComunicado(cid);};
       if(wrap){wrap.appendChild(eb);wrap.appendChild(db);}
     })(c.id);
@@ -4052,7 +4052,7 @@ function renderReunioes(){
       +'<div id="reu-del-'+r.id+'"></div>'
       +'</div>';
     (function(rid){
-      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent=''+icon('trash')+'';
+      var dbtn=document.createElement('button');dbtn.className='btn-dsm';dbtn.style='padding:3px 8px;font-size:11px';dbtn.textContent='Excluir';
       dbtn.onclick=function(){db.collection('reunioes').doc(rid).delete();};
       var wrap=row.querySelector('#reu-del-'+rid);
       if(wrap)wrap.appendChild(dbtn);
@@ -4282,13 +4282,13 @@ function renderGrupos(){
     var editBtn = document.createElement('button');
     editBtn.className='btn-ghost';
     editBtn.style='padding:8px 10px;font-size:12px';
-    editBtn.textContent=''+icon('edit')+'';
+    editBtn.textContent='Editar';
     (function(gid){ editBtn.onclick=function(){ openModalGrupo(gid); }; })(g.id);
 
     var delBtn = document.createElement('button');
     delBtn.className='btn-dsm';
     delBtn.style='padding:8px 10px;font-size:12px';
-    delBtn.textContent=''+icon('trash')+'';
+    delBtn.textContent='Excluir';
     (function(gid){ delBtn.onclick=function(){ confirmDelete(function(){ db.collection('wa_grupos').doc(gid).delete(); }); }; })(g.id);
 
     actions.appendChild(sendBtn);
@@ -6627,7 +6627,7 @@ function renderAtivosCliente(ativos){
       +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(a.tipo||'')+(a.quantidade?' · Qtd: '+a.quantidade:'')+(a.precoMedio?' · PM: '+fmtFull(a.precoMedio):'')+'</div></div>'
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:14px;font-weight:600">'+fmtFull(valorTotal)+'</div>';
-    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent=''+icon('trash')+'';
+    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='Excluir';
     (function(aid){delBtn.onclick=function(){
       confirmDelete(function(){
         db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
