@@ -771,10 +771,11 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="page-title" id="black-detalhe-title">—</div>
           <div class="page-sub" id="black-detalhe-sub">—</div>
         </div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-secondary" onclick="openModalBlackLanc('simplificado')">+ Simplificado</button>
           <button class="btn-secondary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
-          <button class="btn-primary" onclick="openModalBlackNota()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nota de Corretagem</button>
+          <button class="btn-secondary" onclick="openImportPlanilha()">Importar Planilha</button>
+          <button class="btn-primary" onclick="openModalBlackNota()">Nota de Corretagem</button>
         </div>
       </div>
       <div class="page-content" style="padding-top:20px">
