@@ -6937,15 +6937,30 @@ function calcPayoff(){
       breakevens.push((minPrice+(i-0.5)*(maxPrice-minPrice)/steps).toFixed(2));
     }
   }
-  // Stats
+  // Stats — detect truly naked positions
   if(statsEl) statsEl.style.display='grid';
-  var hasNakedCall=pernas.some(function(p){return p.cv==='V'&&p.tipo==='call';});
+
+  // A CALL vendida só é descoberta se não há CALL comprada com strike <= ao vendido
+  var callsVendidas = pernas.filter(function(p){return p.cv==='V'&&p.tipo==='call';});
+  var callsCompradas = pernas.filter(function(p){return p.cv==='C'&&p.tipo==='call';});
+  var putsVendidas = pernas.filter(function(p){return p.cv==='V'&&p.tipo==='put';});
+  var putsCompradas = pernas.filter(function(p){return p.cv==='C'&&p.tipo==='put';});
+
+  var nakedCall = callsVendidas.some(function(v){
+    // Naked if no bought call with strike <= sold strike (covers upside)
+    return !callsCompradas.some(function(c){ return c.strike <= v.strike; });
+  });
+  var nakedPut = putsVendidas.some(function(v){
+    // Naked if no bought put with strike >= sold strike (covers downside)
+    return !putsCompradas.some(function(c){ return c.strike >= v.strike; });
+  });
+
   var ml=document.getElementById('payoff-max-lucro');
   var mp=document.getElementById('payoff-max-perda');
   var be=document.getElementById('payoff-breakeven');
-  if(ml) ml.textContent=hasNakedCall?'Ilimitado':fmtFull(maxLucro);
-  if(mp) mp.textContent=hasNakedCall?'Ilimitado':fmtFull(Math.abs(maxPerda));
-  if(be) be.textContent=breakevens.length?'R$'+breakevens.join(' / R$'):'N/A';
+  if(ml) ml.textContent = nakedCall ? 'Ilimitado' : fmtFull(maxLucro);
+  if(mp) mp.textContent = (nakedCall||nakedPut) ? 'Ilimitado' : fmtFull(Math.abs(maxPerda));
+  if(be) be.textContent = breakevens.length ? 'R$'+breakevens.join(' / R$') : 'N/A';
   // Chart
   if(emptyEl) emptyEl.style.display='none';
   if(canvas) canvas.style.display='block';
