@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DMF · Sistema de Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -6900,9 +6901,16 @@ function getPernasData(){
 function calcPayoffAtPrice(pernas,spot){
   var total=0;
   pernas.forEach(function(p){
-    var intrinsic=p.tipo==='call'?Math.max(0,spot-p.strike):Math.max(0,p.strike-spot);
-    if(p.cv==='C') total+=(intrinsic-p.premio)*p.qtde;
-    else total+=(p.premio-intrinsic)*p.qtde;
+    if(p.tipo==='ativo'){
+      // Ativo: P&L = (spot - precoEntrada) * qtde para compra
+      // precoEntrada = strike (usamos strike como preço de entrada)
+      if(p.cv==='C') total+=(spot-p.strike)*p.qtde;
+      else total+=(p.strike-spot)*p.qtde;
+    } else {
+      var intrinsic=p.tipo==='call'?Math.max(0,spot-p.strike):Math.max(0,p.strike-spot);
+      if(p.cv==='C') total+=(intrinsic-p.premio)*p.qtde;
+      else total+=(p.premio-intrinsic)*p.qtde;
+    }
   });
   return Number(total.toFixed(2));
 }
@@ -6979,7 +6987,28 @@ function calcPayoff(){
         tooltip:{callbacks:{
           label:function(ctx){return 'P&L: '+fmtFull(ctx.parsed.y);},
           title:function(ctx){return 'Ativo: R$'+ctx[0].label;}
-        }}
+        }},
+        annotation:{
+          annotations:{
+            spotLine:{
+              type:'line',
+              xMin: spot.toFixed(2),
+              xMax: spot.toFixed(2),
+              borderColor:'#f59e0b',
+              borderWidth:2,
+              borderDash:[6,3],
+              label:{
+                content:'R$'+spot.toFixed(2),
+                enabled:true,
+                position:'start',
+                backgroundColor:'#f59e0b',
+                color:'#000',
+                font:{size:10,weight:'bold'},
+                padding:{x:6,y:3}
+              }
+            }
+          }
+        }
       },
       scales:{
         x:{ticks:{color:'#4a6080',font:{size:10},maxTicksLimit:8,callback:function(v){return 'R$'+this.getLabelForValue(v);}},grid:{color:'#0e2040'}},
@@ -7029,13 +7058,17 @@ function addPayoffPerna(dados){
     }
     input.id = 'payoff-perna-'+id+'-'+suffix;
     input.oninput = calcPayoff;
-    input.onchange = calcPayoff;
+    if(suffix==='tipo'){
+      input.onchange = function(){ updatePayoffLabels(id); calcPayoff(); };
+    } else {
+      input.onchange = calcPayoff;
+    }
     wrap.appendChild(input);
     return wrap;
   }
 
   row.appendChild(makeField('C/V','cv','select',[{v:'C',l:'Compra'},{v:'V',l:'Venda'}],d.cv));
-  row.appendChild(makeField('Tipo','tipo','select',[{v:'call',l:'CALL'},{v:'put',l:'PUT'}],d.tipo));
+  row.appendChild(makeField('Tipo','tipo','select',[{v:'call',l:'CALL'},{v:'put',l:'PUT'},{v:'ativo',l:'Ativo'}],d.tipo));
   row.appendChild(makeField('Strike','strike','number',[],d.strike));
   row.appendChild(makeField('Qtde','qtde','number',[],d.qtde));
   row.appendChild(makeField('Prêmio','premio','number',[],d.premio));
@@ -7085,6 +7118,24 @@ function getPernasData(){
     var premio=parseFloat((document.getElementById('payoff-perna-'+id+'-premio')||{value:0}).value)||0;
     return {cv:cv,tipo:tipo,strike:strike,qtde:qtde,premio:premio};
   }).filter(function(p){return p.strike>0;});
+}
+
+
+function updatePayoffLabels(id){
+  var tipo = (document.getElementById('payoff-perna-'+id+'-tipo')||{value:'call'}).value;
+  var strikeLbl = document.querySelector('#payoff-perna-'+id+' label[for-field="strike"]');
+  var premioLbl = document.querySelector('#payoff-perna-'+id+' label[for-field="premio"]');
+  // Find labels by position in the row
+  var row = document.getElementById('payoff-perna-'+id);
+  if(!row) return;
+  var labels = row.querySelectorAll('label');
+  // labels: C/V, Tipo, Strike, Qtde, Prêmio
+  if(labels[2]) labels[2].textContent = tipo==='ativo' ? 'Preço Entrada' : 'Strike';
+  if(labels[4]) labels[4].textContent = tipo==='ativo' ? 'Custo (R$)' : 'Prêmio (R$)';
+  // Hide premio field for ativo (no premium, it's already in the PnL)
+  var premioInput = document.getElementById('payoff-perna-'+id+'-premio');
+  var premioWrap = premioInput ? premioInput.parentNode : null;
+  if(premioWrap) premioWrap.style.opacity = tipo==='ativo' ? '0.3' : '1';
 }
 
 </script>
