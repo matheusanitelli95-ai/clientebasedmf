@@ -1135,7 +1135,7 @@ textarea.form-input{resize:vertical;min-height:80px}
                 <option value="30">±30%</option>
                 <option value="50">±50%</option>
               </select>
-              <button class="btn-secondary" onclick="addPerna()" style="font-size:11px;padding:5px 10px">+ Perna</button>
+              <button class="btn-secondary" onclick="addPayoffPerna()" style="font-size:11px;padding:5px 10px">+ Perna</button>
               <button class="btn-primary" onclick="calcPayoff()" style="font-size:11px;padding:5px 10px">Calcular</button>
               <button class="btn-ghost" onclick="limparPayoff()" style="font-size:11px;padding:5px 10px">Limpar</button>
             </div>
@@ -6972,6 +6972,104 @@ function calcPayoff(){
       }
     }
   });
+}
+
+
+// ── Payoff Perna Management ───────────────────────────────
+var payoffPernas = [];
+var payoffPernaId = 0;
+var payoffChart = null;
+
+function addPayoffPerna(dados){
+  payoffPernaId++;
+  var id = payoffPernaId;
+  var d = dados || {tipo:'call', cv:'C', strike:30, qtde:1000, premio:1.00};
+  var row = document.createElement('div');
+  row.id = 'payoff-perna-'+id;
+  row.style = 'display:grid;grid-template-columns:90px 80px 90px 90px 90px 28px;gap:6px;align-items:end;margin-bottom:6px';
+
+  function makeField(label, suffix, type, opts, val){
+    var wrap = document.createElement('div');
+    var lbl = document.createElement('label');
+    lbl.style = 'font-size:10px;color:var(--text3);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em;font-weight:700';
+    lbl.textContent = label;
+    wrap.appendChild(lbl);
+    var input;
+    if(type==='select'){
+      input = document.createElement('select');
+      input.className = 'filter-input';
+      input.style = 'width:100%;font-size:11px;padding:5px 7px';
+      opts.forEach(function(o){
+        var opt = document.createElement('option');
+        opt.value=o.v; opt.textContent=o.l;
+        if(o.v===val) opt.selected=true;
+        input.appendChild(opt);
+      });
+    } else {
+      input = document.createElement('input');
+      input.type = type; input.step = '0.01';
+      input.className = 'filter-input';
+      input.style = 'width:100%;font-size:11px;padding:5px 7px';
+      input.value = val;
+    }
+    input.id = 'payoff-perna-'+id+'-'+suffix;
+    input.oninput = calcPayoff;
+    input.onchange = calcPayoff;
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  row.appendChild(makeField('C/V','cv','select',[{v:'C',l:'Compra'},{v:'V',l:'Venda'}],d.cv));
+  row.appendChild(makeField('Tipo','tipo','select',[{v:'call',l:'CALL'},{v:'put',l:'PUT'}],d.tipo));
+  row.appendChild(makeField('Strike','strike','number',[],d.strike));
+  row.appendChild(makeField('Qtde','qtde','number',[],d.qtde));
+  row.appendChild(makeField('Prêmio','premio','number',[],d.premio));
+
+  var delWrap = document.createElement('div');
+  var delBtn = document.createElement('button');
+  delBtn.className = 'btn-dsm';
+  delBtn.style = 'width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center';
+  delBtn.textContent = '×';
+  (function(pid){ delBtn.onclick = function(){ removePayoffPerna(pid); }; })(id);
+  delWrap.appendChild(delBtn);
+  row.appendChild(delWrap);
+
+  document.getElementById('payoff-pernas').appendChild(row);
+  payoffPernas.push(id);
+  calcPayoff();
+}
+
+function removePayoffPerna(id){
+  var el = document.getElementById('payoff-perna-'+id);
+  if(el) el.parentNode.removeChild(el);
+  payoffPernas = payoffPernas.filter(function(x){ return x!==id; });
+  calcPayoff();
+}
+
+function limparPayoff(){
+  payoffPernas.forEach(function(id){
+    var el = document.getElementById('payoff-perna-'+id);
+    if(el) el.parentNode.removeChild(el);
+  });
+  payoffPernas = []; payoffPernaId = 0;
+  if(payoffChart){ payoffChart.destroy(); payoffChart=null; }
+  var canvas=document.getElementById('payoff-chart');
+  var emptyEl=document.getElementById('payoff-empty');
+  var statsEl=document.getElementById('payoff-stats');
+  if(canvas) canvas.style.display='none';
+  if(emptyEl) emptyEl.style.display='block';
+  if(statsEl) statsEl.style.display='none';
+}
+
+function getPernasData(){
+  return payoffPernas.map(function(id){
+    var cv=(document.getElementById('payoff-perna-'+id+'-cv')||{value:'C'}).value;
+    var tipo=(document.getElementById('payoff-perna-'+id+'-tipo')||{value:'call'}).value;
+    var strike=parseFloat((document.getElementById('payoff-perna-'+id+'-strike')||{value:30}).value)||0;
+    var qtde=parseFloat((document.getElementById('payoff-perna-'+id+'-qtde')||{value:1000}).value)||0;
+    var premio=parseFloat((document.getElementById('payoff-perna-'+id+'-premio')||{value:0}).value)||0;
+    return {cv:cv,tipo:tipo,strike:strike,qtde:qtde,premio:premio};
+  }).filter(function(p){return p.strike>0;});
 }
 
 </script>
