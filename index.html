@@ -3541,9 +3541,9 @@ function editBlackOp(op){
     document.getElementById('bs-impostos').value=op.custos?op.custos.impostos||'':'';
     document.getElementById('bs-custodia').value=op.custos?op.custos.custodia||'':'';
     document.getElementById('bs-outros').value=op.custos?op.custos.outros||'':'';
-    document.getElementById('bs-ibov').value=op.ibov||'';
-    document.getElementById('bs-cdi').value=op.cdi||'';
-    document.getElementById('bs-carteira-di').value=op.carteiraTotal||'';
+    var bsIbov=document.getElementById('bs-ibov');if(bsIbov)bsIbov.value=op.ibov||'';
+    var bsCdi=document.getElementById('bs-cdi');if(bsCdi)bsCdi.value=op.cdi||'';
+    var bsCdv=document.getElementById('bs-carteira-di');if(bsCdv)bsCdv.value=op.carteiraTotal||'';
     document.getElementById('bs-obs').value=op.obs||'';
     buildYearMonthSelectors('bs-ano','bs-mes-sel','bs-mes');
     document.getElementById('bs-ano').value=op.ano;
@@ -3570,8 +3570,8 @@ function editBlackOp(op){
     document.getElementById('bd-exec').value=op.custos?op.custos.execucao||'':'';
     document.getElementById('bd-impostos').value=op.custos?op.custos.impostos||'':'';
     document.getElementById('bd-outros').value=op.custos?op.custos.outros||'':'';
-    document.getElementById('bd-ibov').value=op.ibov||'';
-    document.getElementById('bd-cdi').value=op.cdi||'';
+    var bdIbov=document.getElementById('bd-ibov');if(bdIbov)bdIbov.value=op.ibov||'';
+    var bdCdi=document.getElementById('bd-cdi');if(bdCdi)bdCdi.value=op.cdi||'';
     document.getElementById('bd-obs').value=op.obs||'';
     buildYearMonthSelectors('bd-ano','bd-mes-sel','bd-mes');
     document.getElementById('bd-ano').value=op.ano;
