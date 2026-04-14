@@ -2047,69 +2047,40 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div class="modal-overlay" id="modal-import-planilha" style="display:none" onclick="if(event.target===this)closeModal('modal-import-planilha')">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">Importar do Google Sheets</div>
+      <div class="modal-title">Importar Dados do Google Sheets</div>
       <button class="modal-close" onclick="closeModal('modal-import-planilha')">×</button>
     </div>
     <div style="padding:0 0 16px">
-
-      <!-- Step 1: URL -->
-      <div id="imp-step1">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
-          Cole o link da sua planilha do Google Sheets. A planilha deve estar compartilhada como <strong style="color:var(--white)">"Qualquer pessoa com o link pode ver"</strong>.
-        </div>
-        <div class="form-group form-full" style="margin-bottom:12px">
-          <label>Link da planilha *</label>
-          <input class="form-input" id="imp-sheets-url" placeholder="https://docs.google.com/spreadsheets/d/..." style="font-size:12px">
-        </div>
-        <button class="btn-primary" onclick="carregarAbas()" style="font-size:12px">Carregar Abas</button>
-        <div id="imp-status" style="font-size:13px;color:var(--text3);margin-top:10px;min-height:20px"></div>
+      <div style="background:#1e8fff11;border:1px solid #1e8fff33;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--white)">Como usar:</strong><br>
+        1. Abra a aba do cliente no Google Sheets<br>
+        2. Selecione todos os dados da tabela <strong style="color:var(--white)">(Ctrl+A ou selecione as células)</strong><br>
+        3. Copie <strong style="color:var(--white)">(Ctrl+C)</strong><br>
+        4. Cole aqui abaixo <strong style="color:var(--white)">(Ctrl+V)</strong>
       </div>
-
-      <!-- Step 2: Select sheet and client -->
-      <div id="imp-step2" style="display:none">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">
-          Selecione a aba e o cliente correspondente:
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Cliente *</label>
+          <select class="form-input" id="imp-cliente-sel">
+            <option value="">Selecione o cliente...</option>
+          </select>
         </div>
-        <div class="form-grid" style="margin-bottom:16px">
-          <div class="form-group">
-            <label>Aba da planilha *</label>
-            <select class="form-input" id="imp-aba-sel" onchange="tentarCasarCliente()">
-              <option value="">Selecione a aba...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Cliente *</label>
-            <select class="form-input" id="imp-cliente-sel">
-              <option value="">Selecione o cliente...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ano de referência *</label>
-            <select class="form-input" id="imp-ano-sel"></select>
-          </div>
-          <div class="form-group">
-            <label>Coluna do Saldo</label>
-            <select class="form-input" id="imp-col-modo">
-              <option value="auto">Detectar automaticamente</option>
-              <option value="saldo">Só usar coluna Saldo</option>
-              <option value="cv">Usar Compras e Vendas</option>
-            </select>
-          </div>
+        <div class="form-group">
+          <label>Ano de referência *</label>
+          <select class="form-input" id="imp-ano-sel"></select>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-secondary" onclick="voltarStep1()" style="font-size:12px">← Voltar</button>
-          <button class="btn-primary" onclick="lerAbaSelecionada()" style="font-size:12px">Ler Dados da Aba</button>
-        </div>
-        <div id="imp-status2" style="font-size:13px;color:var(--text3);margin-top:10px;min-height:20px"></div>
       </div>
-
-      <!-- Step 3: Preview and confirm -->
-      <div id="imp-step3" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px" id="imp-preview-title">Dados encontrados:</div>
-          <button class="btn-secondary" onclick="voltarStep2()" style="font-size:11px">← Voltar</button>
-        </div>
-        <div class="table-wrap" style="margin-bottom:16px;max-height:300px;overflow-y:auto">
+      <div class="form-group form-full" style="margin-bottom:14px">
+        <label>Cole os dados aqui *</label>
+        <textarea class="form-input" id="imp-paste-area" rows="8" 
+          placeholder="Cole aqui os dados copiados do Google Sheets (Ctrl+V)..." 
+          style="font-family:DM Mono,monospace;font-size:12px;resize:vertical"
+          oninput="processarColagem()"></textarea>
+      </div>
+      <div id="imp-status" style="font-size:13px;margin-bottom:10px;min-height:20px"></div>
+      <div id="imp-results" style="display:none">
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:14px;margin-bottom:10px" id="imp-preview-title"></div>
+        <div class="table-wrap" style="margin-bottom:16px;max-height:280px;overflow-y:auto">
           <table>
             <thead><tr><th>Mês</th><th>Compras (R$)</th><th>Vendas (R$)</th><th>Saldo (R$)</th><th></th></tr></thead>
             <tbody id="imp-table-body"></tbody>
@@ -7935,6 +7906,565 @@ function importarDaImagem(){
 
 
 // ═══════════════════════════════════════════════════════════
+// IMPORTAÇÃO VIA COLAR (CTRL+V) DO GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════
+var importDados = [];
+
+var MESES_MAP = {
+  'jan':1,'fev':2,'mar':3,'abr':4,'mai':5,'jun':6,
+  'jul':7,'ago':8,'set':9,'out':10,'nov':11,'dez':12,
+  'janeiro':1,'fevereiro':2,'marco':3,'marco':3,'abril':4,'maio':5,'junho':6,
+  'julho':7,'agosto':8,'setembro':9,'outubro':10,'novembro':11,'dezembro':12
+};
+
+function parseMes(val){
+  if(!val) return 0;
+  var s = String(val).toLowerCase().trim()
+    .normalize('NFD').replace(/[̀-ͯ]/g,''); // remove accents
+  if(MESES_MAP[s]) return MESES_MAP[s];
+  var n = parseInt(s);
+  if(n >= 1 && n <= 12) return n;
+  for(var k in MESES_MAP){
+    if(s.startsWith(k.substring(0,3))) return MESES_MAP[k];
+  }
+  return 0;
+}
+
+function parseMoney(val){
+  if(val === null || val === undefined || val === '') return null;
+  var s = String(val).replace(/R[$]/g,'').replace(/[.]/g,'').replace(',','.').trim();
+  if(s === '' || s === '-' || s === '—') return null;
+  var n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
+
+function openImportPlanilha(){
+  // Populate clientes
+  var sel = document.getElementById('imp-cliente-sel');
+  sel.innerHTML = '<option value="">Selecione o cliente...</option>';
+  clientes.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(c){
+    var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;
+    if(c.id===currentBlackClienteId)o.selected=true;
+    sel.appendChild(o);
+  });
+  // Populate ano
+  var anoSel = document.getElementById('imp-ano-sel');
+  anoSel.innerHTML='';
+  var yr=new Date().getFullYear();
+  for(var y=yr;y>=yr-5;y--){
+    var o=document.createElement('option');o.value=y;o.textContent=y;
+    if(y===yr)o.selected=true;
+    anoSel.appendChild(o);
+  }
+  // Reset
+  importDados=[];
+  document.getElementById('imp-paste-area').value='';
+  document.getElementById('imp-results').style.display='none';
+  document.getElementById('imp-btn-importar').style.display='none';
+  document.getElementById('imp-status').textContent='';
+  openModal('modal-import-planilha');
+}
+
+function processarColagem(){
+  var text = document.getElementById('imp-paste-area').value;
+  var ano = Number(document.getElementById('imp-ano-sel').value);
+  if(!text.trim()){ 
+    document.getElementById('imp-results').style.display='none';
+    document.getElementById('imp-btn-importar').style.display='none';
+    return; 
+  }
+
+  importDados = [];
+  var lines = text.split(String.fromCharCode(10)).map(function(l){return l.trim();}).filter(Boolean);
+
+  lines.forEach(function(line){
+    // Split by tab (Sheets copies with tabs)
+    var cells = line.split('	').map(function(c){return c.trim();});
+    if(cells.length < 2) return;
+
+    // Find mes in any cell
+    var mesIdx = -1, mes = 0;
+    cells.forEach(function(c,i){
+      if(mes) return;
+      var m = parseMes(c);
+      if(m > 0){ mes=m; mesIdx=i; }
+    });
+    if(!mes) return;
+
+    // Get money values after mes
+    var moneys = [];
+    for(var i=mesIdx+1;i<cells.length;i++){
+      var v = parseMoney(cells[i]);
+      if(v !== null) moneys.push(v);
+    }
+
+    if(!moneys.length) return;
+
+    var compras=0, vendas=0, saldo=0;
+    if(moneys.length >= 3){
+      compras=Math.abs(moneys[0]);
+      vendas=Math.abs(moneys[1]);
+      saldo=moneys[2];
+    } else if(moneys.length === 2){
+      compras=Math.abs(moneys[0]);
+      vendas=Math.abs(moneys[1]);
+      saldo=vendas-compras;
+    } else {
+      saldo=moneys[0];
+    }
+
+    if(saldo===0 && compras===0 && vendas===0) return;
+    importDados.push({mes:mes, compras:compras, vendas:vendas, saldo:saldo});
+  });
+
+  // Sort by mes
+  importDados.sort(function(a,b){return a.mes-b.mes;});
+
+  var statusEl = document.getElementById('imp-status');
+  var resultsEl = document.getElementById('imp-results');
+  var btn = document.getElementById('imp-btn-importar');
+
+  if(!importDados.length){
+    statusEl.textContent = 'Nenhum dado encontrado. Verifique se copiou corretamente.';
+    statusEl.style.color='#ef4444';
+    resultsEl.style.display='none';
+    btn.style.display='none';
+    return;
+  }
+
+  statusEl.textContent = importDados.length+' lançamentos identificados!';
+  statusEl.style.color='#22c55e';
+
+  // Render preview
+  var tbody=document.getElementById('imp-table-body');
+  tbody.innerHTML='';
+  importDados.forEach(function(d,i){
+    var cor=d.saldo>=0?'#22c55e':'#ef4444';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[d.mes-1]+'/'+ano+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#ef4444">'+fmtFull(d.compras)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e">'+fmtFull(d.vendas)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:'+cor+'">'+fmtFull(d.saldo)+'</td>'
+      +'<td><button class="btn-dsm" style="padding:2px 6px;font-size:10px" onclick="(function(){importDados.splice('+i+',1);processarColagem();})()">×</button></td>';
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('imp-preview-title').textContent=importDados.length+' lançamentos encontrados:';
+  resultsEl.style.display='block';
+  btn.style.display='inline-flex';
+}
+
+function importarDaImagem(){
+  var clienteId=document.getElementById('imp-cliente-sel').value;
+  var ano=Number(document.getElementById('imp-ano-sel').value);
+  if(!clienteId){alert('Selecione o cliente!');return;}
+  if(!importDados.length){alert('Nenhum dado para importar!');return;}
+  var cli=clientes.find(function(c){return c.id===clienteId;});
+  var clienteNome=cli?cli.nome:'';
+  var btn=document.getElementById('imp-btn-importar');
+  btn.textContent='Importando...';btn.disabled=true;
+  var batch=db.batch();
+  importDados.forEach(function(d){
+    var ref=db.collection('black_operacoes').doc();
+    batch.set(ref,{
+      clienteId:clienteId,clienteNome:clienteNome,
+      ano:ano,mes:Number(d.mes),tipo:'simplificado',
+      compras:Number(d.compras)||0,vendas:Number(d.vendas)||0,
+      custoTotal:0,custos:{},ibov:0,cdi:0,carteiraTotal:0,
+      obs:'Importado do Google Sheets',
+      criadoEm:new Date().toISOString()
+    });
+  });
+  batch.commit().then(function(){
+    closeModal('modal-import-planilha');
+    var s=document.createElement('div');
+    s.style='position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent=importDados.length+' lançamentos importados para '+clienteNome+'!';
+    document.body.appendChild(s);
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},4000);
+    btn.textContent='Importar Lançamentos';btn.disabled=false;
+    if(currentBlackClienteId===clienteId)renderBlackDetalhe();
+  }).catch(function(e){
+    btn.textContent='Importar Lançamentos';btn.disabled=false;
+    alert('Erro: '+e.message);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD DMF BLACK
+// ═══════════════════════════════════════════════════════════
+var bkdChart = null;
+var bkdPeriod = 0;
+var bkdAllOps = [];
+
+var _origShowViewBKD = showView;
+showView = function(v, btn){
+  _origShowViewBKD(v, btn);
+  if(v === 'black-dashboard') loadBlackDashboard();
+};
+
+function loadBlackDashboard(){
+  // Populate year selector
+  var anoSel = document.getElementById('bkd-ano');
+  if(anoSel && !anoSel.options.length){
+    var yr = new Date().getFullYear();
+    for(var y=yr;y>=yr-4;y--){
+      var o=document.createElement('option');o.value=y;o.textContent=y;
+      if(y===yr)o.selected=true;
+      anoSel.appendChild(o);
+    }
+    anoSel.onchange = loadBlackDashboard;
+  }
+
+  db.collection('black_operacoes').get().then(function(snap){
+    bkdAllOps = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    renderBlackDashboard2();
+  });
+}
+
+function setBkdPeriod(n, btn){
+  bkdPeriod = n;
+  document.querySelectorAll('#view-black-dashboard .tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderBlackDashboard2();
+}
+
+function renderBlackDashboard2(){
+  if(!bkdAllOps.length) return;
+
+  var now = new Date();
+  var curMes = now.getMonth()+1;
+  var curAno = now.getFullYear();
+  var curTrim = now.getMonth(); // 0-indexed
+
+  // Group by month for chart
+  var byMonth = {};
+  bkdAllOps.forEach(function(op){
+    var key = op.ano+'-'+String(op.mes).padStart(2,'0');
+    if(!byMonth[key]) byMonth[key] = {ano:op.ano, mes:op.mes, saldo:0, clientes:{}};
+    var s = (op.vendas||0)-(op.compras||0);
+    byMonth[key].saldo += s;
+    byMonth[key].clientes[op.clienteId] = (byMonth[key].clientes[op.clienteId]||0) + s;
+  });
+
+  var sortedMonths = Object.keys(byMonth).sort();
+
+  // Apply period filter
+  var filteredMonths = sortedMonths;
+  if(bkdPeriod > 0){
+    var cutoff = new Date(now.getFullYear(), now.getMonth() - bkdPeriod + 1, 1);
+    filteredMonths = sortedMonths.filter(function(k){
+      var m = byMonth[k];
+      return new Date(m.ano, m.mes-1, 1) >= cutoff;
+    });
+  }
+
+  // KPIs
+  var acumTotal = 0, saldoMes = 0, saldoTrim = 0;
+  var clienteAcum = {};
+
+  bkdAllOps.forEach(function(op){
+    var s = (op.vendas||0)-(op.compras||0);
+    acumTotal += s;
+    if(!clienteAcum[op.clienteId]) clienteAcum[op.clienteId] = {nome:op.clienteNome||'', acum:0};
+    clienteAcum[op.clienteId].acum += s;
+    if(op.mes===curMes && op.ano===curAno) saldoMes += s;
+    // Trimestral: last 3 months
+    var opDate = new Date(op.ano, op.mes-1, 1);
+    var trimStart = new Date(now.getFullYear(), now.getMonth()-2, 1);
+    if(opDate >= trimStart) saldoTrim += s;
+  });
+
+  var nClientes = Object.keys(clienteAcum).length;
+  var retornoMedio = nClientes ? (acumTotal/nClientes) : 0;
+
+  // Update KPI elements
+  var setEl = function(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; };
+  setEl('bkd-acum', fmtFull(acumTotal));
+  setEl('bkd-mes', (saldoMes>=0?'+':'')+fmtFull(saldoMes));
+  setEl('bkd-trim', (saldoTrim>=0?'+':'')+fmtFull(saldoTrim));
+  setEl('bkd-retorno', fmtFull(retornoMedio));
+
+  // Color KPIs
+  var mesEl = document.getElementById('bkd-mes');
+  if(mesEl) mesEl.style.color = saldoMes >= 0 ? '#22c55e' : '#ef4444';
+  var trimEl = document.getElementById('bkd-trim');
+  if(trimEl) trimEl.style.color = saldoTrim >= 0 ? '#c084fc' : '#ef4444';
+
+  // Chart
+  var labels = [], data = [], acumRun = 0;
+  filteredMonths.forEach(function(k){
+    var m = byMonth[k];
+    acumRun += m.saldo;
+    labels.push(MESES[m.mes-1]+'/'+String(m.ano).slice(2));
+    data.push(Number(acumRun.toFixed(2)));
+  });
+
+  var canvas = document.getElementById('bkd-chart');
+  if(canvas && labels.length){
+    if(bkdChart){ bkdChart.destroy(); }
+    bkdChart = new Chart(canvas.getContext('2d'),{
+      type:'line',
+      data:{labels:labels,datasets:[{
+        label:'Acumulado DMF Black (R$)',
+        data:data,
+        borderColor:'#1e8fff',
+        backgroundColor:'#1e8fff22',
+        borderWidth:2.5,
+        pointRadius:3,
+        tension:.4,
+        fill:true,
+        segment:{borderColor:function(ctx){return ctx.p1.parsed.y>=0?'#22c55e':'#ef4444';}}
+      }]},
+      options:{
+        responsive:true,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return 'Acum: '+fmtFull(ctx.parsed.y);}}}},
+        scales:{
+          x:{ticks:{color:'#4a6080',font:{size:10}},grid:{display:false}},
+          y:{ticks:{color:'#4a6080',font:{size:10},callback:function(v){return fmtFull(v);}},grid:{color:'#0e2040'}}
+        }
+      }
+    });
+  }
+
+  // Ranking
+  var rankEl = document.getElementById('bkd-ranking');
+  if(!rankEl) return;
+  rankEl.innerHTML = '';
+
+  var ranked = Object.values(clienteAcum).sort(function(a,b){ return b.acum-a.acum; });
+  if(!ranked.length){
+    rankEl.innerHTML = '<div class="empty"><div class="empty-title">Nenhuma operação registrada</div></div>';
+    return;
+  }
+
+  var maxAcum = Math.max.apply(null, ranked.map(function(r){ return Math.abs(r.acum); })) || 1;
+
+  ranked.forEach(function(r, i){
+    var pct = Math.abs(r.acum) / maxAcum * 100;
+    var cor = r.acum >= 0 ? '#22c55e' : '#ef4444';
+    var row = document.createElement('div');
+    row.style = 'display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML = '<div style="font-family:DM Mono,monospace;font-size:11px;color:var(--text3);width:20px;text-align:right">'+(i+1)+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px">'+r.nome+'</div>'
+      +'<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+cor+';border-radius:2px;transition:width .4s"></div>'
+      +'</div></div>'
+      +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:'+cor+';white-space:nowrap">'+fmtFull(r.acum)+'</div>';
+    rankEl.appendChild(row);
+  });
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+var importImageBase64 = null;
+var importDados = [];
+
+function openImportPlanilha(){
+  // Populate clientes
+  var sel = document.getElementById('imp-cliente-sel');
+  sel.innerHTML = '<option value="">Selecione o cliente...</option>';
+  clientes.filter(function(c){ return c.servico && c.servico.indexOf('Black')>=0; })
+    .sort(function(a,b){ return a.nome.localeCompare(b.nome); })
+    .forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.nome;
+      if(c.id === currentBlackClienteId) o.selected = true;
+      sel.appendChild(o);
+    });
+
+  // Populate ano
+  var anoSel = document.getElementById('imp-ano-sel');
+  anoSel.innerHTML = '';
+  var yr = new Date().getFullYear();
+  for(var y=yr;y>=yr-5;y--){
+    var o=document.createElement('option');o.value=y;o.textContent=y;
+    if(y===yr)o.selected=true;
+    anoSel.appendChild(o);
+  }
+
+  // Reset state
+  importImageBase64 = null;
+  importDados = [];
+  document.getElementById('imp-preview').style.display = 'none';
+  document.getElementById('imp-results').style.display = 'none';
+  document.getElementById('imp-btn-analisar').style.display = 'none';
+  document.getElementById('imp-btn-importar').style.display = 'none';
+  document.getElementById('imp-status').textContent = '';
+  document.getElementById('imp-file-input').value = '';
+
+  openModal('modal-import-planilha');
+}
+
+function onImportImageSelected(event){
+  var file = event.target.files[0];
+  if(!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    importImageBase64 = e.target.result.split(',')[1];
+    var mediaType = file.type || 'image/jpeg';
+
+    // Show preview
+    document.getElementById('imp-preview-img').src = e.target.result;
+    document.getElementById('imp-preview').style.display = 'block';
+    document.getElementById('imp-btn-analisar').style.display = 'inline-flex';
+    document.getElementById('imp-results').style.display = 'none';
+    document.getElementById('imp-btn-importar').style.display = 'none';
+    document.getElementById('imp-status').textContent = 'Imagem carregada. Clique em "Analisar Imagem".';
+    document.getElementById('imp-status').style.color = 'var(--text3)';
+
+    // Store media type
+    document.getElementById('imp-file-input').setAttribute('data-type', mediaType);
+  };
+  reader.readAsDataURL(file);
+}
+
+function analisarImagemPlanilha(){
+  if(!importImageBase64){
+    alert('Selecione uma imagem primeiro!');
+    return;
+  }
+
+  var statusEl = document.getElementById('imp-status');
+  var btnAnalisar = document.getElementById('imp-btn-analisar');
+  btnAnalisar.textContent = 'Analisando...';
+  btnAnalisar.disabled = true;
+  statusEl.textContent = 'A IA está lendo sua planilha...';
+  statusEl.style.color = '#f59e0b';
+
+  var mediaType = document.getElementById('imp-file-input').getAttribute('data-type') || 'image/jpeg';
+  var ano = document.getElementById('imp-ano-sel').value;
+
+  var prompt = 'Você está vendo uma planilha de operações com opções financeiras. '
+    +'Extraia TODOS os dados de cada linha que contém: Mês, Compras (R$), Vendas (R$) e Saldo (R$). '
+    +'O ano de referência é '+ano+'. '
+    +'Responda APENAS com um JSON válido no formato: '
+    +'{"lancamentos":[{"mes":1,"compras":1000.00,"vendas":1500.00},{"mes":2,"compras":800.00,"vendas":1200.00}]} '
+    +'Use números inteiros para mês (1=Jan, 12=Dez). '
+    +'Valores monetários sem formatação (apenas números). '
+    +'Se não conseguir ler algum valor, use 0. '
+    +'NÃO inclua texto adicional, apenas o JSON.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          {type: 'image', source: {type: 'base64', media_type: mediaType, data: importImageBase64}},
+          {type: 'text', text: prompt}
+        ]
+      }]
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    btnAnalisar.textContent = 'Analisar Imagem';
+    btnAnalisar.disabled = false;
+
+    var texto = data.content && data.content[0] ? data.content[0].text : '';
+    // Clean and parse JSON
+    var jsonStr = texto.replace(/```json|```/g, '').trim();
+
+    try {
+      var parsed = JSON.parse(jsonStr);
+      importDados = parsed.lancamentos || [];
+
+      if(!importDados.length){
+        statusEl.textContent = 'Nenhum dado encontrado. Tente uma imagem mais clara.';
+        statusEl.style.color = '#ef4444';
+        return;
+      }
+
+      // Show results table
+      var tbody = document.getElementById('imp-table-body');
+      tbody.innerHTML = '';
+      importDados.forEach(function(d, i){
+        var saldo = (d.vendas||0) - (d.compras||0);
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td style="font-weight:600;color:var(--white)">'+MESES[(d.mes||1)-1]+'</td>'
+          +'<td style="color:var(--text2)">'+ano+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#ef4444">'+fmtFull(d.compras||0)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:12px;color:#22c55e">'+fmtFull(d.vendas||0)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
+          +'<td><button class="btn-dsm" style="padding:2px 6px;font-size:10px" onclick="importDados.splice('+i+',1);analisarImagemPlanilha()">×</button></td>';
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('imp-results').style.display = 'block';
+      document.getElementById('imp-btn-importar').style.display = 'inline-flex';
+      statusEl.textContent = importDados.length + ' lançamentos identificados. Revise e confirme.';
+      statusEl.style.color = '#22c55e';
+
+    } catch(e){
+      statusEl.textContent = 'Erro ao interpretar resposta da IA. Tente novamente.';
+      statusEl.style.color = '#ef4444';
+      console.error('Parse error:', e, 'Text:', texto);
+    }
+  }).catch(function(e){
+    btnAnalisar.textContent = 'Analisar Imagem';
+    btnAnalisar.disabled = false;
+    statusEl.textContent = 'Erro de conexão: ' + e.message;
+    statusEl.style.color = '#ef4444';
+  });
+}
+
+function importarDaImagem(){
+  var clienteId = document.getElementById('imp-cliente-sel').value;
+  var ano = Number(document.getElementById('imp-ano-sel').value);
+
+  if(!clienteId){ alert('Selecione o cliente!'); return; }
+  if(!importDados.length){ alert('Nenhum dado para importar!'); return; }
+
+  var cli = clientes.find(function(c){ return c.id === clienteId; });
+  var clienteNome = cli ? cli.nome : '';
+
+  var btn = document.getElementById('imp-btn-importar');
+  btn.textContent = 'Importando...';
+  btn.disabled = true;
+
+  var batch = db.batch();
+  importDados.forEach(function(d){
+    var ref = db.collection('black_operacoes').doc();
+    batch.set(ref, {
+      clienteId: clienteId,
+      clienteNome: clienteNome,
+      ano: ano,
+      mes: Number(d.mes),
+      tipo: 'simplificado',
+      compras: Number(d.compras)||0,
+      vendas: Number(d.vendas)||0,
+      custoTotal: 0,
+      custos: {},
+      ibov: 0, cdi: 0, carteiraTotal: 0,
+      obs: 'Importado via imagem',
+      criadoEm: new Date().toISOString()
+    });
+  });
+
+  batch.commit().then(function(){
+    closeModal('modal-import-planilha');
+    var s = document.createElement('div');
+    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+    s.textContent = importDados.length + ' lançamentos importados para '+clienteNome+'!';
+    document.body.appendChild(s);
+    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 4000);
+    btn.textContent = 'Importar Lançamentos';
+    btn.disabled = false;
+    // Refresh if viewing this client
+    if(currentBlackClienteId === clienteId) renderBlackDetalhe();
+  }).catch(function(e){
+    btn.textContent = 'Importar Lançamentos';
+    btn.disabled = false;
+    alert('Erro: ' + e.message);
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
 // IMPORTAÇÃO VIA GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════════
 var impSheetId = '';
@@ -8130,7 +8660,7 @@ function parseMes(val){
 
 function parseMoney(val){
   if(val === null || val === undefined) return 0;
-  var s = String(val).replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
+  var s = String(val).replace(/R[$]/g,'').replace(/[.]/g,'').replace(',','.').trim();
   var n = parseFloat(s);
   return isNaN(n) ? 0 : n;
 }
