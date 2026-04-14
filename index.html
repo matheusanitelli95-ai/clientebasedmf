@@ -8090,26 +8090,21 @@ function lerAbaSelecionada(){
   statusEl.textContent = 'Lendo aba "'+aba+'"...';
   statusEl.style.color = '#f59e0b';
 
-  // Use CSV export - works without auth for public sheets
+  // Use AllOrigins proxy to bypass CORS
   var csvUrl = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/export?format=csv&sheet='+encodeURIComponent(aba);
+  var proxyUrl = 'https://api.allorigins.win/get?url='+encodeURIComponent(csvUrl);
 
-  fetch(csvUrl).then(function(r){
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.text();
-  }).then(function(csv){
-    processarCSV(csv, aba);
-    statusEl.textContent = '';
-  }).catch(function(e){
-    // Fallback: try gviz
-    var gvizUrl = 'https://docs.google.com/spreadsheets/d/'+impSheetId+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(aba);
-    fetch(gvizUrl).then(function(r){ return r.text(); }).then(function(csv){
-      processarCSV(csv, aba);
+  fetch(proxyUrl)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.contents) throw new Error('Sem conteúdo');
+      processarCSV(data.contents, aba);
       statusEl.textContent = '';
-    }).catch(function(e2){
-      statusEl.textContent = 'Erro: '+e2.message+'. Verifique se a planilha está compartilhada como pública.';
+    })
+    .catch(function(e){
+      statusEl.textContent = 'Erro ao ler aba: '+e.message;
       statusEl.style.color = '#ef4444';
     });
-  });
 }
 
 var MESES_MAP = {
