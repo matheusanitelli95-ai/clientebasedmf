@@ -6192,62 +6192,12 @@ function loadMinhasOperacoes(){
   });
 }
 
-function loadMinhaCarteira(){
-  if(!currentClienteVinculado) return;
-  var c = clientes.find(function(x){ return x.id === currentClienteVinculado; });
-  if(!c) return;
-
-  var el = document.getElementById('mc-sub');
-  if(el) el.textContent = 'Olá, '+c.nome+'!';
-
-  var pat = c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
-  document.getElementById('mc-patrimonio').textContent = fmtFull(pat);
-
-  // Load Black ops
-  db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
-    var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    var acum = ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
-    var retorno = pat ? (acum/pat*100).toFixed(2) : 0;
-    document.getElementById('mc-acumulado').textContent = fmtFull(acum);
-    document.getElementById('mc-retorno').textContent = retorno+'%';
-
-    // Show operations table
-    var el = document.getElementById('mc-dados');
-    if(!ops.length){
-      el.innerHTML='<div class="card"><div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="empty-title">Nenhuma operação registrada</div></div></div>';
-      return;
-    }
-    var sorted = ops.sort(function(a,b){return b.ano!==a.ano?b.ano-a.ano:b.mes-a.mes;});
-    var acumRun=0;
-    el.innerHTML='<div class="card"><div class="section-title">Histórico de Operações</div><div class="table-wrap" style="border:none"><table><thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>Acumulado</th></tr></thead><tbody>'
-      +sorted.map(function(op){
-        var saldo=(op.vendas||0)-(op.compras||0);
-        var custos=op.custoTotal||0;
-        var liq=saldo-custos;
-        acumRun+=saldo;
-        return'<tr><td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+fmtFull(saldo)+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custos)+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
-          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumRun>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acumRun)+'</td></tr>';
-      }).join('')
-      +'</tbody></table></div></div>';
-  });
-}
-
 // ── Gerenciar Usuários ────────────────────────────────────
 var _origShowViewCfg = showView;
 showView = function(v,btn){
   _origShowViewCfg(v,btn);
   if(v==='configuracoes') loadUsuarios();
 };
-
-function loadUsuarios(){
-  db.collection('usuarios').onSnapshot(function(snap){
-    usuarios = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    renderUsuarios();
-  });
-}
 
 function renderUsuarios(){
   var el = document.getElementById('usuarios-list');
@@ -7071,17 +7021,6 @@ function renderLeadsCRM(){
 
 
 // ── Payoff Calculator ─────────────────────────────────────
-function getPernasData(){
-  return payoffPernas.map(function(id){
-    var cv=(document.getElementById('perna-'+id+'-cv')||{value:'C'}).value;
-    var tipo=(document.getElementById('perna-'+id+'-tipo')||{value:'call'}).value;
-    var strike=parseFloat((document.getElementById('perna-'+id+'-strike')||{value:30}).value)||0;
-    var qtde=parseFloat((document.getElementById('perna-'+id+'-qtde')||{value:1000}).value)||0;
-    var premio=parseFloat((document.getElementById('perna-'+id+'-premio')||{value:0}).value)||0;
-    return {cv:cv,tipo:tipo,strike:strike,qtde:qtde,premio:premio};
-  }).filter(function(p){return p.strike>0;});
-}
-
 function calcPayoffAtPrice(pernas,spot){
   var total=0;
   pernas.forEach(function(p){
@@ -7463,18 +7402,6 @@ function esqueceuSenha(){
   });
 }
 
-function reenviarAcesso(email){
-  if(!confirm('Enviar email de redefinição de senha para ' + email + '?')) return;
-  auth.sendPasswordResetEmail(email).then(function(){
-    var s = document.createElement('div');
-    s.style = 'position:fixed;top:24px;right:24px;background:#22c55e;color:#000;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
-    s.textContent = 'Email de acesso enviado para ' + email;
-    document.body.appendChild(s);
-    setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 4000);
-  }).catch(function(e){
-    alert('Erro: ' + e.message);
-  });
-}
 
 
 // ── Esqueci minha senha ───────────────────────────────────
