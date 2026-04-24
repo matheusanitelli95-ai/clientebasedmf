@@ -536,6 +536,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="nav-section">Ferramentas</div>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Simulador IF</span></button>
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
+      <div class="nav-section">Educacional</div>
+      <button class="nav-item" onclick="showView('materiais-gestao',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span>Materiais</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -964,6 +966,30 @@ textarea.form-input{resize:vertical;min-height:80px}
           <button class="btn-secondary" onclick="restaurarGlossarioPadrao()" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Restaurar termos padrão</button>
         </div>
         <div id="glossario-list"></div>
+      </div>
+    </div>
+
+    <!-- MATERIAIS GESTÃO -->
+    <div class="view" id="view-materiais-gestao">
+      <div class="page-header">
+        <div><div class="page-title">Materiais Educacionais</div><div class="page-sub">Gerencie o conteúdo disponível para os clientes no portal</div></div>
+        <button class="btn-primary" onclick="openModalMaterial(null)">+ Novo Material</button>
+      </div>
+      <div class="page-content">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <input class="filter-input" id="mat-search" placeholder="Buscar por título..." oninput="renderMateriaisGestao()" style="min-width:260px">
+          <select class="filter-input" id="mat-filter-cat" onchange="renderMateriaisGestao()">
+            <option value="">Todas categorias</option>
+          </select>
+          <select class="filter-input" id="mat-filter-tipo" onchange="renderMateriaisGestao()">
+            <option value="">Todos os tipos</option>
+            <option value="link">Link</option>
+            <option value="arquivo">Arquivo</option>
+            <option value="texto">Texto</option>
+          </select>
+          <span id="mat-count" style="font-size:12px;color:var(--text3);margin-left:auto"></span>
+        </div>
+        <div id="materiais-list"></div>
       </div>
     </div>
 
@@ -1846,6 +1872,60 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-glossario')">Cancelar</button>
       <button class="btn-primary" onclick="saveGlossario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MATERIAL EDUCACIONAL -->
+<div class="modal-overlay" id="modal-material" style="display:none" onclick="if(event.target===this)closeModal('modal-material')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-mat-title">Novo Material</div>
+      <button class="modal-close" onclick="closeModal('modal-material')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Título *</label><input class="form-input" id="mat-titulo" placeholder="Ex: Introdução ao mercado de opções"></div>
+      <div class="form-group"><label>Categoria *</label>
+        <select class="form-input" id="mat-categoria">
+          <option>Opções</option>
+          <option>Renda Fixa</option>
+          <option>Renda Variável</option>
+          <option>Planejamento</option>
+          <option>Macro</option>
+          <option>Gestão de Risco</option>
+          <option>DMF Black</option>
+          <option>Geral</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Tipo *</label>
+        <select class="form-input" id="mat-tipo" onchange="updateMaterialTipoFields()">
+          <option value="link">Link externo (YouTube, artigo, site)</option>
+          <option value="arquivo">Arquivo (URL de PDF/doc)</option>
+          <option value="texto">Texto escrito no sistema</option>
+        </select>
+      </div>
+      <div class="form-group form-full"><label>Descrição curta</label><textarea class="form-input" id="mat-descricao" rows="2" placeholder="Resumo do que o cliente vai aprender..."></textarea></div>
+      <div class="form-group form-full" id="mat-field-url"><label id="mat-url-label">URL do link *</label><input class="form-input" id="mat-url" placeholder="https://..."></div>
+      <div class="form-group form-full" id="mat-field-texto" style="display:none"><label>Conteúdo *</label><textarea class="form-input" id="mat-texto" rows="8" placeholder="Escreva o conteúdo educacional aqui. Você pode usar quebras de linha normalmente..."></textarea></div>
+      <div class="form-group form-full"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="mat-destaque"> <span>Destacar no topo do portal</span></label></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-material')">Cancelar</button>
+      <button class="btn-primary" onclick="saveMaterial()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VISUALIZAR MATERIAL (CLIENTE) -->
+<div class="modal-overlay" id="modal-material-view" style="display:none" onclick="if(event.target===this)closeModal('modal-material-view')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mv-titulo">Material</div>
+      <button class="modal-close" onclick="closeModal('modal-material-view')">×</button>
+    </div>
+    <div id="mv-body" style="padding:4px 2px"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-material-view')">Fechar</button>
     </div>
   </div>
 </div>
@@ -5859,9 +5939,9 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario'],
-  cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias']
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao'],
+  cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias','materiais-cliente']
 };
 
 var PERFIL_COR = {adm:'#1e8fff', gestor:'#22c55e', cliente:'#c084fc'};
@@ -6003,6 +6083,8 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-noticias','noticias','Notícias',false));
     clienteNav.appendChild(mkBtn('cnav-glossario','glossario','Glossário',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
+    clienteNav.appendChild(mkSec('Educacional'));
+    clienteNav.appendChild(mkBtn('cnav-materiais','materiais-cliente','Materiais',false));
     clienteNav.appendChild(mkSec('Suporte'));
     clienteNav.appendChild(mkBtn('cnav-chamados','chamados','Abrir Chamado',false));
 
@@ -6013,6 +6095,7 @@ function showClientePortal(){
   if(!document.getElementById('view-minha-conta')) buildMinhaContaView();
   if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
   if(!document.getElementById('view-chamados')) buildChamadosView();
+  if(!document.getElementById('view-materiais-cliente')) buildMateriaisClienteView();
 
   showClienteView('minha-carteira', document.getElementById('cnav-carteira'));
   loadMinhaCarteira();
@@ -6033,6 +6116,7 @@ function showClienteView(viewId, btn){
   if(viewId==='estrategias') setTimeout(renderEst, 50);
   if(viewId==='noticias') loadNoticias&&loadNoticias();
   if(viewId==='chamados') loadChamados();
+  if(viewId==='materiais-cliente') loadMateriais();
 }
 
 function buildMinhaCarteiraView(){
@@ -7232,6 +7316,248 @@ function updatePayoffLabels(id){
   var premioWrap = premioInput ? premioInput.parentNode : null;
   if(premioWrap) premioWrap.style.opacity = tipo==='ativo' ? '0.3' : '1';
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// MATERIAIS EDUCACIONAIS
+// ═══════════════════════════════════════════════════════════
+var materiais = [];
+var editingMaterialId = null;
+var _materiaisLoaded = false;
+
+function loadMateriais(){
+  if(_materiaisLoaded){
+    renderMateriaisRoute();
+    return;
+  }
+  _materiaisLoaded = true;
+  db.collection('materiais').onSnapshot(function(snap){
+    materiais = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderMateriaisRoute();
+  }, function(err){
+    console.error('Erro ao carregar materiais:', err);
+  });
+}
+
+function renderMateriaisRoute(){
+  // Renderiza a view apropriada dependendo de qual está ativa
+  if(document.getElementById('view-materiais-gestao') && document.getElementById('view-materiais-gestao').classList.contains('active')){
+    renderMateriaisGestao();
+  }
+  if(document.getElementById('view-materiais-cliente') && document.getElementById('view-materiais-cliente').classList.contains('active')){
+    renderMateriaisCliente();
+  }
+}
+
+function iconTipoMaterial(tipo){
+  if(tipo==='link') return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+  if(tipo==='arquivo') return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+}
+
+function labelTipoMaterial(tipo){
+  return tipo==='link'?'Link':tipo==='arquivo'?'Arquivo':'Texto';
+}
+
+function corTipoMaterial(tipo){
+  return tipo==='link'?'#1e8fff':tipo==='arquivo'?'#f59e0b':'#c084fc';
+}
+
+function renderMateriaisGestao(){
+  var list = document.getElementById('materiais-list');
+  if(!list) return;
+  // Popular filtro de categoria
+  var catSel = document.getElementById('mat-filter-cat');
+  var cats = Array.from(new Set(materiais.map(function(m){return m.categoria;}).filter(Boolean))).sort();
+  if(catSel){
+    var curVal = catSel.value;
+    catSel.innerHTML = '<option value="">Todas categorias</option>' + cats.map(function(c){return '<option'+(c===curVal?' selected':'')+'>'+c+'</option>';}).join('');
+  }
+  var q = (document.getElementById('mat-search')||{value:''}).value.toLowerCase().trim();
+  var fcat = (document.getElementById('mat-filter-cat')||{value:''}).value;
+  var ftipo = (document.getElementById('mat-filter-tipo')||{value:''}).value;
+  var filtrados = materiais.filter(function(m){
+    if(q && !(m.titulo||'').toLowerCase().includes(q)) return false;
+    if(fcat && m.categoria!==fcat) return false;
+    if(ftipo && m.tipo!==ftipo) return false;
+    return true;
+  }).sort(function(a,b){
+    if(a.destaque && !b.destaque) return -1;
+    if(!a.destaque && b.destaque) return 1;
+    return (b.criadoEm||'').localeCompare(a.criadoEm||'');
+  });
+  var countEl = document.getElementById('mat-count');
+  if(countEl) countEl.textContent = filtrados.length+' de '+materiais.length+' material'+(materiais.length!==1?'is':'');
+  if(!filtrados.length){
+    list.innerHTML = '<div class="empty" style="padding:40px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="empty-title">'+(materiais.length?'Nenhum material encontrado com esses filtros':'Nenhum material cadastrado ainda')+'</div><p style="font-size:13px;margin-top:4px">'+(materiais.length?'Tente ajustar os filtros ou limpar a busca':'Clique em "+ Novo Material" para cadastrar o primeiro')+'</p></div>';
+    return;
+  }
+  list.innerHTML = '<div class="card" style="padding:0"><div class="table-wrap" style="border:none"><table><thead><tr><th>Título</th><th>Categoria</th><th>Tipo</th><th style="text-align:center">Destaque</th><th>Criado em</th><th style="width:120px"></th></tr></thead><tbody>'
+    + filtrados.map(function(m){
+      var c = corTipoMaterial(m.tipo);
+      return '<tr>'
+        + '<td style="font-weight:600;color:var(--white)">'+(m.titulo||'—')+(m.descricao?'<div style="font-size:11px;color:var(--text3);font-weight:400;margin-top:2px">'+m.descricao.substring(0,80)+(m.descricao.length>80?'…':'')+'</div>':'')+'</td>'
+        + '<td><span class="badge" style="background:#1e8fff22;color:#1e8fff">'+(m.categoria||'—')+'</span></td>'
+        + '<td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:'+c+'">'+iconTipoMaterial(m.tipo)+' '+labelTipoMaterial(m.tipo)+'</span></td>'
+        + '<td style="text-align:center">'+(m.destaque?'<span style="color:#f59e0b">★</span>':'—')+'</td>'
+        + '<td style="font-size:12px;color:var(--text3)">'+(m.criadoEm?new Date(m.criadoEm).toLocaleDateString('pt-BR'):'—')+'</td>'
+        + '<td><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalMaterial(\''+m.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteMaterial(\''+m.id+'\')})">'+icon('trash')+'</button></div></td>'
+        + '</tr>';
+    }).join('')
+    + '</tbody></table></div></div>';
+}
+
+function renderMateriaisCliente(){
+  var list = document.getElementById('mat-cli-list');
+  if(!list) return;
+  // Popular filtro de categoria
+  var catSel = document.getElementById('mat-cli-cat');
+  var cats = Array.from(new Set(materiais.map(function(m){return m.categoria;}).filter(Boolean))).sort();
+  if(catSel){
+    var curVal = catSel.value;
+    catSel.innerHTML = '<option value="">Todas categorias</option>' + cats.map(function(c){return '<option'+(c===curVal?' selected':'')+'>'+c+'</option>';}).join('');
+  }
+  var q = (document.getElementById('mat-cli-search')||{value:''}).value.toLowerCase().trim();
+  var fcat = (document.getElementById('mat-cli-cat')||{value:''}).value;
+  var filtrados = materiais.filter(function(m){
+    if(q){
+      var inTit = (m.titulo||'').toLowerCase().includes(q);
+      var inDesc = (m.descricao||'').toLowerCase().includes(q);
+      if(!inTit && !inDesc) return false;
+    }
+    if(fcat && m.categoria!==fcat) return false;
+    return true;
+  }).sort(function(a,b){
+    if(a.destaque && !b.destaque) return -1;
+    if(!a.destaque && b.destaque) return 1;
+    return (b.criadoEm||'').localeCompare(a.criadoEm||'');
+  });
+  if(!filtrados.length){
+    list.innerHTML = '<div class="empty" style="padding:40px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="empty-title">'+(materiais.length?'Nenhum material encontrado':'Em breve, materiais educacionais aqui')+'</div></div>';
+    return;
+  }
+  list.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">'
+    + filtrados.map(function(m){
+      var c = corTipoMaterial(m.tipo);
+      return '<div class="card" style="cursor:pointer;padding:18px;transition:transform .15s,border-color .15s;'+(m.destaque?'border-color:#f59e0b':'')+'" onclick="viewMaterial(\''+m.id+'\')" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.borderColor=\'#1e8fff\'" onmouseout="this.style.transform=\'\';this.style.borderColor=\''+(m.destaque?'#f59e0b':'var(--border)')+'\'">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">'
+        +   '<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:'+c+';text-transform:uppercase;letter-spacing:.05em">'+iconTipoMaterial(m.tipo)+' '+labelTipoMaterial(m.tipo)+'</span>'
+        +   (m.destaque?'<span style="color:#f59e0b;font-size:14px">★</span>':'')
+        + '</div>'
+        + '<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;line-height:1.3;margin-bottom:8px">'+(m.titulo||'—')+'</div>'
+        + (m.descricao?'<div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px">'+(m.descricao.length>120?m.descricao.substring(0,120)+'…':m.descricao)+'</div>':'')
+        + '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border)"><span class="badge" style="background:#1e8fff22;color:#1e8fff">'+(m.categoria||'—')+'</span><span style="font-size:11px;color:var(--text3)">'+(m.criadoEm?new Date(m.criadoEm).toLocaleDateString('pt-BR'):'')+'</span></div>'
+        + '</div>';
+    }).join('')
+    + '</div>';
+}
+
+function buildMateriaisClienteView(){
+  var mainContent = document.getElementById('main-content');
+  if(document.getElementById('view-materiais-cliente')) return;
+  var div = document.createElement('div');
+  div.className = 'view';
+  div.id = 'view-materiais-cliente';
+  div.innerHTML = '<div class="page-header"><div><div class="page-title">Material Educacional</div><div class="page-sub">Conteúdo exclusivo para sua formação financeira</div></div></div>'
+    + '<div class="page-content">'
+    + '<div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center">'
+    +   '<input class="filter-input" id="mat-cli-search" placeholder="Buscar material..." oninput="renderMateriaisCliente()" style="min-width:260px">'
+    +   '<select class="filter-input" id="mat-cli-cat" onchange="renderMateriaisCliente()"><option value="">Todas categorias</option></select>'
+    + '</div>'
+    + '<div id="mat-cli-list"></div>'
+    + '</div>';
+  mainContent.appendChild(div);
+}
+
+function openModalMaterial(id){
+  editingMaterialId = id;
+  document.getElementById('modal-mat-title').textContent = id?'Editar Material':'Novo Material';
+  var m = id ? materiais.find(function(x){return x.id===id;}) : null;
+  document.getElementById('mat-titulo').value = m?m.titulo||'':'';
+  document.getElementById('mat-categoria').value = m?m.categoria||'Geral':'Geral';
+  document.getElementById('mat-tipo').value = m?m.tipo||'link':'link';
+  document.getElementById('mat-descricao').value = m?m.descricao||'':'';
+  document.getElementById('mat-url').value = m&&(m.tipo==='link'||m.tipo==='arquivo')?m.conteudo||'':'';
+  document.getElementById('mat-texto').value = m&&m.tipo==='texto'?m.conteudo||'':'';
+  document.getElementById('mat-destaque').checked = m?!!m.destaque:false;
+  updateMaterialTipoFields();
+  document.getElementById('modal-material').style.display = 'flex';
+}
+
+function updateMaterialTipoFields(){
+  var tipo = document.getElementById('mat-tipo').value;
+  var fieldUrl = document.getElementById('mat-field-url');
+  var fieldTexto = document.getElementById('mat-field-texto');
+  var urlLabel = document.getElementById('mat-url-label');
+  if(tipo==='texto'){
+    fieldUrl.style.display = 'none';
+    fieldTexto.style.display = 'block';
+  } else {
+    fieldUrl.style.display = 'block';
+    fieldTexto.style.display = 'none';
+    urlLabel.textContent = tipo==='arquivo' ? 'URL do arquivo (PDF, doc, etc) *' : 'URL do link *';
+  }
+}
+
+function saveMaterial(){
+  var titulo = document.getElementById('mat-titulo').value.trim();
+  var categoria = document.getElementById('mat-categoria').value;
+  var tipo = document.getElementById('mat-tipo').value;
+  var descricao = document.getElementById('mat-descricao').value.trim();
+  var destaque = document.getElementById('mat-destaque').checked;
+  var conteudo = tipo==='texto' ? document.getElementById('mat-texto').value.trim() : document.getElementById('mat-url').value.trim();
+  if(!titulo){ alert('Informe o título do material.'); return; }
+  if(!conteudo){ alert(tipo==='texto'?'Escreva o conteúdo do material.':'Informe a URL do '+(tipo==='arquivo'?'arquivo':'link')+'.'); return; }
+  if(tipo!=='texto' && !/^https?:\/\//i.test(conteudo)){ alert('A URL deve começar com http:// ou https://'); return; }
+  var data = {titulo:titulo, categoria:categoria, tipo:tipo, descricao:descricao, conteudo:conteudo, destaque:destaque};
+  var promise;
+  if(editingMaterialId){
+    promise = db.collection('materiais').doc(editingMaterialId).update(data);
+  } else {
+    data.criadoEm = new Date().toISOString();
+    data.autor = (currentUser&&currentUser.email)||'';
+    promise = db.collection('materiais').add(data);
+  }
+  promise.then(function(){
+    closeModal('modal-material');
+    editingMaterialId = null;
+  }).catch(function(e){ alert('Erro ao salvar: '+e.message); });
+}
+
+function deleteMaterial(id){
+  db.collection('materiais').doc(id).delete().catch(function(e){ alert('Erro ao excluir: '+e.message); });
+}
+
+function viewMaterial(id){
+  var m = materiais.find(function(x){return x.id===id;});
+  if(!m) return;
+  document.getElementById('mv-titulo').textContent = m.titulo||'Material';
+  var body = document.getElementById('mv-body');
+  var c = corTipoMaterial(m.tipo);
+  var header = '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">'
+    +'<span class="badge" style="background:#1e8fff22;color:#1e8fff">'+(m.categoria||'—')+'</span>'
+    +'<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:'+c+';text-transform:uppercase;letter-spacing:.05em">'+iconTipoMaterial(m.tipo)+' '+labelTipoMaterial(m.tipo)+'</span>'
+    +'</div>';
+  var desc = m.descricao ? '<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">'+m.descricao+'</div>' : '';
+  var conteudo = '';
+  if(m.tipo==='texto'){
+    var textoFormatado = (m.conteudo||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    conteudo = '<div style="font-size:14px;color:var(--white);line-height:1.7;max-height:50vh;overflow-y:auto;padding-right:8px">'+textoFormatado+'</div>';
+  } else {
+    var labelBtn = m.tipo==='arquivo'?'Abrir arquivo':'Abrir link';
+    conteudo = '<a href="'+m.conteudo+'" target="_blank" rel="noopener" style="text-decoration:none"><button class="btn-primary" style="width:100%;justify-content:center;padding:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'+labelBtn+'</button></a>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;word-break:break-all">'+m.conteudo+'</div>';
+  }
+  body.innerHTML = header + desc + conteudo;
+  document.getElementById('modal-material-view').style.display = 'flex';
+}
+
+// Hook na gestão ADM — carregar materiais quando entrar na view
+var _origShowViewMat = showView;
+showView = function(v, btn){
+  _origShowViewMat(v, btn);
+  if(v==='materiais-gestao') loadMateriais();
+};
 
 
 // ═══════════════════════════════════════════════════════════
