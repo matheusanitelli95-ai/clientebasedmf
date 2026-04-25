@@ -536,7 +536,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="nav-section">Ferramentas</div>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Simulador IF</span></button>
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
-      <div class="nav-section">Educacional</div>
+      <div class="nav-section">DMF Academy</div>
       <button class="nav-item" onclick="showView('materiais-gestao',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span>Materiais</span></button>
     </div>
     <div class="sidebar-footer">
@@ -972,7 +972,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <!-- MATERIAIS GESTÃO -->
     <div class="view" id="view-materiais-gestao">
       <div class="page-header">
-        <div><div class="page-title">Materiais Educacionais</div><div class="page-sub">Gerencie o conteúdo disponível para os clientes no portal</div></div>
+        <div><div class="page-title">DMF Academy</div><div class="page-sub">Gerencie o conteúdo disponível para os clientes no portal</div></div>
         <button class="btn-primary" onclick="openModalMaterial(null)">+ Novo Material</button>
       </div>
       <div class="page-content">
@@ -1818,7 +1818,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Notícia / Análise</option>
           <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Operações DMF Black</option>
           <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Comunicado Geral</option>
-          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Material Educacional</option>
+          <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> DMF Academy</option>
         </select>
       </div>
       <div class="form-group"><label>Data</label><input class="form-input" id="com-data" type="date"></div>
@@ -6083,7 +6083,7 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-noticias','noticias','Notícias',false));
     clienteNav.appendChild(mkBtn('cnav-glossario','glossario','Glossário',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
-    clienteNav.appendChild(mkSec('Educacional'));
+    clienteNav.appendChild(mkSec('DMF Academy'));
     clienteNav.appendChild(mkBtn('cnav-materiais','materiais-cliente','Materiais',false));
     clienteNav.appendChild(mkSec('Suporte'));
     clienteNav.appendChild(mkBtn('cnav-chamados','chamados','Abrir Chamado',false));
@@ -7458,7 +7458,7 @@ function buildMateriaisClienteView(){
   var div = document.createElement('div');
   div.className = 'view';
   div.id = 'view-materiais-cliente';
-  div.innerHTML = '<div class="page-header"><div><div class="page-title">Material Educacional</div><div class="page-sub">Conteúdo exclusivo para sua formação financeira</div></div></div>'
+  div.innerHTML = '<div class="page-header"><div><div class="page-title">DMF Academy</div><div class="page-sub">Conteúdo exclusivo para sua formação financeira</div></div></div>'
     + '<div class="page-content">'
     + '<div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center">'
     +   '<input class="filter-input" id="mat-cli-search" placeholder="Buscar material..." oninput="renderMateriaisCliente()" style="min-width:260px">'
