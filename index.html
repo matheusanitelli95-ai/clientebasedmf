@@ -538,6 +538,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
       <div class="nav-section">DMF Academy</div>
       <button class="nav-item" onclick="showView('materiais-gestao',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span>Materiais</span></button>
+      <button class="nav-item" onclick="showView('academy-trilha',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>Trilha</span></button>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -990,6 +991,17 @@ textarea.form-input{resize:vertical;min-height:80px}
           <span id="mat-count" style="font-size:12px;color:var(--text3);margin-left:auto"></span>
         </div>
         <div id="materiais-list"></div>
+      </div>
+    </div>
+
+    <!-- ACADEMY TRILHA (ADM) -->
+    <div class="view" id="view-academy-trilha">
+      <div class="page-header">
+        <div><div class="page-title">Trilha Progressiva</div><div class="page-sub">Acompanhe o progresso dos clientes na DMF Academy</div></div>
+      </div>
+      <div class="page-content">
+        <div class="grid-4" id="trilha-kpis" style="margin-bottom:20px"></div>
+        <div class="card"><div class="section-title">Progresso dos Clientes</div><div id="trilha-adm-list"></div></div>
       </div>
     </div>
 
@@ -5939,8 +5951,8 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao'],
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','academy-trilha'],
   cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias','materiais-cliente']
 };
 
@@ -6085,6 +6097,8 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
     clienteNav.appendChild(mkSec('DMF Academy'));
     clienteNav.appendChild(mkBtn('cnav-materiais','materiais-cliente','Materiais',false));
+    // Trilha do cliente desabilitada — descomentar para liberar:
+    // clienteNav.appendChild(mkBtn('cnav-trilha','academy-trilha-cliente','Trilha',false));
     clienteNav.appendChild(mkSec('Suporte'));
     clienteNav.appendChild(mkBtn('cnav-chamados','chamados','Abrir Chamado',false));
 
@@ -6096,6 +6110,8 @@ function showClientePortal(){
   if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
   if(!document.getElementById('view-chamados')) buildChamadosView();
   if(!document.getElementById('view-materiais-cliente')) buildMateriaisClienteView();
+  // Trilha do cliente desabilitada — descomentar para liberar:
+  // if(!document.getElementById('view-academy-trilha-cliente')) buildAcademyTrilhaClienteView();
 
   showClienteView('minha-carteira', document.getElementById('cnav-carteira'));
   loadMinhaCarteira();
@@ -6117,6 +6133,7 @@ function showClienteView(viewId, btn){
   if(viewId==='noticias') loadNoticias&&loadNoticias();
   if(viewId==='chamados') loadChamados();
   if(viewId==='materiais-cliente') loadMateriais();
+  if(viewId==='academy-trilha-cliente') renderAcademyTrilhaCliente();
 }
 
 function buildMinhaCarteiraView(){
@@ -8147,6 +8164,533 @@ function importarDaImagem(){
     btn.disabled = false;
     alert('Erro: ' + e.message);
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DMF ACADEMY — TRILHA PROGRESSIVA
+// ═══════════════════════════════════════════════════════════
+
+var ACADEMY_NIVEIS = [
+  {id:'sobrevivencia', nome:'Sobrevivência', cor:'#22c55e', desc:'Evitar os erros que destroem patrimônio', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
+  {id:'estrutura', nome:'Estrutura', cor:'#1e8fff', desc:'Organizar a carteira como sistema', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'},
+  {id:'decisao', nome:'Decisão', cor:'#f59e0b', desc:'Agir com coerência em cenários reais', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
+  {id:'eficiencia', nome:'Eficiência', cor:'#c084fc', desc:'Otimizar retorno com estrutura', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'},
+  {id:'gestor', nome:'Mentalidade de Gestor', cor:'#ef4444', desc:'Pensar como profissional de mercado', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'}
+];
+
+var ACADEMY_EXERCICIOS = [
+  // NÍVEL 1 — Sobrevivência
+  {id:'ex6', nivel:'sobrevivencia', titulo:'O pior erro',
+    cenario:'Sua carteira é de longo prazo. O mercado cai -10% em uma semana.',
+    pergunta:'Qual é a pior decisão que você pode tomar?',
+    opcoes:[
+      {letra:'A', texto:'Sair totalmente da posição', classe:'prejudicial', pontos:0},
+      {letra:'B', texto:'Reduzir a posição pela metade', classe:'fraca', pontos:1},
+      {letra:'C', texto:'Manter a posição como está', classe:'boa', pontos:2},
+      {letra:'D', texto:'Rebalancear a carteira', classe:'estrategica', pontos:3}
+    ],
+    ideal:'A',
+    feedbacks:{
+      A:'Essa é a decisão que mais destrói retorno no longo prazo. Você transforma volatilidade em prejuízo definitivo.',
+      B:'Reduzir posição por medo raramente é uma boa estratégia. Você cristaliza parte da perda sem motivo estrutural.',
+      C:'Manter é uma decisão aceitável. Você não amplifica o erro, mas também não aproveita a oportunidade.',
+      D:'Rebalancear é a decisão mais estratégica. Você compra mais barato e mantém a estrutura da carteira.'
+    }
+  },
+  {id:'ex7', nivel:'sobrevivencia', titulo:'Curto vs longo prazo',
+    cenario:'Um cliente olha a carteira todos os dias. As oscilações diárias estão incomodando.',
+    pergunta:'O problema está onde?',
+    opcoes:[
+      {letra:'A', texto:'Nos ativos escolhidos', classe:'fraca', pontos:1},
+      {letra:'B', texto:'No mercado estar volátil', classe:'prejudicial', pontos:0},
+      {letra:'C', texto:'No horizonte de investimento', classe:'estrategica', pontos:3},
+      {letra:'D', texto:'Na estratégia da carteira', classe:'boa', pontos:2}
+    ],
+    ideal:'C',
+    feedbacks:{
+      A:'Os ativos podem até ser bons. O erro não está na escolha, está na forma de avaliar.',
+      B:'Culpar o mercado é a resposta mais comum e mais improdutiva. O mercado faz o que faz.',
+      C:'Exato. O erro não está no mercado. Está em querer avaliar longo prazo com mentalidade de curto prazo.',
+      D:'A estratégia pode estar correta. O problema é comportamental, não técnico.'
+    }
+  },
+  // NÍVEL 2 — Estrutura
+  {id:'ex8', nivel:'estrutura', titulo:'Carteira mal construída',
+    cenario:'Cliente com perfil moderado possui: 80% em ações e 20% em renda fixa.',
+    pergunta:'Qual o principal erro dessa carteira?',
+    opcoes:[
+      {letra:'A', texto:'Falta de diversificação geográfica', classe:'fraca', pontos:1},
+      {letra:'B', texto:'Excesso de risco para o perfil', classe:'estrategica', pontos:3},
+      {letra:'C', texto:'Falta de ativos internacionais', classe:'fraca', pontos:1},
+      {letra:'D', texto:'Pouca renda fixa', classe:'boa', pontos:2}
+    ],
+    ideal:'B',
+    feedbacks:{
+      A:'Diversificação geográfica é importante, mas não é o problema central aqui.',
+      B:'O problema central não é diversificação. É risco incompatível com o perfil. Um moderado com 80% em RV está correndo risco de agressivo.',
+      C:'Internacionalização é um complemento, não a questão principal.',
+      D:'Está perto, mas o ponto é mais amplo: o risco total está acima do que o perfil comporta.'
+    }
+  },
+  {id:'ex9', nivel:'estrutura', titulo:'Função da renda fixa',
+    cenario:'Um cliente diz: "Renda fixa não serve pra nada, rende pouco. Quero tudo em ação."',
+    pergunta:'Qual a função principal da renda fixa na carteira?',
+    opcoes:[
+      {letra:'A', texto:'Gerar rentabilidade acima da bolsa', classe:'prejudicial', pontos:0},
+      {letra:'B', texto:'Segurança e liquidez', classe:'estrategica', pontos:3},
+      {letra:'C', texto:'Superar o CDI no longo prazo', classe:'fraca', pontos:1},
+      {letra:'D', texto:'Fazer timing de mercado', classe:'prejudicial', pontos:0}
+    ],
+    ideal:'B',
+    feedbacks:{
+      A:'Se você espera que RF supere a bolsa, está usando o instrumento errado para o objetivo errado.',
+      B:'Renda fixa não é sobre ganhar mais. É sobre sustentar a estratégia. Ela protege a carteira nos momentos de estresse.',
+      C:'CDI é benchmark de RF, mas a função dela vai além de retorno. É estrutural.',
+      D:'Timing de mercado é uma ilusão. RF não serve para isso.'
+    }
+  },
+  // NÍVEL 3 — Decisão
+  {id:'ex10', nivel:'decisao', titulo:'Agir ou reagir?',
+    cenario:'O mercado cai -7% no mês. Seu perfil é moderado. Sua carteira está dentro da alocação planejada.',
+    pergunta:'O que você faz?',
+    opcoes:[
+      {letra:'A', texto:'Sai de toda a posição de risco', classe:'prejudicial', pontos:0},
+      {letra:'B', texto:'Reduz a exposição por segurança', classe:'fraca', pontos:1},
+      {letra:'C', texto:'Mantém a posição como planejado', classe:'boa', pontos:2},
+      {letra:'D', texto:'Rebalanceia aproveitando preços menores', classe:'estrategica', pontos:3}
+    ],
+    ideal:'D',
+    feedbacks:{
+      A:'Sair por medo transforma oscilação em perda real. Você age por emoção, não por estratégia.',
+      B:'Reduzir sem motivo técnico é reagir ao mercado. A carteira já estava dentro do plano.',
+      C:'Manter é uma boa decisão. Você respeita o plano original. Mas existe algo ainda melhor.',
+      D:'Rebalancear é agir com base em estrutura. Você compra ativos a preços menores e fortalece a carteira.'
+    }
+  },
+  {id:'ex11', nivel:'decisao', titulo:'Aceitável vs eficiente',
+    cenario:'Mesmo cenário de queda de -7%. Você tem caixa disponível para aportes.',
+    pergunta:'Qual decisão é MAIS eficiente?',
+    opcoes:[
+      {letra:'A', texto:'Manter a carteira como está', classe:'boa', pontos:2},
+      {letra:'B', texto:'Rebalancear com novos aportes', classe:'estrategica', pontos:3},
+      {letra:'C', texto:'Reduzir risco e esperar', classe:'fraca', pontos:1}
+    ],
+    ideal:'B',
+    feedbacks:{
+      A:'Manter é aceitável. Você não faz besteira. Mas deixa de aproveitar uma oportunidade.',
+      B:'Manter é aceitável. Rebalancear é eficiente. A diferença entre "não errar" e "acertar" está aqui.',
+      C:'Reduzir e esperar é reagir ao medo disfarçado de prudência. O plano já existia antes da queda.'
+    }
+  },
+  // NÍVEL 4 — Eficiência
+  {id:'ex12', nivel:'eficiencia', titulo:'Uso de caixa',
+    cenario:'Você tem 15% da carteira em caixa. O mercado está lateral há 3 meses, sem tendência clara.',
+    pergunta:'Qual o melhor uso para esse caixa?',
+    opcoes:[
+      {letra:'A', texto:'Esperar a próxima grande queda', classe:'fraca', pontos:1},
+      {letra:'B', texto:'Aplicar tudo de uma vez agora', classe:'fraca', pontos:1},
+      {letra:'C', texto:'Alocar gradualmente em parcelas', classe:'boa', pontos:2},
+      {letra:'D', texto:'Usar de forma estratégica conforme oportunidades', classe:'estrategica', pontos:3}
+    ],
+    ideal:'D',
+    feedbacks:{
+      A:'Esperar "a grande queda" é timing de mercado disfarçado. O custo de oportunidade é real.',
+      B:'Investir tudo de uma vez elimina sua reserva de oportunidade. Falta estratégia.',
+      C:'Gradual é melhor que tudo junto, mas ainda é mecânico. Falta critério.',
+      D:'Caixa parado protege. Caixa estratégico produz. A diferença está em ter critérios claros para uso.'
+    }
+  },
+  {id:'ex13', nivel:'eficiencia', titulo:'Erro sofisticado',
+    cenario:'Um investidor experiente tenta "acertar o topo" do mercado para vender antes da queda. Ele estuda gráficos diariamente.',
+    pergunta:'O principal erro dele é:',
+    opcoes:[
+      {letra:'A', texto:'A escolha dos ativos', classe:'fraca', pontos:1},
+      {letra:'B', texto:'Tentar fazer timing de mercado', classe:'estrategica', pontos:3},
+      {letra:'C', texto:'Excesso de risco concentrado', classe:'boa', pontos:2},
+      {letra:'D', texto:'Falta de estudo técnico', classe:'prejudicial', pontos:0}
+    ],
+    ideal:'B',
+    feedbacks:{
+      A:'O ativo pode até estar correto. O erro está na forma de operar.',
+      B:'O erro não está no ativo. Está em tentar prever o mercado. Ninguém acerta topos e fundos consistentemente.',
+      C:'Concentração pode ser um problema, mas o erro fundamental é o timing.',
+      D:'Mais estudo não resolve. O problema é a premissa: achar que é possível prever o mercado.'
+    }
+  },
+  // NÍVEL 5 — Mentalidade de Gestor
+  {id:'ex14', nivel:'gestor', titulo:'Cliente em pânico',
+    cenario:'Seu cliente liga em desespero após uma queda de -12% e pede para vender tudo imediatamente.',
+    pergunta:'Como profissional, o que você faz?',
+    opcoes:[
+      {letra:'A', texto:'Executa a ordem do cliente', classe:'fraca', pontos:1},
+      {letra:'B', texto:'Convence a manter com dados e cenário', classe:'estrategica', pontos:3},
+      {letra:'C', texto:'Ajusta parcialmente para aliviar a pressão', classe:'boa', pontos:2},
+      {letra:'D', texto:'Reestrutura a carteira com perfil mais conservador', classe:'estrategica', pontos:3}
+    ],
+    ideal:'B',
+    feedbacks:{
+      A:'Executar por pressão é obedecer, não gerir. O cliente contratou expertise, não obediência.',
+      B:'Gestão não é obedecer o cliente. É proteger o patrimônio dele. Mostrar cenário com dados é o papel do gestor.',
+      C:'Ajuste parcial pode aliviar, mas não resolve a causa. O problema é emocional, não técnico.',
+      D:'Reestruturar pode ser válido se o perfil realmente mudou. Mas se a motivação é o pânico, você está cedendo à emoção do cliente.'
+    }
+  },
+  {id:'ex15', nivel:'gestor', titulo:'O que realmente importa',
+    cenario:'Uma carteira apresentou rentabilidade abaixo do esperado nos últimos 12 meses. O cliente questiona a estratégia.',
+    pergunta:'O que você avalia primeiro?',
+    opcoes:[
+      {letra:'A', texto:'O retorno absoluto no período', classe:'fraca', pontos:1},
+      {letra:'B', texto:'Comparação com benchmark de mercado', classe:'boa', pontos:2},
+      {letra:'C', texto:'A consistência da estratégia ao longo do tempo', classe:'estrategica', pontos:3},
+      {letra:'D', texto:'Os ativos individuais que performaram mal', classe:'fraca', pontos:1}
+    ],
+    ideal:'C',
+    feedbacks:{
+      A:'Retorno de curto prazo não valida nem invalida estratégia. É apenas um recorte.',
+      B:'Comparar com benchmark é útil, mas não é o mais importante. O benchmark pode ter sido atípico.',
+      C:'Retorno de curto prazo não valida estratégia. Consistência sim. Se a estratégia é coerente com o perfil e o cenário, 12 meses é ruído.',
+      D:'Olhar ativos individuais é detalhe operacional. A visão precisa ser estrutural primeiro.'
+    }
+  }
+];
+
+var academyProgressData = {};
+var academyProgressListener = null;
+
+function initAcademyProgress(){
+  if(academyProgressListener) return;
+  academyProgressListener = db.collection('academy_progress').onSnapshot(function(snap){
+    academyProgressData = {};
+    snap.forEach(function(doc){
+      academyProgressData[doc.id] = doc.data();
+    });
+    renderAcademyTrilhaAdm();
+  });
+}
+
+function getMyAcademyProgress(){
+  if(!currentUser) return {};
+  return academyProgressData[currentUser.email] || {};
+}
+
+function calcScoreDMF(progress){
+  var respostas = progress.respostas || {};
+  var totalPontos = 0;
+  var totalMax = 0;
+  ACADEMY_EXERCICIOS.forEach(function(ex){
+    totalMax += 3;
+    if(respostas[ex.id]){
+      totalPontos += (respostas[ex.id].pontos || 0);
+    }
+  });
+  if(totalMax === 0) return 0;
+  return Math.round((totalPontos / totalMax) * 100);
+}
+
+function getNivelDesbloqueado(progress){
+  var respostas = progress.respostas || {};
+  for(var i = 0; i < ACADEMY_NIVEIS.length; i++){
+    var nivel = ACADEMY_NIVEIS[i];
+    var exerciciosNivel = ACADEMY_EXERCICIOS.filter(function(e){ return e.nivel === nivel.id; });
+    var todos = exerciciosNivel.every(function(e){ return respostas[e.id]; });
+    if(!todos) return i;
+  }
+  return ACADEMY_NIVEIS.length;
+}
+
+function buildAcademyTrilhaClienteView(){
+  var mainContent = document.getElementById('main-content');
+  if(document.getElementById('view-academy-trilha-cliente')) return;
+  var div = document.createElement('div');
+  div.className = 'view';
+  div.id = 'view-academy-trilha-cliente';
+  div.innerHTML = '<div class="page-header"><div>'
+    +'<div class="page-title">Trilha DMF Academy</div>'
+    +'<div class="page-sub">Evolua sua mentalidade de investidor em 5 níveis</div>'
+    +'</div><div id="trilha-score-badge"></div></div>'
+    +'<div class="page-content"><div id="trilha-cliente-body"></div></div>';
+  mainContent.appendChild(div);
+}
+
+function renderAcademyTrilhaCliente(){
+  var body = document.getElementById('trilha-cliente-body');
+  if(!body) return;
+  var progress = getMyAcademyProgress();
+  var respostas = progress.respostas || {};
+  var nivelAtual = getNivelDesbloqueado(progress);
+  var score = calcScoreDMF(progress);
+
+  // Score badge
+  var badge = document.getElementById('trilha-score-badge');
+  if(badge){
+    badge.innerHTML = '<div style="text-align:center;padding:8px 20px;background:'+
+      (score>=80?'#22c55e22':score>=50?'#f59e0b22':'#1e8fff22')+
+      ';border-radius:12px;border:1px solid '+(score>=80?'#22c55e44':score>=50?'#f59e0b44':'#1e8fff44')+'">'
+      +'<div style="font-family:DM Mono,monospace;font-size:28px;font-weight:700;color:'+(score>=80?'#22c55e':score>=50?'#f59e0b':'#1e8fff')+'">'+score+'</div>'
+      +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Score DMF</div></div>';
+  }
+
+  var html = '';
+
+  // Barra de progresso geral
+  var totalEx = ACADEMY_EXERCICIOS.length;
+  var feitos = Object.keys(respostas).length;
+  var pct = totalEx > 0 ? Math.round((feitos/totalEx)*100) : 0;
+  html += '<div class="card" style="margin-bottom:20px;padding:20px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    +'<span style="font-size:13px;color:var(--text2)">Progresso geral</span>'
+    +'<span style="font-family:DM Mono,monospace;font-size:13px;color:var(--white)">'+feitos+'/'+totalEx+' exercícios</span></div>'
+    +'<div style="background:var(--card);border-radius:6px;height:8px;overflow:hidden">'
+    +'<div style="background:linear-gradient(90deg,#1e8fff,#22c55e);height:100%;width:'+pct+'%;border-radius:6px;transition:width .5s"></div></div></div>';
+
+  // Níveis
+  ACADEMY_NIVEIS.forEach(function(nivel, idx){
+    var desbloqueado = idx <= nivelAtual;
+    var exercicios = ACADEMY_EXERCICIOS.filter(function(e){ return e.nivel === nivel.id; });
+    var exerciciosFeitos = exercicios.filter(function(e){ return respostas[e.id]; }).length;
+    var completo = exerciciosFeitos === exercicios.length;
+
+    html += '<div class="card" style="margin-bottom:14px;'+(desbloqueado?'':'opacity:.45;pointer-events:none;')+'">'
+      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">'
+      +'<div style="width:44px;height:44px;border-radius:12px;background:'+nivel.cor+'18;display:flex;align-items:center;justify-content:center;color:'+nivel.cor+'">'+nivel.icon+'</div>'
+      +'<div style="flex:1">'
+      +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:var(--white)">Nível '+(idx+1)+' — '+nivel.nome+'</div>'
+      +'<div style="font-size:12px;color:var(--text3)">'+nivel.desc+'</div></div>'
+      +'<div style="text-align:right">';
+    if(completo){
+      html += '<span class="badge" style="background:#22c55e22;color:#22c55e">Completo</span>';
+    } else if(desbloqueado){
+      html += '<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--text3)">'+exerciciosFeitos+'/'+exercicios.length+'</span>';
+    } else {
+      html += '<span style="font-size:12px;color:var(--text3)">Bloqueado</span>';
+    }
+    html += '</div></div>';
+
+    // Exercícios do nível
+    exercicios.forEach(function(ex){
+      var resp = respostas[ex.id];
+      if(resp){
+        var corClasse = resp.classe==='estrategica'?'#22c55e':resp.classe==='boa'?'#1e8fff':resp.classe==='fraca'?'#f59e0b':'#ef4444';
+        html += '<div style="padding:12px 16px;margin-bottom:8px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;gap:12px">'
+          +'<div style="width:8px;height:8px;border-radius:50%;background:'+corClasse+';flex-shrink:0"></div>'
+          +'<div style="flex:1"><span style="font-size:13px;color:var(--white);font-weight:600">'+ex.titulo+'</span>'
+          +'<span style="font-size:11px;color:var(--text3);margin-left:8px">'+resp.pontos+'/3 pts</span></div>'
+          +'<span class="badge" style="background:'+corClasse+'22;color:'+corClasse+';font-size:10px;text-transform:capitalize">'+resp.classe+'</span>'
+          +'<button class="btn-ghost" style="font-size:11px" onclick="abrirExercicioAcademy(\''+ex.id+'\',true)">Rever</button></div>';
+      } else if(desbloqueado){
+        html += '<div style="padding:12px 16px;margin-bottom:8px;border-radius:10px;background:var(--card);border:1px dashed var(--border);display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirExercicioAcademy(\''+ex.id+'\',false)">'
+          +'<div style="width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0"></div>'
+          +'<div style="flex:1;font-size:13px;color:var(--text2)">'+ex.titulo+'</div>'
+          +'<span style="font-size:12px;color:var(--blue)">Iniciar →</span></div>';
+      }
+    });
+    html += '</div>';
+  });
+
+  body.innerHTML = html;
+}
+
+function abrirExercicioAcademy(exId, revisao){
+  var ex = ACADEMY_EXERCICIOS.find(function(e){ return e.id === exId; });
+  if(!ex) return;
+  var nivel = ACADEMY_NIVEIS.find(function(n){ return n.id === ex.nivel; });
+  var progress = getMyAcademyProgress();
+  var respostaAnterior = (progress.respostas||{})[exId];
+
+  var overlay = document.createElement('div');
+  overlay.id = 'academy-exercise-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+
+  var card = document.createElement('div');
+  card.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px';
+
+  var h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+    +'<span style="color:'+nivel.cor+'">'+nivel.icon+'</span>'
+    +'<span class="badge" style="background:'+nivel.cor+'22;color:'+nivel.cor+'">'+nivel.nome+'</span></div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:20px">'+ex.titulo+'</div>'
+    +'<div class="card" style="padding:18px;margin-bottom:20px;border-color:'+nivel.cor+'44">'
+    +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Cenário</div>'
+    +'<div style="font-size:14px;color:var(--white);line-height:1.6">'+ex.cenario+'</div></div>'
+    +'<div style="font-size:15px;color:var(--white);font-weight:600;margin-bottom:16px">'+ex.pergunta+'</div>'
+    +'<div id="academy-opcoes">';
+
+  ex.opcoes.forEach(function(op){
+    var selected = respostaAnterior && respostaAnterior.letra === op.letra;
+    h += '<button class="academy-opcao'+(selected?' selected':'')+'" data-letra="'+op.letra+'" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:8px;border-radius:10px;border:1px solid '+(selected?nivel.cor:'var(--border)')+';background:'+(selected?nivel.cor+'15':'var(--card)')+';cursor:pointer;text-align:left;transition:all .2s" '
+      +(revisao?'':'onclick="selecionarOpcaoAcademy(this,\''+op.letra+'\')"')+'>'
+      +'<span style="width:28px;height:28px;border-radius:8px;background:'+(selected?nivel.cor+'33':'var(--border)')+';display:flex;align-items:center;justify-content:center;font-family:DM Mono,monospace;font-weight:700;font-size:13px;color:'+(selected?nivel.cor:'var(--text3)')+';flex-shrink:0">'+op.letra+'</span>'
+      +'<span style="font-size:14px;color:var(--white)">'+op.texto+'</span></button>';
+  });
+  h += '</div>';
+
+  if(revisao && respostaAnterior){
+    var feedbackTexto = ex.feedbacks[respostaAnterior.letra];
+    var corClasse = respostaAnterior.classe==='estrategica'?'#22c55e':respostaAnterior.classe==='boa'?'#1e8fff':respostaAnterior.classe==='fraca'?'#f59e0b':'#ef4444';
+    h += '<div id="academy-feedback" style="margin-top:16px;padding:18px;border-radius:12px;background:'+corClasse+'10;border:1px solid '+corClasse+'33">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+      +'<span class="badge" style="background:'+corClasse+'22;color:'+corClasse+';text-transform:capitalize">'+respostaAnterior.classe+'</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--text3)">'+respostaAnterior.pontos+'/3 pts</span></div>'
+      +'<div style="font-size:14px;color:var(--white);line-height:1.6">'+feedbackTexto+'</div></div>';
+  }
+
+  h += '<div id="academy-feedback-area"></div>'
+    +'<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">'
+    +'<button class="btn-ghost" onclick="fecharExercicioAcademy()">Fechar</button>';
+  if(!revisao){
+    h += '<button class="btn-primary" id="academy-confirmar" style="opacity:.4;pointer-events:none" onclick="confirmarRespostaAcademy(\''+ex.id+'\')">Confirmar Resposta</button>';
+  }
+  h += '</div>';
+
+  card.innerHTML = h;
+  overlay.appendChild(card);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) fecharExercicioAcademy(); });
+  document.body.appendChild(overlay);
+}
+
+var _academyLetraSelecionada = null;
+
+function selecionarOpcaoAcademy(btn, letra){
+  _academyLetraSelecionada = letra;
+  var parent = btn.parentElement;
+  parent.querySelectorAll('.academy-opcao').forEach(function(b){
+    b.style.borderColor = 'var(--border)';
+    b.style.background = 'var(--card)';
+  });
+  btn.style.borderColor = '#1e8fff';
+  btn.style.background = '#1e8fff15';
+  var confirmar = document.getElementById('academy-confirmar');
+  if(confirmar){
+    confirmar.style.opacity = '1';
+    confirmar.style.pointerEvents = 'auto';
+  }
+}
+
+function confirmarRespostaAcademy(exId){
+  if(!_academyLetraSelecionada || !currentUser) return;
+  var ex = ACADEMY_EXERCICIOS.find(function(e){ return e.id === exId; });
+  if(!ex) return;
+  var opcao = ex.opcoes.find(function(o){ return o.letra === _academyLetraSelecionada; });
+  if(!opcao) return;
+
+  var feedbackTexto = ex.feedbacks[_academyLetraSelecionada];
+  var corClasse = opcao.classe==='estrategica'?'#22c55e':opcao.classe==='boa'?'#1e8fff':opcao.classe==='fraca'?'#f59e0b':'#ef4444';
+
+  // Mostrar feedback
+  var area = document.getElementById('academy-feedback-area');
+  if(area){
+    area.innerHTML = '<div style="margin-top:16px;padding:18px;border-radius:12px;background:'+corClasse+'10;border:1px solid '+corClasse+'33;animation:fadeIn .3s">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+      +'<span class="badge" style="background:'+corClasse+'22;color:'+corClasse+';text-transform:capitalize">'+opcao.classe+'</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:12px;color:var(--text3)">'+opcao.pontos+'/3 pontos</span></div>'
+      +'<div style="font-size:14px;color:var(--white);line-height:1.6">'+feedbackTexto+'</div></div>';
+  }
+
+  // Desabilitar opções e botão
+  var opcoesDiv = document.getElementById('academy-opcoes');
+  if(opcoesDiv){
+    opcoesDiv.querySelectorAll('.academy-opcao').forEach(function(b){ b.style.pointerEvents='none'; });
+  }
+  var confirmar = document.getElementById('academy-confirmar');
+  if(confirmar){ confirmar.style.display='none'; }
+
+  // Salvar no Firestore
+  var updateData = {};
+  updateData['respostas.'+exId] = {
+    letra: _academyLetraSelecionada,
+    classe: opcao.classe,
+    pontos: opcao.pontos,
+    data: new Date().toISOString()
+  };
+  db.collection('academy_progress').doc(currentUser.email).set(updateData, {merge:true}).then(function(){
+    _academyLetraSelecionada = null;
+    // Re-render after small delay
+    setTimeout(function(){ renderAcademyTrilhaCliente(); }, 500);
+  });
+}
+
+function fecharExercicioAcademy(){
+  var overlay = document.getElementById('academy-exercise-overlay');
+  if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  _academyLetraSelecionada = null;
+}
+
+// ─── Painel ADM: ver progresso ───
+function renderAcademyTrilhaAdm(){
+  var list = document.getElementById('trilha-adm-list');
+  var kpis = document.getElementById('trilha-kpis');
+  if(!list) return;
+
+  var emails = Object.keys(academyProgressData);
+  var totalAlunos = emails.length;
+  var totalCompletos = 0;
+  var somaScore = 0;
+  var totalExercicios = ACADEMY_EXERCICIOS.length;
+
+  emails.forEach(function(email){
+    var p = academyProgressData[email];
+    var respostas = p.respostas || {};
+    var feitos = Object.keys(respostas).length;
+    if(feitos >= totalExercicios) totalCompletos++;
+    somaScore += calcScoreDMF(p);
+  });
+
+  var mediaScore = totalAlunos > 0 ? Math.round(somaScore / totalAlunos) : 0;
+
+  if(kpis){
+    kpis.innerHTML = '<div class="kpi-card"><div class="kpi-label">Alunos ativos</div><div class="kpi-value">'+totalAlunos+'</div></div>'
+      +'<div class="kpi-card"><div class="kpi-label">Trilha completa</div><div class="kpi-value">'+totalCompletos+'</div></div>'
+      +'<div class="kpi-card"><div class="kpi-label">Score médio</div><div class="kpi-value">'+mediaScore+'</div></div>'
+      +'<div class="kpi-card"><div class="kpi-label">Exercícios</div><div class="kpi-value">'+totalExercicios+'</div></div>';
+  }
+
+  if(!emails.length){
+    list.innerHTML = '<div class="empty" style="padding:40px"><div class="empty-title">Nenhum aluno iniciou a trilha ainda</div><p style="font-size:13px;margin-top:4px">Quando clientes responderem exercícios, o progresso aparecerá aqui</p></div>';
+    return;
+  }
+
+  // Mapear nomes dos clientes
+  var clienteMap = {};
+  clientes.forEach(function(c){ if(c.email) clienteMap[c.email.toLowerCase()] = c.nome; });
+
+  var rows = emails.map(function(email){
+    var p = academyProgressData[email];
+    var respostas = p.respostas || {};
+    var feitos = Object.keys(respostas).length;
+    var score = calcScoreDMF(p);
+    var nivelIdx = getNivelDesbloqueado(p);
+    var nivelAtual = nivelIdx < ACADEMY_NIVEIS.length ? ACADEMY_NIVEIS[nivelIdx] : ACADEMY_NIVEIS[ACADEMY_NIVEIS.length-1];
+    var nome = clienteMap[email.toLowerCase()] || email;
+    var pct = Math.round((feitos/totalExercicios)*100);
+    return {email:email, nome:nome, feitos:feitos, score:score, nivelAtual:nivelAtual, pct:pct, completo:feitos>=totalExercicios};
+  }).sort(function(a,b){ return b.score - a.score; });
+
+  list.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Nível Atual</th><th>Progresso</th><th style="text-align:center">Score DMF</th></tr></thead><tbody>'
+    + rows.map(function(r){
+      var scoreCor = r.score>=80?'#22c55e':r.score>=50?'#f59e0b':'#1e8fff';
+      return '<tr>'
+        +'<td style="font-weight:600;color:var(--white)">'+r.nome+'<div style="font-size:11px;color:var(--text3);font-weight:400">'+r.email+'</div></td>'
+        +'<td><span class="badge" style="background:'+r.nivelAtual.cor+'22;color:'+r.nivelAtual.cor+'">'+r.nivelAtual.nome+'</span></td>'
+        +'<td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;background:var(--card);border-radius:4px;height:6px;overflow:hidden"><div style="background:'+scoreCor+';height:100%;width:'+r.pct+'%"></div></div><span style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+r.feitos+'/'+ACADEMY_EXERCICIOS.length+'</span></div></td>'
+        +'<td style="text-align:center"><span style="font-family:DM Mono,monospace;font-weight:700;font-size:16px;color:'+scoreCor+'">'+r.score+'</span></td>'
+        +'</tr>';
+    }).join('')
+    + '</tbody></table></div>';
+}
+
+// Hook showView for academy-trilha (ADM)
+var _origShowViewAcademy = showView;
+showView = function(v, btn){
+  _origShowViewAcademy(v, btn);
+  if(v==='academy-trilha') initAcademyProgress();
+};
+
+// Init academy progress listener for clients too
+var _origShowClientePortal = typeof showClientePortal === 'function' ? showClientePortal : null;
+if(_origShowClientePortal){
+  showClientePortal = function(){
+    _origShowClientePortal();
+    initAcademyProgress();
+  };
 }
 
 </script>
