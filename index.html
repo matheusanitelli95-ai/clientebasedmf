@@ -534,7 +534,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Financeiro</span></button>
       <button class="nav-item" onclick="showView('dre',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>DRE</span></button>
       <button class="nav-item" onclick="showView('balanco',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span><span>Balanço</span></button>
-      <button class="nav-item" onclick="showView('crm',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>CRM & Tarefas</span></button>
+      <button class="nav-item" onclick="showView('crm',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>CRM</span></button>
+      <button class="nav-item" onclick="showView('tarefas-equipe',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Tarefas</span></button>
       <button class="nav-item" onclick="showView('organograma',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><rect x="1" y="14" width="6" height="4" rx="1"/><rect x="9" y="14" width="6" height="4" rx="1"/><rect x="17" y="14" width="6" height="4" rx="1"/><path d="M4 14V9h16v5M12 6v3"/></svg></span><span>Organograma</span></button>
       <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp</span></button>
       <div class="nav-section">DMF Black</div>
@@ -668,7 +669,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="tabs">
           <button class="tab active" onclick="showTab('dados',this)">Dados Cadastrais</button>
           <button class="tab" onclick="showTab('carteira',this)">Carteira de Ativos</button>
-          <button class="tab" onclick="showTab('crm-cli',this)">CRM & Tarefas</button>
+          <button class="tab" onclick="showTab('crm-cli',this)">CRM</button>
           <button class="tab" onclick="showTab('historico',this)">Histórico</button>
         </div>
         <div id="tab-dados" class="tab-content active"></div>
@@ -692,20 +693,36 @@ textarea.form-input{resize:vertical;min-height:80px}
     <!-- CRM -->
     <div class="view" id="view-crm">
       <div class="page-header">
-        <div><div class="page-title">CRM & Tarefas</div><div class="page-sub">Relacionamento com clientes</div></div>
-        <button class="btn-primary" onclick="openModalTarefa()">+ Nova Tarefa</button>
+        <div><div class="page-title">CRM</div><div class="page-sub">Relacionamento com clientes</div></div>
       </div>
       <div class="page-content">
         <div class="tabs" style="margin-bottom:20px">
           <button class="tab active" onclick="showCRMTab('agenda',this)">Agenda</button>
-          <button class="tab" onclick="showCRMTab('tarefas',this)">Tarefas</button>
           <button class="tab" onclick="showCRMTab('leads-crm',this)">Leads</button>
           <button class="tab" onclick="showCRMTab('alertas-crm',this)">Alertas</button>
         </div>
         <div id="crm-tab-agenda" class="tab-content active"><div id="crm-content"></div></div>
-        <div id="crm-tab-tarefas" class="tab-content"><div id="crm-tarefas-content"></div></div>
         <div id="crm-tab-leads-crm" class="tab-content"><div id="leads-crm-content"></div></div>
         <div id="crm-tab-alertas-crm" class="tab-content"><div id="alertas-content"></div></div>
+      </div>
+    </div>
+
+    <!-- TAREFAS DA EQUIPE -->
+    <div class="view" id="view-tarefas-equipe">
+      <div class="page-header">
+        <div><div class="page-title">Tarefas da Equipe</div><div class="page-sub">Gestão de tarefas e produtividade</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="filter-input" id="tf-filtro-resp" onchange="renderTarefasEquipe()" style="font-size:12px"><option value="">Todos</option></select>
+          <select class="filter-input" id="tf-filtro-prio" onchange="renderTarefasEquipe()" style="font-size:12px"><option value="">Prioridade</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+          <div style="display:flex;gap:2px;background:var(--card2);border-radius:8px;padding:2px">
+            <button class="btn-ghost" id="tf-view-kanban" onclick="setTarefasView('kanban')" style="padding:4px 10px;font-size:11px;border-radius:6px;background:var(--blue);color:#fff">Kanban</button>
+            <button class="btn-ghost" id="tf-view-lista" onclick="setTarefasView('lista')" style="padding:4px 10px;font-size:11px;border-radius:6px">Lista</button>
+          </div>
+          <button class="btn-primary" onclick="openModalTarefaEquipe()">+ Nova Tarefa</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="tarefas-equipe-body"></div>
       </div>
     </div>
 
@@ -5138,14 +5155,15 @@ function updateThemeBtn(isLight){
 // ═══════════════════════════════════════════════════════════
 var tarefas = [], editingTarefaId = null;
 var PRIORIDADE_C = {Alta:'#ff1744', Média:'#f59e0b', Baixa:'#00c853'};
-var STATUS_T_C = {Aberta:'#ff8c00', 'Em andamento':'#f59e0b', Concluída:'#00c853', Cancelada:'#555555'};
+var STATUS_T_C = {'A fazer':'#ff8c00', 'Em andamento':'#3b82f6', 'Aguardando':'#a855f7', 'Atrasada':'#ff1744', 'Concluída':'#00c853'};
+var tarefasViewMode = 'kanban';
+var tarefasEquipeLoaded = false;
 
 function showCRMTab(tab, btn){
   document.querySelectorAll('#view-crm .tab-content').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('#view-crm .tab').forEach(function(el){el.classList.remove('active');});
   document.getElementById('crm-tab-'+tab).classList.add('active');
   if(btn) btn.classList.add('active');
-  if(tab==='tarefas') loadTarefas();
   if(tab==='leads-crm') loadLeadsCRM();
   if(tab==='alertas-crm') renderAlertas();
 }
@@ -5153,227 +5171,497 @@ function showCRMTab(tab, btn){
 function loadTarefas(){
   db.collection('tarefas').orderBy('criadoEm','desc').onSnapshot(function(snap){
     tarefas = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    renderTarefas();
+    // Auto-marcar atrasadas
+    var hj = today();
+    tarefas.forEach(function(t){
+      if(t.prazo && t.prazo < hj && t.status !== 'Concluída' && t.status !== 'Atrasada'){
+        db.collection('tarefas').doc(t.id).update({status:'Atrasada'});
+      }
+    });
+    renderTarefasEquipe();
   });
 }
 
-function renderTarefas(){
-  var el = document.getElementById('crm-tarefas-content');
-  if(!el) return;
-  el.innerHTML = '';
+function initTarefasEquipe(){
+  if(!tarefasEquipeLoaded){
+    tarefasEquipeLoaded = true;
+    loadTarefas();
+    loadOrganograma();
+    // Popular filtro de responsáveis
+    setTimeout(populateTfFiltroResp, 1000);
+  }
+}
 
-  var cols = ['Aberta','Em andamento','Concluída'];
+function populateTfFiltroResp(){
+  var sel = document.getElementById('tf-filtro-resp');
+  if(!sel) return;
+  var current = sel.value;
+  sel.innerHTML = '<option value="">Todos</option>';
+  cargos.forEach(function(c){
+    sel.innerHTML += '<option value="'+c.nome+'">'+c.nome+'</option>';
+  });
+  sel.value = current;
+}
+
+function setTarefasView(mode){
+  tarefasViewMode = mode;
+  document.getElementById('tf-view-kanban').style.background = mode==='kanban'?'var(--blue)':'transparent';
+  document.getElementById('tf-view-kanban').style.color = mode==='kanban'?'#fff':'var(--text2)';
+  document.getElementById('tf-view-lista').style.background = mode==='lista'?'var(--blue)':'transparent';
+  document.getElementById('tf-view-lista').style.color = mode==='lista'?'#fff':'var(--text2)';
+  renderTarefasEquipe();
+}
+
+function renderTarefasEquipe(){
+  var el = document.getElementById('tarefas-equipe-body');
+  if(!el) return;
+
+  // Filtros
+  var filtroResp = (document.getElementById('tf-filtro-resp')||{}).value||'';
+  var filtroPrio = (document.getElementById('tf-filtro-prio')||{}).value||'';
+  var filtered = tarefas.filter(function(t){
+    if(filtroResp && t.responsavel !== filtroResp) return false;
+    if(filtroPrio && t.prioridade !== filtroPrio) return false;
+    return true;
+  });
+
+  if(tarefasViewMode === 'kanban') renderTarefasKanban(el, filtered);
+  else renderTarefasLista(el, filtered);
+}
+
+function renderTarefasKanban(el, items){
+  el.innerHTML = '';
+  var cols = ['A fazer','Em andamento','Aguardando','Atrasada','Concluída'];
   var grid = document.createElement('div');
-  grid.style = 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px';
+  grid.style = 'display:grid;grid-template-columns:repeat(5,1fr);gap:12px;min-height:400px';
 
   cols.forEach(function(status){
-    var items = tarefas.filter(function(t){return t.status===status;});
+    var colItems = items.filter(function(t){return t.status===status;});
     var col = document.createElement('div');
-    col.style = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px';
+    col.style = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;min-height:300px';
 
     var header = document.createElement('div');
     header.style = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px';
     var leftDiv = document.createElement('div');
     leftDiv.style = 'display:flex;align-items:center;gap:8px';
     var dot = document.createElement('div');
-    dot.style = 'width:8px;height:8px;border-radius:50%;background:'+STATUS_T_C[status];
+    dot.style = 'width:8px;height:8px;border-radius:50%;background:'+(STATUS_T_C[status]||'#555');
     var lbl = document.createElement('span');
-    lbl.style = 'font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)';
+    lbl.style = 'font-family:Syne,sans-serif;font-weight:700;font-size:12px;color:var(--white)';
     lbl.textContent = status;
     var cnt = document.createElement('span');
-    cnt.style = 'font-size:11px;color:var(--text3)';
-    cnt.textContent = items.length;
+    cnt.style = 'font-size:11px;color:var(--text3);background:var(--card2);padding:1px 8px;border-radius:10px';
+    cnt.textContent = colItems.length;
     leftDiv.appendChild(dot);leftDiv.appendChild(lbl);
     header.appendChild(leftDiv);header.appendChild(cnt);
     col.appendChild(header);
 
-    if(!items.length){
+    if(!colItems.length){
       var empty = document.createElement('div');
-      empty.style = 'text-align:center;padding:24px;color:var(--text3);font-size:12px';
+      empty.style = 'text-align:center;padding:24px;color:var(--text3);font-size:11px';
       empty.textContent = 'Nenhuma tarefa';
       col.appendChild(empty);
     }
 
-    items.forEach(function(t){
-      var card = document.createElement('div');
-      card.style = 'background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;transition:border-color .2s';
-      card.onmouseover=function(){this.style.borderColor='var(--border2)';};
-      card.onmouseout=function(){this.style.borderColor='var(--border)';};
-
-      var prio = t.prioridade||'Média';
-      var isLead = t.descricao && t.descricao.indexOf('Lead via') >= 0;
-
-      // Title + badges
-      var titleRow = document.createElement('div');
-      titleRow.style = 'display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px';
-      var titleEl = document.createElement('div');
-      titleEl.style = 'font-size:13px;font-weight:600;color:var(--white);line-height:1.3;flex:1';
-      titleEl.textContent = t.titulo;
-      var badges = document.createElement('div');
-      badges.style = 'display:flex;gap:4px;flex-shrink:0;margin-left:8px';
-      if(isLead){
-        var lb=document.createElement('span');
-        lb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:#c084fc22;color:#c084fc;font-weight:700';
-        lb.textContent='Lead';badges.appendChild(lb);
-      }
-      var pb=document.createElement('span');
-      pb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700';
-      pb.textContent=prio;badges.appendChild(pb);
-      titleRow.appendChild(titleEl);titleRow.appendChild(badges);
-      card.appendChild(titleRow);
-
-      if(t.cliente){var cliEl=document.createElement('div');cliEl.style='font-size:11px;color:var(--blue);margin-bottom:4px';cliEl.textContent=t.cliente;card.appendChild(cliEl);}
-      if(t.responsavel){var respEl=document.createElement('div');respEl.style='font-size:11px;color:var(--text3);margin-bottom:4px';respEl.textContent=t.responsavel;card.appendChild(respEl);}
-      if(t.prazo){var prazoEl=document.createElement('div');prazoEl.style='font-size:11px;color:'+(t.prazo<today()?'#ff1744':'var(--text3)');prazoEl.textContent=fmtDate(t.prazo);card.appendChild(prazoEl);}
-      // Show respostas if lead
-      if(isLead && t.respostas){
-        var respDiv=document.createElement('div');
-        respDiv.style='margin-top:8px;border-top:1px solid var(--border);padding-top:8px';
-        var LABELS={carteira:'Carteira',deixandoDinheiro:'Deixando dinheiro',situacao:'Situação',objetivo:'Objetivo',comprometimento:'Comprometimento',patrimonio:'Patrimônio',modeloPagamento:'Modelo',eficiencia:'Eficiência'};
-        Object.keys(LABELS).forEach(function(k){
-          if(t.respostas[k]){
-            var row=document.createElement('div');
-            row.style='font-size:10px;color:var(--text3);margin-bottom:3px;line-height:1.4';
-            row.innerHTML='<span style="color:var(--text2);font-weight:600">'+LABELS[k]+':</span> '+t.respostas[k];
-            respDiv.appendChild(row);
-          }
-        });
-        if(t.contato){
-          if(t.contato.horario){var h=document.createElement('div');h.style='font-size:10px;color:var(--text3);margin-bottom:3px';h.innerHTML='<span style="color:var(--text2);font-weight:600">Horário:</span> '+t.contato.horario;respDiv.appendChild(h);}
-          if(t.contato.origem){var o=document.createElement('div');o.style='font-size:10px;color:var(--text3);margin-bottom:3px';o.innerHTML='<span style="color:var(--text2);font-weight:600">Origem:</span> '+t.contato.origem;respDiv.appendChild(o);}
-        }
-        card.appendChild(respDiv);
-      } else if(t.descricao && t.descricao !== 'Lead via formulário de captação'){
-        var descEl=document.createElement('div');descEl.style='font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5;border-top:1px solid var(--border);padding-top:6px';descEl.textContent=t.descricao;card.appendChild(descEl);
-      }
-
-      if(isLead){
-        var iaBtn=document.createElement('button');
-        iaBtn.style='margin-top:8px;width:100%;background:#c084fc22;border:1px solid #c084fc33;border-radius:8px;padding:5px;color:#c084fc;font-size:11px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif';
-        iaBtn.textContent='Gerar sugestão de abordagem';
-        (function(tid){iaBtn.onclick=function(){gerarAbordagemIA(tid);};})(t.id);
-        card.appendChild(iaBtn);
-      }
-
-      // Action buttons
-      var btnRow=document.createElement('div');
-      btnRow.style='display:flex;gap:6px;margin-top:10px';
-
-      // Avançar status
-      if(status!=='Concluída'){
-        var nextStatus=status==='Aberta'?'Em andamento':'Concluída';
-        var advBtn=document.createElement('button');
-        advBtn.className='btn-ghost';
-        advBtn.style='padding:4px 8px;font-size:11px;flex:1';
-        advBtn.textContent=status==='Aberta'?'Iniciar':'Concluir';
-        (function(id,ns){advBtn.onclick=function(e){e.stopPropagation();db.collection('tarefas').doc(id).update({status:ns});};})(t.id,nextStatus);
-        btnRow.appendChild(advBtn);
-      }
-      // Voltar status
-      if(status!=='Aberta'){
-        var prevStatus=status==='Concluída'?'Em andamento':'Aberta';
-        var backBtn=document.createElement('button');
-        backBtn.className='btn-ghost';
-        backBtn.style='padding:4px 8px;font-size:11px;color:var(--text3)';
-        backBtn.textContent='Voltar';
-        (function(id,ps){backBtn.onclick=function(e){e.stopPropagation();db.collection('tarefas').doc(id).update({status:ps});};})(t.id,prevStatus);
-        btnRow.appendChild(backBtn);
-      }
-
-      var editBtn=document.createElement('button');
-      editBtn.className='btn-ghost';
-      editBtn.style='padding:4px 8px;font-size:11px';
-      editBtn.textContent='Editar';
-      (function(tid){editBtn.onclick=function(e){e.stopPropagation();openModalTarefaEdit(tid);};})(t.id);
-
-      var delBtn=document.createElement('button');
-      delBtn.className='btn-dsm';
-      delBtn.style='padding:4px 8px;font-size:11px';
-      delBtn.textContent='Excluir';
-      (function(tid){delBtn.onclick=function(e){e.stopPropagation();confirmDelete(function(){db.collection('tarefas').doc(tid).delete();});};})(t.id);
-
-      btnRow.appendChild(editBtn);btnRow.appendChild(delBtn);
-      card.appendChild(btnRow);
-      col.appendChild(card);
+    colItems.forEach(function(t){
+      col.appendChild(buildTarefaCard(t));
     });
     grid.appendChild(col);
   });
   el.appendChild(grid);
 }
 
+function renderTarefasLista(el, items){
+  el.innerHTML = '';
+  if(!items.length){
+    el.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title">Nenhuma tarefa encontrada</div></div>';
+    return;
+  }
+  // Agrupar por responsável
+  var porResp = {};
+  items.forEach(function(t){
+    var r = t.responsavel || 'Sem responsável';
+    if(!porResp[r]) porResp[r] = [];
+    porResp[r].push(t);
+  });
 
-function openModalTarefa(){
+  Object.keys(porResp).sort().forEach(function(resp){
+    var div = document.createElement('div');
+    div.className = 'card';
+    div.style = 'margin-bottom:16px;padding:0;overflow:hidden';
+
+    var hdr = document.createElement('div');
+    hdr.style = 'padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),var(--card));display:flex;align-items:center;gap:10px';
+    hdr.innerHTML = '<span style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">'+resp.charAt(0).toUpperCase()+'</span>'
+      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white)">'+resp+'</span>'
+      +'<span style="font-size:11px;color:var(--text3)">'+porResp[resp].length+' tarefas</span>';
+    div.appendChild(hdr);
+
+    var table = document.createElement('div');
+    table.className = 'table-wrap';
+    table.style = 'border:none';
+    var html = '<table style="font-size:13px"><thead><tr>'
+      +'<th style="padding:8px 12px">Tarefa</th>'
+      +'<th style="padding:8px 12px">Status</th>'
+      +'<th style="padding:8px 12px">Prioridade</th>'
+      +'<th style="padding:8px 12px">Categoria</th>'
+      +'<th style="padding:8px 12px">Prazo</th>'
+      +'<th style="padding:8px 12px;text-align:center">Ações</th>'
+      +'</tr></thead><tbody>';
+
+    porResp[resp].forEach(function(t){
+      var prio = t.prioridade||'Média';
+      var cat = t.categoria||'—';
+      var prazoColor = t.prazo && t.prazo < today() && t.status!=='Concluída' ? '#ff1744' : 'var(--text2)';
+      var statusColor = STATUS_T_C[t.status]||'#555';
+
+      html += '<tr style="border-bottom:1px solid var(--border)">'
+        +'<td style="padding:8px 12px;font-weight:600;color:var(--white);max-width:250px">'+t.titulo+(t.recorrencia?'<span style="font-size:9px;color:var(--blue);margin-left:6px">↻ '+t.recorrencia+'</span>':'')+'</td>'
+        +'<td style="padding:8px 12px"><span style="font-size:10px;padding:3px 8px;border-radius:10px;background:'+statusColor+'22;color:'+statusColor+';font-weight:700">'+t.status+'</span></td>'
+        +'<td style="padding:8px 12px"><span style="font-size:10px;padding:3px 8px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700">'+prio+'</span></td>'
+        +'<td style="padding:8px 12px;font-size:11px;color:var(--text3)">'+cat+'</td>'
+        +'<td style="padding:8px 12px;font-size:11px;color:'+prazoColor+'">'+(t.prazo?fmtDate(t.prazo):'—')+'</td>'
+        +'<td style="padding:8px 12px;text-align:center">'
+        +'<button class="btn-ghost" style="padding:3px 8px;font-size:10px;margin-right:4px" onclick="openModalTarefaEquipeEdit(\''+t.id+'\')">Editar</button>'
+        +'<button class="btn-ghost" style="padding:3px 8px;font-size:10px;margin-right:4px" onclick="avancarTarefa(\''+t.id+'\')">Avançar</button>'
+        +'<button class="btn-dsm" style="padding:3px 8px;font-size:10px" onclick="confirmDelete(function(){db.collection(\'tarefas\').doc(\''+t.id+'\').delete()})">×</button>'
+        +'</td></tr>';
+    });
+    html += '</tbody></table>';
+    table.innerHTML = html;
+    div.appendChild(table);
+    el.appendChild(div);
+  });
+}
+
+function buildTarefaCard(t){
+  var card = document.createElement('div');
+  card.style = 'background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
+  card.onmouseover=function(){this.style.borderColor='var(--blue)';};
+  card.onmouseout=function(){this.style.borderColor='var(--border)';};
+  card.onclick=function(){openTarefaDetalhe(t.id);};
+
+  var prio = t.prioridade||'Média';
+
+  // Badges
+  var badgeRow = document.createElement('div');
+  badgeRow.style = 'display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap';
+  var pb=document.createElement('span');
+  pb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700';
+  pb.textContent=prio;badgeRow.appendChild(pb);
+  if(t.categoria){
+    var cb=document.createElement('span');
+    cb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:#3b82f622;color:#3b82f6;font-weight:600';
+    cb.textContent=t.categoria;badgeRow.appendChild(cb);
+  }
+  if(t.recorrencia){
+    var rb=document.createElement('span');
+    rb.style='font-size:9px;padding:2px 6px;border-radius:10px;background:#a855f722;color:#a855f7;font-weight:600';
+    rb.textContent='↻ '+t.recorrencia;badgeRow.appendChild(rb);
+  }
+  card.appendChild(badgeRow);
+
+  // Title
+  var titleEl = document.createElement('div');
+  titleEl.style = 'font-size:13px;font-weight:600;color:var(--white);line-height:1.3;margin-bottom:6px';
+  titleEl.textContent = t.titulo;
+  card.appendChild(titleEl);
+
+  // Responsável
+  if(t.responsavel){
+    var respEl=document.createElement('div');
+    respEl.style='display:flex;align-items:center;gap:6px;margin-bottom:4px';
+    respEl.innerHTML='<span style="width:18px;height:18px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0">'+t.responsavel.charAt(0).toUpperCase()+'</span><span style="font-size:11px;color:var(--text2)">'+t.responsavel+'</span>';
+    card.appendChild(respEl);
+  }
+
+  // Checklist progress
+  if(t.checklist && t.checklist.length){
+    var done = t.checklist.filter(function(c){return c.done;}).length;
+    var total = t.checklist.length;
+    var pct = Math.round(done/total*100);
+    var progDiv = document.createElement('div');
+    progDiv.style = 'margin-top:6px';
+    progDiv.innerHTML = '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>Checklist</span><span>'+done+'/'+total+'</span></div>'
+      +'<div style="height:3px;background:var(--border);border-radius:2px"><div style="height:3px;border-radius:2px;background:var(--blue);width:'+pct+'%"></div></div>';
+    card.appendChild(progDiv);
+  }
+
+  // Prazo
+  if(t.prazo){
+    var prazoEl=document.createElement('div');
+    var isLate = t.prazo < today() && t.status !== 'Concluída';
+    prazoEl.style='font-size:10px;color:'+(isLate?'#ff1744':'var(--text3)')+';margin-top:6px;display:flex;align-items:center;gap:4px';
+    prazoEl.innerHTML=(isLate?'⚠ ':'')+fmtDate(t.prazo);
+    card.appendChild(prazoEl);
+  }
+
+  // Quick actions
+  var btnRow=document.createElement('div');
+  btnRow.style='display:flex;gap:4px;margin-top:8px';
+
+  if(t.status!=='Concluída'){
+    var advBtn=document.createElement('button');
+    advBtn.className='btn-ghost';
+    advBtn.style='padding:3px 8px;font-size:10px;flex:1';
+    advBtn.textContent=t.status==='A fazer'?'Iniciar':t.status==='Em andamento'?'Concluir':t.status==='Aguardando'?'Retomar':'Resolver';
+    (function(id){advBtn.onclick=function(e){e.stopPropagation();avancarTarefa(id);};})(t.id);
+    btnRow.appendChild(advBtn);
+  }
+
+  var delBtn=document.createElement('button');
+  delBtn.className='btn-dsm';
+  delBtn.style='padding:3px 6px;font-size:10px';
+  delBtn.textContent='×';
+  (function(tid){delBtn.onclick=function(e){e.stopPropagation();confirmDelete(function(){db.collection('tarefas').doc(tid).delete();});};})(t.id);
+  btnRow.appendChild(delBtn);
+
+  card.appendChild(btnRow);
+  return card;
+}
+
+function avancarTarefa(id){
+  var t = tarefas.find(function(x){return x.id===id;});
+  if(!t) return;
+  var map = {'A fazer':'Em andamento','Em andamento':'Concluída','Aguardando':'Em andamento','Atrasada':'Em andamento'};
+  var next = map[t.status];
+  if(!next) return;
+  var upd = {status:next};
+  if(next==='Concluída') upd.concluidoEm = new Date().toISOString();
+  db.collection('tarefas').doc(id).update(upd);
+}
+
+// === MODAL NOVA TAREFA (COMPLETO) ===
+function openModalTarefaEquipe(){
   editingTarefaId = null;
-  // Build tarefa modal dynamically
   var overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.style.cssText = 'display:flex;z-index:200';
   overlay.onclick = function(e){ if(e.target===overlay) document.body.removeChild(overlay); };
-  
+
   var box = document.createElement('div');
   box.className = 'modal';
-  box.style.maxWidth = '520px';
-  
-  // Populate prof options
-  var profOpts = '<option value="">Selecione...</option>' + profissionais.map(function(p){return '<option>'+p.nome+'</option>';}).join('');
-  var cliOpts = '<option value="">Selecione...</option>' + clientes.map(function(c){return '<option>'+c.nome+'</option>';}).join('');
-  
-  // Build modal via DOM
-  var mh2=document.createElement('div');mh2.className='modal-header';
-  var mt2=document.createElement('div');mt2.className='modal-title';mt2.textContent='Nova Tarefa';
-  var mc2=document.createElement('button');mc2.className='modal-close';mc2.textContent='x';
-  mc2.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
-  mh2.appendChild(mt2);mh2.appendChild(mc2);box.appendChild(mh2);
-  var fg2=document.createElement('div');fg2.className='form-grid';
-  fg2.innerHTML='<div class="form-group form-full"><label>Titulo</label><input class="form-input" id="t-titulo" placeholder="Descreva a tarefa..."></div>'
-    +'<div class="form-group"><label>Responsavel</label><select class="form-input" id="t-resp">'+profOpts+'</select></div>'
-    +'<div class="form-group"><label>Cliente</label><select class="form-input" id="t-cli">'+cliOpts+'</select></div>'
-    +'<div class="form-group"><label>Prioridade</label><select class="form-input" id="t-prio"><option>Alta</option><option selected>Media</option><option>Baixa</option></select></div>'
-    +'<div class="form-group"><label>Prazo</label><input class="form-input" id="t-prazo" type="date"></div>'
-    +'<div class="form-group form-full"><label>Descricao</label><textarea class="form-input" id="t-desc" rows="3" placeholder="Detalhes..."></textarea></div>';
-  box.appendChild(fg2);
-  var ma2=document.createElement('div');ma2.className='modal-actions';
-  var cb2=document.createElement('button');cb2.className='btn-secondary';cb2.textContent='Cancelar';
-  cb2.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
-  var sb2=document.createElement('button');sb2.className='btn-primary';sb2.textContent='Salvar';
-  sb2.onclick=function(){saveTarefa(overlay);};
-  ma2.appendChild(cb2);ma2.appendChild(sb2);box.appendChild(ma2);
-    overlay.appendChild(box);
+  box.style.maxWidth = '580px';
+
+  // Responsáveis = cargos do organograma
+  var respOpts = '<option value="">Selecione...</option>';
+  cargos.forEach(function(c){ respOpts += '<option>'+c.nome+'</option>'; });
+
+  var mh=document.createElement('div');mh.className='modal-header';
+  var mt=document.createElement('div');mt.className='modal-title';mt.textContent='Nova Tarefa';
+  var mc=document.createElement('button');mc.className='modal-close';mc.textContent='×';
+  mc.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
+  mh.appendChild(mt);mh.appendChild(mc);box.appendChild(mh);
+
+  var fg=document.createElement('div');fg.className='form-grid';
+  fg.innerHTML='<div class="form-group form-full"><label>Título</label><input class="form-input" id="te-titulo" placeholder="Descreva a tarefa..."></div>'
+    +'<div class="form-group"><label>Responsável</label><select class="form-input" id="te-resp">'+respOpts+'</select></div>'
+    +'<div class="form-group"><label>Prioridade</label><select class="form-input" id="te-prio"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>'
+    +'<div class="form-group"><label>Prazo</label><input class="form-input" id="te-prazo" type="date"></div>'
+    +'<div class="form-group"><label>Categoria</label><input class="form-input" id="te-cat" placeholder="Ex: Comercial, Operação, Admin..." list="te-cat-list"><datalist id="te-cat-list"><option value="Comercial"><option value="Operacional"><option value="Administrativo"><option value="Compliance"><option value="Financeiro"><option value="Marketing"></datalist></div>'
+    +'<div class="form-group"><label>Status</label><select class="form-input" id="te-status"><option>A fazer</option><option>Em andamento</option><option>Aguardando</option></select></div>'
+    +'<div class="form-group"><label>Recorrência</label><select class="form-input" id="te-recorrencia"><option value="">Nenhuma</option><option value="Diária">Diária</option><option value="Semanal">Semanal</option><option value="Quinzenal">Quinzenal</option><option value="Mensal">Mensal</option></select></div>'
+    +'<div class="form-group form-full"><label>Descrição</label><textarea class="form-input" id="te-desc" rows="3" placeholder="Detalhes da tarefa..."></textarea></div>'
+    +'<div class="form-group form-full"><label>Checklist (um item por linha)</label><textarea class="form-input" id="te-checklist" rows="3" placeholder="Item 1&#10;Item 2&#10;Item 3"></textarea></div>';
+  box.appendChild(fg);
+
+  var ma=document.createElement('div');ma.className='modal-actions';
+  var cb=document.createElement('button');cb.className='btn-secondary';cb.textContent='Cancelar';
+  cb.onclick=function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);};
+  var sb=document.createElement('button');sb.className='btn-primary';sb.textContent='Salvar';
+  sb.onclick=function(){saveTarefaEquipe(overlay);};
+  ma.appendChild(cb);ma.appendChild(sb);box.appendChild(ma);
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
 }
 
-function openModalTarefaEdit(id){
+function openModalTarefaEquipeEdit(id){
   var t = tarefas.find(function(x){return x.id===id;});
   if(!t) return;
-  openModalTarefa();
+  openModalTarefaEquipe();
   setTimeout(function(){
-    document.getElementById('t-titulo').value = t.titulo||'';
-    document.getElementById('t-resp').value = t.responsavel||'';
-    document.getElementById('t-cli').value = t.cliente||'';
-    document.getElementById('t-prio').value = t.prioridade||'Média';
-    document.getElementById('t-prazo').value = t.prazo||'';
-    document.getElementById('t-desc').value = t.descricao||'';
+    document.getElementById('te-titulo').value = t.titulo||'';
+    document.getElementById('te-resp').value = t.responsavel||'';
+    document.getElementById('te-prio').value = t.prioridade||'Média';
+    document.getElementById('te-prazo').value = t.prazo||'';
+    document.getElementById('te-cat').value = t.categoria||'';
+    document.getElementById('te-status').value = t.status||'A fazer';
+    document.getElementById('te-recorrencia').value = t.recorrencia||'';
+    document.getElementById('te-desc').value = t.descricao||'';
+    if(t.checklist && t.checklist.length){
+      document.getElementById('te-checklist').value = t.checklist.map(function(c){return c.texto;}).join('\n');
+    }
     editingTarefaId = id;
+    // Update modal title
+    var mTitle = document.querySelector('.modal-overlay .modal-title');
+    if(mTitle) mTitle.textContent = 'Editar Tarefa';
   }, 50);
 }
 
-function saveTarefa(overlay){
-  var titulo = document.getElementById('t-titulo').value.trim();
+function saveTarefaEquipe(overlay){
+  var titulo = document.getElementById('te-titulo').value.trim();
   if(!titulo){alert('Título obrigatório!');return;}
+
+  var checklistText = document.getElementById('te-checklist').value.trim();
+  var checklist = [];
+  if(checklistText){
+    var oldChecklist = editingTarefaId ? (tarefas.find(function(t){return t.id===editingTarefaId;})||{}).checklist||[] : [];
+    checklistText.split('\n').forEach(function(line, i){
+      line = line.trim();
+      if(!line) return;
+      var oldItem = oldChecklist.find(function(c){return c.texto===line;});
+      checklist.push({texto:line, done: oldItem ? oldItem.done : false});
+    });
+  }
+
   var data = {
     titulo:titulo,
-    responsavel:document.getElementById('t-resp').value,
-    cliente:document.getElementById('t-cli').value,
-    prioridade:document.getElementById('t-prio').value,
-    prazo:document.getElementById('t-prazo').value,
-    descricao:document.getElementById('t-desc').value,
-    status:editingTarefaId?(tarefas.find(function(t){return t.id===editingTarefaId;})||{status:'Aberta'}).status:'Aberta',
+    responsavel:document.getElementById('te-resp').value,
+    prioridade:document.getElementById('te-prio').value,
+    prazo:document.getElementById('te-prazo').value,
+    categoria:document.getElementById('te-cat').value,
+    status:document.getElementById('te-status').value,
+    recorrencia:document.getElementById('te-recorrencia').value,
+    descricao:document.getElementById('te-desc').value,
+    checklist:checklist,
     criadoEm:new Date().toISOString()
   };
-  if(editingTarefaId) db.collection('tarefas').doc(editingTarefaId).update(data);
-  else db.collection('tarefas').add(data);
+
+  if(editingTarefaId){
+    var old = tarefas.find(function(t){return t.id===editingTarefaId;});
+    if(old) data.status = document.getElementById('te-status').value;
+    db.collection('tarefas').doc(editingTarefaId).update(data);
+  } else {
+    db.collection('tarefas').add(data);
+  }
   if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
 }
+
+// === DETALHE DA TAREFA (com checklist interativo e comentários) ===
+function openTarefaDetalhe(id){
+  var t = tarefas.find(function(x){return x.id===id;});
+  if(!t) return;
+
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;z-index:200';
+  overlay.onclick = function(e){ if(e.target===overlay) document.body.removeChild(overlay); };
+
+  var box = document.createElement('div');
+  box.className = 'modal';
+  box.style.maxWidth = '600px';
+
+  var statusColor = STATUS_T_C[t.status]||'#555';
+  var prio = t.prioridade||'Média';
+  var isLate = t.prazo && t.prazo < today() && t.status !== 'Concluída';
+
+  var html = '<div class="modal-header"><div class="modal-title">'+t.titulo+'</div><button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">×</button></div>';
+  html += '<div style="padding:20px">';
+
+  // Info row
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
+  html += '<span style="font-size:10px;padding:4px 10px;border-radius:10px;background:'+statusColor+'22;color:'+statusColor+';font-weight:700">'+t.status+'</span>';
+  html += '<span style="font-size:10px;padding:4px 10px;border-radius:10px;background:'+PRIORIDADE_C[prio]+'22;color:'+PRIORIDADE_C[prio]+';font-weight:700">'+prio+'</span>';
+  if(t.categoria) html += '<span style="font-size:10px;padding:4px 10px;border-radius:10px;background:#3b82f622;color:#3b82f6;font-weight:600">'+t.categoria+'</span>';
+  if(t.recorrencia) html += '<span style="font-size:10px;padding:4px 10px;border-radius:10px;background:#a855f722;color:#a855f7;font-weight:600">↻ '+t.recorrencia+'</span>';
+  html += '</div>';
+
+  // Details
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  html += '<div><span style="font-size:10px;color:var(--text3);text-transform:uppercase">Responsável</span><div style="font-size:13px;color:var(--white);font-weight:600;margin-top:2px">'+(t.responsavel||'—')+'</div></div>';
+  html += '<div><span style="font-size:10px;color:var(--text3);text-transform:uppercase">Prazo</span><div style="font-size:13px;color:'+(isLate?'#ff1744':'var(--white)')+';font-weight:600;margin-top:2px">'+(t.prazo?fmtDate(t.prazo):'—')+(isLate?' ⚠ Atrasada':'')+'</div></div>';
+  html += '</div>';
+
+  if(t.descricao){
+    html += '<div style="margin-bottom:16px"><span style="font-size:10px;color:var(--text3);text-transform:uppercase">Descrição</span><div style="font-size:13px;color:var(--text);margin-top:4px;line-height:1.6;white-space:pre-wrap">'+t.descricao+'</div></div>';
+  }
+
+  // Checklist
+  if(t.checklist && t.checklist.length){
+    var done = t.checklist.filter(function(c){return c.done;}).length;
+    html += '<div style="margin-bottom:16px"><span style="font-size:10px;color:var(--text3);text-transform:uppercase">Checklist ('+done+'/'+t.checklist.length+')</span>';
+    html += '<div style="margin-top:8px">';
+    t.checklist.forEach(function(item, idx){
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="toggleChecklistItem(\''+t.id+'\','+idx+')">'
+        +'<div style="width:18px;height:18px;border-radius:4px;border:2px solid '+(item.done?'var(--blue)':'var(--border2)')+';background:'+(item.done?'var(--blue)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(item.done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+        +'<span style="font-size:12px;color:'+(item.done?'var(--text3)':'var(--white)')+';'+(item.done?'text-decoration:line-through':'')+'">'+item.texto+'</span>'
+        +'</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // Comentários
+  html += '<div style="margin-bottom:16px"><span style="font-size:10px;color:var(--text3);text-transform:uppercase">Comentários</span>';
+  html += '<div id="tf-comentarios-'+t.id+'" style="margin-top:8px"><span style="font-size:11px;color:var(--text3)">Carregando...</span></div>';
+  html += '<div style="display:flex;gap:8px;margin-top:10px"><input class="form-input" id="tf-com-input-'+t.id+'" placeholder="Escreva um comentário..." style="flex:1;font-size:12px;padding:8px 12px"><button class="btn-primary" onclick="enviarComentarioTarefa(\''+t.id+'\')" style="padding:8px 14px;font-size:11px">Enviar</button></div>';
+  html += '</div>';
+
+  // Actions
+  html += '<div style="display:flex;gap:8px;border-top:1px solid var(--border);padding-top:16px">';
+  if(t.status!=='Concluída'){
+    html += '<button class="btn-primary" style="flex:1" onclick="avancarTarefa(\''+t.id+'\');this.closest(\'.modal-overlay\').remove()">'+(t.status==='A fazer'?'Iniciar':'Concluir')+'</button>';
+  }
+  html += '<button class="btn-secondary" onclick="openModalTarefaEquipeEdit(\''+t.id+'\');this.closest(\'.modal-overlay\').remove()">Editar</button>';
+  html += '<button class="btn-dsm" onclick="confirmDelete(function(){db.collection(\'tarefas\').doc(\''+t.id+'\').delete();});this.closest(\'.modal-overlay\').remove()">Excluir</button>';
+  html += '</div></div>';
+
+  box.innerHTML = html;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Load comments
+  loadComentariosTarefa(t.id);
+}
+
+function toggleChecklistItem(tarefaId, idx){
+  var t = tarefas.find(function(x){return x.id===tarefaId;});
+  if(!t || !t.checklist) return;
+  t.checklist[idx].done = !t.checklist[idx].done;
+  db.collection('tarefas').doc(tarefaId).update({checklist:t.checklist}).then(function(){
+    // Refresh the detalhe modal
+    var overlay = document.querySelector('.modal-overlay');
+    if(overlay) overlay.remove();
+    openTarefaDetalhe(tarefaId);
+  });
+}
+
+function loadComentariosTarefa(tarefaId){
+  var list = document.getElementById('tf-comentarios-'+tarefaId);
+  if(!list) return;
+  db.collection('tarefas').doc(tarefaId).collection('comentarios').orderBy('criadoEm','asc').get().then(function(snap){
+    list.innerHTML='';
+    if(snap.empty){list.innerHTML='<span style="font-size:11px;color:var(--text3)">Nenhum comentário ainda.</span>';return;}
+    snap.forEach(function(doc){
+      var d=doc.data();
+      var div=document.createElement('div');
+      div.style='padding:8px 10px;border-radius:6px;background:var(--card2);margin-bottom:6px';
+      var nome=d.autor||'Anônimo';
+      var data=d.criadoEm?new Date(d.criadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+      div.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600;color:var(--blue)">'+nome+'</span><span style="font-size:10px;color:var(--text3)">'+data+'</span></div><div style="font-size:12px;color:var(--text);line-height:1.4">'+d.texto+'</div>';
+      list.appendChild(div);
+    });
+  });
+}
+
+function enviarComentarioTarefa(tarefaId){
+  var input=document.getElementById('tf-com-input-'+tarefaId);
+  if(!input) return;
+  var texto=input.value.trim();
+  if(!texto) return;
+  var user=firebase.auth().currentUser;
+  var autor=user?user.email:'Anônimo';
+  db.collection('tarefas').doc(tarefaId).collection('comentarios').add({
+    texto:texto,autor:autor,criadoEm:new Date().toISOString()
+  }).then(function(){
+    input.value='';
+    loadComentariosTarefa(tarefaId);
+  });
+}
+
+// Compatibility: old openModalTarefa still works for leads
+function openModalTarefa(){ openModalTarefaEquipe(); }
+function openModalTarefaEdit(id){ openModalTarefaEquipeEdit(id); }
+function saveTarefa(overlay){ saveTarefaEquipe(overlay); }
 
 // ═══════════════════════════════════════════════════════════
 // ORGANOGRAMA
@@ -5385,6 +5673,7 @@ var _origShowViewOrg = showView;
 showView = function(v,btn){
   _origShowViewOrg(v,btn);
   if(v==='organograma') loadOrganograma();
+  if(v==='tarefas-equipe') initTarefasEquipe();
   if(v==='crm'){ renderCRM(); setTimeout(function(){ if(document.getElementById('crm-tab-alertas-crm').classList.contains('active')) renderAlertas(); },100); }
 };
 
@@ -6140,8 +6429,8 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
   cliente: ['minha-carteira','agendamento','comunicados','panorama','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
 };
 
