@@ -1,52 +1,63 @@
 export default async function handler(req, res) {
   const tickers = req.query.tickers || '';
 
-  // Adicionar .SA para tickers brasileiros que não têm sufixo
-  const symbols = tickers.split(',').map(function(t) {
+  // Adicionar .SA para tickers brasileiros
+  const tickerList = tickers.split(',').map(function(t) {
     t = t.trim();
     if (!t) return '';
-    // Se já tem sufixo (ex: =SA, .SA), manter
     if (t.indexOf('.') > 0 || t.indexOf('=') > 0) return t;
-    // Adicionar .SA para tickers brasileiros
     return t + '.SA';
-  }).filter(Boolean).join(',');
-
-  const yahooUrl = 'https://query2.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(symbols);
+  }).filter(Boolean);
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
 
   try {
-    const response = await fetch(yahooUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json'
-      }
-    });
-    const data = await response.json();
-    // Normalizar resposta para formato simples
-    var results = [];
-    if (data && data.quoteResponse && data.quoteResponse.result) {
-      results = data.quoteResponse.result.map(function(r) {
-        // Remover .SA do symbol para bater com o ticker original
-        var sym = (r.symbol || '').replace('.SA', '');
+    // Buscar cada ticker via Yahoo Finance v8 chart (não precisa de auth)
+    const promises = tickerList.map(async function(sym) {
+      try {
+        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym) + '?interval=1d&range=1d&includePrePost=false';
+        const resp = await fetch(url, {
+          headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+        });
+        const data = await resp.json();
+        if (!data.chart || !data.chart.result || !data.chart.result[0]) return null;
+        const meta = data.chart.result[0].meta;
+        const indicators = data.chart.result[0].indicators;
+        const timestamps = data.chart.result[0].timestamp || [];
+        const quotes = indicators && indicators.quote && indicators.quote[0] ? indicators.quote[0] : {};
+
+        // Pegar high/low do dia dos arrays de dados
+        const highs = (quotes.high || []).filter(v => v != null);
+        const lows = (quotes.low || []).filter(v => v != null);
+        const dayHigh = highs.length ? Math.max(...highs) : meta.regularMarketDayHigh || null;
+        const dayLow = lows.length ? Math.min(...lows) : meta.regularMarketDayLow || null;
+
+        // Remover .SA do symbol
+        const cleanSym = (meta.symbol || sym).replace('.SA', '');
+
         return {
-          symbol: sym,
-          shortName: r.shortName || r.longName || '',
-          regularMarketPrice: r.regularMarketPrice,
-          regularMarketChangePercent: r.regularMarketChangePercent,
-          regularMarketDayHigh: r.regularMarketDayHigh,
-          regularMarketDayLow: r.regularMarketDayLow,
-          regularMarketOpen: r.regularMarketOpen,
-          regularMarketPreviousClose: r.regularMarketPreviousClose,
-          regularMarketTime: r.regularMarketTime ? r.regularMarketTime * 1000 : null,
-          regularMarketVolume: r.regularMarketVolume,
-          fiftyTwoWeekHigh: r.fiftyTwoWeekHigh,
-          fiftyTwoWeekLow: r.fiftyTwoWeekLow,
+          symbol: cleanSym,
+          shortName: meta.shortName || meta.longName || '',
+          regularMarketPrice: meta.regularMarketPrice,
+          regularMarketChangePercent: meta.previousClose ? ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose * 100) : 0,
+          regularMarketDayHigh: dayHigh,
+          regularMarketDayLow: dayLow,
+          regularMarketOpen: meta.regularMarketOpen || (quotes.open && quotes.open[0]) || null,
+          regularMarketPreviousClose: meta.previousClose || null,
+          regularMarketTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : null,
+          regularMarketVolume: meta.regularMarketVolume || null,
+          fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh || null,
+          fiftyTwoWeekLow: meta.fiftyTwoWeekLow || null,
           logourl: null
         };
-      });
-    }
+      } catch(e) {
+        return null;
+      }
+    });
+
+    const all = await Promise.all(promises);
+    const results = all.filter(Boolean);
     return res.status(200).json({ results: results });
   } catch (error) {
     return res.status(500).json({ error: error.message, results: [] });
