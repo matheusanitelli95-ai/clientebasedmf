@@ -541,7 +541,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Operações</span></button>
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Notícias</span></button>
-      <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Cotações</span></button>
+      <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span>Cotações</span></button>
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Agendamento</span></button>
       <button class="nav-item" onclick="showView('comunicados',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span><span>Comunicados</span></button>
       <div class="nav-section">Ferramentas</div>
@@ -1975,7 +1975,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="form-grid">
       <div class="form-group form-full"><label>Nome do Grupo *</label><input class="form-input" id="gg-nome" placeholder="Ex: DMF Grade, TOP 20 Ibovespa"></div>
       <div class="form-group form-full"><label>Tickers (separados por vírgula) *</label><textarea class="form-input" id="gg-tickers" rows="4" placeholder="PETR4, VALE3, ITUB4, BBDC4..." style="font-family:DM Mono,monospace;font-size:12px"></textarea></div>
-      <div class="form-group form-full" style="font-size:11px;color:var(--text3);line-height:1.5">Use tickers da B3: ações (PETR4), FIIs (KNRI11), ETFs (BOVA11), índices (IBOV), dólar (USDBRL), etc.</div>
+      <div class="form-group form-full" style="font-size:11px;color:var(--text3);line-height:1.5">Ações (PETR4), FIIs (KNRI11), ETFs (BOVA11), Índice (^BVSP = Ibovespa). Moedas no formato: USD-BRL, EUR-BRL, GBP-BRL.</div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
       <button class="btn-ghost" onclick="closeModal('modal-grupo-grade')">Cancelar</button>
@@ -6019,7 +6019,7 @@ var editingUsrId = null;
 var PERFIL_MENUS = {
   adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha','configuracoes'],
   gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha'],
-  cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias','materiais-cliente']
+  cliente: ['minha-carteira','agendamento','comunicados','grade-cotacoes','glossario','estrategias','materiais-cliente']
 };
 
 var PERFIL_COR = {adm:'#1e8fff', gestor:'#22c55e', cliente:'#c084fc'};
@@ -6140,7 +6140,8 @@ function showClientePortal(){
       'noticias':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
       'glossario':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       'estrategias':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-      'chamados':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+      'chamados':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      'grade-cotacoes':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>'
     };
     function mkBtn(id, view, label, active){
       var btn = document.createElement('button');
@@ -6167,6 +6168,7 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-agendamento','agendamento','Agendamento',false));
     clienteNav.appendChild(mkBtn('cnav-comunicados','comunicados','Comunicados',false));
     clienteNav.appendChild(mkBtn('cnav-noticias','noticias','Notícias',false));
+    clienteNav.appendChild(mkBtn('cnav-cotacoes','grade-cotacoes','Cotações',false));
     clienteNav.appendChild(mkBtn('cnav-glossario','glossario','Glossário',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
     clienteNav.appendChild(mkSec('DMF Academy'));
@@ -6205,6 +6207,7 @@ function showClienteView(viewId, btn){
   if(viewId==='glossario') loadGlossario();
   if(viewId==='estrategias') setTimeout(renderEst, 50);
   if(viewId==='noticias') loadNoticias&&loadNoticias();
+  if(viewId==='grade-cotacoes') initGradeCotacoes();
   if(viewId==='chamados') loadChamados();
   if(viewId==='materiais-cliente') loadMateriais();
   if(viewId==='academy-trilha-cliente') renderAcademyTrilhaCliente();
@@ -8584,9 +8587,14 @@ var gradeRefreshInterval = null;
 var editandoGrupoGradeId = null;
 
 var GRADE_DEFAULT_GRUPOS = [
-  {nome:'DMF Grade', tickers:['IBOV','USDBRL','WDOFUT','PETR4','VALE3','ITUB4','BBDC4','B3SA3','BPAC11'], ordem:0},
+  {nome:'DMF Grade', tickers:['^BVSP','USD-BRL','EUR-BRL','GBP-BRL','PETR4','VALE3','ITUB4','BBDC4','B3SA3','BPAC11'], ordem:0},
   {nome:'TOP 10 Ibovespa', tickers:['PETR4','VALE3','ITUB4','BBDC4','SBSP3','B3SA3','ITSA4','BPAC11','BBAS3','WEGE3'], ordem:1}
 ];
+
+// Detectar se um ticker é par de moeda (ex: USD-BRL, EUR-BRL)
+function isCurrencyPair(ticker){
+  return /^[A-Z]{3}-[A-Z]{3}$/.test(ticker);
+}
 
 function initGradeCotacoes(){
   if(gradeGruposListener) return;
@@ -8624,23 +8632,66 @@ function refreshGradeCotacoes(){
     return;
   }
 
-  // Fetch ticker a ticker
+  // Separar tickers normais e pares de moeda
+  var stockTickers = allTickers.filter(function(t){ return !isCurrencyPair(t); });
+  var currencyPairs = allTickers.filter(function(t){ return isCurrencyPair(t); });
+
   var cotacoes = {};
+  var totalJobs = stockTickers.length + (currencyPairs.length ? 1 : 0);
   var done = 0;
-  allTickers.forEach(function(ticker){
-    var url = 'https://brapi.dev/api/quote/' + ticker + '?token=' + brapiToken;
+
+  function checkDone(){
+    done++;
+    if(done >= totalJobs) renderGradeCotacoes(cotacoes);
+  }
+
+  // Fetch ações/índices ticker a ticker
+  stockTickers.forEach(function(ticker){
+    var url = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken;
     fetch(url).then(function(r){return r.json();}).then(function(data){
       if(data.results && data.results.length){
         var r = data.results[0];
-        cotacoes[r.symbol] = r;
+        cotacoes[r.symbol || ticker] = r;
+        // Também mapear pelo ticker original (ex: ^BVSP)
+        if(r.symbol !== ticker) cotacoes[ticker] = r;
       }
-      done++;
-      if(done>=allTickers.length) renderGradeCotacoes(cotacoes);
-    }).catch(function(){
-      done++;
-      if(done>=allTickers.length) renderGradeCotacoes(cotacoes);
-    });
+      checkDone();
+    }).catch(function(){ checkDone(); });
   });
+
+  // Fetch moedas em batch via /api/v2/currency
+  if(currencyPairs.length){
+    var currParam = currencyPairs.join(',');
+    var url = 'https://brapi.dev/api/v2/currency?currency=' + encodeURIComponent(currParam) + '&token=' + brapiToken;
+    fetch(url).then(function(r){return r.json();}).then(function(data){
+      var currencies = data.currency || [];
+      currencies.forEach(function(c){
+        var pairKey = c.fromCurrency + '-' + c.toCurrency;
+        // Normalizar para o formato que renderGradeCotacoes espera
+        cotacoes[pairKey] = {
+          symbol: pairKey,
+          shortName: c.name || (c.fromCurrency + '/' + c.toCurrency),
+          regularMarketPrice: Number(c.bidPrice) || 0,
+          regularMarketChangePercent: Number(c.bidVariation) || 0,
+          regularMarketDayHigh: Number(c.high) || null,
+          regularMarketDayLow: Number(c.low) || null,
+          regularMarketOpen: null,
+          regularMarketPreviousClose: null,
+          regularMarketTime: c.updatedAtDate || null,
+          fiftyTwoWeekHigh: null,
+          fiftyTwoWeekLow: null,
+          logourl: null,
+          _isCurrency: true
+        };
+      });
+      checkDone();
+    }).catch(function(){ checkDone(); });
+  }
+
+  // Fallback se não houver nenhum job
+  if(!totalJobs){
+    renderGradeCotacoes(cotacoes);
+  }
 }
 
 function renderGradeCotacoes(cotacoes){
@@ -8787,11 +8838,19 @@ function renderGradeCotacoes(cotacoes){
       var varPct = c.regularMarketChangePercent||0;
       var corVar = varPct>=0?'#22c55e':'#ef4444';
       var seta = varPct>=0?'▲':'▼';
-      var hora = c.regularMarketTime ? new Date(c.regularMarketTime).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—';
+      var hora = '—';
+      if(c.regularMarketTime){
+        try{ hora = new Date(c.regularMarketTime).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }catch(e){}
+      }
       var logo = c.logourl ? '<img src="'+c.logourl+'" style="width:18px;height:18px;border-radius:4px;background:#fff;vertical-align:middle;margin-right:6px" onerror="this.style.display=\'none\'">' : '';
+      // Ícone especial para moedas
+      if(c._isCurrency && !logo) logo = '<span style="font-size:14px;margin-right:4px">💱</span>';
+      // Ícone para índice
+      if(!logo && (c.symbol||'').indexOf('^')===0) logo = '<span style="font-size:14px;margin-right:4px">📊</span>';
+      var displayName = c.shortName ? '<span style="font-size:10px;color:var(--text3);margin-left:4px">'+c.shortName+'</span>' : '';
 
       html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'#1e8fff08\'" onmouseout="this.style.background=\'transparent\'">'
-        +'<td style="padding:8px 12px;font-weight:700;color:var(--white)">'+logo+c.symbol+'</td>'
+        +'<td style="padding:8px 12px;font-weight:700;color:var(--white)">'+logo+c.symbol+displayName+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:600;color:var(--white)">'+fmtNum(c.regularMarketPrice)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketDayHigh)+'</td>'
