@@ -6888,7 +6888,7 @@ function salvarMinhaConta(){
 // ── Minha Carteira - Ativos ───────────────────────────────
 // ─── OpLab — Cotações em Tempo Real ──────────────────────
 var OPLAB_TOKEN = 'H018X6kXAGmy//aUJ0QYGNVlqQ5atBGNQ3zIMJYegT/pERLLkIAX8N2XjAy4X5yr~YycfjDvfOf0sFoJLAKUO5A==~YzhiZjc0NWNkNjAwMTFkZWFiZGFmMDVjMWVhYjI4YmM=';
-var OPLAB_BASE = 'https://api.oplab.com.br/v3';
+var OPLAB_BASE = '/api/oplab'; // Proxy via Vercel rewrites → api.oplab.com.br/v3
 var cotacoesCache = {};
 var cotacoesCacheTime = 0;
 var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
