@@ -6769,7 +6769,7 @@ function salvarMinhaConta(){
 
 // ── Minha Carteira - Ativos ───────────────────────────────
 // ─── Brapi — Cotações em Tempo Real ──────────────────────
-var brapiToken = '';
+var brapiToken = 'qNCPxhPqqAgesRXAATPBuw';
 var cotacoesCache = {};
 var cotacoesCacheTime = 0;
 var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
@@ -6799,7 +6799,9 @@ function salvarBrapiToken(){
 function isTickerLike(nome){
   if(!nome) return false;
   var n = nome.trim().toUpperCase();
-  return /^[A-Z]{3,6}\d{1,2}(F)?$/.test(n);
+  // BR: PETR4, KNRI11, LFTB11, BOVA11F
+  // US/Intl: VT, VOO, TFLO, SPY, QQQ
+  return /^[A-Z]{2,6}\d{0,2}(F)?$/.test(n) && n.length >= 2 && n.length <= 8;
 }
 
 function fetchBrapiCotacoes(tickers, callback){
