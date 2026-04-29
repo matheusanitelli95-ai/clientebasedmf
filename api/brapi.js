@@ -1,11 +1,13 @@
 export default async function handler(req, res) {
   const tickers = req.query.tickers || '';
 
-  // Adicionar .SA para tickers brasileiros
+  // Adicionar .SA apenas para tickers brasileiros simples (sem ^, =, -, .)
   const tickerList = tickers.split(',').map(function(t) {
     t = t.trim();
     if (!t) return '';
-    if (t.indexOf('.') > 0 || t.indexOf('=') > 0) return t;
+    // Manter como está se já tem sufixo ou é índice/futuro/cripto/moeda
+    if (t.indexOf('.') > 0 || t.indexOf('=') > 0 || t.indexOf('^') >= 0 || t.indexOf('-') > 0) return t;
+    // Adicionar .SA para tickers brasileiros
     return t + '.SA';
   }).filter(Boolean);
 
@@ -33,8 +35,9 @@ export default async function handler(req, res) {
         const dayHigh = highs.length ? Math.max(...highs) : meta.regularMarketDayHigh || null;
         const dayLow = lows.length ? Math.min(...lows) : meta.regularMarketDayLow || null;
 
-        // Remover .SA do symbol
-        const cleanSym = (meta.symbol || sym).replace('.SA', '');
+        // Remover apenas o sufixo .SA (tickers brasileiros), manter outros (.MI, .SS, etc.)
+        const rawSym = meta.symbol || sym;
+        const cleanSym = rawSym.endsWith('.SA') ? rawSym.slice(0, -3) : rawSym;
 
         return {
           symbol: cleanSym,
