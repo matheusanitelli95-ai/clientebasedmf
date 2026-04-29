@@ -8624,17 +8624,45 @@ function isCurrencyPair(ticker){
   return /^[A-Z]{3}-[A-Z]{3}$/.test(ticker);
 }
 
+// Migração automática de tickers antigos → novos
+var TICKER_MIGRATION = {
+  'IBOV': '^BVSP',
+  'USDBRL': 'USD-BRL',
+  'EURBRL': 'EUR-BRL',
+  'GBPBRL': 'GBP-BRL'
+};
+var TICKERS_TO_REMOVE = ['WDOFUT']; // Não disponível na Brapi
+
+function migrateGradeGrupo(grupo){
+  var tickers = grupo.tickers || [];
+  var changed = false;
+  var newTickers = [];
+  tickers.forEach(function(t){
+    var tu = t.trim().toUpperCase();
+    if(TICKERS_TO_REMOVE.indexOf(tu) >= 0){ changed = true; return; }
+    if(TICKER_MIGRATION[tu]){ newTickers.push(TICKER_MIGRATION[tu]); changed = true; }
+    else { newTickers.push(t); }
+  });
+  if(changed){
+    db.collection('grade_grupos').doc(grupo.id).update({tickers: newTickers});
+  }
+  return changed;
+}
+
 function initGradeCotacoes(){
   if(gradeGruposListener) return;
   gradeGruposListener = db.collection('grade_grupos').orderBy('ordem').onSnapshot(function(snap){
     gradeGrupos = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     if(!gradeGrupos.length){
-      // Seed com grupos padrão
       GRADE_DEFAULT_GRUPOS.forEach(function(g){
         db.collection('grade_grupos').add(g);
       });
       return;
     }
+    // Migrar tickers antigos automaticamente
+    var migrated = false;
+    gradeGrupos.forEach(function(g){ if(migrateGradeGrupo(g)) migrated = true; });
+    if(migrated) return; // onSnapshot vai disparar de novo com dados corrigidos
     refreshGradeCotacoes();
   });
 }
