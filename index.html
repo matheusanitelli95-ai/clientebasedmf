@@ -6282,7 +6282,7 @@ function buildMinhasOperacoesView(){
     +'<div class="card" style="margin-bottom:20px"><div class="section-title">Acumulado DMF vs Benchmarks</div><canvas id="mo-chart" height="120"></canvas></div>'
     +'<div class="card"><div class="section-title">Histórico Mensal</div>'
     +'<div class="table-wrap" style="border:none"><table>'
-    +'<thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>% Mês</th><th>Acumulado</th></tr></thead>'
+    +'<thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>% Mês</th><th>Acumulado</th><th style="text-align:center">Ações</th></tr></thead>'
     +'<tbody id="mo-tbody"></tbody></table></div></div>'
     +'</div>';
   mainContent.appendChild(div);
@@ -6327,7 +6327,25 @@ function loadMinhasOperacoes(){
           +'<td style="font-family:DM Mono,monospace;color:#ef4444;font-size:12px">'+fmtFull(custos)+'</td>'
           +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
           +'<td style="font-size:12px;color:'+(saldo>=0?'#22c55e':'#ef4444')+'">'+pctMes+'</td>'
-          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acum>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acum)+'</td>';
+          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acum>=0?'#22c55e':'#ef4444')+'">'+fmtFull(acum)+'</td>'
+          +'<td style="text-align:center;white-space:nowrap">'
+          +'<button class="btn-edit-op" style="padding:4px 10px;font-size:11px;background:#1e8fff22;color:#1e8fff;border:1px solid #1e8fff44;border-radius:6px;cursor:pointer;margin-right:4px" data-opid="'+op.id+'">Editar</button>'
+          +'<button class="btn-del-op" style="padding:4px 10px;font-size:11px;background:#ef444422;color:#ef4444;border:1px solid #ef444444;border-radius:6px;cursor:pointer" data-opid="'+op.id+'">Excluir</button>'
+          +'</td>';
+        // Bind edit button
+        (function(opData){
+          tr.querySelector('.btn-edit-op').onclick=function(){
+            currentBlackClienteId = currentClienteVinculado;
+            editBlackOp(opData);
+          };
+          tr.querySelector('.btn-del-op').onclick=function(){
+            if(confirm('Excluir operação de '+MESES[opData.mes-1]+'/'+opData.ano+'?')){
+              db.collection('black_operacoes').doc(opData.id).delete().then(function(){
+                loadMinhasOperacoes();
+              });
+            }
+          };
+        })(op);
         tbody.appendChild(tr);
       }
     });
@@ -6359,7 +6377,7 @@ function loadMinhasOperacoes(){
 
     if(!ops.length && tbody){
       var tr=document.createElement('tr');
-      tr.innerHTML='<td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">Nenhuma operação registrada ainda</td>';
+      tr.innerHTML='<td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Nenhuma operação registrada ainda</td>';
       tbody.appendChild(tr);
     }
   });
