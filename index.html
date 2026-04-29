@@ -205,6 +205,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
 .btn-ghost{background:var(--card2);color:var(--text2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
 .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-ghost.active{background:var(--blue);color:#000;border-color:var(--blue);font-weight:600}
 .btn-dsm{background:#ff174411;color:var(--danger);border:1px solid #ff174422;border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
 
 /* ─── CARDS ─────────────────────────────── */
@@ -1036,6 +1037,38 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <!-- Asset header -->
         <div id="opcoes-asset-header" style="display:none"></div>
+        <!-- Filtros -->
+        <div id="opcoes-filtros" class="card" style="display:none;margin-bottom:16px;padding:14px">
+          <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+            <div style="flex:1;min-width:160px">
+              <label style="margin-bottom:4px">Vencimento</label>
+              <select class="form-input" id="opcoes-fil-venc" onchange="aplicarFiltrosOpcoes()" style="font-size:12px;padding:7px 10px">
+                <option value="all">Todos</option>
+              </select>
+            </div>
+            <div>
+              <label style="margin-bottom:4px">Tipo</label>
+              <div style="display:flex;gap:4px">
+                <button class="btn-ghost opcoes-fil-tipo active" data-tipo="ambos" onclick="setFiltroTipo(this)" style="font-size:11px;padding:6px 10px">Ambos</button>
+                <button class="btn-ghost opcoes-fil-tipo" data-tipo="call" onclick="setFiltroTipo(this)" style="font-size:11px;padding:6px 10px;color:#00c853">Calls</button>
+                <button class="btn-ghost opcoes-fil-tipo" data-tipo="put" onclick="setFiltroTipo(this)" style="font-size:11px;padding:6px 10px;color:#ff1744">Puts</button>
+              </div>
+            </div>
+            <div>
+              <label style="margin-bottom:4px">Moneyness</label>
+              <div style="display:flex;gap:4px">
+                <button class="btn-ghost opcoes-fil-money active" data-money="todos" onclick="setFiltroMoney(this)" style="font-size:11px;padding:6px 10px">Todos</button>
+                <button class="btn-ghost opcoes-fil-money" data-money="itm" onclick="setFiltroMoney(this)" style="font-size:11px;padding:6px 10px">ITM</button>
+                <button class="btn-ghost opcoes-fil-money" data-money="atm" onclick="setFiltroMoney(this)" style="font-size:11px;padding:6px 10px">ATM</button>
+                <button class="btn-ghost opcoes-fil-money" data-money="otm" onclick="setFiltroMoney(this)" style="font-size:11px;padding:6px 10px">OTM</button>
+              </div>
+            </div>
+            <div style="min-width:140px">
+              <label style="margin-bottom:4px">Strikes (±<span id="opcoes-fil-range-val">10</span> do preço)</label>
+              <input type="range" id="opcoes-fil-range" min="3" max="30" value="10" step="1" oninput="document.getElementById('opcoes-fil-range-val').textContent=this.value;aplicarFiltrosOpcoes()" style="width:100%">
+            </div>
+          </div>
+        </div>
         <!-- Chain content -->
         <div id="opcoes-chain-body"></div>
       </div>
@@ -9049,7 +9082,8 @@ function buscarOpcoesChain(){
     });
 
     opcoesChainData = series;
-    renderOpcoesChain(series, ticker);
+    mostrarFiltrosOpcoes();
+    aplicarFiltrosOpcoes();
     if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
     if(sub) sub.textContent = series.length + ' vencimento(s) para ' + ticker;
 
@@ -9218,6 +9252,97 @@ function renderOpcoesChain(series, symbol){
   });
 
   body.innerHTML = html;
+}
+
+// ─── Filtros Grade de Opções ─────────────────────────────
+var opcoesFiltros = {venc:'all', tipo:'ambos', money:'todos', range:10};
+
+function mostrarFiltrosOpcoes(){
+  var el = document.getElementById('opcoes-filtros');
+  if(!el || !opcoesChainData || !opcoesChainData.length) return;
+  el.style.display='block';
+  // Popular dropdown de vencimentos
+  var sel = document.getElementById('opcoes-fil-venc');
+  if(!sel) return;
+  sel.innerHTML='<option value="all">Todos os vencimentos</option>';
+  opcoesChainData.forEach(function(ser, idx){
+    var dt = '';
+    if(ser.due_date){
+      var d = new Date(ser.due_date);
+      dt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      var dtm = ser.days_to_maturity||0;
+      if(!dtm){var h=new Date();h.setHours(0,0,0,0);dtm=Math.ceil((d-h)/(1000*60*60*24));}
+      dt += ' ('+dtm+' dias)';
+    }
+    sel.innerHTML += '<option value="'+idx+'">'+(dt||'Venc. '+(idx+1))+'</option>';
+  });
+}
+
+function setFiltroTipo(btn){
+  document.querySelectorAll('.opcoes-fil-tipo').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  opcoesFiltros.tipo = btn.getAttribute('data-tipo');
+  aplicarFiltrosOpcoes();
+}
+
+function setFiltroMoney(btn){
+  document.querySelectorAll('.opcoes-fil-money').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  opcoesFiltros.money = btn.getAttribute('data-money');
+  aplicarFiltrosOpcoes();
+}
+
+function aplicarFiltrosOpcoes(){
+  if(!opcoesChainData) return;
+  var vencSel = document.getElementById('opcoes-fil-venc');
+  var rangeSel = document.getElementById('opcoes-fil-range');
+  opcoesFiltros.venc = vencSel ? vencSel.value : 'all';
+  opcoesFiltros.range = rangeSel ? parseInt(rangeSel.value) : 10;
+
+  var currentPrice = opcoesAssetData ? opcoesAssetData.close : 0;
+
+  // Filtrar séries por vencimento
+  var series = opcoesChainData;
+  if(opcoesFiltros.venc !== 'all'){
+    var idx = parseInt(opcoesFiltros.venc);
+    series = [series[idx]];
+  }
+
+  // Aplicar filtros em cada série
+  var filtered = series.map(function(ser){
+    var strikes = (ser.strikes||[]).filter(function(s){
+      var strike = s.strike;
+      // Filtro de faixa de strike
+      if(currentPrice){
+        var diff = Math.abs(strike - currentPrice);
+        var stepSize = currentPrice * 0.01; // ~1% do preço como "step"
+        if(diff / stepSize > opcoesFiltros.range) return false;
+      }
+      // Filtro moneyness
+      if(opcoesFiltros.money !== 'todos' && currentPrice){
+        var pctDiff = Math.abs(strike - currentPrice) / currentPrice;
+        var isATM = pctDiff < 0.02;
+        var isITM_call = strike < currentPrice;
+        var isOTM_call = strike > currentPrice;
+        if(opcoesFiltros.money === 'atm' && !isATM) return false;
+        if(opcoesFiltros.money === 'itm' && !isITM_call && !isATM) return false;
+        if(opcoesFiltros.money === 'otm' && !isOTM_call && !isATM) return false;
+      }
+      // Filtro tipo (call/put) — oculta strikes que só têm o tipo não selecionado
+      if(opcoesFiltros.tipo === 'call' && (!s.call || !s.call.symbol)) return false;
+      if(opcoesFiltros.tipo === 'put' && (!s.put || !s.put.symbol)) return false;
+      return true;
+    });
+    return {
+      due_date: ser.due_date,
+      days_to_maturity: ser.days_to_maturity,
+      call: ser.call,
+      put: ser.put,
+      strikes: strikes
+    };
+  }).filter(function(ser){ return ser.strikes.length > 0; });
+
+  renderOpcoesChain(filtered, opcoesAssetData ? opcoesAssetData.symbol : '');
 }
 
 // Enter key on ticker input
