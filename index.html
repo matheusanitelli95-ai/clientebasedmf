@@ -6659,13 +6659,22 @@ function renderPendentes(pendentes){
       var o=document.createElement('option');o.value=c.id;o.textContent=c.nome;
       linkSel.appendChild(o);
     });
+    // Select perfil
+    var perfilSel=document.createElement('select');
+    perfilSel.className='form-input';
+    perfilSel.style='font-size:12px;padding:6px 10px;flex-shrink:0;max-width:120px';
+    var perfilOpts=[{v:'cliente',l:'Cliente'},{v:'gestor',l:'Gestor'},{v:'adm',l:'ADM'}];
+    perfilOpts.forEach(function(po){
+      var o=document.createElement('option');o.value=po.v;o.textContent=po.l;
+      perfilSel.appendChild(o);
+    });
     var aprovarBtn=document.createElement('button');
     aprovarBtn.className='btn-primary';aprovarBtn.style='padding:8px 16px;font-size:12px;flex-shrink:0';
     aprovarBtn.textContent='Aprovar';
-    (function(pend, sel){
-      aprovarBtn.onclick=function(){ aprovarCliente(pend, sel.value); };
-    })(p, linkSel);
-    card.appendChild(info);card.appendChild(linkSel);
+    (function(pend, sel, pSel){
+      aprovarBtn.onclick=function(){ aprovarCliente(pend, sel.value, pSel.value); };
+    })(p, linkSel, perfilSel);
+    card.appendChild(info);card.appendChild(perfilSel);card.appendChild(linkSel);
     var rejBtn=document.createElement('button');
     rejBtn.className='btn-dsm';rejBtn.style='padding:8px 12px;font-size:12px;flex-shrink:0';
     rejBtn.textContent='Recusar';
@@ -6677,17 +6686,36 @@ function renderPendentes(pendentes){
   });
 }
 
-function aprovarCliente(p, existingClienteId){
+function aprovarCliente(p, existingClienteId, perfilEscolhido){
+  var perfil = perfilEscolhido || 'cliente';
+
+  // ADM e Gestor não precisam de vínculo com cliente
+  if(perfil === 'adm' || perfil === 'gestor'){
+    db.collection('usuarios').doc(p.email).set({
+      email:p.email, nome:p.nome, cpf:p.cpf||'',
+      telefone:p.telefone||'', banco:p.banco||'',
+      perfil:perfil, uid:p.uid,
+      aprovadoEm:new Date().toISOString()
+    }).then(function(){
+      return db.collection('pendentes').doc(p.id).delete();
+    }).then(function(){
+      var s=document.createElement('div');
+      s.style='position:fixed;top:24px;right:24px;background:#1e8fff;color:#fff;padding:14px 20px;border-radius:12px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;z-index:999';
+      s.textContent='Aprovado como '+perfil.toUpperCase()+': '+p.nome;
+      document.body.appendChild(s);
+      setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},3000);
+    }).catch(function(e){alert('Erro: '+e.message);});
+    return;
+  }
+
+  // Fluxo normal para clientes
   var clienteIdPromise;
   if(existingClienteId){
-    // Link to existing cliente
     clienteIdPromise = Promise.resolve(existingClienteId);
-    // Update existing cliente with email/tel info
     db.collection('clientes').doc(existingClienteId).update({
       email: p.email, telefone: p.telefone||'', cpf: p.cpf||''
     });
   } else {
-    // Create new cliente
     clienteIdPromise = db.collection('clientes').add({
       nome:p.nome, cpf:p.cpf, email:p.email,
       telefone:p.telefone, banco:p.banco,
