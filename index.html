@@ -6819,10 +6819,8 @@ function fetchBrapiCotacoes(tickers, callback){
   }
   var concluidos = 0;
   lotes.forEach(function(lote){
-    var url = 'https://brapi.dev/api/quote/list?tickers=' + lote.join(',');
-    var headers = {};
-    if(brapiToken) headers['Authorization'] = 'Bearer ' + brapiToken;
-    fetch(url, {headers:headers}).then(function(r){ return r.json(); }).then(function(data){
+    var url = 'https://brapi.dev/api/quote/' + lote.join(',') + '?token=' + brapiToken;
+    fetch(url).then(function(r){ return r.json(); }).then(function(data){
       if(data.results){
         data.results.forEach(function(r){
           cotacoesCache[r.symbol] = {
@@ -7004,24 +7002,35 @@ function renderAtivosCliente(ativos, cotacoes){
     }
     right += '</div>';
 
-    // Botão excluir
-    var actions = '<div style="flex-shrink:0">';
+    row.innerHTML = left + center + right;
 
-    row.innerHTML = left + center + right + actions;
+    // Botões Editar + Excluir
+    var btnWrap = document.createElement('div');
+    btnWrap.style = 'display:flex;flex-direction:column;gap:4px;flex-shrink:0';
 
-    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='Excluir';
+    var editBtn = document.createElement('button');
+    editBtn.className='btn-ghost';editBtn.style='padding:4px 10px;font-size:11px';editBtn.textContent='Editar';
+    (function(ativo){editBtn.onclick=function(){ editarAtivoCliente(ativo); };})(a.raw);
+    btnWrap.appendChild(editBtn);
+
+    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 10px;font-size:11px';delBtn.textContent='Excluir';
     (function(aid){delBtn.onclick=function(){
       confirmDelete(function(){
         db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
           .then(function(){loadMinhaCarteira();});
       });
     };})(a.raw.id);
-    row.appendChild(delBtn);
+    btnWrap.appendChild(delBtn);
+
+    row.appendChild(btnWrap);
     el.appendChild(row);
   });
 }
 
+var editandoAtivoId = null;
+
 function openModalAtivoCliente(){
+  editandoAtivoId = null;
   document.getElementById('fa-nome').value='';
   document.getElementById('fa-categoria').value='Renda Variável';
   updateSubcategoria();
@@ -7030,6 +7039,44 @@ function openModalAtivoCliente(){
   document.getElementById('fa-valor').value='';
   document.getElementById('fa-data').value=today();
   document.getElementById('fa-obs').value='';
+  // Título do modal
+  var title = document.querySelector('#modal-ativo .modal-title');
+  if(title) title.textContent = 'Adicionar Ativo';
+  // Override save button
+  var modal=document.getElementById('modal-ativo');
+  var saveBtn=document.getElementById('fa-save-btn')||modal.querySelector('.btn-primary');
+  saveBtn.onclick=saveAtivoCliente;
+  openModal('modal-ativo');
+}
+
+function editarAtivoCliente(ativo){
+  editandoAtivoId = ativo.id;
+  document.getElementById('fa-nome').value = ativo.nome||'';
+  // Categoria
+  var catEl = document.getElementById('fa-categoria');
+  if(catEl) catEl.value = ativo.categoria||'Renda Variável';
+  updateSubcategoria();
+  // Subcategoria (setar após updateSubcategoria)
+  var tipoEl = document.getElementById('fa-tipo');
+  if(tipoEl) tipoEl.value = ativo.tipo||'';
+  // Moeda
+  var moedaEl = document.getElementById('fa-moeda');
+  if(moedaEl) moedaEl.value = ativo.moeda||'BRL';
+  // Quantidade
+  var qtdeEl = document.getElementById('fa-qtde');
+  if(qtdeEl) qtdeEl.value = ativo.quantidade||'';
+  // Preço Médio
+  var pmEl = document.getElementById('fa-valor');
+  if(pmEl) pmEl.value = ativo.precoMedio||'';
+  // Data
+  var dataEl = document.getElementById('fa-data');
+  if(dataEl) dataEl.value = ativo.dataAplicacao||'';
+  // Obs
+  var obsEl = document.getElementById('fa-obs');
+  if(obsEl) obsEl.value = ativo.obs||'';
+  // Título do modal
+  var title = document.querySelector('#modal-ativo .modal-title');
+  if(title) title.textContent = 'Editar Ativo';
   // Override save button
   var modal=document.getElementById('modal-ativo');
   var saveBtn=document.getElementById('fa-save-btn')||modal.querySelector('.btn-primary');
@@ -7046,14 +7093,24 @@ function saveAtivoCliente(){
   var moeda=(document.getElementById('fa-moeda')||{}).value||'BRL';
   var qtde=Number((document.getElementById('fa-qtde')||{}).value)||0;
   var pm=Number((document.getElementById('fa-valor')||{}).value)||0;
-  var data={
+  var dados={
     nome:nome, categoria:categoria, tipo:tipo, moeda:moeda,
     quantidade:qtde, precoMedio:pm, valorTotal:qtde*pm,
     dataAplicacao:(document.getElementById('fa-data')||{}).value||'',
     obs:(document.getElementById('fa-obs')||{}).value||''
   };
-  db.collection('clientes').doc(currentClienteVinculado).collection('ativos').add(data)
-    .then(function(){closeModal('modal-ativo');setTimeout(loadMinhaCarteira,500);});
+  var ref = db.collection('clientes').doc(currentClienteVinculado).collection('ativos');
+  var promise;
+  if(editandoAtivoId){
+    promise = ref.doc(editandoAtivoId).update(dados);
+  } else {
+    promise = ref.add(dados);
+  }
+  promise.then(function(){
+    closeModal('modal-ativo');
+    editandoAtivoId = null;
+    setTimeout(loadMinhaCarteira, 500);
+  }).catch(function(e){ alert('Erro ao salvar: '+e.message); });
 }
 
 // ── Minhas Operações - Lançamento ─────────────────────────
