@@ -6812,27 +6812,38 @@ function fetchBrapiCotacoes(tickers, callback){
     var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
     if(todosCached){ callback(cotacoesCache); return; }
   }
-  var url = 'https://brapi.dev/api/quote/' + tickers.join(',');
-  if(brapiToken) url += '?token=' + brapiToken;
-  fetch(url).then(function(r){ return r.json(); }).then(function(data){
-    if(data.results){
-      data.results.forEach(function(r){
-        cotacoesCache[r.symbol] = {
-          price: r.regularMarketPrice,
-          change: r.regularMarketChange||0,
-          changePct: r.regularMarketChangePercent||0,
-          prevClose: r.regularMarketPreviousClose||0,
-          logo: r.logourl||'',
-          name: r.shortName||r.longName||'',
-          time: r.regularMarketTime||''
-        };
-      });
-      cotacoesCacheTime = Date.now();
-    }
-    callback(cotacoesCache);
-  }).catch(function(e){
-    console.warn('Brapi error:', e);
-    callback(cotacoesCache);
+  // Brapi: máx 10 tickers por chamada (plano Startup)
+  var lotes = [];
+  for(var i=0; i<tickers.length; i+=10){
+    lotes.push(tickers.slice(i, i+10));
+  }
+  var concluidos = 0;
+  lotes.forEach(function(lote){
+    var url = 'https://brapi.dev/api/quote/list?tickers=' + lote.join(',');
+    var headers = {};
+    if(brapiToken) headers['Authorization'] = 'Bearer ' + brapiToken;
+    fetch(url, {headers:headers}).then(function(r){ return r.json(); }).then(function(data){
+      if(data.results){
+        data.results.forEach(function(r){
+          cotacoesCache[r.symbol] = {
+            price: r.regularMarketPrice,
+            change: r.regularMarketChange||0,
+            changePct: r.regularMarketChangePercent||0,
+            prevClose: r.regularMarketPreviousClose||0,
+            logo: r.logourl||'',
+            name: r.shortName||r.longName||'',
+            time: r.regularMarketTime||''
+          };
+        });
+        cotacoesCacheTime = Date.now();
+      }
+      concluidos++;
+      if(concluidos >= lotes.length) callback(cotacoesCache);
+    }).catch(function(e){
+      console.warn('Brapi error:', e);
+      concluidos++;
+      if(concluidos >= lotes.length) callback(cotacoesCache);
+    });
   });
 }
 
