@@ -2,6 +2,9 @@
   "functions": {
     "api/proxy.js": {
       "maxDuration": 10
+    },
+    "api/brapi.js": {
+      "maxDuration": 10
     }
   }
 }
