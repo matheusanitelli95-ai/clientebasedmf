@@ -6894,10 +6894,8 @@ var cotacoesCacheTime = 0;
 var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 function oplabFetch(path){
-  // Passar token via query string (header não é repassado pelo proxy Vercel)
-  var sep = path.indexOf('?') >= 0 ? '&' : '?';
-  var url = OPLAB_BASE + path + sep + 'access_token=' + encodeURIComponent(OPLAB_TOKEN);
-  return fetch(url).then(function(r){
+  // O token é enviado pelo serverless function (api/oplab/[...path].js)
+  return fetch(OPLAB_BASE + path).then(function(r){
     if(!r.ok) throw new Error('OpLab HTTP ' + r.status);
     return r.json();
   });
