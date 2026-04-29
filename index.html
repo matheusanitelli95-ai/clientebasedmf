@@ -542,6 +542,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Notícias</span></button>
       <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span>Cotações</span></button>
+      <button class="nav-item" onclick="showView('opcoes-chain',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg></span><span>Opções</span></button>
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Agendamento</span></button>
       <button class="nav-item" onclick="showView('comunicados',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span><span>Comunicados</span></button>
       <div class="nav-section">Ferramentas</div>
@@ -1017,6 +1018,26 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="page-content">
         <div id="grade-destaques" style="margin-bottom:20px"></div>
         <div id="grade-cotacoes-body"></div>
+      </div>
+    </div>
+
+    <!-- GRADE DE OPÇÕES -->
+    <div class="view" id="view-opcoes-chain">
+      <div class="page-header">
+        <div><div class="page-title">Grade de Opções</div><div class="page-sub" id="opcoes-sub">Cadeia de opções em tempo real</div></div>
+      </div>
+      <div class="page-content">
+        <!-- Search bar -->
+        <div class="card" style="margin-bottom:16px;padding:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;position:relative">
+            <input class="form-input" id="opcoes-ticker-input" placeholder="Digite o ticker do ativo (ex: PETR4, VALE3, BBDC4...)" style="font-family:DM Mono,monospace;font-size:14px;text-transform:uppercase" autocomplete="off">
+          </div>
+          <button class="btn-primary" id="opcoes-buscar-btn" onclick="buscarOpcoesChain()">Buscar Opções</button>
+        </div>
+        <!-- Asset header -->
+        <div id="opcoes-asset-header" style="display:none"></div>
+        <!-- Chain content -->
+        <div id="opcoes-chain-body"></div>
       </div>
     </div>
 
@@ -6017,9 +6038,9 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha'],
-  cliente: ['minha-carteira','agendamento','comunicados','grade-cotacoes','glossario','estrategias','materiais-cliente']
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
+  cliente: ['minha-carteira','agendamento','comunicados','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
 };
 
 var PERFIL_COR = {adm:'#1e8fff', gestor:'#22c55e', cliente:'#c084fc'};
@@ -6141,7 +6162,8 @@ function showClientePortal(){
       'glossario':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       'estrategias':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
       'chamados':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-      'grade-cotacoes':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>'
+      'grade-cotacoes':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
+      'opcoes-chain':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg>'
     };
     function mkBtn(id, view, label, active){
       var btn = document.createElement('button');
@@ -6164,6 +6186,7 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-conta','minha-conta','Minha Conta',false));
     clienteNav.appendChild(mkSec('DMF Black'));
     clienteNav.appendChild(mkBtn('cnav-operacoes','minhas-operacoes','Operações',false));
+    clienteNav.appendChild(mkBtn('cnav-opcoes','opcoes-chain','Opções',false));
     clienteNav.appendChild(mkSec('DMF'));
     clienteNav.appendChild(mkBtn('cnav-agendamento','agendamento','Agendamento',false));
     clienteNav.appendChild(mkBtn('cnav-comunicados','comunicados','Comunicados',false));
@@ -6208,6 +6231,7 @@ function showClienteView(viewId, btn){
   if(viewId==='estrategias') setTimeout(renderEst, 50);
   if(viewId==='noticias') loadNoticias&&loadNoticias();
   if(viewId==='grade-cotacoes') initGradeCotacoes();
+  if(viewId==='opcoes-chain') initOpcoesChain();
   if(viewId==='chamados') loadChamados();
   if(viewId==='materiais-cliente') loadMateriais();
   if(viewId==='academy-trilha-cliente') renderAcademyTrilhaCliente();
@@ -8996,6 +9020,258 @@ var _origShowViewGrade = showView;
 showView = function(v, btn){
   _origShowViewGrade(v, btn);
   if(v==='grade-cotacoes') initGradeCotacoes();
+};
+
+// ═══════════════════════════════════════════════════════════
+// GRADE DE OPÇÕES (OPTIONS CHAIN)
+// ═══════════════════════════════════════════════════════════
+
+var opcoesChainData = null;
+var opcoesAssetData = null;
+
+function initOpcoesChain(){
+  // Focus on ticker input
+  var inp = document.getElementById('opcoes-ticker-input');
+  if(inp) inp.focus();
+}
+
+function buscarOpcoesChain(){
+  var inp = document.getElementById('opcoes-ticker-input');
+  var ticker = (inp ? inp.value.trim().toUpperCase() : '');
+  if(!ticker){ alert('Digite um ticker!'); return; }
+
+  var btn = document.getElementById('opcoes-buscar-btn');
+  var body = document.getElementById('opcoes-chain-body');
+  var header = document.getElementById('opcoes-asset-header');
+  var sub = document.getElementById('opcoes-sub');
+  if(btn){btn.textContent='Buscando...';btn.disabled=true;}
+  if(body) body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:14px">Buscando opções de '+ticker+'...</div></div>';
+
+  // First fetch the asset quote
+  var quoteUrl = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken;
+
+  fetch(quoteUrl).then(function(r){return r.json();}).then(function(quoteData){
+    if(quoteData.results && quoteData.results.length){
+      opcoesAssetData = quoteData.results[0];
+    }
+
+    // Now try to fetch options data via modules
+    var optUrl = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken + '&modules=options';
+    return fetch(optUrl).then(function(r){return r.json();});
+  }).then(function(data){
+    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
+
+    // Debug: log the response to help understand the format
+    console.log('Brapi options response:', JSON.stringify(data).substring(0, 2000));
+
+    var result = data.results ? data.results[0] : data;
+
+    // Render the asset header
+    renderOpcoesAssetHeader();
+
+    // Try to find options data in various possible response formats
+    var options = null;
+
+    // Format 1: result.options (array of expiration groups)
+    if(result && result.options && Array.isArray(result.options)){
+      options = result.options;
+    }
+    // Format 2: result.optionChain
+    else if(result && result.optionChain){
+      options = result.optionChain.options || result.optionChain;
+    }
+    // Format 3: directly in the result with strikePrices
+    else if(result && result.strikePrices){
+      options = [{calls: result.calls || [], puts: result.puts || [], strikePrices: result.strikePrices}];
+    }
+
+    if(options && options.length){
+      opcoesChainData = options;
+      renderOpcoesChain(options, (opcoesAssetData||{}).symbol || '');
+      if(sub) sub.textContent = 'Exibindo '+options.length+' vencimento(s) para '+(opcoesAssetData?opcoesAssetData.symbol:'');
+    } else {
+      // Show what we received for debugging
+      var bodyEl = document.getElementById('opcoes-chain-body');
+      if(bodyEl){
+        var keys = result ? Object.keys(result) : [];
+        bodyEl.innerHTML = '<div class="card" style="padding:20px">'
+          +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:16px;color:var(--warn);margin-bottom:12px">Dados de opções não encontrados</div>'
+          +'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">A API retornou dados, mas sem a cadeia de opções no formato esperado.</div>'
+          +'<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Campos retornados: <span style="font-family:DM Mono,monospace;color:var(--blue)">'+keys.join(', ')+'</span></div>'
+          +'<div style="font-size:11px;color:var(--text3)">Verifique se o seu plano Brapi inclui o módulo de opções. Abra o console (F12) para ver a resposta completa.</div>'
+          +'</div>';
+      }
+    }
+  }).catch(function(e){
+    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
+    var bodyEl = document.getElementById('opcoes-chain-body');
+    if(bodyEl) bodyEl.innerHTML='<div class="card" style="padding:20px;text-align:center"><div style="color:#ef4444;font-weight:600">Erro ao buscar opções</div><div style="font-size:12px;color:var(--text3);margin-top:4px">'+e.message+'</div></div>';
+  });
+}
+
+function renderOpcoesAssetHeader(){
+  var el = document.getElementById('opcoes-asset-header');
+  if(!el || !opcoesAssetData) return;
+  var a = opcoesAssetData;
+  var varPct = a.regularMarketChangePercent || 0;
+  var corVar = varPct >= 0 ? '#22c55e' : '#ef4444';
+  var seta = varPct >= 0 ? '▲' : '▼';
+  var logo = a.logourl ? '<img src="'+a.logourl+'" style="width:28px;height:28px;border-radius:6px;background:#fff" onerror="this.style.display=\'none\'">' : '';
+
+  el.style.display = 'block';
+  el.innerHTML = '<div class="card" style="margin-bottom:16px;padding:16px">'
+    +'<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +logo
+    +'<div>'
+    +'<div style="font-family:Syne,sans-serif;font-weight:800;font-size:20px;color:var(--white)">'+a.symbol+'</div>'
+    +'<div style="font-size:11px;color:var(--text3)">'+(a.shortName||a.longName||'')+'</div>'
+    +'</div></div>'
+    +'<div style="display:flex;align-items:baseline;gap:12px">'
+    +'<span style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:var(--white)">'+fmtNum(a.regularMarketPrice)+'</span>'
+    +'<span style="font-family:DM Mono,monospace;font-size:15px;font-weight:700;color:'+corVar+'">'+seta+' '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</span>'
+    +'</div>'
+    +'<div style="display:flex;gap:20px;flex-wrap:wrap;margin-left:auto">'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Abertura</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+fmtNum(a.regularMarketOpen)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Máxima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e88">'+fmtNum(a.regularMarketDayHigh)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Mínima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#ef444488">'+fmtNum(a.regularMarketDayLow)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Volume</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+(a.regularMarketVolume?Number(a.regularMarketVolume).toLocaleString('pt-BR'):'—')+'</div></div>'
+    +'</div></div></div>';
+}
+
+function renderOpcoesChain(options, symbol){
+  var body = document.getElementById('opcoes-chain-body');
+  if(!body) return;
+  var html = '';
+  var currentPrice = opcoesAssetData ? opcoesAssetData.regularMarketPrice : 0;
+
+  options.forEach(function(expGroup, idx){
+    var expDate = expGroup.expirationDate;
+    var expStr = '';
+    if(expDate){
+      var d = new Date(typeof expDate === 'number' && expDate < 1e12 ? expDate*1000 : expDate);
+      expStr = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      // Calculate days to expiration
+      var hoje = new Date(); hoje.setHours(0,0,0,0);
+      var diffDays = Math.ceil((d - hoje)/(1000*60*60*24));
+      expStr += ' (' + diffDays + ' dias)';
+    }
+
+    var calls = expGroup.calls || [];
+    var puts = expGroup.puts || [];
+
+    // Build a map by strike
+    var strikes = {};
+    calls.forEach(function(c){
+      var s = c.strike;
+      if(!strikes[s]) strikes[s] = {};
+      strikes[s].call = c;
+    });
+    puts.forEach(function(p){
+      var s = p.strike;
+      if(!strikes[s]) strikes[s] = {};
+      strikes[s].put = p;
+    });
+    var sortedStrikes = Object.keys(strikes).map(Number).sort(function(a,b){return a-b;});
+
+    var isOpen = idx < 2; // First 2 expirations open by default
+
+    html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">';
+
+    // Accordion header
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;background:linear-gradient(135deg,#0a1222,#08111e);border-bottom:1px solid var(--border)" onclick="this.parentElement.querySelector(\'.opcoes-exp-body\').style.display=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.opcoes-arrow\').textContent=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'▸\':\'▾\'">'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +'<span class="opcoes-arrow" style="color:var(--blue);font-size:14px">'+(isOpen?'▾':'▸')+'</span>'
+      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">Vencimento: '+expStr+'</span>'
+      +'<span style="font-size:11px;color:var(--text3)">'+sortedStrikes.length+' strikes</span>'
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+calls.length+' calls · '+puts.length+' puts</div>'
+      +'</div>';
+
+    // Body (table)
+    html += '<div class="opcoes-exp-body" style="display:'+(isOpen?'block':'none')+';overflow-x:auto">';
+    html += '<table style="width:100%;font-size:12px;border-collapse:collapse">';
+
+    // Header
+    html += '<thead><tr style="background:#060c16">'
+      +'<th colspan="5" style="text-align:center;padding:8px;color:#22c55e;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #22c55e33;border-right:1px solid var(--border)">CALLS</th>'
+      +'<th style="padding:8px;text-align:center;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid var(--blue);border-left:1px solid var(--border);border-right:1px solid var(--border)">STRIKE</th>'
+      +'<th colspan="5" style="text-align:center;padding:8px;color:#ef4444;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #ef444433;border-left:1px solid var(--border)">PUTS</th>'
+      +'</tr>';
+    html += '<tr style="background:#060c16">'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:left">Código</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right;border-right:1px solid var(--border)">Vol.</th>'
+      +'<th style="padding:6px 8px;text-align:center;font-weight:700;color:var(--blue);font-size:10px;border-left:1px solid var(--border);border-right:1px solid var(--border)">R$</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:left;border-left:1px solid var(--border)">Código</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
+      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Vol.</th>'
+      +'</tr></thead><tbody>';
+
+    sortedStrikes.forEach(function(strike){
+      var row = strikes[strike];
+      var c = row.call;
+      var p = row.put;
+      var isITM_call = currentPrice && strike <= currentPrice;
+      var isITM_put = currentPrice && strike >= currentPrice;
+      var isATM = currentPrice && Math.abs(strike - currentPrice) < (currentPrice * 0.01);
+      var bgCall = isITM_call ? '#22c55e08' : 'transparent';
+      var bgPut = isITM_put ? '#ef444408' : 'transparent';
+      var atmBorder = isATM ? 'border-top:2px solid var(--blue);border-bottom:2px solid var(--blue)' : 'border-bottom:1px solid var(--border)';
+
+      html += '<tr style="'+atmBorder+';transition:background .1s">';
+
+      // Call side
+      if(c){
+        html += '<td style="padding:5px 8px;background:'+bgCall+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px">'+(c.contractSymbol||c.symbol||'—')+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(c.lastPrice||c.last||c.regularMarketPrice)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(c.bid)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(c.ask)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px;border-right:1px solid var(--border)">'+(c.volume||c.openInterest||'—')+'</td>';
+      } else {
+        html += '<td colspan="5" style="padding:5px 8px;color:var(--text3);font-size:10px;text-align:center;border-right:1px solid var(--border)">—</td>';
+      }
+
+      // Strike
+      html += '<td style="padding:5px 8px;text-align:center;font-family:DM Mono,monospace;font-weight:700;font-size:12px;color:'+(isATM?'var(--blue)':'var(--white)')+';background:'+(isATM?'#1e8fff11':'#060c16')+';border-left:1px solid var(--border);border-right:1px solid var(--border)">'+fmtNum(strike)+'</td>';
+
+      // Put side
+      if(p){
+        html += '<td style="padding:5px 8px;background:'+bgPut+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px;border-left:1px solid var(--border)">'+(p.contractSymbol||p.symbol||'—')+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(p.lastPrice||p.last||p.regularMarketPrice)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(p.bid)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(p.ask)+'</td>'
+          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(p.volume||p.openInterest||'—')+'</td>';
+      } else {
+        html += '<td colspan="5" style="padding:5px 8px;color:var(--text3);font-size:10px;text-align:center;border-left:1px solid var(--border)">—</td>';
+      }
+
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  });
+
+  body.innerHTML = html;
+}
+
+// Enter key on ticker input
+document.addEventListener('DOMContentLoaded', function(){
+  var inp2 = document.getElementById('opcoes-ticker-input');
+  if(inp2) inp2.addEventListener('keydown', function(e){
+    if(e.key==='Enter') buscarOpcoesChain();
+  });
+});
+
+// Hook showView for opcoes-chain
+var _origShowViewOpcoes = showView;
+showView = function(v, btn){
+  _origShowViewOpcoes(v, btn);
+  if(v==='opcoes-chain') initOpcoesChain();
 };
 
 // ═══════════════════════════════════════════════════════════
