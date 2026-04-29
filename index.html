@@ -1009,7 +1009,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <!-- GRADE DE COTAÇÕES -->
     <div class="view" id="view-grade-cotacoes">
       <div class="page-header">
-        <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Grade de Cotações <span id="grade-clock" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="grade-sub">Cotações em tempo real via Brapi</div></div>
+        <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Grade de Cotações <span id="grade-clock" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="grade-sub">Cotações em tempo real via OpLab</div></div>
         <div style="display:flex;gap:8px">
           <button class="btn-secondary" onclick="refreshGradeCotacoes()" id="grade-refresh-btn">Atualizar</button>
           <button class="btn-primary" onclick="openModalGrupoGrade()">+ Novo Grupo</button>
@@ -1377,15 +1377,15 @@ textarea.form-input{resize:vertical;min-height:80px}
             </div>
           </div>
         </div>
-        <!-- Brapi Config -->
+        <!-- OpLab Config -->
         <div class="card" style="margin-bottom:20px">
-          <div class="section-title">Cotações em Tempo Real (Brapi)</div>
-          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6">Cadastre seu token da <a href="https://brapi.dev" target="_blank" style="color:var(--blue)">brapi.dev</a> para atualizar cotações automaticamente na carteira dos clientes. Sem token, apenas PETR4, VALE3, MGLU3 e ITUB4 funcionam.</div>
+          <div class="section-title">Cotações em Tempo Real (OpLab)</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6">Cotações e opções fornecidas pela <a href="https://oplab.com.br" target="_blank" style="color:var(--blue)">OpLab</a>. O token pode ser atualizado abaixo caso necessário.</div>
           <div style="display:flex;gap:10px;align-items:center">
-            <input class="form-input" id="cfg-brapi-token" placeholder="Seu token Brapi" style="flex:1;font-family:DM Mono,monospace;font-size:12px">
-            <button class="btn-primary" onclick="salvarBrapiToken()" style="white-space:nowrap">Salvar Token</button>
+            <input class="form-input" id="cfg-oplab-token" placeholder="Seu Access-Token OpLab" style="flex:1;font-family:DM Mono,monospace;font-size:12px">
+            <button class="btn-primary" onclick="salvarOplabToken()" style="white-space:nowrap">Salvar Token</button>
           </div>
-          <div id="cfg-brapi-status" style="font-size:11px;margin-top:8px;color:var(--text3)"></div>
+          <div id="cfg-oplab-status" style="font-size:11px;margin-top:8px;color:var(--text3)"></div>
         </div>
         <!-- Pendentes -->
         <div id="pendentes-section" style="display:none;margin-bottom:20px">
@@ -6073,8 +6073,8 @@ auth.onAuthStateChanged(function(user){
       // Apply perfil BEFORE showing content
       applyPerfil();
       // Only load full data for adm/gestor
-      // Carregar token Brapi para cotações
-      loadBrapiToken();
+      // Carregar token OpLab para cotações
+      loadOplabToken();
       if(currentPerfil === 'cliente'){
         // Cliente: only load own data
         loadClienteData();
@@ -6886,30 +6886,39 @@ function salvarMinhaConta(){
 }
 
 // ── Minha Carteira - Ativos ───────────────────────────────
-// ─── Brapi — Cotações em Tempo Real ──────────────────────
-var brapiToken = 'qNCPxhPqqAgesRXAATPBuw';
+// ─── OpLab — Cotações em Tempo Real ──────────────────────
+var OPLAB_TOKEN = 'H018X6kXAGmy//aUJ0QYGNVlqQ5atBGNQ3zIMJYegT/pERLLkIAX8N2XjAy4X5yr~YycfjDvfOf0sFoJLAKUO5A==~YzhiZjc0NWNkNjAwMTFkZWFiZGFmMDVjMWVhYjI4YmM=';
+var OPLAB_BASE = 'https://api.oplab.com.br/v3';
 var cotacoesCache = {};
 var cotacoesCacheTime = 0;
 var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
-function loadBrapiToken(){
-  db.collection('config').doc('brapi').get().then(function(doc){
-    if(doc.exists) brapiToken = doc.data().token || '';
-    // Preencher campo na config se estiver visível
-    var inp = document.getElementById('cfg-brapi-token');
-    if(inp && brapiToken) inp.value = brapiToken;
+function oplabFetch(path){
+  return fetch(OPLAB_BASE + path, {
+    headers: { 'Access-Token': OPLAB_TOKEN }
+  }).then(function(r){
+    if(!r.ok) throw new Error('OpLab HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+function loadOplabToken(){
+  db.collection('config').doc('oplab').get().then(function(doc){
+    if(doc.exists && doc.data().token) OPLAB_TOKEN = doc.data().token;
+    var inp = document.getElementById('cfg-oplab-token');
+    if(inp && OPLAB_TOKEN) inp.value = OPLAB_TOKEN;
   }).catch(function(){});
 }
 
-function salvarBrapiToken(){
-  var token = (document.getElementById('cfg-brapi-token')||{}).value||'';
+function salvarOplabToken(){
+  var token = (document.getElementById('cfg-oplab-token')||{}).value||'';
   token = token.trim();
-  db.collection('config').doc('brapi').set({token:token},{merge:true}).then(function(){
-    brapiToken = token;
-    var st = document.getElementById('cfg-brapi-status');
+  db.collection('config').doc('oplab').set({token:token},{merge:true}).then(function(){
+    OPLAB_TOKEN = token;
+    var st = document.getElementById('cfg-oplab-status');
     if(st){st.textContent = token ? 'Token salvo com sucesso!' : 'Token removido.'; st.style.color='#22c55e';}
   }).catch(function(e){
-    var st = document.getElementById('cfg-brapi-status');
+    var st = document.getElementById('cfg-oplab-status');
     if(st){st.textContent = 'Erro: '+e.message; st.style.color='#ef4444';}
   });
 }
@@ -6922,7 +6931,7 @@ function isTickerLike(nome){
   return /^[A-Z]{2,6}\d{0,2}(F)?$/.test(n) && n.length >= 2 && n.length <= 8;
 }
 
-function fetchBrapiCotacoes(tickers, callback){
+function fetchOplabCotacoes(tickers, callback){
   if(!tickers.length){ callback({}); return; }
   // Checar cache
   var agora = Date.now();
@@ -6930,32 +6939,25 @@ function fetchBrapiCotacoes(tickers, callback){
     var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
     if(todosCached){ callback(cotacoesCache); return; }
   }
-  // Buscar ticker a ticker para evitar que um erro quebre todos
-  var concluidos = 0;
-  var total = tickers.length;
-  tickers.forEach(function(ticker){
-    var url = 'https://brapi.dev/api/quote/' + ticker + '?token=' + brapiToken;
-    fetch(url).then(function(r){ return r.json(); }).then(function(data){
-      if(data.results && data.results.length){
-        var r = data.results[0];
-        cotacoesCache[r.symbol] = {
-          price: r.regularMarketPrice,
-          change: r.regularMarketChange||0,
-          changePct: r.regularMarketChangePercent||0,
-          prevClose: r.regularMarketPreviousClose||0,
-          logo: r.logourl||'',
-          name: r.shortName||r.longName||'',
-          time: r.regularMarketTime||''
-        };
-        cotacoesCacheTime = Date.now();
-      }
-      concluidos++;
-      if(concluidos >= total) callback(cotacoesCache);
-    }).catch(function(e){
-      console.warn('Brapi: '+ticker+' erro:', e.message||e);
-      concluidos++;
-      if(concluidos >= total) callback(cotacoesCache);
+  // Buscar todos de uma vez via /market/quote?tickers=X,Y,Z
+  oplabFetch('/market/quote?tickers=' + encodeURIComponent(tickers.join(','))).then(function(data){
+    var items = Array.isArray(data) ? data : (data.data || data.results || []);
+    items.forEach(function(r){
+      cotacoesCache[r.symbol] = {
+        price: r.close,
+        change: 0,
+        changePct: r.variation||0,
+        prevClose: 0,
+        logo: '',
+        name: r.name||'',
+        time: r.time ? new Date(r.time * 1000).toISOString() : ''
+      };
     });
+    cotacoesCacheTime = Date.now();
+    callback(cotacoesCache);
+  }).catch(function(e){
+    console.warn('OpLab cotações erro:', e.message||e);
+    callback(cotacoesCache);
   });
 }
 
@@ -6987,7 +6989,7 @@ function loadMinhaCarteira(){
       // Mostrar loading
       var statusEl = document.getElementById('mc-cotacao-status');
       if(statusEl){statusEl.style.display='block';statusEl.innerHTML='<span style="color:var(--blue)">Atualizando cotações...</span>';}
-      fetchBrapiCotacoes(tickers, function(cotacoes){
+      fetchOplabCotacoes(tickers, function(cotacoes){
         renderAtivosCliente(ativos, cotacoes);
       });
     } else {
@@ -7061,7 +7063,7 @@ function renderAtivosCliente(ativos, cotacoes){
       statusEl.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="#22c55e" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/></svg>'+tickersEncontrados+' cotaç'+(tickersEncontrados>1?'ões atualizadas':'ão atualizada')+(time?' · '+time:'');
     } else if(tickersBuscados>0){
       statusEl.style.display='block';
-      statusEl.innerHTML='<span style="color:#f59e0b">Cotações indisponíveis — verifique o token Brapi nas Configurações</span>';
+      statusEl.innerHTML='<span style="color:#f59e0b">Cotações indisponíveis — verifique o token OpLab nas Configurações</span>';
     } else {
       statusEl.style.display='none';
     }
@@ -7228,7 +7230,7 @@ function saveAtivoCliente(){
   }).catch(function(e){ alert('Erro ao salvar: '+e.message); });
 }
 
-// ── Autocomplete Ativo (Brapi) ──────────────────────────
+// ── Autocomplete Ativo (OpLab) ──────────────────────────
 var _acTimer = null;
 var _acCache = {};
 document.addEventListener('DOMContentLoaded', function(){
@@ -7240,7 +7242,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var q = inp.value.trim().toUpperCase();
     clearTimeout(_acTimer);
     if(q.length < 2){ list.style.display='none'; return; }
-    _acTimer = setTimeout(function(){ searchBrapiTickers(q); }, 300);
+    _acTimer = setTimeout(function(){ searchOplabTickers(q); }, 300);
   });
 
   inp.addEventListener('keydown', function(e){
@@ -7271,7 +7273,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-function searchBrapiTickers(query){
+function searchOplabTickers(query){
   var list = document.getElementById('fa-nome-ac');
   if(!list) return;
 
@@ -7281,12 +7283,11 @@ function searchBrapiTickers(query){
     return;
   }
 
-  // Brapi search: /api/available returns array of ticker strings
-  var url = 'https://brapi.dev/api/available?search=' + encodeURIComponent(query) + '&token=' + brapiToken;
-  fetch(url).then(function(r){ return r.json(); }).then(function(data){
-    var stocks = data.stocks || [];
-    // Filter to top 8 matches
-    var filtered = stocks.slice(0, 8);
+  // OpLab search: /market/instruments/search returns array of instruments
+  oplabFetch('/market/instruments/search?search=' + encodeURIComponent(query)).then(function(data){
+    var items = Array.isArray(data) ? data : (data.data || data.results || []);
+    // Extract ticker symbols, filter to top 8
+    var filtered = items.slice(0, 8).map(function(i){ return i.symbol || i; });
     _acCache[query] = filtered;
     renderAcList(list, filtered, query);
   }).catch(function(){
@@ -8657,23 +8658,18 @@ var gradeRefreshInterval = null;
 var editandoGrupoGradeId = null;
 
 var GRADE_DEFAULT_GRUPOS = [
-  {nome:'DMF Grade', tickers:['^BVSP','USD-BRL','EUR-BRL','GBP-BRL','PETR4','VALE3','ITUB4','BBDC4','B3SA3','BPAC11'], ordem:0},
+  {nome:'DMF Grade', tickers:['IBOV','USDBRL','EURBRL','GBPBRL','PETR4','VALE3','ITUB4','BBDC4','B3SA3','BPAC11'], ordem:0},
   {nome:'TOP 10 Ibovespa', tickers:['PETR4','VALE3','ITUB4','BBDC4','SBSP3','B3SA3','ITSA4','BPAC11','BBAS3','WEGE3'], ordem:1}
 ];
 
-// Detectar se um ticker é par de moeda (ex: USD-BRL, EUR-BRL)
-function isCurrencyPair(ticker){
-  return /^[A-Z]{3}-[A-Z]{3}$/.test(ticker);
-}
-
-// Migração automática de tickers antigos → novos
+// Migração automática de tickers antigos → formato OpLab
 var TICKER_MIGRATION = {
-  'IBOV': '^BVSP',
-  'USDBRL': 'USD-BRL',
-  'EURBRL': 'EUR-BRL',
-  'GBPBRL': 'GBP-BRL'
+  '^BVSP': 'IBOV',
+  'USD-BRL': 'USDBRL',
+  'EUR-BRL': 'EURBRL',
+  'GBP-BRL': 'GBPBRL'
 };
-var TICKERS_TO_REMOVE = ['WDOFUT']; // Não disponível na Brapi
+var TICKERS_TO_REMOVE = ['WDOFUT'];
 
 function migrateGradeGrupo(grupo){
   var tickers = grupo.tickers || [];
@@ -8730,66 +8726,39 @@ function refreshGradeCotacoes(){
     return;
   }
 
-  // Separar tickers normais e pares de moeda
-  var stockTickers = allTickers.filter(function(t){ return !isCurrencyPair(t); });
-  var currencyPairs = allTickers.filter(function(t){ return isCurrencyPair(t); });
+  // OpLab: buscar todos de uma vez via /market/quote
+  oplabFetch('/market/quote?tickers=' + encodeURIComponent(allTickers.join(','))).then(function(data){
+    var items = Array.isArray(data) ? data : (data.data || data.results || []);
+    console.log('OpLab quote response (' + items.length + ' items):', items.length ? JSON.stringify(items[0]) : 'vazio');
 
-  var cotacoes = {};
-  var totalJobs = stockTickers.length + (currencyPairs.length ? 1 : 0);
-  var done = 0;
-
-  function checkDone(){
-    done++;
-    if(done >= totalJobs) renderGradeCotacoes(cotacoes);
-  }
-
-  // Fetch ações/índices ticker a ticker
-  stockTickers.forEach(function(ticker){
-    var url = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken;
-    fetch(url).then(function(r){return r.json();}).then(function(data){
-      if(data.results && data.results.length){
-        var r = data.results[0];
-        cotacoes[r.symbol || ticker] = r;
-        // Também mapear pelo ticker original (ex: ^BVSP)
-        if(r.symbol !== ticker) cotacoes[ticker] = r;
-      }
-      checkDone();
-    }).catch(function(){ checkDone(); });
-  });
-
-  // Fetch moedas em batch via /api/v2/currency
-  if(currencyPairs.length){
-    var currParam = currencyPairs.join(',');
-    var url = 'https://brapi.dev/api/v2/currency?currency=' + encodeURIComponent(currParam) + '&token=' + brapiToken;
-    fetch(url).then(function(r){return r.json();}).then(function(data){
-      var currencies = data.currency || [];
-      currencies.forEach(function(c){
-        var pairKey = c.fromCurrency + '-' + c.toCurrency;
-        // Normalizar para o formato que renderGradeCotacoes espera
-        cotacoes[pairKey] = {
-          symbol: pairKey,
-          shortName: c.name || (c.fromCurrency + '/' + c.toCurrency),
-          regularMarketPrice: Number(c.bidPrice) || 0,
-          regularMarketChangePercent: Number(c.bidVariation) || 0,
-          regularMarketDayHigh: Number(c.high) || null,
-          regularMarketDayLow: Number(c.low) || null,
-          regularMarketOpen: null,
-          regularMarketPreviousClose: null,
-          regularMarketTime: c.updatedAtDate || null,
-          fiftyTwoWeekHigh: null,
-          fiftyTwoWeekLow: null,
-          logourl: null,
-          _isCurrency: true
-        };
-      });
-      checkDone();
-    }).catch(function(){ checkDone(); });
-  }
-
-  // Fallback se não houver nenhum job
-  if(!totalJobs){
+    var cotacoes = {};
+    items.forEach(function(r){
+      // Normalizar para o formato que renderGradeCotacoes espera
+      cotacoes[r.symbol] = {
+        symbol: r.symbol,
+        shortName: r.name || '',
+        regularMarketPrice: r.close,
+        regularMarketChangePercent: r.variation || 0,
+        regularMarketDayHigh: r.high,
+        regularMarketDayLow: r.low,
+        regularMarketOpen: r.open,
+        regularMarketPreviousClose: null,
+        regularMarketTime: r.time ? (typeof r.time === 'number' ? new Date(r.time * 1000).toISOString() : r.time) : null,
+        regularMarketVolume: r.volume,
+        fiftyTwoWeekHigh: null,
+        fiftyTwoWeekLow: null,
+        logourl: null,
+        bid: r.bid,
+        ask: r.ask,
+        _isCurrency: (r.symbol||'').indexOf('BRL') > 0 && (r.symbol||'').length <= 6
+      };
+    });
     renderGradeCotacoes(cotacoes);
-  }
+  }).catch(function(e){
+    console.error('OpLab quote error:', e);
+    if(btn){btn.textContent='Atualizar';btn.disabled=false;}
+    body.innerHTML='<div class="card" style="padding:20px;text-align:center"><div style="color:#ef4444;font-weight:600">Erro ao buscar cotações</div><div style="font-size:12px;color:var(--text3);margin-top:4px">'+e.message+'</div></div>';
+  });
 }
 
 function renderGradeCotacoes(cotacoes){
@@ -9023,14 +8992,15 @@ showView = function(v, btn){
 };
 
 // ═══════════════════════════════════════════════════════════
-// GRADE DE OPÇÕES (OPTIONS CHAIN)
+// GRADE DE OPÇÕES (OPTIONS CHAIN) — via OpLab API
+// Uma única chamada /market/instruments/series/{symbol}
+// retorna tudo: ativo + séries + strikes + calls + puts
 // ═══════════════════════════════════════════════════════════
 
 var opcoesChainData = null;
 var opcoesAssetData = null;
 
 function initOpcoesChain(){
-  // Focus on ticker input
   var inp = document.getElementById('opcoes-ticker-input');
   if(inp) inp.focus();
 }
@@ -9042,70 +9012,51 @@ function buscarOpcoesChain(){
 
   var btn = document.getElementById('opcoes-buscar-btn');
   var body = document.getElementById('opcoes-chain-body');
-  var header = document.getElementById('opcoes-asset-header');
   var sub = document.getElementById('opcoes-sub');
   if(btn){btn.textContent='Buscando...';btn.disabled=true;}
-  if(body) body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:14px">Buscando opções de '+ticker+'...</div></div>';
+  if(body) body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:14px">Buscando opções de '+ticker+' via OpLab...</div></div>';
 
-  // First fetch the asset quote
-  var quoteUrl = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken;
+  // Uma única chamada retorna tudo: ativo + séries com strikes/calls/puts
+  // bs=true adiciona Black-Scholes (gregas) — precisa da taxa de juros (irate)
+  oplabFetch('/market/instruments/series/' + encodeURIComponent(ticker) + '?bs=true&irate=14.75').then(function(data){
+    console.log('OpLab series response keys:', Object.keys(data));
+    console.log('OpLab series count:', (data.series||[]).length);
+    if(data.series && data.series.length) console.log('OpLab first series:', JSON.stringify(data.series[0]).substring(0, 1500));
 
-  fetch(quoteUrl).then(function(r){return r.json();}).then(function(quoteData){
-    if(quoteData.results && quoteData.results.length){
-      opcoesAssetData = quoteData.results[0];
-    }
-
-    // Now try to fetch options data via modules
-    var optUrl = 'https://brapi.dev/api/quote/' + encodeURIComponent(ticker) + '?token=' + brapiToken + '&modules=options';
-    return fetch(optUrl).then(function(r){return r.json();});
-  }).then(function(data){
-    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
-
-    // Debug: log the response to help understand the format
-    console.log('Brapi options response:', JSON.stringify(data).substring(0, 2000));
-
-    var result = data.results ? data.results[0] : data;
-
-    // Render the asset header
+    // Salvar dados do ativo para o header
+    opcoesAssetData = data;
     renderOpcoesAssetHeader();
 
-    // Try to find options data in various possible response formats
-    var options = null;
-
-    // Format 1: result.options (array of expiration groups)
-    if(result && result.options && Array.isArray(result.options)){
-      options = result.options;
-    }
-    // Format 2: result.optionChain
-    else if(result && result.optionChain){
-      options = result.optionChain.options || result.optionChain;
-    }
-    // Format 3: directly in the result with strikePrices
-    else if(result && result.strikePrices){
-      options = [{calls: result.calls || [], puts: result.puts || [], strikePrices: result.strikePrices}];
+    var series = data.series || [];
+    if(!series.length){
+      if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
+      body.innerHTML='<div class="card" style="padding:20px">'
+        +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:16px;color:var(--warn);margin-bottom:12px">Nenhum vencimento encontrado</div>'
+        +'<div style="font-size:13px;color:var(--text2)">Não foram encontradas séries de opções para '+ticker+' no OpLab.</div>'
+        +'<div style="font-size:11px;color:var(--text3);margin-top:8px">Verifique se o ticker está correto (ex: PETR4, VALE3, BBDC4).</div>'
+        +'</div>';
+      return;
     }
 
-    if(options && options.length){
-      opcoesChainData = options;
-      renderOpcoesChain(options, (opcoesAssetData||{}).symbol || '');
-      if(sub) sub.textContent = 'Exibindo '+options.length+' vencimento(s) para '+(opcoesAssetData?opcoesAssetData.symbol:'');
-    } else {
-      // Show what we received for debugging
-      var bodyEl = document.getElementById('opcoes-chain-body');
-      if(bodyEl){
-        var keys = result ? Object.keys(result) : [];
-        bodyEl.innerHTML = '<div class="card" style="padding:20px">'
-          +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:16px;color:var(--warn);margin-bottom:12px">Dados de opções não encontrados</div>'
-          +'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">A API retornou dados, mas sem a cadeia de opções no formato esperado.</div>'
-          +'<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Campos retornados: <span style="font-family:DM Mono,monospace;color:var(--blue)">'+keys.join(', ')+'</span></div>'
-          +'<div style="font-size:11px;color:var(--text3)">Verifique se o seu plano Brapi inclui o módulo de opções. Abra o console (F12) para ver a resposta completa.</div>'
-          +'</div>';
-      }
-    }
-  }).catch(function(e){
+    // Filtrar séries vencidas
+    var hoje = new Date(); hoje.setHours(0,0,0,0);
+    series = series.filter(function(s){
+      return !s.due_date || new Date(s.due_date) >= hoje;
+    });
+
+    opcoesChainData = series;
+    renderOpcoesChain(series, ticker);
     if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
-    var bodyEl = document.getElementById('opcoes-chain-body');
-    if(bodyEl) bodyEl.innerHTML='<div class="card" style="padding:20px;text-align:center"><div style="color:#ef4444;font-weight:600">Erro ao buscar opções</div><div style="font-size:12px;color:var(--text3);margin-top:4px">'+e.message+'</div></div>';
+    if(sub) sub.textContent = series.length + ' vencimento(s) para ' + ticker;
+
+  }).catch(function(e){
+    console.error('OpLab series error:', e);
+    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
+    body.innerHTML='<div class="card" style="padding:20px;text-align:center">'
+      +'<div style="color:#ef4444;font-weight:600;margin-bottom:8px">Erro ao buscar opções via OpLab</div>'
+      +'<div style="font-size:12px;color:var(--text3)">'+e.message+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:8px">Verifique o console (F12) para detalhes.</div>'
+      +'</div>';
   });
 }
 
@@ -9113,68 +9064,61 @@ function renderOpcoesAssetHeader(){
   var el = document.getElementById('opcoes-asset-header');
   if(!el || !opcoesAssetData) return;
   var a = opcoesAssetData;
-  var varPct = a.regularMarketChangePercent || 0;
+  var varPct = a.variation || 0;
   var corVar = varPct >= 0 ? '#22c55e' : '#ef4444';
   var seta = varPct >= 0 ? '▲' : '▼';
-  var logo = a.logourl ? '<img src="'+a.logourl+'" style="width:28px;height:28px;border-radius:6px;background:#fff" onerror="this.style.display=\'none\'">' : '';
 
   el.style.display = 'block';
   el.innerHTML = '<div class="card" style="margin-bottom:16px;padding:16px">'
     +'<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
-    +'<div style="display:flex;align-items:center;gap:10px">'
-    +logo
     +'<div>'
-    +'<div style="font-family:Syne,sans-serif;font-weight:800;font-size:20px;color:var(--white)">'+a.symbol+'</div>'
-    +'<div style="font-size:11px;color:var(--text3)">'+(a.shortName||a.longName||'')+'</div>'
-    +'</div></div>'
+    +'<div style="font-family:Syne,sans-serif;font-weight:800;font-size:20px;color:var(--white)">'+(a.symbol||'')+'</div>'
+    +'<div style="font-size:11px;color:var(--text3)">'+(a.name||'')+'</div>'
+    +'</div>'
     +'<div style="display:flex;align-items:baseline;gap:12px">'
-    +'<span style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:var(--white)">'+fmtNum(a.regularMarketPrice)+'</span>'
+    +'<span style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:var(--white)">'+fmtNum(a.close)+'</span>'
     +'<span style="font-family:DM Mono,monospace;font-size:15px;font-weight:700;color:'+corVar+'">'+seta+' '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</span>'
     +'</div>'
     +'<div style="display:flex;gap:20px;flex-wrap:wrap;margin-left:auto">'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Abertura</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+fmtNum(a.regularMarketOpen)+'</div></div>'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Máxima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e88">'+fmtNum(a.regularMarketDayHigh)+'</div></div>'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Mínima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#ef444488">'+fmtNum(a.regularMarketDayLow)+'</div></div>'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Volume</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+(a.regularMarketVolume?Number(a.regularMarketVolume).toLocaleString('pt-BR'):'—')+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Abertura</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+fmtNum(a.open)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Máxima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#22c55e88">'+fmtNum(a.high)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Mínima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#ef444488">'+fmtNum(a.low)+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Volume</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+(a.volume?Number(a.volume).toLocaleString('pt-BR'):'—')+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">IV Atual</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#f59e0b">'+(a.iv_current?(a.iv_current*100).toFixed(1)+'%':'—')+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">EWMA</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#a78bfa">'+(a.ewma_current?(a.ewma_current*100).toFixed(1)+'%':'—')+'</div></div>'
     +'</div></div></div>';
 }
 
-function renderOpcoesChain(options, symbol){
+function renderOpcoesChain(series, symbol){
   var body = document.getElementById('opcoes-chain-body');
   if(!body) return;
   var html = '';
-  var currentPrice = opcoesAssetData ? opcoesAssetData.regularMarketPrice : 0;
+  var currentPrice = opcoesAssetData ? opcoesAssetData.close : 0;
 
-  options.forEach(function(expGroup, idx){
-    var expDate = expGroup.expirationDate;
+  series.forEach(function(ser, idx){
+    var expDate = ser.due_date;
+    var dtm = ser.days_to_maturity || 0;
     var expStr = '';
     if(expDate){
-      var d = new Date(typeof expDate === 'number' && expDate < 1e12 ? expDate*1000 : expDate);
+      var d = new Date(expDate);
       expStr = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
-      // Calculate days to expiration
-      var hoje = new Date(); hoje.setHours(0,0,0,0);
-      var diffDays = Math.ceil((d - hoje)/(1000*60*60*24));
-      expStr += ' (' + diffDays + ' dias)';
+      if(!dtm){
+        var hoje = new Date(); hoje.setHours(0,0,0,0);
+        dtm = Math.ceil((d - hoje)/(1000*60*60*24));
+      }
+      expStr += ' (' + dtm + ' dias)';
     }
 
-    var calls = expGroup.calls || [];
-    var puts = expGroup.puts || [];
+    var strikes = ser.strikes || [];
+    var seriesLabel = '';
+    if(ser.call) seriesLabel += 'Call: ' + ser.call;
+    if(ser.put) seriesLabel += (seriesLabel ? ' · ' : '') + 'Put: ' + ser.put;
 
-    // Build a map by strike
-    var strikes = {};
-    calls.forEach(function(c){
-      var s = c.strike;
-      if(!strikes[s]) strikes[s] = {};
-      strikes[s].call = c;
-    });
-    puts.forEach(function(p){
-      var s = p.strike;
-      if(!strikes[s]) strikes[s] = {};
-      strikes[s].put = p;
-    });
-    var sortedStrikes = Object.keys(strikes).map(Number).sort(function(a,b){return a-b;});
+    // Count calls and puts
+    var callCount = 0, putCount = 0;
+    strikes.forEach(function(s){ if(s.call) callCount++; if(s.put) putCount++; });
 
-    var isOpen = idx < 2; // First 2 expirations open by default
+    var isOpen = idx < 2;
 
     html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">';
 
@@ -9183,9 +9127,10 @@ function renderOpcoesChain(options, symbol){
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<span class="opcoes-arrow" style="color:var(--blue);font-size:14px">'+(isOpen?'▾':'▸')+'</span>'
       +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">Vencimento: '+expStr+'</span>'
-      +'<span style="font-size:11px;color:var(--text3)">'+sortedStrikes.length+' strikes</span>'
+      +(seriesLabel ? '<span style="font-size:10px;color:var(--blue);font-family:DM Mono,monospace;background:#1e8fff15;padding:2px 6px;border-radius:4px">'+seriesLabel+'</span>' : '')
+      +'<span style="font-size:11px;color:var(--text3)">'+strikes.length+' strikes</span>'
       +'</div>'
-      +'<div style="font-size:11px;color:var(--text3)">'+calls.length+' calls · '+puts.length+' puts</div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+callCount+' calls · '+putCount+' puts</div>'
       +'</div>';
 
     // Body (table)
@@ -9194,28 +9139,32 @@ function renderOpcoesChain(options, symbol){
 
     // Header
     html += '<thead><tr style="background:#060c16">'
-      +'<th colspan="5" style="text-align:center;padding:8px;color:#22c55e;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #22c55e33;border-right:1px solid var(--border)">CALLS</th>'
+      +'<th colspan="7" style="text-align:center;padding:8px;color:#22c55e;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #22c55e33;border-right:1px solid var(--border)">CALLS</th>'
       +'<th style="padding:8px;text-align:center;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid var(--blue);border-left:1px solid var(--border);border-right:1px solid var(--border)">STRIKE</th>'
-      +'<th colspan="5" style="text-align:center;padding:8px;color:#ef4444;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #ef444433;border-left:1px solid var(--border)">PUTS</th>'
+      +'<th colspan="7" style="text-align:center;padding:8px;color:#ef4444;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #ef444433;border-left:1px solid var(--border)">PUTS</th>'
       +'</tr>';
     html += '<tr style="background:#060c16">'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:left">Código</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right;border-right:1px solid var(--border)">Vol.</th>'
-      +'<th style="padding:6px 8px;text-align:center;font-weight:700;color:var(--blue);font-size:10px;border-left:1px solid var(--border);border-right:1px solid var(--border)">R$</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:left;border-left:1px solid var(--border)">Código</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
-      +'<th style="padding:6px 8px;color:var(--text3);font-size:10px;text-align:right">Vol.</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:left">Código</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Vol.</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Var%</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:center;border-right:1px solid var(--border)">MM</th>'
+      +'<th style="padding:5px 6px;text-align:center;font-weight:700;color:var(--blue);font-size:10px;border-left:1px solid var(--border);border-right:1px solid var(--border)">R$</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:left;border-left:1px solid var(--border)">Código</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Ask</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Vol.</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Var%</th>'
+      +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:center">MM</th>'
       +'</tr></thead><tbody>';
 
-    sortedStrikes.forEach(function(strike){
-      var row = strikes[strike];
-      var c = row.call;
-      var p = row.put;
+    strikes.forEach(function(strikeObj){
+      var strike = strikeObj.strike;
+      var c = strikeObj.call;
+      var p = strikeObj.put;
       var isITM_call = currentPrice && strike <= currentPrice;
       var isITM_put = currentPrice && strike >= currentPrice;
       var isATM = currentPrice && Math.abs(strike - currentPrice) < (currentPrice * 0.01);
@@ -9223,31 +9172,39 @@ function renderOpcoesChain(options, symbol){
       var bgPut = isITM_put ? '#ef444408' : 'transparent';
       var atmBorder = isATM ? 'border-top:2px solid var(--blue);border-bottom:2px solid var(--blue)' : 'border-bottom:1px solid var(--border)';
 
-      html += '<tr style="'+atmBorder+';transition:background .1s">';
+      html += '<tr style="'+atmBorder+';transition:background .1s" onmouseover="this.style.background=\'#ffffff06\'" onmouseout="this.style.background=\'\'">';
 
       // Call side
-      if(c){
-        html += '<td style="padding:5px 8px;background:'+bgCall+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px">'+(c.contractSymbol||c.symbol||'—')+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(c.lastPrice||c.last||c.regularMarketPrice)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(c.bid)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(c.ask)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px;border-right:1px solid var(--border)">'+(c.volume||c.openInterest||'—')+'</td>';
+      if(c && c.symbol){
+        var cVar = c.variation||0;
+        var cVarCor = cVar>=0?'#22c55e':'#ef4444';
+        html += '<td style="padding:4px 6px;background:'+bgCall+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px">'+(c.symbol||'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(c.close)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(c.bid)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(c.ask)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(c.volume ? Number(c.volume).toLocaleString('pt-BR') : '—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:'+cVarCor+';font-size:10px">'+(cVar?(cVar>=0?'+':'')+cVar.toFixed(1)+'%':'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:center;font-size:10px;border-right:1px solid var(--border)">'+(c.market_maker?'<span style="color:#f59e0b" title="Market Maker">★</span>':'')+'</td>';
       } else {
-        html += '<td colspan="5" style="padding:5px 8px;color:var(--text3);font-size:10px;text-align:center;border-right:1px solid var(--border)">—</td>';
+        html += '<td colspan="7" style="padding:4px 6px;color:var(--text3);font-size:10px;text-align:center;border-right:1px solid var(--border)">—</td>';
       }
 
       // Strike
-      html += '<td style="padding:5px 8px;text-align:center;font-family:DM Mono,monospace;font-weight:700;font-size:12px;color:'+(isATM?'var(--blue)':'var(--white)')+';background:'+(isATM?'#1e8fff11':'#060c16')+';border-left:1px solid var(--border);border-right:1px solid var(--border)">'+fmtNum(strike)+'</td>';
+      html += '<td style="padding:4px 6px;text-align:center;font-family:DM Mono,monospace;font-weight:700;font-size:12px;color:'+(isATM?'var(--blue)':'var(--white)')+';background:'+(isATM?'#1e8fff11':'#060c16')+';border-left:1px solid var(--border);border-right:1px solid var(--border)">'+fmtNum(strike)+'</td>';
 
       // Put side
-      if(p){
-        html += '<td style="padding:5px 8px;background:'+bgPut+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px;border-left:1px solid var(--border)">'+(p.contractSymbol||p.symbol||'—')+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(p.lastPrice||p.last||p.regularMarketPrice)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(p.bid)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(p.ask)+'</td>'
-          +'<td style="padding:5px 8px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(p.volume||p.openInterest||'—')+'</td>';
+      if(p && p.symbol){
+        var pVar = p.variation||0;
+        var pVarCor = pVar>=0?'#22c55e':'#ef4444';
+        html += '<td style="padding:4px 6px;background:'+bgPut+';font-family:DM Mono,monospace;color:var(--text2);font-size:11px;border-left:1px solid var(--border)">'+(p.symbol||'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--white);font-weight:600">'+fmtNum(p.close)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#22c55e;font-size:11px">'+fmtNum(p.bid)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#ef4444;font-size:11px">'+fmtNum(p.ask)+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(p.volume ? Number(p.volume).toLocaleString('pt-BR') : '—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:'+pVarCor+';font-size:10px">'+(pVar?(pVar>=0?'+':'')+pVar.toFixed(1)+'%':'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:center;font-size:10px">'+(p.market_maker?'<span style="color:#f59e0b" title="Market Maker">★</span>':'')+'</td>';
       } else {
-        html += '<td colspan="5" style="padding:5px 8px;color:var(--text3);font-size:10px;text-align:center;border-left:1px solid var(--border)">—</td>';
+        html += '<td colspan="7" style="padding:4px 6px;color:var(--text3);font-size:10px;text-align:center;border-left:1px solid var(--border)">—</td>';
       }
 
       html += '</tr>';
