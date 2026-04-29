@@ -356,6 +356,16 @@ textarea.form-input{resize:vertical;min-height:80px}
 .sim-rate-btn:hover:not(.active){border-color:var(--border2);color:var(--text)}
 .sim-cell{border-radius:8px;padding:12px 8px;text-align:center;border:1px solid var(--border);transition:transform .1s}
 .sim-cell:hover{transform:scale(1.03)}
+
+/* ─── AUTOCOMPLETE ─────────────────────────── */
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--card2);border:1px solid var(--border2);border-radius:8px;z-index:999;display:none;box-shadow:0 8px 24px #00000066}
+.autocomplete-item{padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.autocomplete-item:hover,.autocomplete-item.selected{background:var(--blue);color:#fff}
+.autocomplete-item .ac-ticker{font-family:DM Mono,monospace;font-weight:700;min-width:70px}
+.autocomplete-item .ac-name{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.autocomplete-item:hover .ac-name,.autocomplete-item.selected .ac-name{color:#ffffffbb}
+
 @media(max-width:900px){
   .sidebar{width:64px;min-width:64px}
   .sidebar-logo span:not(.dmf-logo-sm),.nav-item span:not(.icon),.user-email,.sidebar-tagline{display:none}
@@ -531,6 +541,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Operações</span></button>
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Notícias</span></button>
+      <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Cotações</span></button>
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Agendamento</span></button>
       <button class="nav-item" onclick="showView('comunicados',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span><span>Comunicados</span></button>
       <div class="nav-section">Ferramentas</div>
@@ -991,6 +1002,21 @@ textarea.form-input{resize:vertical;min-height:80px}
           <span id="mat-count" style="font-size:12px;color:var(--text3);margin-left:auto"></span>
         </div>
         <div id="materiais-list"></div>
+      </div>
+    </div>
+
+    <!-- GRADE DE COTAÇÕES -->
+    <div class="view" id="view-grade-cotacoes">
+      <div class="page-header">
+        <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Grade de Cotações <span id="grade-clock" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="grade-sub">Cotações em tempo real via Brapi</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="refreshGradeCotacoes()" id="grade-refresh-btn">Atualizar</button>
+          <button class="btn-primary" onclick="openModalGrupoGrade()">+ Novo Grupo</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="grade-destaques" style="margin-bottom:20px"></div>
+        <div id="grade-cotacoes-body"></div>
       </div>
     </div>
 
@@ -1474,7 +1500,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="modal-close" onclick="closeModal('modal-ativo')">×</button>
     </div>
     <div class="form-grid">
-      <div class="form-group form-full"><label>Nome do Ativo *</label><input class="form-input" id="fa-nome" placeholder="Ex: PETR4, CDB BTG, KNRI11..."></div>
+      <div class="form-group form-full"><label>Nome do Ativo *</label><div class="autocomplete-wrap"><input class="form-input" id="fa-nome" placeholder="Ex: PETR4, CDB BTG, KNRI11..." autocomplete="off"><div class="autocomplete-list" id="fa-nome-ac"></div></div></div>
       <div class="form-group">
         <label>Categoria *</label>
         <select class="form-input" id="fa-categoria" onchange="updateSubcategoria()">
@@ -1939,6 +1965,25 @@ textarea.form-input{resize:vertical;min-height:80px}
 </div>
 
 <!-- MODAL VISUALIZAR MATERIAL (CLIENTE) -->
+<!-- MODAL GRUPO GRADE -->
+<div class="modal-overlay" id="modal-grupo-grade" style="display:none" onclick="if(event.target===this)closeModal('modal-grupo-grade')">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-gg-title">Novo Grupo</div>
+      <button class="modal-close" onclick="closeModal('modal-grupo-grade')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Nome do Grupo *</label><input class="form-input" id="gg-nome" placeholder="Ex: DMF Grade, TOP 20 Ibovespa"></div>
+      <div class="form-group form-full"><label>Tickers (separados por vírgula) *</label><textarea class="form-input" id="gg-tickers" rows="4" placeholder="PETR4, VALE3, ITUB4, BBDC4..." style="font-family:DM Mono,monospace;font-size:12px"></textarea></div>
+      <div class="form-group form-full" style="font-size:11px;color:var(--text3);line-height:1.5">Use tickers da B3: ações (PETR4), FIIs (KNRI11), ETFs (BOVA11), índices (IBOV), dólar (USDBRL), etc.</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button class="btn-ghost" onclick="closeModal('modal-grupo-grade')">Cancelar</button>
+      <button class="btn-primary" onclick="salvarGrupoGrade()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-material-view" style="display:none" onclick="if(event.target===this)closeModal('modal-material-view')">
   <div class="modal">
     <div class="modal-header">
@@ -5972,8 +6017,8 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','academy-trilha','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','materiais-gestao','academy-trilha'],
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','grade-cotacoes','materiais-gestao','academy-trilha'],
   cliente: ['minha-carteira','agendamento','comunicados','glossario','estrategias','materiais-cliente']
 };
 
@@ -6812,35 +6857,31 @@ function fetchBrapiCotacoes(tickers, callback){
     var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
     if(todosCached){ callback(cotacoesCache); return; }
   }
-  // Brapi: máx 10 tickers por chamada (plano Startup)
-  var lotes = [];
-  for(var i=0; i<tickers.length; i+=10){
-    lotes.push(tickers.slice(i, i+10));
-  }
+  // Buscar ticker a ticker para evitar que um erro quebre todos
   var concluidos = 0;
-  lotes.forEach(function(lote){
-    var url = 'https://brapi.dev/api/quote/' + lote.join(',') + '?token=' + brapiToken;
+  var total = tickers.length;
+  tickers.forEach(function(ticker){
+    var url = 'https://brapi.dev/api/quote/' + ticker + '?token=' + brapiToken;
     fetch(url).then(function(r){ return r.json(); }).then(function(data){
-      if(data.results){
-        data.results.forEach(function(r){
-          cotacoesCache[r.symbol] = {
-            price: r.regularMarketPrice,
-            change: r.regularMarketChange||0,
-            changePct: r.regularMarketChangePercent||0,
-            prevClose: r.regularMarketPreviousClose||0,
-            logo: r.logourl||'',
-            name: r.shortName||r.longName||'',
-            time: r.regularMarketTime||''
-          };
-        });
+      if(data.results && data.results.length){
+        var r = data.results[0];
+        cotacoesCache[r.symbol] = {
+          price: r.regularMarketPrice,
+          change: r.regularMarketChange||0,
+          changePct: r.regularMarketChangePercent||0,
+          prevClose: r.regularMarketPreviousClose||0,
+          logo: r.logourl||'',
+          name: r.shortName||r.longName||'',
+          time: r.regularMarketTime||''
+        };
         cotacoesCacheTime = Date.now();
       }
       concluidos++;
-      if(concluidos >= lotes.length) callback(cotacoesCache);
+      if(concluidos >= total) callback(cotacoesCache);
     }).catch(function(e){
-      console.warn('Brapi error:', e);
+      console.warn('Brapi: '+ticker+' erro:', e.message||e);
       concluidos++;
-      if(concluidos >= lotes.length) callback(cotacoesCache);
+      if(concluidos >= total) callback(cotacoesCache);
     });
   });
 }
@@ -7002,27 +7043,28 @@ function renderAtivosCliente(ativos, cotacoes){
     }
     right += '</div>';
 
-    row.innerHTML = left + center + right;
-
     // Botões Editar + Excluir
-    var btnWrap = document.createElement('div');
-    btnWrap.style = 'display:flex;flex-direction:column;gap:4px;flex-shrink:0';
+    var actionsHtml = '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="btn-edit-ativo" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;background:#1e8fff22;color:#1e8fff;border:1px solid #1e8fff44;border-radius:6px;cursor:pointer;font-weight:600">Editar</button>'
+      +'<button class="btn-del-ativo" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;background:#ef444422;color:#ef4444;border:1px solid #ef444444;border-radius:6px;cursor:pointer;font-weight:600">Excluir</button>'
+      +'</div>';
 
-    var editBtn = document.createElement('button');
-    editBtn.className='btn-ghost';editBtn.style='padding:4px 10px;font-size:11px';editBtn.textContent='Editar';
-    (function(ativo){editBtn.onclick=function(){ editarAtivoCliente(ativo); };})(a.raw);
-    btnWrap.appendChild(editBtn);
+    row.innerHTML = left + center + right + actionsHtml;
 
-    var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 10px;font-size:11px';delBtn.textContent='Excluir';
-    (function(aid){delBtn.onclick=function(){
-      confirmDelete(function(){
-        db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
-          .then(function(){loadMinhaCarteira();});
-      });
-    };})(a.raw.id);
-    btnWrap.appendChild(delBtn);
+    // Bind events
+    (function(ativo){
+      row.querySelector('.btn-edit-ativo').onclick = function(e){ e.stopPropagation(); editarAtivoCliente(ativo); };
+    })(a.raw);
+    (function(aid){
+      row.querySelector('.btn-del-ativo').onclick = function(e){
+        e.stopPropagation();
+        confirmDelete(function(){
+          db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
+            .then(function(){loadMinhaCarteira();});
+        });
+      };
+    })(a.raw.id);
 
-    row.appendChild(btnWrap);
     el.appendChild(row);
   });
 }
@@ -7111,6 +7153,97 @@ function saveAtivoCliente(){
     editandoAtivoId = null;
     setTimeout(loadMinhaCarteira, 500);
   }).catch(function(e){ alert('Erro ao salvar: '+e.message); });
+}
+
+// ── Autocomplete Ativo (Brapi) ──────────────────────────
+var _acTimer = null;
+var _acCache = {};
+document.addEventListener('DOMContentLoaded', function(){
+  var inp = document.getElementById('fa-nome');
+  var list = document.getElementById('fa-nome-ac');
+  if(!inp || !list) return;
+
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toUpperCase();
+    clearTimeout(_acTimer);
+    if(q.length < 2){ list.style.display='none'; return; }
+    _acTimer = setTimeout(function(){ searchBrapiTickers(q); }, 300);
+  });
+
+  inp.addEventListener('keydown', function(e){
+    var items = list.querySelectorAll('.autocomplete-item');
+    var sel = list.querySelector('.autocomplete-item.selected');
+    var idx = -1;
+    items.forEach(function(it, i){ if(it===sel) idx=i; });
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(sel) sel.classList.remove('selected');
+      idx = (idx+1) % items.length;
+      if(items[idx]) items[idx].classList.add('selected');
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(sel) sel.classList.remove('selected');
+      idx = idx<=0 ? items.length-1 : idx-1;
+      if(items[idx]) items[idx].classList.add('selected');
+    } else if(e.key==='Enter'){
+      e.preventDefault();
+      if(sel) sel.click();
+    } else if(e.key==='Escape'){
+      list.style.display='none';
+    }
+  });
+
+  inp.addEventListener('blur', function(){
+    setTimeout(function(){ list.style.display='none'; }, 200);
+  });
+});
+
+function searchBrapiTickers(query){
+  var list = document.getElementById('fa-nome-ac');
+  if(!list) return;
+
+  // Check cache
+  if(_acCache[query]){
+    renderAcList(list, _acCache[query], query);
+    return;
+  }
+
+  // Brapi search: /api/available returns array of ticker strings
+  var url = 'https://brapi.dev/api/available?search=' + encodeURIComponent(query) + '&token=' + brapiToken;
+  fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    var stocks = data.stocks || [];
+    // Filter to top 8 matches
+    var filtered = stocks.slice(0, 8);
+    _acCache[query] = filtered;
+    renderAcList(list, filtered, query);
+  }).catch(function(){
+    list.style.display='none';
+  });
+}
+
+function renderAcList(list, items, query){
+  if(!items.length){ list.style.display='none'; return; }
+  var html = '';
+  items.forEach(function(ticker){
+    html += '<div class="autocomplete-item" data-ticker="'+ticker+'">'
+      +'<span class="ac-ticker">'+ticker+'</span>'
+      +'</div>';
+  });
+  list.innerHTML = html;
+  list.style.display = 'block';
+
+  // Click handlers
+  list.querySelectorAll('.autocomplete-item').forEach(function(el){
+    el.addEventListener('mousedown', function(e){
+      e.preventDefault();
+      var inp = document.getElementById('fa-nome');
+      inp.value = el.getAttribute('data-ticker');
+      list.style.display='none';
+      // Auto-set to Renda Variável if it's a ticker
+      var catEl = document.getElementById('fa-categoria');
+      if(catEl) { catEl.value = 'Renda Variável'; updateSubcategoria(); }
+    });
+  });
 }
 
 // ── Minhas Operações - Lançamento ─────────────────────────
@@ -8441,6 +8574,296 @@ function importarDaImagem(){
     alert('Erro: ' + e.message);
   });
 }
+
+// ═══════════════════════════════════════════════════════════
+// GRADE DE COTAÇÕES
+// ═══════════════════════════════════════════════════════════
+var gradeGrupos = [];
+var gradeGruposListener = null;
+var gradeRefreshInterval = null;
+var editandoGrupoGradeId = null;
+
+var GRADE_DEFAULT_GRUPOS = [
+  {nome:'DMF Grade', tickers:['IBOV','USDBRL','WDOFUT','PETR4','VALE3','ITUB4','BBDC4','B3SA3','BPAC11'], ordem:0},
+  {nome:'TOP 10 Ibovespa', tickers:['PETR4','VALE3','ITUB4','BBDC4','SBSP3','B3SA3','ITSA4','BPAC11','BBAS3','WEGE3'], ordem:1}
+];
+
+function initGradeCotacoes(){
+  if(gradeGruposListener) return;
+  gradeGruposListener = db.collection('grade_grupos').orderBy('ordem').onSnapshot(function(snap){
+    gradeGrupos = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    if(!gradeGrupos.length){
+      // Seed com grupos padrão
+      GRADE_DEFAULT_GRUPOS.forEach(function(g){
+        db.collection('grade_grupos').add(g);
+      });
+      return;
+    }
+    refreshGradeCotacoes();
+  });
+}
+
+function refreshGradeCotacoes(){
+  var body = document.getElementById('grade-cotacoes-body');
+  if(!body) return;
+  var btn = document.getElementById('grade-refresh-btn');
+  if(btn){btn.textContent='Atualizando...';btn.disabled=true;}
+
+  // Coletar todos os tickers únicos
+  var allTickers = [];
+  gradeGrupos.forEach(function(g){
+    (g.tickers||[]).forEach(function(t){
+      var tu = t.trim().toUpperCase();
+      if(tu && allTickers.indexOf(tu)<0) allTickers.push(tu);
+    });
+  });
+
+  if(!allTickers.length){
+    body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title">Nenhum grupo configurado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Novo Grupo" para adicionar tickers</p></div>';
+    if(btn){btn.textContent='Atualizar';btn.disabled=false;}
+    return;
+  }
+
+  // Fetch ticker a ticker
+  var cotacoes = {};
+  var done = 0;
+  allTickers.forEach(function(ticker){
+    var url = 'https://brapi.dev/api/quote/' + ticker + '?token=' + brapiToken;
+    fetch(url).then(function(r){return r.json();}).then(function(data){
+      if(data.results && data.results.length){
+        var r = data.results[0];
+        cotacoes[r.symbol] = r;
+      }
+      done++;
+      if(done>=allTickers.length) renderGradeCotacoes(cotacoes);
+    }).catch(function(){
+      done++;
+      if(done>=allTickers.length) renderGradeCotacoes(cotacoes);
+    });
+  });
+}
+
+function renderGradeCotacoes(cotacoes){
+  var body = document.getElementById('grade-cotacoes-body');
+  if(!body) return;
+  var btn = document.getElementById('grade-refresh-btn');
+  if(btn){btn.textContent='Atualizar';btn.disabled=false;}
+
+  // Timestamp
+  var sub = document.getElementById('grade-sub');
+  if(sub){
+    var agora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    sub.textContent = 'Última atualização: '+agora;
+  }
+
+  // Live clock
+  if(window._gradeClockTimer) clearInterval(window._gradeClockTimer);
+  window._gradeClockTimer = setInterval(function(){
+    var el = document.getElementById('grade-clock');
+    if(el) el.textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }, 1000);
+
+  // === DESTAQUES DO MERCADO ===
+  var destDiv = document.getElementById('grade-destaques');
+  if(destDiv){
+    var allItems = [];
+    Object.keys(cotacoes).forEach(function(k){
+      var c = cotacoes[k];
+      if(c && typeof c.regularMarketChangePercent === 'number') allItems.push(c);
+    });
+
+    // Altas do dia (top 5 maiores variações positivas)
+    var altasDia = allItems.filter(function(c){return c.regularMarketChangePercent > 0;})
+      .sort(function(a,b){return b.regularMarketChangePercent - a.regularMarketChangePercent;}).slice(0,5);
+    // Baixas do dia (top 5 maiores variações negativas)
+    var baixasDia = allItems.filter(function(c){return c.regularMarketChangePercent < 0;})
+      .sort(function(a,b){return a.regularMarketChangePercent - b.regularMarketChangePercent;}).slice(0,5);
+
+    // Altas do ano (52w high proximity — closest to 52w high)
+    var altasAno = allItems.filter(function(c){return c.fiftyTwoWeekHigh && c.regularMarketPrice;})
+      .map(function(c){
+        var pctFromHigh = ((c.regularMarketPrice - c.fiftyTwoWeekLow) / (c.fiftyTwoWeekHigh - c.fiftyTwoWeekLow)) * 100;
+        return {symbol:c.symbol, logourl:c.logourl, pct: pctFromHigh, price: c.regularMarketPrice, high52: c.fiftyTwoWeekHigh, low52: c.fiftyTwoWeekLow};
+      }).sort(function(a,b){return b.pct - a.pct;}).slice(0,5);
+
+    // Baixas do ano (closest to 52w low)
+    var baixasAno = allItems.filter(function(c){return c.fiftyTwoWeekHigh && c.regularMarketPrice;})
+      .map(function(c){
+        var pctFromHigh = ((c.regularMarketPrice - c.fiftyTwoWeekLow) / (c.fiftyTwoWeekHigh - c.fiftyTwoWeekLow)) * 100;
+        return {symbol:c.symbol, logourl:c.logourl, pct: pctFromHigh, price: c.regularMarketPrice, high52: c.fiftyTwoWeekHigh, low52: c.fiftyTwoWeekLow};
+      }).sort(function(a,b){return a.pct - b.pct;}).slice(0,5);
+
+    function destCard(title, icon, items, tipo){
+      var corTitulo = tipo==='alta' ? '#22c55e' : '#ef4444';
+      var bgGrad = tipo==='alta' ? 'linear-gradient(135deg,#22c55e08,#22c55e02)' : 'linear-gradient(135deg,#ef444408,#ef444402)';
+      var h = '<div style="background:'+bgGrad+';border:1px solid '+(tipo==='alta'?'#22c55e22':'#ef444422')+';border-radius:12px;padding:14px 16px;min-width:0">';
+      h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="color:'+corTitulo+';font-size:14px">'+icon+'</span><span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:'+corTitulo+'">'+title+'</span></div>';
+      if(!items.length){
+        h += '<div style="font-size:11px;color:var(--text3);padding:8px 0">Sem dados</div>';
+      } else {
+        items.forEach(function(item, idx){
+          var logo = item.logourl ? '<img src="'+item.logourl+'" style="width:16px;height:16px;border-radius:3px;background:#fff" onerror="this.style.display=\'none\'">' : '';
+          if(item.regularMarketChangePercent !== undefined){
+            // Dia
+            var v = item.regularMarketChangePercent;
+            var cor = v>=0?'#22c55e':'#ef4444';
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;'+(idx?'border-top:1px solid var(--border);':'')+'">'
+              +'<div style="display:flex;align-items:center;gap:6px">'+logo+'<span style="font-size:12px;font-weight:600;color:var(--white)">'+item.symbol+'</span></div>'
+              +'<div style="display:flex;align-items:center;gap:8px"><span style="font-family:DM Mono,monospace;font-size:11px;color:var(--text2)">'+fmtNum(item.regularMarketPrice)+'</span>'
+              +'<span style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+cor+'">'+(v>=0?'+':'')+v.toFixed(2)+'%</span></div></div>';
+          } else {
+            // Ano
+            var cor2 = tipo==='alta'?'#22c55e':'#ef4444';
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;'+(idx?'border-top:1px solid var(--border);':'')+'">'
+              +'<div style="display:flex;align-items:center;gap:6px">'+logo+'<span style="font-size:12px;font-weight:600;color:var(--white)">'+item.symbol+'</span></div>'
+              +'<div style="display:flex;align-items:center;gap:8px"><span style="font-family:DM Mono,monospace;font-size:11px;color:var(--text2)">'+fmtNum(item.price)+'</span>'
+              +'<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--text3)">'+(tipo==='alta'?'máx '+fmtNum(item.high52):'mín '+fmtNum(item.low52))+'</span></div></div>';
+          }
+        });
+      }
+      h += '</div>';
+      return h;
+    }
+
+    var dHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">';
+    dHtml += destCard('Altas do Dia','▲', altasDia, 'alta');
+    dHtml += destCard('Baixas do Dia','▼', baixasDia, 'baixa');
+    dHtml += destCard('Próximo da Máxima 52s','▲', altasAno, 'alta');
+    dHtml += destCard('Próximo da Mínima 52s','▼', baixasAno, 'baixa');
+    dHtml += '</div>';
+    destDiv.innerHTML = dHtml;
+  }
+
+  // === GRUPOS PERSONALIZADOS ===
+  var html = '';
+
+  gradeGrupos.forEach(function(grupo){
+    var tickers = (grupo.tickers||[]).map(function(t){return t.trim().toUpperCase();});
+
+    var somaVar = 0, countVar = 0;
+    tickers.forEach(function(t){
+      var c = cotacoes[t];
+      if(c && typeof c.regularMarketChangePercent === 'number'){
+        somaVar += c.regularMarketChangePercent;
+        countVar++;
+      }
+    });
+    var mediaVar = countVar ? (somaVar/countVar) : 0;
+    var corMedia = mediaVar>=0?'#22c55e':'#ef4444';
+
+    html += '<div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">';
+
+    // Header do grupo
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#0a1222,#08111e)">'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white)">'+grupo.nome+'</span>'
+      +'<span style="font-size:11px;color:var(--text3)">'+tickers.length+' ativos</span></div>'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +'<span style="font-family:DM Mono,monospace;font-weight:700;font-size:13px;color:'+corMedia+'">'+(mediaVar>=0?'+':'')+mediaVar.toFixed(2)+'%</span>'
+      +'<button class="btn-ghost" style="padding:3px 8px;font-size:10px" onclick="editarGrupoGrade(\''+grupo.id+'\')">Editar</button>'
+      +'<button class="btn-dsm" style="padding:3px 8px;font-size:10px" onclick="confirmDelete(function(){db.collection(\'grade_grupos\').doc(\''+grupo.id+'\').delete()})">×</button>'
+      +'</div></div>';
+
+    // Table
+    html += '<div class="table-wrap" style="border:none"><table style="font-size:13px">'
+      +'<thead><tr>'
+      +'<th style="padding:8px 12px">Ativo</th>'
+      +'<th style="padding:8px 12px;text-align:right">Último</th>'
+      +'<th style="padding:8px 12px;text-align:right">Var. Dia</th>'
+      +'<th style="padding:8px 12px;text-align:right">Máx. Dia</th>'
+      +'<th style="padding:8px 12px;text-align:right">Mín. Dia</th>'
+      +'<th style="padding:8px 12px;text-align:right">Abertura</th>'
+      +'<th style="padding:8px 12px;text-align:right">Máx. 52s</th>'
+      +'<th style="padding:8px 12px;text-align:right">Mín. 52s</th>'
+      +'<th style="padding:8px 12px;text-align:center">Hora</th>'
+      +'</tr></thead><tbody>';
+
+    tickers.forEach(function(ticker){
+      var c = cotacoes[ticker];
+      if(!c){
+        html += '<tr><td style="padding:8px 12px;color:var(--text3)">'+ticker+'</td><td colspan="8" style="padding:8px 12px;font-size:11px;color:var(--text3)">Indisponível</td></tr>';
+        return;
+      }
+      var varPct = c.regularMarketChangePercent||0;
+      var corVar = varPct>=0?'#22c55e':'#ef4444';
+      var seta = varPct>=0?'▲':'▼';
+      var hora = c.regularMarketTime ? new Date(c.regularMarketTime).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—';
+      var logo = c.logourl ? '<img src="'+c.logourl+'" style="width:18px;height:18px;border-radius:4px;background:#fff;vertical-align:middle;margin-right:6px" onerror="this.style.display=\'none\'">' : '';
+
+      html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'#1e8fff08\'" onmouseout="this.style.background=\'transparent\'">'
+        +'<td style="padding:8px 12px;font-weight:700;color:var(--white)">'+logo+c.symbol+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:600;color:var(--white)">'+fmtNum(c.regularMarketPrice)+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketDayHigh)+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketDayLow)+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketOpen)+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:'+(c.fiftyTwoWeekHigh?'#22c55e88':'var(--text3)')+'">'+fmtNum(c.fiftyTwoWeekHigh)+'</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:'+(c.fiftyTwoWeekLow?'#ef444488':'var(--text3)')+'">'+fmtNum(c.fiftyTwoWeekLow)+'</td>'
+        +'<td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">'+hora+'</td>'
+        +'</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  });
+
+  body.innerHTML = html;
+
+  // Auto-refresh a cada 5 min
+  if(gradeRefreshInterval) clearInterval(gradeRefreshInterval);
+  gradeRefreshInterval = setInterval(function(){
+    var view = document.getElementById('view-grade-cotacoes');
+    if(view && view.classList.contains('active')) refreshGradeCotacoes();
+  }, 5*60*1000);
+}
+
+function fmtNum(n){
+  if(n===undefined||n===null) return '—';
+  return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function openModalGrupoGrade(){
+  editandoGrupoGradeId = null;
+  document.getElementById('modal-gg-title').textContent = 'Novo Grupo';
+  document.getElementById('gg-nome').value = '';
+  document.getElementById('gg-tickers').value = '';
+  openModal('modal-grupo-grade');
+}
+
+function editarGrupoGrade(id){
+  var g = gradeGrupos.find(function(x){return x.id===id;});
+  if(!g) return;
+  editandoGrupoGradeId = id;
+  document.getElementById('modal-gg-title').textContent = 'Editar Grupo';
+  document.getElementById('gg-nome').value = g.nome||'';
+  document.getElementById('gg-tickers').value = (g.tickers||[]).join(', ');
+  openModal('modal-grupo-grade');
+}
+
+function salvarGrupoGrade(){
+  var nome = document.getElementById('gg-nome').value.trim();
+  var tickersRaw = document.getElementById('gg-tickers').value;
+  if(!nome){alert('Informe o nome do grupo.');return;}
+  if(!tickersRaw.trim()){alert('Informe pelo menos um ticker.');return;}
+  var tickers = tickersRaw.split(/[,;\n]+/).map(function(t){return t.trim().toUpperCase();}).filter(Boolean);
+  var data = {nome:nome, tickers:tickers, ordem: gradeGrupos.length};
+  var promise;
+  if(editandoGrupoGradeId){
+    promise = db.collection('grade_grupos').doc(editandoGrupoGradeId).update({nome:nome,tickers:tickers});
+  } else {
+    promise = db.collection('grade_grupos').add(data);
+  }
+  promise.then(function(){
+    closeModal('modal-grupo-grade');
+    editandoGrupoGradeId = null;
+  }).catch(function(e){alert('Erro: '+e.message);});
+}
+
+// Hook showView para grade
+var _origShowViewGrade = showView;
+showView = function(v, btn){
+  _origShowViewGrade(v, btn);
+  if(v==='grade-cotacoes') initGradeCotacoes();
+};
 
 // ═══════════════════════════════════════════════════════════
 // DMF ACADEMY — TRILHA PROGRESSIVA
