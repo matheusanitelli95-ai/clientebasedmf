@@ -114,7 +114,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .login-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:500;color:var(--text2);letter-spacing:.15em;text-transform:uppercase;margin-bottom:32px}
 .login-divider{width:40px;height:1px;background:var(--blue);margin:0 auto 32px;opacity:.5}
 .login-input{
-  width:100%;background:#0a0a0a;border:1px solid var(--border2);border-radius:12px;
+  width:100%;background:var(--card);border:1px solid var(--border2);border-radius:12px;
   color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
   padding:14px 16px;outline:none;margin-bottom:12px;transition:all .2s;
 }
@@ -271,7 +271,7 @@ tr:hover td{background:#1a1a1a;cursor:pointer}
 .form-group{display:flex;flex-direction:column;gap:6px}
 label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:700}
 .form-input{
-  width:100%;background:#0a0a0a;border:1px solid var(--border2);border-radius:9px;
+  width:100%;background:var(--card);border:1px solid var(--border2);border-radius:9px;
   color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
   padding:10px 13px;outline:none;transition:all .2s;
 }
@@ -287,7 +287,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 }
 
 /* ─── TABS ─────────────────────────────── */
-.tabs{display:flex;gap:2px;background:#0a0a0a;border-radius:11px;padding:4px;margin-bottom:20px;border:1px solid var(--border)}
+.tabs{display:flex;gap:2px;background:var(--card);border-radius:11px;padding:4px;margin-bottom:20px;border:1px solid var(--border)}
 .tab{flex:1;padding:9px 16px;border-radius:8px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;text-align:center;letter-spacing:.02em}
 .tab.active{background:var(--card);color:var(--text);box-shadow:0 1px 6px #00000066}
 .tab-content{display:none}
@@ -301,20 +301,20 @@ textarea.form-input{resize:vertical;min-height:80px}
 .client-meta-item{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
 
 /* ─── ASSETS ─────────────────────────────── */
-.asset-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:border-color .2s}
+.asset-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:border-color .2s}
 .asset-row:hover{border-color:var(--border2)}
 .asset-name{font-weight:600;color:var(--white);font-size:14px}
 .asset-type{font-size:11px;color:var(--text3);margin-top:2px}
 .asset-value{font-family:'DM Mono',monospace;color:var(--blue);font-size:14px;font-weight:500}
 
 /* ─── CRM ─────────────────────────────── */
-.check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0a0a0a;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .2s;margin-bottom:8px}
 .check-item:hover{border-color:var(--border2)}
 .check-item.checked{background:#ff8c000a;border-color:#ff8c0022}
 .check-item input[type=checkbox]{accent-color:var(--blue);width:15px;height:15px;cursor:pointer}
 .check-label{font-size:13px;color:var(--text)}
 .check-item.checked .check-label{color:var(--blue)}
-.contact-item{padding:14px 16px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.contact-item{padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
 .contact-date{font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
 .contact-text{font-size:13px;color:var(--text)}
 
@@ -487,7 +487,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           </button>
         </div>
         <!-- Resumo -->
-        <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px">
           <div style="color:var(--text3);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Resumo do cadastro</div>
           <div id="cad-resumo" style="color:var(--text2);line-height:1.8"></div>
         </div>
@@ -614,7 +614,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
           <span style="font-size:13px;font-weight:700;color:#000" id="bulk-count">0 selecionados</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <select class="form-input" id="bulk-campo" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff" onchange="updateBulkValores()">
+            <select class="form-input" id="bulk-campo" style="font-size:12px;padding:6px 10px;background:var(--card);border-color:var(--border);color:var(--text)" onchange="updateBulkValores()">
               <option value="">Selecionar campo...</option>
               <option value="status">Status</option>
               <option value="servico">Serviço</option>
@@ -623,7 +623,7 @@ textarea.form-input{resize:vertical;min-height:80px}
               <option value="segmentação">Segmentação</option>
               <option value="nivel">Nível Black</option>
             </select>
-            <select class="form-input" id="bulk-valor" style="font-size:12px;padding:6px 10px;background:#000;border-color:#000;color:#fff">
+            <select class="form-input" id="bulk-valor" style="font-size:12px;padding:6px 10px;background:var(--card);border-color:var(--border);color:var(--text)">
               <option value="">Selecionar valor...</option>
             </select>
             <button onclick="aplicarBulk()" style="background:#fff;color:#000;border:none;border-radius:8px;padding:6px 14px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer">Aplicar</button>
@@ -3594,18 +3594,18 @@ function addPerna(){
   var list=document.getElementById('bd-pernas-list');
   var perna=document.createElement('div');
   perna.id='perna-'+idx;
-  perna.style='background:#0a0a0a;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px';
+  perna.style='background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px';
   perna.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Perna '+idx+'</span>'
     +(idx>1?'<button type="button" class="btn-dsm" style="padding:3px 8px;font-size:11px" onclick="removePerna('+idx+')">Remover</button>':'')+'</div>'
     +'<div class="form-grid">'
     +'<div class="form-group"><label>C/V</label><select class="form-input" id="p'+idx+'-cv" onchange="updateBdPreview()"><option value="V">Venda</option><option value="C">Compra</option></select></div>'
     +'<div class="form-group"><label>Código da Opção</label><input class="form-input" id="p'+idx+'-codigo" placeholder="Ex: BOVAB250" oninput="autoVencimento('+idx+')"></div>'
 
-    +'<div class="form-group"><label>Mês Venc. (auto)</label><input class="form-input" id="p'+idx+'-mes-venc" readonly style="background:#0a0a0a;color:var(--blue)" placeholder="Automático pelo código"></div>'
+    +'<div class="form-group"><label>Mês Venc. (auto)</label><input class="form-input" id="p'+idx+'-mes-venc" readonly style="background:var(--card);color:var(--blue)" placeholder="Automático pelo código"></div>'
     +'<div class="form-group"><label>Ano Venc.</label><select class="form-input" id="p'+idx+'-ano-venc" onchange="autoVencimento('+idx+')"></select></div>'
     +'<div class="form-group"><label>Quantidade</label><input class="form-input" id="p'+idx+'-qtde" type="number" placeholder="0" oninput="updateBdPreview()"></div>'
     +'<div class="form-group"><label>Prêmio Unitário (R$)</label><input class="form-input" id="p'+idx+'-premio" type="number" step="0.01" placeholder="0,00" oninput="updateBdPreview()"></div>'
-    +'<div class="form-group"><label>Total (R$)</label><input class="form-input" id="p'+idx+'-total" readonly style="background:#0a0a0a;color:var(--blue)" placeholder="Automático"></div>'
+    +'<div class="form-group"><label>Total (R$)</label><input class="form-input" id="p'+idx+'-total" readonly style="background:var(--card);color:var(--blue)" placeholder="Automático"></div>'
     +'</div>';
   list.appendChild(perna);
   // Populate ano venc select
@@ -4025,7 +4025,7 @@ function checkAlertasVencimento(){
     alertas.forEach(function(a){
       var cor = a.dias<=5?'#ff1744':a.dias<=15?'#f59e0b':'#ff8c00';
       var row = document.createElement('div');
-      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0a0a0a;border:1px solid var(--border);border-radius:9px;margin-bottom:8px';
+      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:8px';
       row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+a.cliente+' — '+a.codigo+'</div>'
         +'<div style="font-size:11px;color:var(--text3)">'+a.mesVenc+' · '+(a.cv==='V'?'Venda':'Compra')+'</div></div>'
         +'<span style="font-family:DM Mono,monospace;font-weight:700;font-size:14px;color:'+cor+'">'+a.dias+' dias</span>';
@@ -4238,7 +4238,7 @@ function renderGlossario(){
       // Exemplo
       if(t.ex){
         var ex=document.createElement('div');
-        ex.style='font-size:12px;color:var(--text3);background:#0a0a0a;border-radius:8px;padding:8px 10px;margin-top:8px;border-left:2px solid var(--blue)';
+        ex.style='font-size:12px;color:var(--text3);background:var(--card);border-radius:8px;padding:8px 10px;margin-top:8px;border-left:2px solid var(--blue)';
         var exLabel=document.createElement('span');exLabel.style='font-weight:700;color:var(--blue);margin-right:6px';exLabel.textContent='Ex:';
         var exText=document.createTextNode(t.ex);
         ex.appendChild(exLabel);ex.appendChild(exText);
@@ -4436,7 +4436,7 @@ function prepararDisparo(){
   var box=document.createElement('div');box.className='modal';box.style.maxWidth='520px';
   box.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:16px;margin-bottom:8px">'+tipo+'</div>'
     +'<div style="font-size:13px;color:var(--text2);margin-bottom:4px">'+destinatarios.length+' destinatários</div>'
-    +'<div style="font-size:12px;color:var(--text3);background:#0a0a0a;padding:12px;border-radius:8px;margin-bottom:16px;line-height:1.6;white-space:pre-wrap">'+msg+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);background:var(--card);padding:12px;border-radius:8px;margin-bottom:16px;line-height:1.6;white-space:pre-wrap">'+msg+'</div>'
     +'<div id="disparo-status" style="margin-bottom:12px"></div>'
     +'<div style="display:flex;gap:10px;justify-content:flex-end">'
     +(instance&&token?'<button class="btn-primary" id="btn-disparo-api"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Disparar via Z-API ('+destinatarios.length+')</button>':'')
@@ -4456,7 +4456,7 @@ function prepararDisparo(){
       var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
       var url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
       var a=document.createElement('a');a.href=url;a.target='_blank';
-      a.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0a0a0a;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none';
+      a.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none';
       a.innerHTML='<span style="font-size:13px;color:var(--text)">'+c.nome+'</span><span style="font-size:12px;color:#25d366">Abrir →</span>';
       list.appendChild(a);
     });
@@ -4628,7 +4628,7 @@ function buscarGruposZAPI(){
       var participants = g.participants||g.membersCount||0;
       
       var row=document.createElement('div');
-      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0a0a0a;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
+      row.style='display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:border-color .2s';
       row.onmouseover=function(){this.style.borderColor='var(--border2)';};
       row.onmouseout=function(){this.style.borderColor='var(--border)';};
       row.innerHTML='<div><div style="font-size:13px;color:var(--text);font-weight:500">'+grpName+'</div>'
@@ -5067,7 +5067,7 @@ function renderTarefas(){
   cols.forEach(function(status){
     var items = tarefas.filter(function(t){return t.status===status;});
     var col = document.createElement('div');
-    col.style = 'background:#0a0a0a;border:1px solid var(--border);border-radius:14px;padding:16px';
+    col.style = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px';
 
     var header = document.createElement('div');
     header.style = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px';
@@ -7085,7 +7085,7 @@ function renderAtivosCliente(ativos, cotacoes){
 
   ativosRender.forEach(function(a){
     var row=document.createElement('div');
-    row.style='display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;gap:12px;flex-wrap:wrap';
+    row.style='display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;gap:12px;flex-wrap:wrap';
 
     // Coluna esquerda: nome + detalhes
     var left = '<div style="flex:1;min-width:180px">'
@@ -7422,7 +7422,7 @@ function gerarAbordagemIA(tarefaId){
     // Perfil summary
     if(linhas.length){
       var summary=document.createElement('div');
-      summary.style='background:#0a0a0a;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:1.8;color:var(--text2)';
+      summary.style='background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;line-height:1.8;color:var(--text2)';
       var sh=document.createElement('div');
       sh.style='font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px';
       sh.textContent='Perfil do Lead';
@@ -7534,7 +7534,7 @@ function renderLeadsCRM(){
     campos.forEach(function(k){
       if(!lead[k]) return;
       var item = document.createElement('div');
-      item.style = 'background:#0a0a0a;border-radius:8px;padding:10px 12px';
+      item.style = 'background:var(--card);border-radius:8px;padding:10px 12px';
       item.innerHTML = '<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+LABELS_TRIAGEM[k]+'</div>'
         +'<div style="font-size:12px;color:var(--text);line-height:1.4">'+lead[k]+'</div>';
       grid.appendChild(item);
@@ -8876,7 +8876,7 @@ function renderGradeCotacoes(cotacoes){
     html += '<div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">';
 
     // Header do grupo
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#111111,#0a0a0a)">'
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),var(--card))">'
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white)">'+grupo.nome+'</span>'
       +'<span style="font-size:11px;color:var(--text3)">'+tickers.length+' ativos</span></div>'
@@ -9127,7 +9127,7 @@ function renderOpcoesChain(series, symbol){
     html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">';
 
     // Accordion header
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;background:linear-gradient(135deg,#111111,#0a0a0a);border-bottom:1px solid var(--border)" onclick="this.parentElement.querySelector(\'.opcoes-exp-body\').style.display=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.opcoes-arrow\').textContent=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'▸\':\'▾\'">'
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;background:linear-gradient(135deg,var(--card2),var(--card));border-bottom:1px solid var(--border)" onclick="this.parentElement.querySelector(\'.opcoes-exp-body\').style.display=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.opcoes-arrow\').textContent=this.parentElement.querySelector(\'.opcoes-exp-body\').style.display===\'none\'?\'▸\':\'▾\'">'
       +'<div style="display:flex;align-items:center;gap:10px">'
       +'<span class="opcoes-arrow" style="color:var(--blue);font-size:14px">'+(isOpen?'▾':'▸')+'</span>'
       +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">Vencimento: '+expStr+'</span>'
@@ -9142,12 +9142,12 @@ function renderOpcoesChain(series, symbol){
     html += '<table style="width:100%;font-size:12px;border-collapse:collapse">';
 
     // Header
-    html += '<thead><tr style="background:#0a0a0a">'
+    html += '<thead><tr style="background:var(--card)">'
       +'<th colspan="7" style="text-align:center;padding:8px;color:#00c853;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #00c85333;border-right:1px solid var(--border)">CALLS</th>'
       +'<th style="padding:8px;text-align:center;color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid var(--blue);border-left:1px solid var(--border);border-right:1px solid var(--border)">STRIKE</th>'
       +'<th colspan="7" style="text-align:center;padding:8px;color:#ff1744;font-size:11px;text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid #ff174433;border-left:1px solid var(--border)">PUTS</th>'
       +'</tr>';
-    html += '<tr style="background:#0a0a0a">'
+    html += '<tr style="background:var(--card)">'
       +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:left">Código</th>'
       +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Último</th>'
       +'<th style="padding:5px 6px;color:var(--text3);font-size:10px;text-align:right">Bid</th>'
@@ -9194,7 +9194,7 @@ function renderOpcoesChain(series, symbol){
       }
 
       // Strike
-      html += '<td style="padding:4px 6px;text-align:center;font-family:DM Mono,monospace;font-weight:700;font-size:12px;color:'+(isATM?'var(--blue)':'var(--white)')+';background:'+(isATM?'#ff8c0011':'#0a0a0a')+';border-left:1px solid var(--border);border-right:1px solid var(--border)">'+fmtNum(strike)+'</td>';
+      html += '<td style="padding:4px 6px;text-align:center;font-family:DM Mono,monospace;font-weight:700;font-size:12px;color:'+(isATM?'var(--blue)':'var(--white)')+';background:'+(isATM?'#ff8c0011':'var(--card2)')+';border-left:1px solid var(--border);border-right:1px solid var(--border)">'+fmtNum(strike)+'</td>';
 
       // Put side
       if(p && p.symbol){
