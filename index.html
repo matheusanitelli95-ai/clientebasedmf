@@ -8859,19 +8859,24 @@ function refreshGradeCotacoes(){
       };
     });
 
-    // Verificar tickers que o OpLab não retornou
-    var missing = allTickers.filter(function(t){ return !cotacoes[t]; });
-    if(missing.length > 0){
-      console.log('Tickers não encontrados no OpLab, tentando brapi:', missing.join(','));
-      fetch('/api/brapi?tickers=' + encodeURIComponent(missing.join(','))).then(function(r){
-        if(!r.ok) throw new Error('brapi HTTP ' + r.status);
-        return r.json();
-      }).then(function(brapiData){
-        var results = brapiData.results || [];
-        results.forEach(function(r){
+    // Buscar dados complementares do Yahoo Finance para TODOS os tickers
+    // (tickers faltantes + dados de 52 semanas que o OpLab não fornece)
+    console.log('Buscando dados complementares do Yahoo Finance para todos os tickers...');
+    fetch('/api/brapi?tickers=' + encodeURIComponent(allTickers.join(','))).then(function(r){
+      if(!r.ok) throw new Error('Yahoo HTTP ' + r.status);
+      return r.json();
+    }).then(function(yahooData){
+      var results = yahooData.results || [];
+      results.forEach(function(r){
+        if(cotacoes[r.symbol]){
+          // Ticker já veio do OpLab — só complementar dados de 52 semanas
+          cotacoes[r.symbol].fiftyTwoWeekHigh = r.fiftyTwoWeekHigh || cotacoes[r.symbol].fiftyTwoWeekHigh;
+          cotacoes[r.symbol].fiftyTwoWeekLow = r.fiftyTwoWeekLow || cotacoes[r.symbol].fiftyTwoWeekLow;
+        } else {
+          // Ticker não veio do OpLab — usar dados completos do Yahoo
           cotacoes[r.symbol] = {
             symbol: r.symbol,
-            shortName: r.shortName || r.longName || '',
+            shortName: r.shortName || '',
             regularMarketPrice: r.regularMarketPrice,
             regularMarketChangePercent: r.regularMarketChangePercent || 0,
             regularMarketDayHigh: r.regularMarketDayHigh,
@@ -8882,20 +8887,18 @@ function refreshGradeCotacoes(){
             regularMarketVolume: r.regularMarketVolume,
             fiftyTwoWeekHigh: r.fiftyTwoWeekHigh || null,
             fiftyTwoWeekLow: r.fiftyTwoWeekLow || null,
-            logourl: r.logourl || null,
+            logourl: null,
             bid: null,
             ask: null,
             _isCurrency: false
           };
-        });
-        renderGradeCotacoes(cotacoes);
-      }).catch(function(e2){
-        console.warn('brapi fallback falhou:', e2.message);
-        renderGradeCotacoes(cotacoes);
+        }
       });
-    } else {
       renderGradeCotacoes(cotacoes);
-    }
+    }).catch(function(e2){
+      console.warn('Yahoo fallback falhou:', e2.message);
+      renderGradeCotacoes(cotacoes);
+    });
   }).catch(function(e){
     console.error('OpLab quote error:', e);
     if(btn){btn.textContent='Atualizar';btn.disabled=false;}
