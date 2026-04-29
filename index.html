@@ -556,7 +556,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="main-content" id="main-content">
 
     <!-- DASHBOARD -->
-    <div class="view active" id="view-dashboard">
+    <div class="view" id="view-dashboard">
       <div class="page-header">
         <div><div class="page-title">Dashboard</div><div class="page-sub">Visão geral do escritório</div></div>
         <button class="btn-primary" onclick="openModalCliente(null)">+ Novo Cliente</button>
@@ -1329,6 +1329,16 @@ textarea.form-input{resize:vertical;min-height:80px}
               </div>
             </div>
           </div>
+        </div>
+        <!-- Brapi Config -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title">Cotações em Tempo Real (Brapi)</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6">Cadastre seu token da <a href="https://brapi.dev" target="_blank" style="color:var(--blue)">brapi.dev</a> para atualizar cotações automaticamente na carteira dos clientes. Sem token, apenas PETR4, VALE3, MGLU3 e ITUB4 funcionam.</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input class="form-input" id="cfg-brapi-token" placeholder="Seu token Brapi" style="flex:1;font-family:DM Mono,monospace;font-size:12px">
+            <button class="btn-primary" onclick="salvarBrapiToken()" style="white-space:nowrap">Salvar Token</button>
+          </div>
+          <div id="cfg-brapi-status" style="font-size:11px;margin-top:8px;color:var(--text3)"></div>
         </div>
         <!-- Pendentes -->
         <div id="pendentes-section" style="display:none;margin-bottom:20px">
@@ -2279,7 +2289,12 @@ auth.onAuthStateChanged(function(user){
 });
 
 function loadClienteData(){
-  if(!currentClienteVinculado) return;
+  if(!currentClienteVinculado){
+    // Mesmo sem vínculo, montar portal do cliente (vazio mas seguro)
+    clientes = [];
+    showClientePortal();
+    return;
+  }
   db.collection('clientes').doc(currentClienteVinculado).onSnapshot(function(doc){
     if(doc.exists){
       clientes = [Object.assign({id:doc.id},doc.data())];
@@ -2309,9 +2324,15 @@ function loadData(){
 
 // NAV
 function showView(v,btn){
+  // Security: block company views for clients
+  if(currentPerfil === 'cliente'){
+    var clienteMenus = PERFIL_MENUS.cliente || [];
+    if(clienteMenus.indexOf(v) < 0) return;
+  }
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('view-'+v).classList.add('active');
+  var viewEl = document.getElementById('view-'+v);
+  if(viewEl) viewEl.classList.add('active');
   if(btn)btn.classList.add('active');
 }
 
@@ -5986,11 +6007,16 @@ auth.onAuthStateChanged(function(user){
       // Apply perfil BEFORE showing content
       applyPerfil();
       // Only load full data for adm/gestor
+      // Carregar token Brapi para cotações
+      loadBrapiToken();
       if(currentPerfil === 'cliente'){
         // Cliente: only load own data
         loadClienteData();
       } else {
         loadData();
+        // Ativar Dashboard como view inicial para ADM/Gestor
+        var dashView = document.getElementById('view-dashboard');
+        if(dashView) dashView.classList.add('active');
       }
       // Now show content
       document.getElementById('main-content').style.visibility='visible';
@@ -6012,7 +6038,10 @@ function applyPerfil(){
   if(currentPerfil === 'cliente'){
     // Hide all views immediately for security
     document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
-    // Don't call showClientePortal here - it's called after data loads
+    // Hide ALL sidebar nav items immediately — don't wait for showClientePortal
+    document.querySelectorAll('.nav-item, .nav-section').forEach(function(el){
+      el.style.display='none';
+    });
     return;
   }
 
@@ -6144,12 +6173,14 @@ function buildMinhaCarteiraView(){
   div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Carteira</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div>'
     +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Adicionar Ativo</button></div>'
     +'<div class="page-content">'
-    +'<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">'
-    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-patrimonio" style="font-size:20px">R$0</div><div class="kpi-label">Patrimônio em Ativos</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>'
-    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado Black</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>'
-    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-retorno" style="font-size:20px">0%</div><div class="kpi-label">Retorno Black</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>'
+    +'<div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-patrimonio" style="font-size:20px">R$0</div><div class="kpi-label">Valor Atualizado</div></div><div class="kpi-accent" style="background:#22c55e"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-investido" style="font-size:20px">R$0</div><div class="kpi-label">Valor Investido</div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-ganho" style="font-size:20px">R$0</div><div class="kpi-label">Ganho / Perda</div></div><div class="kpi-accent" style="background:#c084fc"></div></div>'
+    +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-acumulado" style="font-size:20px">R$0</div><div class="kpi-label">Acumulado Black</div></div><div class="kpi-accent" style="background:#f59e0b"></div></div>'
     +'</div>'
-    +'<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Meus Ativos</div></div><div id="mc-ativos-list"></div></div>'
+    +'<div id="mc-cotacao-status" style="font-size:11px;color:var(--text3);margin-bottom:12px;display:none"></div>'
+    +'<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Meus Ativos</div><div id="mc-ativos-header-right" style="font-size:12px;color:var(--text3)"></div></div><div id="mc-ativos-list"></div></div>'
     +'</div>';
   mainContent.appendChild(div);
 }
@@ -6737,86 +6768,258 @@ function salvarMinhaConta(){
 }
 
 // ── Minha Carteira - Ativos ───────────────────────────────
+// ─── Brapi — Cotações em Tempo Real ──────────────────────
+var brapiToken = '';
+var cotacoesCache = {};
+var cotacoesCacheTime = 0;
+var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+function loadBrapiToken(){
+  db.collection('config').doc('brapi').get().then(function(doc){
+    if(doc.exists) brapiToken = doc.data().token || '';
+    // Preencher campo na config se estiver visível
+    var inp = document.getElementById('cfg-brapi-token');
+    if(inp && brapiToken) inp.value = brapiToken;
+  }).catch(function(){});
+}
+
+function salvarBrapiToken(){
+  var token = (document.getElementById('cfg-brapi-token')||{}).value||'';
+  token = token.trim();
+  db.collection('config').doc('brapi').set({token:token},{merge:true}).then(function(){
+    brapiToken = token;
+    var st = document.getElementById('cfg-brapi-status');
+    if(st){st.textContent = token ? 'Token salvo com sucesso!' : 'Token removido.'; st.style.color='#22c55e';}
+  }).catch(function(e){
+    var st = document.getElementById('cfg-brapi-status');
+    if(st){st.textContent = 'Erro: '+e.message; st.style.color='#ef4444';}
+  });
+}
+
+function isTickerLike(nome){
+  if(!nome) return false;
+  var n = nome.trim().toUpperCase();
+  return /^[A-Z]{3,6}\d{1,2}(F)?$/.test(n);
+}
+
+function fetchBrapiCotacoes(tickers, callback){
+  if(!tickers.length){ callback({}); return; }
+  // Checar cache
+  var agora = Date.now();
+  if(agora - cotacoesCacheTime < COTACOES_CACHE_TTL){
+    var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
+    if(todosCached){ callback(cotacoesCache); return; }
+  }
+  var url = 'https://brapi.dev/api/quote/' + tickers.join(',');
+  if(brapiToken) url += '?token=' + brapiToken;
+  fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    if(data.results){
+      data.results.forEach(function(r){
+        cotacoesCache[r.symbol] = {
+          price: r.regularMarketPrice,
+          change: r.regularMarketChange||0,
+          changePct: r.regularMarketChangePercent||0,
+          prevClose: r.regularMarketPreviousClose||0,
+          logo: r.logourl||'',
+          name: r.shortName||r.longName||'',
+          time: r.regularMarketTime||''
+        };
+      });
+      cotacoesCacheTime = Date.now();
+    }
+    callback(cotacoesCache);
+  }).catch(function(e){
+    console.warn('Brapi error:', e);
+    callback(cotacoesCache);
+  });
+}
+
+// ─── Minha Carteira ──────────────────────────────────────
 function loadMinhaCarteira(){
   if(!currentClienteVinculado) return;
   var cli=clientes.find(function(x){return x.id===currentClienteVinculado;});
   if(cli){
     var el=document.getElementById('mc-sub');
     if(el) el.textContent='Olá, '+cli.nome+'!';
-    var pat=cli.patrimonio||(cli.custodiaRF||0)+(cli.custodiaRV||0);
-    var patronEl=document.getElementById('mc-patrimonio');
-    if(patronEl) patronEl.textContent=fmtFull(pat);
   }
   // Load black ops for acumulado
   db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
     var ops=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     var acum=ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
-    var pat=cli?cli.patrimonio||0:0;
-    var retorno=pat?(acum/pat*100).toFixed(2):0;
     var acumEl=document.getElementById('mc-acumulado');
-    var retEl=document.getElementById('mc-retorno');
     if(acumEl){acumEl.textContent=fmtFull(acum);acumEl.style.color=acum>=0?'#22c55e':'#ef4444';}
-    if(retEl){retEl.textContent=retorno+'%';retEl.style.color=Number(retorno)>=0?'#c084fc':'#ef4444';}
   });
-  // Load ativos
+  // Load ativos + cotações
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
     var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    renderAtivosCliente(ativos);
+    // Extrair tickers para buscar cotação
+    var tickers = [];
+    ativos.forEach(function(a){
+      var ticker = (a.nome||'').trim().toUpperCase();
+      if(isTickerLike(ticker) && tickers.indexOf(ticker)<0) tickers.push(ticker);
+    });
+    if(tickers.length){
+      // Mostrar loading
+      var statusEl = document.getElementById('mc-cotacao-status');
+      if(statusEl){statusEl.style.display='block';statusEl.innerHTML='<span style="color:var(--blue)">Atualizando cotações...</span>';}
+      fetchBrapiCotacoes(tickers, function(cotacoes){
+        renderAtivosCliente(ativos, cotacoes);
+      });
+    } else {
+      renderAtivosCliente(ativos, {});
+    }
   });
 }
 
-function renderAtivosCliente(ativos){
+function renderAtivosCliente(ativos, cotacoes){
   var el=document.getElementById('mc-ativos-list');if(!el)return;
+  cotacoes = cotacoes||{};
   el.innerHTML='';
   if(!ativos.length){
     el.innerHTML='<div class="empty" style="padding:30px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para registrar sua carteira</p></div>';
+    // Zerar KPIs
+    var pe=document.getElementById('mc-patrimonio');if(pe)pe.textContent='R$ 0,00';
+    var ie=document.getElementById('mc-investido');if(ie)ie.textContent='R$ 0,00';
+    var ge=document.getElementById('mc-ganho');if(ge)ge.textContent='R$ 0,00';
     return;
   }
-  var total=ativos.reduce(function(s,a){return s+(a.valorTotal||0);},0);
-  var header=document.createElement('div');
-  header.style='display:flex;justify-content:space-between;margin-bottom:12px;font-size:12px;color:var(--text3)';
-  header.innerHTML='<span>'+ativos.length+' ativos</span><span style="font-family:DM Mono,monospace;color:#22c55e;font-weight:700">Total: '+fmtFull(total)+'</span>';
-  el.appendChild(header);
-  ativos.sort(function(a,b){return(b.valorTotal||0)-(a.valorTotal||0);}).forEach(function(a){
+
+  var totalAtualizado = 0;
+  var totalInvestido = 0;
+  var tickersEncontrados = 0;
+  var tickersBuscados = 0;
+
+  // Preparar dados enriquecidos
+  var ativosRender = ativos.map(function(a){
+    var ticker = (a.nome||'').trim().toUpperCase();
+    var qtde = a.quantidade||0;
+    var pm = a.precoMedio||0;
+    var investido = qtde * pm;
+    var cot = isTickerLike(ticker) ? cotacoes[ticker] : null;
+    var precoAtual = cot ? cot.price : pm;
+    var valorAtual = qtde * precoAtual;
+    var ganho = valorAtual - investido;
+    var ganhoPct = investido > 0 ? ((ganho/investido)*100) : 0;
+    if(cot) tickersEncontrados++;
+    if(isTickerLike(ticker)) tickersBuscados++;
+    totalAtualizado += valorAtual;
+    totalInvestido += investido;
+    return {
+      raw: a, ticker: ticker, qtde: qtde, pm: pm, investido: investido,
+      cot: cot, precoAtual: precoAtual, valorAtual: valorAtual,
+      ganho: ganho, ganhoPct: ganhoPct
+    };
+  });
+
+  var ganhoTotal = totalAtualizado - totalInvestido;
+  var ganhoPctTotal = totalInvestido > 0 ? ((ganhoTotal/totalInvestido)*100) : 0;
+
+  // Atualizar KPIs
+  var pe=document.getElementById('mc-patrimonio');
+  if(pe){pe.textContent=fmtFull(totalAtualizado);pe.style.color='#22c55e';}
+  var ie=document.getElementById('mc-investido');
+  if(ie) ie.textContent=fmtFull(totalInvestido);
+  var ge=document.getElementById('mc-ganho');
+  if(ge){
+    var sinal = ganhoTotal>=0?'+':'';
+    ge.textContent=sinal+fmtFull(ganhoTotal)+' ('+ganhoPctTotal.toFixed(1)+'%)';
+    ge.style.color=ganhoTotal>=0?'#22c55e':'#ef4444';
+  }
+
+  // Status cotações
+  var statusEl = document.getElementById('mc-cotacao-status');
+  if(statusEl){
+    if(tickersEncontrados>0){
+      var time = '';
+      for(var k in cotacoes){if(cotacoes[k].time){time=new Date(cotacoes[k].time).toLocaleString('pt-BR');break;}}
+      statusEl.style.display='block';
+      statusEl.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="#22c55e" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/></svg>'+tickersEncontrados+' cotaç'+(tickersEncontrados>1?'ões atualizadas':'ão atualizada')+(time?' · '+time:'');
+    } else if(tickersBuscados>0){
+      statusEl.style.display='block';
+      statusEl.innerHTML='<span style="color:#f59e0b">Cotações indisponíveis — verifique o token Brapi nas Configurações</span>';
+    } else {
+      statusEl.style.display='none';
+    }
+  }
+
+  // Header
+  var headerRight = document.getElementById('mc-ativos-header-right');
+  if(headerRight) headerRight.innerHTML=ativos.length+' ativo'+(ativos.length>1?'s':'');
+
+  // Ordenar por valor atualizado
+  ativosRender.sort(function(a,b){return b.valorAtual-a.valorAtual;});
+
+  // Tabela
+  var hasAnyCot = ativosRender.some(function(a){return !!a.cot;});
+
+  ativosRender.forEach(function(a){
     var row=document.createElement('div');
-    row.style='display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#030810;border:1px solid var(--border);border-radius:10px;margin-bottom:8px';
-    var valorTotal=(a.quantidade||0)*(a.precoMedio||0);
-    row.innerHTML='<div><div style="font-weight:700;color:var(--white);font-size:14px">'+a.nome+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+(a.tipo||'')+(a.quantidade?' · Qtd: '+a.quantidade:'')+(a.precoMedio?' · PM: '+fmtFull(a.precoMedio):'')+'</div></div>'
-      +'<div style="display:flex;align-items:center;gap:10px">'
-      +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:14px;font-weight:600">'+fmtFull(valorTotal)+'</div>';
+    row.style='display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#030810;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;gap:12px;flex-wrap:wrap';
+
+    // Coluna esquerda: nome + detalhes
+    var left = '<div style="flex:1;min-width:180px">'
+      +'<div style="display:flex;align-items:center;gap:8px">';
+    if(a.cot && a.cot.logo){
+      left += '<img src="'+a.cot.logo+'" style="width:24px;height:24px;border-radius:6px;background:#fff" onerror="this.style.display=\'none\'">';
+    }
+    left += '<span style="font-weight:700;color:var(--white);font-size:14px">'+a.raw.nome+'</span>';
+    if(a.cot){
+      var corVar = a.cot.changePct>=0?'#22c55e':'#ef4444';
+      left += '<span style="font-size:11px;font-family:DM Mono,monospace;color:'+corVar+'">'+(a.cot.changePct>=0?'+':'')+a.cot.changePct.toFixed(2)+'%</span>';
+    }
+    left += '</div>';
+    left += '<div style="font-size:11px;color:var(--text3);margin-top:3px">'+(a.raw.tipo||a.raw.categoria||'');
+    if(a.qtde) left += ' · Qtd: '+a.qtde.toLocaleString('pt-BR');
+    if(a.pm) left += ' · PM: '+fmtFull(a.pm);
+    left += '</div></div>';
+
+    // Coluna centro: cotação atual (se tiver)
+    var center = '';
+    if(a.cot){
+      center = '<div style="text-align:center;min-width:100px">'
+        +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Cotação</div>'
+        +'<div style="font-family:DM Mono,monospace;font-size:14px;color:var(--white);font-weight:600">'+fmtFull(a.precoAtual)+'</div></div>';
+    }
+
+    // Coluna direita: valor atualizado + ganho
+    var corGanho = a.ganho>=0?'#22c55e':'#ef4444';
+    var right = '<div style="text-align:right;min-width:140px">'
+      +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:15px;font-weight:700">'+fmtFull(a.valorAtual)+'</div>';
+    if(a.investido > 0 && (a.cot || a.pm)){
+      right += '<div style="font-size:11px;font-family:DM Mono,monospace;color:'+corGanho+';margin-top:2px">'
+        +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+a.ganhoPct.toFixed(1)+'%)</div>';
+    }
+    right += '</div>';
+
+    // Botão excluir
+    var actions = '<div style="flex-shrink:0">';
+
+    row.innerHTML = left + center + right + actions;
+
     var delBtn=document.createElement('button');delBtn.className='btn-dsm';delBtn.style='padding:4px 8px;font-size:11px';delBtn.textContent='Excluir';
     (function(aid){delBtn.onclick=function(){
       confirmDelete(function(){
         db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
           .then(function(){loadMinhaCarteira();});
       });
-    };})(a.id);
-    row.querySelector('div:last-child').appendChild(delBtn);
+    };})(a.raw.id);
+    row.appendChild(delBtn);
     el.appendChild(row);
   });
 }
 
 function openModalAtivoCliente(){
-  // Reuse existing modal-ativo but adapted for client
   document.getElementById('fa-nome').value='';
-  document.getElementById('fa-tipo').value='Renda Fixa';
+  document.getElementById('fa-categoria').value='Renda Variável';
+  updateSubcategoria();
+  document.getElementById('fa-moeda').value='BRL';
+  if(document.getElementById('fa-qtde')) document.getElementById('fa-qtde').value='';
   document.getElementById('fa-valor').value='';
   document.getElementById('fa-data').value=today();
   document.getElementById('fa-obs').value='';
-  // Add quantidade and precoMedio fields if not exist
-  var modal=document.getElementById('modal-ativo');
-  if(!document.getElementById('fa-qtde')){
-    var fg=modal.querySelector('.form-grid');
-    var qtdeDiv=document.createElement('div');qtdeDiv.className='form-group';
-    qtdeDiv.innerHTML='<label>Quantidade</label><input class="form-input" id="fa-qtde" type="number" placeholder="Ex: 100">';
-    var pmDiv=document.createElement('div');pmDiv.className='form-group';
-    pmDiv.innerHTML='<label>Preço Médio (R$)</label><input class="form-input" id="fa-pm" type="number" step="0.01" placeholder="0,00">';
-    fg.insertBefore(pmDiv, fg.children[2]);
-    fg.insertBefore(qtdeDiv, fg.children[2]);
-  }
   // Override save button
-  var saveBtn=modal.querySelector('.btn-primary');
+  var modal=document.getElementById('modal-ativo');
+  var saveBtn=document.getElementById('fa-save-btn')||modal.querySelector('.btn-primary');
   saveBtn.onclick=saveAtivoCliente;
   openModal('modal-ativo');
 }
@@ -6825,13 +7028,16 @@ function saveAtivoCliente(){
   if(!currentClienteVinculado) return;
   var nome=document.getElementById('fa-nome').value.trim();
   if(!nome){alert('Nome do ativo é obrigatório!');return;}
-  var qtde=Number(document.getElementById('fa-qtde')?document.getElementById('fa-qtde').value:0)||0;
-  var pm=Number(document.getElementById('fa-pm')?document.getElementById('fa-pm').value:0)||0;
+  var categoria=(document.getElementById('fa-categoria')||{}).value||'';
+  var tipo=(document.getElementById('fa-tipo')||{}).value||'';
+  var moeda=(document.getElementById('fa-moeda')||{}).value||'BRL';
+  var qtde=Number((document.getElementById('fa-qtde')||{}).value)||0;
+  var pm=Number((document.getElementById('fa-valor')||{}).value)||0;
   var data={
-    nome:nome,tipo:document.getElementById('fa-tipo').value,
-    quantidade:qtde,precoMedio:pm,valorTotal:qtde*pm,
-    dataAplicacao:document.getElementById('fa-data').value,
-    obs:document.getElementById('fa-obs').value
+    nome:nome, categoria:categoria, tipo:tipo, moeda:moeda,
+    quantidade:qtde, precoMedio:pm, valorTotal:qtde*pm,
+    dataAplicacao:(document.getElementById('fa-data')||{}).value||'',
+    obs:(document.getElementById('fa-obs')||{}).value||''
   };
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').add(data)
     .then(function(){closeModal('modal-ativo');setTimeout(loadMinhaCarteira,500);});
