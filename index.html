@@ -4097,16 +4097,29 @@ function renderComunicados(){
       +'<div style="font-size:11px;color:var(--text3);margin-top:10px">Visível: '+(c.visivel||'todos')+'</div>'
       +'</div>'
       +'<div id="cact-placeholder" style="display:flex;gap:6px;flex-shrink:0;margin-left:16px"></div>'
-      +'</div>';
+      +'</div>'
+      +'<div style="border-top:1px solid var(--border);margin-top:14px;padding-top:12px">'
+      +'<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleComentarios(\''+c.id+'\')">'
+      +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+      +'<span style="font-size:12px;color:var(--text2)" id="com-count-'+c.id+'">Comentários</span>'
+      +'<span style="font-size:10px;color:var(--text3)">▸</span>'
+      +'</div>'
+      +'<div id="com-section-'+c.id+'" style="display:none;margin-top:10px">'
+      +'<div id="com-list-'+c.id+'" style="margin-bottom:10px"></div>'
+      +'<div style="display:flex;gap:8px">'
+      +'<input class="form-input" id="com-input-'+c.id+'" placeholder="Escreva um comentário..." style="flex:1;font-size:12px;padding:8px 12px">'
+      +'<button class="btn-primary" onclick="enviarComentario(\''+c.id+'\')" style="padding:8px 14px;font-size:11px">Enviar</button>'
+      +'</div></div></div>';
     (function(cid){
       var wrap=card.querySelector('[id="cact-placeholder"]');
       if(wrap) wrap.id='cact-'+cid;
       wrap=card.querySelector('#cact-'+cid);
       var eb=document.createElement('button');eb.className='btn-ghost';eb.style='padding:4px 8px;font-size:11px';eb.textContent='Editar';
       eb.onclick=function(){editComunicado(cid);};
-      var db=document.createElement('button');db.className='btn-dsm';db.style='padding:4px 8px;font-size:11px';db.textContent='Excluir';
-      db.onclick=function(){deleteComunicado(cid);};
-      if(wrap){wrap.appendChild(eb);wrap.appendChild(db);}
+      var delb=document.createElement('button');delb.className='btn-dsm';delb.style='padding:4px 8px;font-size:11px';delb.textContent='Excluir';
+      delb.onclick=function(){deleteComunicado(cid);};
+      if(wrap){wrap.appendChild(eb);wrap.appendChild(delb);}
+      loadComentarioCount(cid);
     })(c.id);
     el.appendChild(card);
   });
@@ -4136,6 +4149,62 @@ function saveComunicado(){
 
 function editComunicado(id){ openModalComunicado(id); }
 function deleteComunicado(id){ confirmDelete(function(){ db.collection('comunicados').doc(id).delete(); }); }
+
+// ── Comentários dos Comunicados ───────────────────────────
+function toggleComentarios(comId){
+  var sec=document.getElementById('com-section-'+comId);
+  if(!sec) return;
+  if(sec.style.display==='none'){
+    sec.style.display='block';
+    loadComentarios(comId);
+  } else {
+    sec.style.display='none';
+  }
+}
+
+function loadComentarios(comId){
+  var list=document.getElementById('com-list-'+comId);
+  if(!list) return;
+  list.innerHTML='<span style="font-size:11px;color:var(--text3)">Carregando...</span>';
+  db.collection('comunicados').doc(comId).collection('comentarios').orderBy('criadoEm','asc').get().then(function(snap){
+    list.innerHTML='';
+    if(snap.empty){list.innerHTML='<span style="font-size:11px;color:var(--text3)">Nenhum comentário ainda.</span>';return;}
+    snap.forEach(function(doc){
+      var d=doc.data();
+      var div=document.createElement('div');
+      div.style='padding:8px 10px;border-radius:6px;background:var(--card2);margin-bottom:6px';
+      var nome=d.autor||'Anônimo';
+      var data=d.criadoEm?new Date(d.criadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+      div.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600;color:var(--blue)">'+nome+'</span><span style="font-size:10px;color:var(--text3)">'+data+'</span></div><div style="font-size:12px;color:var(--text);line-height:1.4">'+d.texto+'</div>';
+      list.appendChild(div);
+    });
+  });
+}
+
+function loadComentarioCount(comId){
+  db.collection('comunicados').doc(comId).collection('comentarios').get().then(function(snap){
+    var el=document.getElementById('com-count-'+comId);
+    if(el) el.textContent=snap.size>0?snap.size+' Comentário'+(snap.size>1?'s':''):'Comentários';
+  });
+}
+
+function enviarComentario(comId){
+  var input=document.getElementById('com-input-'+comId);
+  if(!input) return;
+  var texto=input.value.trim();
+  if(!texto) return;
+  var user=firebase.auth().currentUser;
+  var autor=user?user.email:'Anônimo';
+  db.collection('comunicados').doc(comId).collection('comentarios').add({
+    texto:texto,
+    autor:autor,
+    criadoEm:new Date().toISOString()
+  }).then(function(){
+    input.value='';
+    loadComentarios(comId);
+    loadComentarioCount(comId);
+  });
+}
 
 // ── Glossário ─────────────────────────────────────────────
 var GLOSSARIO_DEFAULT = [
