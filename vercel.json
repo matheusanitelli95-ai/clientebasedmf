@@ -1,8 +1,7 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/oplab/:path*",
-      "destination": "https://api.oplab.com.br/v3/:path*"
+  "functions": {
+    "api/oplab/[...path].js": {
+      "maxDuration": 10
     }
-  ]
+  }
 }
