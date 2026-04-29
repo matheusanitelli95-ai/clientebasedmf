@@ -8839,7 +8839,6 @@ function refreshGradeCotacoes(){
 
     var cotacoes = {};
     items.forEach(function(r){
-      // Normalizar para o formato que renderGradeCotacoes espera
       cotacoes[r.symbol] = {
         symbol: r.symbol,
         shortName: r.name || '',
@@ -8859,7 +8858,44 @@ function refreshGradeCotacoes(){
         _isCurrency: (r.symbol||'').indexOf('BRL') > 0 && (r.symbol||'').length <= 6
       };
     });
-    renderGradeCotacoes(cotacoes);
+
+    // Verificar tickers que o OpLab não retornou
+    var missing = allTickers.filter(function(t){ return !cotacoes[t]; });
+    if(missing.length > 0){
+      console.log('Tickers não encontrados no OpLab, tentando brapi:', missing.join(','));
+      fetch('/api/brapi?tickers=' + encodeURIComponent(missing.join(','))).then(function(r){
+        if(!r.ok) throw new Error('brapi HTTP ' + r.status);
+        return r.json();
+      }).then(function(brapiData){
+        var results = brapiData.results || [];
+        results.forEach(function(r){
+          cotacoes[r.symbol] = {
+            symbol: r.symbol,
+            shortName: r.shortName || r.longName || '',
+            regularMarketPrice: r.regularMarketPrice,
+            regularMarketChangePercent: r.regularMarketChangePercent || 0,
+            regularMarketDayHigh: r.regularMarketDayHigh,
+            regularMarketDayLow: r.regularMarketDayLow,
+            regularMarketOpen: r.regularMarketOpen,
+            regularMarketPreviousClose: r.regularMarketPreviousClose,
+            regularMarketTime: r.regularMarketTime ? new Date(r.regularMarketTime).toISOString() : null,
+            regularMarketVolume: r.regularMarketVolume,
+            fiftyTwoWeekHigh: r.fiftyTwoWeekHigh || null,
+            fiftyTwoWeekLow: r.fiftyTwoWeekLow || null,
+            logourl: r.logourl || null,
+            bid: null,
+            ask: null,
+            _isCurrency: false
+          };
+        });
+        renderGradeCotacoes(cotacoes);
+      }).catch(function(e2){
+        console.warn('brapi fallback falhou:', e2.message);
+        renderGradeCotacoes(cotacoes);
+      });
+    } else {
+      renderGradeCotacoes(cotacoes);
+    }
   }).catch(function(e){
     console.error('OpLab quote error:', e);
     if(btn){btn.textContent='Atualizar';btn.disabled=false;}
