@@ -6447,7 +6447,7 @@ var editingUsrId = null;
 var PERFIL_MENUS = {
   adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','calendario-economico','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
   gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','calendario-economico','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
-  cliente: ['minha-carteira','agendamento','comunicados','panorama','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
+  cliente: ['minha-carteira','agendamento','comunicados','calendario-economico','panorama','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -10015,7 +10015,7 @@ function gerarCalendarioEconomico(){
 
     btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;
     document.getElementById('ce-preview-btn').style.display='';
-    document.getElementById('ce-wa-btn').style.display='';
+    if(currentPerfil!=='cliente') document.getElementById('ce-wa-btn').style.display='';
     document.getElementById('ce-semana').textContent=ceFmtDateBR(ceFmtDate(segundaAtual))+' a '+ceFmtDateBR(ceFmtDate(sexAtual));
     document.getElementById('ce-sub').textContent='Gerado em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   }).catch(function(e){
@@ -10086,12 +10086,14 @@ function renderCalendarioEconomico(dados){
   }
   html+='</div>';
 
-  // ─── Campo Opinião DMF ───
-  html+='<div class="card" style="margin-bottom:16px;padding:20px">';
-  html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:10px">Opinião DMF Investimentos</div>';
-  html+='<textarea id="ce-opiniao" placeholder="Escreva aqui sua análise e recomendações para os clientes..." style="width:100%;min-height:120px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--white);font-size:13px;line-height:1.6;resize:vertical;font-family:inherit" oninput="ceOpiniao=this.value">'+(ceOpiniao||'')+'</textarea>';
-  html+='<p style="font-size:11px;color:var(--text3);margin-top:6px">Este texto será incluído no PDF enviado aos clientes.</p>';
-  html+='</div>';
+  // ─── Campo Opinião DMF (só adm/gestor) ───
+  if(currentPerfil!=='cliente'){
+    html+='<div class="card" style="margin-bottom:16px;padding:20px">';
+    html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:10px">Opinião DMF Investimentos</div>';
+    html+='<textarea id="ce-opiniao" placeholder="Escreva aqui sua análise e recomendações para os clientes..." style="width:100%;min-height:120px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--white);font-size:13px;line-height:1.6;resize:vertical;font-family:inherit" oninput="ceOpiniao=this.value">'+(ceOpiniao||'')+'</textarea>';
+    html+='<p style="font-size:11px;color:var(--text3);margin-top:6px">Este texto será incluído no PDF enviado aos clientes.</p>';
+    html+='</div>';
+  }
 
   body.innerHTML=html;
 }
