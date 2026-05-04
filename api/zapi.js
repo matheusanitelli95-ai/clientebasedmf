@@ -24,9 +24,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Parâmetro "action" obrigatório' });
   }
 
-  // Whitelist de ações permitidas
-  var allowed = ['send-text', 'groups', 'status'];
-  if (allowed.indexOf(action) < 0) {
+  // Whitelist de ações permitidas (suporta subpath como send-document/pdf)
+  var baseAction = action.split('/')[0];
+  var allowed = ['send-text', 'send-image', 'send-document', 'groups', 'status'];
+  if (allowed.indexOf(baseAction) < 0) {
     return res.status(403).json({ error: 'Ação não permitida' });
   }
 
