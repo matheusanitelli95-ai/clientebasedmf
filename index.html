@@ -9482,7 +9482,9 @@ function refreshPanorama(){
         nome: PANORAMA_NOMES[origSym] || r.shortName || origSym,
         preco: r.regularMarketPrice,
         variacao: r.regularMarketChangePercent || 0,
+        varAbsoluta: r.regularMarketChange || 0,
         abertura: r.regularMarketOpen,
+        fechAnterior: r.regularMarketPreviousClose,
         maxDia: r.regularMarketDayHigh,
         minDia: r.regularMarketDayLow,
         volume: r.regularMarketVolume,
@@ -9553,7 +9555,7 @@ function renderPanorama(allData){
       if(!d) return;
       var corVar = d.variacao>=0?'#00c853':'#ff1744';
       var seta = d.variacao>=0?'▲':'▼';
-      var varAbs = d.preco && d.abertura ? (d.preco - d.abertura) : 0;
+      var varAbs = d.varAbsoluta || (d.preco && d.fechAnterior ? (d.preco - d.fechAnterior) : (d.preco && d.abertura ? (d.preco - d.abertura) : 0));
 
       html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'#ff8c0008\'" onmouseout="this.style.background=\'transparent\'">'
         +'<td style="padding:8px 12px;color:var(--white);font-weight:600">'+d.nome+'</td>'
