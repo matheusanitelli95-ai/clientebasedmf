@@ -7,6 +7,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -544,6 +546,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Notícias</span></button>
       <button class="nav-item" onclick="showView('pre-mercado',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span><span>Pré-Mercado</span></button>
+      <button class="nav-item" onclick="showView('calendario-economico',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="8" y2="18.01"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg></span><span>Calendário</span></button>
       <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
       <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span>Cotações</span></button>
       <button class="nav-item" onclick="showView('opcoes-chain',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg></span><span>Opções</span></button>
@@ -1032,6 +1035,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Pré-Mercado <span id="pm-clock" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="pm-sub">Resumo diário antes da abertura</div></div>
         <div style="display:flex;gap:8px">
           <button class="btn-secondary" onclick="gerarPreMercado()" id="pm-gerar-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório</button>
+          <button class="btn-secondary" onclick="previewImagemPM()" id="pm-preview-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Visualizar Imagem</button>
           <button class="btn-primary" onclick="dispararPreMercadoWA()" id="pm-wa-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp</button>
         </div>
       </div>
@@ -1041,6 +1045,27 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
             <div class="empty-title">Relatório Pré-Mercado</div>
             <p style="font-size:13px;margin-top:8px;color:var(--text3)">Clique em "Gerar Relatório" para puxar os dados atualizados e criar o resumo do dia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDÁRIO ECONÔMICO SEMANAL -->
+    <div class="view" id="view-calendario-economico">
+      <div class="page-header">
+        <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Calendário Econômico <span id="ce-semana" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="ce-sub">Relatório semanal — retrospectiva + agenda + opinião DMF</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="gerarCalendarioEconomico()" id="ce-gerar-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório</button>
+          <button class="btn-secondary" onclick="previewPDFCalendario()" id="ce-preview-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Visualizar PDF</button>
+          <button class="btn-primary" onclick="dispararCalendarioWA()" id="ce-wa-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="ce-body">
+          <div class="empty" style="padding:60px">
+            <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="empty-title">Relatório Semanal</div>
+            <p style="font-size:13px;margin-top:8px;color:var(--text3)">Clique em "Gerar Relatório" para buscar a retrospectiva da semana passada e a agenda econômica da semana atual.</p>
           </div>
         </div>
       </div>
@@ -6397,8 +6422,8 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','calendario-economico','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','calendario-economico','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
   cliente: ['minha-carteira','agendamento','comunicados','panorama','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
 };
 
@@ -9501,6 +9526,7 @@ function gerarPreMercado(){
 
     if(btn){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;}
     document.getElementById('pm-wa-btn').style.display='';
+    document.getElementById('pm-preview-btn').style.display='';
     document.getElementById('pm-sub').textContent='Gerado em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   }).catch(function(e){
     body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro ao buscar dados: '+e.message+'</div></div>';
@@ -9625,98 +9651,587 @@ function gerarAnalisePreMercado(dados){
   return lines.join('\n');
 }
 
+function pmCorVar(sym, pct){
+  if(sym==='^VIX') return pct<=0?'#00c853':'#f59e0b';
+  if(sym==='USDBRL=X') return pct<=0?'#00c853':'#ff1744';
+  if(sym==='DX-Y.NYB') return pct<=0?'#00c853':'#f59e0b';
+  return pct>=0?'#00c853':'#ff1744';
+}
+
 function renderPreMercado(dados, texto){
   var body = document.getElementById('pm-body');
   if(!body) return;
 
   var html = '';
 
-  // Cards de indicadores principais
+  // ─── Cards principais (no app) ───
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">';
   var destaques = [];
   if(dados.futuros) dados.futuros.forEach(function(f){ destaques.push(f); });
   if(dados.brasil) dados.brasil.forEach(function(f){ destaques.push(f); });
   destaques.forEach(function(d){
-    var cor = d.var_pct >= 0 ? '#00c853' : '#ff1744';
-    if(d.sym === '^VIX') cor = d.var_pct <= 0 ? '#00c853' : '#f59e0b';
-    if(d.sym === 'USDBRL=X') cor = d.var_pct <= 0 ? '#00c853' : '#ff1744';
-    var decimals = d.sym === 'USDBRL=X' ? 4 : 2;
+    var cor = pmCorVar(d.sym, d.var_pct);
+    var dec = d.sym==='USDBRL=X'?4:2;
     html += '<div class="card" style="padding:14px;text-align:center">'
       +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">'+d.nome+'</div>'
-      +'<div style="font-size:22px;font-weight:700;font-family:DM Mono,monospace;color:var(--white);margin:6px 0">'+fmtPM(d.preco, decimals)+'</div>'
+      +'<div style="font-size:22px;font-weight:700;font-family:DM Mono,monospace;color:var(--white);margin:6px 0">'+fmtPM(d.preco,dec)+'</div>'
       +'<div style="font-size:13px;font-weight:600;font-family:DM Mono,monospace;color:'+cor+'">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</div>'
       +'</div>';
   });
   html += '</div>';
 
-  // Tabelas por categoria
+  // ─── Tabelas por categoria ───
   Object.keys(PM_TICKERS).forEach(function(cat){
-    var items = dados[cat] || [];
+    var items = dados[cat]||[];
     if(!items.length) return;
     var catNomes = {futuros:'Futuros EUA',brasil:'Brasil',cambio:'Câmbio',commodities:'Commodities'};
     html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">';
     html += '<div style="padding:10px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),var(--card))">';
-    html += '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">'+(catNomes[cat]||cat)+'</span>';
-    html += '</div>';
+    html += '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">'+(catNomes[cat]||cat)+'</span></div>';
     html += '<div class="table-wrap" style="border:none"><table style="font-size:13px"><thead><tr>'
-      +'<th style="padding:6px 12px">Ativo</th>'
-      +'<th style="padding:6px 12px;text-align:right">Preço</th>'
-      +'<th style="padding:6px 12px;text-align:right">Var%</th>'
-      +'<th style="padding:6px 12px;text-align:right">Variação</th>'
+      +'<th style="padding:6px 12px">Ativo</th><th style="padding:6px 12px;text-align:right">Preço</th>'
+      +'<th style="padding:6px 12px;text-align:right">Var%</th><th style="padding:6px 12px;text-align:right">Variação</th>'
       +'</tr></thead><tbody>';
     items.forEach(function(d){
-      var cor = d.var_pct >= 0 ? '#00c853' : '#ff1744';
-      if(d.sym === '^VIX') cor = d.var_pct <= 0 ? '#00c853' : '#f59e0b';
-      if(d.sym === 'USDBRL=X') cor = d.var_pct <= 0 ? '#00c853' : '#ff1744';
+      var cor = pmCorVar(d.sym, d.var_pct);
       var dec = (d.sym==='USDBRL=X'||d.sym==='EURUSD=X'||d.sym==='GBPUSD=X')?4:2;
       html += '<tr style="border-bottom:1px solid var(--border)">'
-        +'<td style="padding:6px 12px;color:var(--white);font-weight:500">'+d.nome+'</td>'
-        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:var(--white)">'+fmtPM(d.preco,dec)+'</td>'
+        +'<td style="padding:6px 12px;color:#fff;font-weight:500">'+d.nome+'</td>'
+        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:#fff">'+fmtPM(d.preco,dec)+'</td>'
         +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+cor+'">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</td>'
-        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:'+cor+'">'+(d.var_abs>=0?'+':'')+fmtPM(d.var_abs,dec)+'</td>'
-        +'</tr>';
+        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:'+cor+'">'+(d.var_abs>=0?'+':'')+fmtPM(d.var_abs,dec)+'</td></tr>';
     });
     html += '</tbody></table></div></div>';
   });
 
-  // Texto da análise
+  // ─── Análise texto ───
   html += '<div class="card" style="padding:20px;margin-top:8px">';
   html += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:12px">Análise do Dia</div>';
-  html += '<div id="pm-texto" style="font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:Inter,sans-serif">'+texto.replace(/\*/g,'').replace(/\_/g,'')+'</div>';
+  html += '<div id="pm-texto" style="font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap">'+texto.replace(/\*/g,'').replace(/\_/g,'')+'</div>';
   html += '</div>';
 
+  // ─── Imagem renderizável (hidden, para captura) ───
+  html += buildPMImageHTML(dados);
+
   body.innerHTML = html;
+}
+
+function buildPMImageHTML(dados){
+  var hoje = new Date();
+  var diaSemana = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'][hoje.getDay()];
+  var dataStr = diaSemana+', '+hoje.getDate()+' de '+['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][hoje.getMonth()]+' de '+hoje.getFullYear();
+  var hora = hoje.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  // Sentimento
+  var esD=(dados.futuros||[]).find(function(f){return f.sym==='ES=F';});
+  var vixD=(dados.futuros||[]).find(function(f){return f.sym==='^VIX';});
+  var ibovD=(dados.brasil||[]).find(function(f){return f.sym==='^BVSP';});
+  var pos=0,neg=0;
+  if(esD&&esD.var_pct>0.1)pos++;else if(esD&&esD.var_pct<-0.1)neg++;
+  if(vixD&&vixD.var_pct<0)pos++;else if(vixD&&vixD.var_pct>0)neg++;
+  if(ibovD&&ibovD.var_pct>0)pos++;else if(ibovD&&ibovD.var_pct<0)neg++;
+  var sentLabel='NEUTRO',sentCor='#f59e0b';
+  if(pos>=2&&neg===0){sentLabel='POSITIVO';sentCor='#00c853';}
+  else if(neg>=2&&pos===0){sentLabel='NEGATIVO';sentCor='#ff1744';}
+  else if(pos>neg){sentLabel='LEVEMENTE POSITIVO';sentCor='#00c853';}
+  else if(neg>pos){sentLabel='LEVEMENTE NEGATIVO';sentCor='#ff1744';}
+
+  var s = '<div id="pm-image-canvas" style="position:absolute;left:-9999px;top:0;width:720px;padding:0;font-family:Inter,Helvetica,Arial,sans-serif;background:#0d0d0d">';
+
+  // Header
+  s += '<div style="padding:28px 32px 20px;background:linear-gradient(135deg,#1a1a1a,#0d0d0d);border-bottom:2px solid #ff8c00">';
+  s += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  s += '<div><div style="font-size:10px;letter-spacing:3px;color:#ff8c00;font-weight:700;margin-bottom:4px">DMF INVESTIMENTOS</div>';
+  s += '<div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px">PRÉ-MERCADO</div></div>';
+  s += '<div style="text-align:right"><div style="font-size:11px;color:#888">'+dataStr+'</div>';
+  s += '<div style="font-size:11px;color:#888">Atualizado às '+hora+'</div></div></div>';
+
+  // Sentimento badge
+  s += '<div style="margin-top:14px;display:inline-block;padding:6px 16px;border-radius:20px;background:'+sentCor+'18;border:1px solid '+sentCor+'44">';
+  s += '<span style="font-size:11px;font-weight:700;color:'+sentCor+';letter-spacing:1px">SENTIMENTO: '+sentLabel+'</span></div>';
+  s += '</div>';
+
+  // Indicadores principais (grid)
+  var mainItems = [];
+  if(dados.futuros)(dados.futuros).forEach(function(f){mainItems.push(f);});
+  if(dados.brasil)(dados.brasil).forEach(function(f){mainItems.push(f);});
+
+  s += '<div style="display:flex;flex-wrap:wrap;padding:16px 24px 8px;gap:8px">';
+  mainItems.forEach(function(d){
+    var cor=pmCorVar(d.sym,d.var_pct);
+    var dec=d.sym==='USDBRL=X'?4:2;
+    s += '<div style="flex:1;min-width:90px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center">';
+    s += '<div style="font-size:9px;color:#777;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap">'+d.nome+'</div>';
+    s += '<div style="font-size:17px;font-weight:700;color:#fff;margin:4px 0;font-family:DM Mono,monospace">'+fmtPM(d.preco,dec)+'</div>';
+    s += '<div style="font-size:11px;font-weight:700;color:'+cor+';font-family:DM Mono,monospace">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</div>';
+    s += '</div>';
+  });
+  s += '</div>';
+
+  // Tabelas
+  var cats = ['futuros','brasil','cambio','commodities'];
+  var catNomes = {futuros:'FUTUROS EUA',brasil:'BRASIL',cambio:'CÂMBIO',commodities:'COMMODITIES'};
+  var catIcons = {futuros:'📊',brasil:'🇧🇷',cambio:'💱',commodities:'🛢️'};
+
+  cats.forEach(function(cat){
+    var items=dados[cat]||[];
+    if(!items.length) return;
+    s += '<div style="padding:8px 24px">';
+    s += '<div style="font-size:11px;font-weight:700;color:#ff8c00;letter-spacing:1.5px;margin-bottom:8px">'+catIcons[cat]+' '+catNomes[cat]+'</div>';
+    s += '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden">';
+    s += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    s += '<tr style="border-bottom:1px solid #2a2a2a"><th style="padding:8px 14px;text-align:left;color:#666;font-size:10px;font-weight:600">ATIVO</th>';
+    s += '<th style="padding:8px 14px;text-align:right;color:#666;font-size:10px;font-weight:600">PREÇO</th>';
+    s += '<th style="padding:8px 14px;text-align:right;color:#666;font-size:10px;font-weight:600">VAR%</th></tr>';
+    items.forEach(function(d,i){
+      var cor=pmCorVar(d.sym,d.var_pct);
+      var dec=(d.sym==='USDBRL=X'||d.sym==='EURUSD=X'||d.sym==='GBPUSD=X')?4:2;
+      var border=i<items.length-1?'border-bottom:1px solid #222':'';
+      s += '<tr style="'+border+'"><td style="padding:8px 14px;color:#ddd;font-weight:500">'+d.nome+'</td>';
+      s += '<td style="padding:8px 14px;text-align:right;color:#fff;font-family:DM Mono,monospace;font-weight:600">'+fmtPM(d.preco,dec)+'</td>';
+      s += '<td style="padding:8px 14px;text-align:right;color:'+cor+';font-family:DM Mono,monospace;font-weight:700">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</td></tr>';
+    });
+    s += '</table></div></div>';
+  });
+
+  // Footer
+  s += '<div style="padding:16px 24px 24px;text-align:center">';
+  s += '<div style="height:1px;background:linear-gradient(90deg,transparent,#ff8c00,transparent);margin-bottom:14px"></div>';
+  s += '<div style="font-size:10px;color:#666;letter-spacing:1px">DMF INVESTIMENTOS — GESTÃO PATRIMONIAL</div>';
+  s += '<div style="font-size:9px;color:#555;margin-top:4px">Relatório gerado automaticamente às '+hora+'</div>';
+  s += '</div></div>';
+
+  return s;
+}
+
+var pmImageBase64 = null;
+
+function capturarImagemPM(){
+  return new Promise(function(resolve, reject){
+    var el = document.getElementById('pm-image-canvas');
+    if(!el){reject(new Error('Elemento não encontrado'));return;}
+    // Mover para visível temporariamente
+    el.style.position='fixed';el.style.left='0';el.style.top='0';el.style.zIndex='9999';
+    setTimeout(function(){
+      html2canvas(el,{backgroundColor:'#0d0d0d',scale:2,useCORS:true,logging:false}).then(function(canvas){
+        el.style.position='absolute';el.style.left='-9999px';
+        pmImageBase64 = canvas.toDataURL('image/png');
+        resolve(pmImageBase64);
+      }).catch(function(err){
+        el.style.position='absolute';el.style.left='-9999px';
+        reject(err);
+      });
+    },200);
+  });
+}
+
+// Visualizar imagem antes de enviar
+function previewImagemPM(){
+  if(!pmTextoCache){alert('Gere o relatório primeiro!');return;}
+  var previewBtn=document.getElementById('pm-preview-btn');
+  previewBtn.textContent='Gerando imagem...';previewBtn.disabled=true;
+
+  capturarImagemPM().then(function(base64){
+    previewBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Visualizar Imagem';previewBtn.disabled=false;
+    // Abrir modal com preview
+    var overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+    overlay.onclick=function(){document.body.removeChild(overlay);};
+    var img=document.createElement('img');
+    img.src=base64;
+    img.style.cssText='max-width:90%;max-height:90%;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5)';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }).catch(function(err){
+    alert('Erro ao gerar imagem: '+err.message);
+    previewBtn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Visualizar Imagem';previewBtn.disabled=false;
+  });
 }
 
 function dispararPreMercadoWA(){
   if(!pmTextoCache){alert('Gere o relatório primeiro!');return;}
   var btn=document.getElementById('pm-wa-btn');
-  btn.textContent='Enviando...';btn.disabled=true;
+  btn.textContent='Gerando imagem...';btn.disabled=true;
 
-  // Buscar clientes ativos com telefone
-  var destinatarios = clientes.filter(function(c){return c.status==='Ativo'&&c.telefone;});
-  if(!destinatarios.length){alert('Nenhum cliente ativo com telefone!');btn.textContent='Disparar via WhatsApp';btn.disabled=false;return;}
+  // Primeiro captura a imagem
+  capturarImagemPM().then(function(base64){
+    // Buscar clientes ativos com telefone
+    var destinatarios = clientes.filter(function(c){return c.status==='Ativo'&&c.telefone;});
+    if(!destinatarios.length){alert('Nenhum cliente ativo com telefone!');btn.textContent='Disparar via WhatsApp';btn.disabled=false;return;}
 
-  var enviados=0,erros=0,total=destinatarios.length;
+    var enviados=0,erros=0,total=destinatarios.length;
+    // Remover prefixo data:image/png;base64, para enviar só o base64 puro
+    var imgBase64 = base64.replace(/^data:image\/\w+;base64,/,'');
 
-  function sendPM(idx){
-    if(idx>=total){
-      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado para '+enviados+' clientes!';
-      btn.style.background='#00c853';
-      setTimeout(function(){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.style.background='';btn.disabled=false;},5000);
-      // Log
-      db.collection('comunicados').add({titulo:'Pré-Mercado',conteudo:pmTextoCache.substring(0,200)+'...',tipo:'WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
-      return;
+    function sendPM(idx){
+      if(idx>=total){
+        btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado para '+enviados+' clientes!';
+        btn.style.background='#00c853';
+        setTimeout(function(){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.style.background='';btn.disabled=false;},5000);
+        // Log
+        db.collection('comunicados').add({titulo:'Pré-Mercado (Imagem)',conteudo:'Relatório visual enviado',tipo:'WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
+        return;
+      }
+      var c=destinatarios[idx];
+      var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+      btn.textContent='Enviando '+(idx+1)+'/'+total+'...';
+      zapiProxy('send-image','POST',{phone:num,image:'data:image/png;base64,'+imgBase64,caption:'Pré-Mercado DMF Investimentos — '+new Date().toLocaleDateString('pt-BR')}).then(function(data){
+        if(data.zaapId||data.messageId) enviados++; else erros++;
+        setTimeout(function(){sendPM(idx+1);},1200);
+      }).catch(function(){erros++;setTimeout(function(){sendPM(idx+1);},1200);});
     }
-    var c=destinatarios[idx];
-    var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
-    btn.textContent='Enviando '+(idx+1)+'/'+total+'...';
-    zapiProxy('send-text','POST',{phone:num,message:pmTextoCache}).then(function(data){
-      if(data.zaapId||data.messageId) enviados++; else erros++;
-      setTimeout(function(){sendPM(idx+1);},800);
-    }).catch(function(){erros++;setTimeout(function(){sendPM(idx+1);},800);});
+    sendPM(0);
+  }).catch(function(err){
+    alert('Erro ao gerar imagem: '+err.message);
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.disabled=false;
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// CALENDÁRIO ECONÔMICO SEMANAL
+// ═══════════════════════════════════════════════════════════
+
+var ceDataCache = null;
+var cePDFBase64 = null;
+var ceOpiniao = '';
+
+// Países de interesse (filtro)
+var CE_PAISES = ['US','BR','EU','CN','JP','GB','DE'];
+
+// Helpers de data
+function ceGetMonday(d){var dt=new Date(d);var day=dt.getDay();var diff=dt.getDate()-day+(day===0?-6:1);dt.setDate(diff);dt.setHours(0,0,0,0);return dt;}
+function ceFmtDate(d){return d.toISOString().split('T')[0];}
+function ceFmtDateBR(str){var p=str.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function ceDiaSemana(str){var d=new Date(str+'T12:00:00');return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getDay()];}
+
+// Buscar dados do Finnhub
+function fetchCalendarioEconomico(from,to){
+  return fetch('/api/finnhub?from='+from+'&to='+to)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      // Finnhub retorna { economicCalendar: [...] }
+      var events = data.economicCalendar || data.result || [];
+      // Filtrar por países de interesse e impacto médio/alto
+      return events.filter(function(ev){
+        return CE_PAISES.indexOf(ev.country)>=0 && (ev.impact==='high'||ev.impact==='medium'||ev.impact===3||ev.impact===2);
+      });
+    });
+}
+
+// Buscar retrospectiva de mercado (usa brapi.js com índices da semana passada)
+function fetchRetrospectiva(){
+  var tickers = '^BVSP,^GSPC,^NDX,^DJI,USDBRL=X,CL=F,GC=F,^VIX';
+  return fetch('/api/brapi?tickers='+encodeURIComponent(tickers))
+    .then(function(r){return r.json();})
+    .then(function(data){return data.results||[];});
+}
+
+function gerarCalendarioEconomico(){
+  var btn=document.getElementById('ce-gerar-btn');
+  var body=document.getElementById('ce-body');
+  btn.textContent='Buscando dados...';btn.disabled=true;
+  body.innerHTML='<div style="padding:40px;text-align:center;color:var(--text3)">Buscando calendário econômico...</div>';
+
+  var hoje=new Date();
+  var segundaAtual=ceGetMonday(hoje);
+  var sexAtual=new Date(segundaAtual);sexAtual.setDate(sexAtual.getDate()+4);
+  var segundaAnterior=new Date(segundaAtual);segundaAnterior.setDate(segundaAnterior.getDate()-7);
+  var sexAnterior=new Date(segundaAnterior);sexAnterior.setDate(sexAnterior.getDate()+4);
+
+  Promise.all([
+    fetchCalendarioEconomico(ceFmtDate(segundaAnterior),ceFmtDate(sexAnterior)),
+    fetchCalendarioEconomico(ceFmtDate(segundaAtual),ceFmtDate(sexAtual)),
+    fetchRetrospectiva()
+  ]).then(function(results){
+    var evPassados=results[0];
+    var evFuturos=results[1];
+    var retro=results[2];
+
+    ceDataCache={
+      semanaAnterior:{de:ceFmtDate(segundaAnterior),ate:ceFmtDate(sexAnterior),eventos:evPassados},
+      semanaAtual:{de:ceFmtDate(segundaAtual),ate:ceFmtDate(sexAtual),eventos:evFuturos},
+      retrospectiva:retro
+    };
+
+    renderCalendarioEconomico(ceDataCache);
+
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;
+    document.getElementById('ce-preview-btn').style.display='';
+    document.getElementById('ce-wa-btn').style.display='';
+    document.getElementById('ce-semana').textContent=ceFmtDateBR(ceFmtDate(segundaAtual))+' a '+ceFmtDateBR(ceFmtDate(sexAtual));
+    document.getElementById('ce-sub').textContent='Gerado em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }).catch(function(e){
+    body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro: '+e.message+'</div></div>';
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;
+  });
+}
+
+function renderCalendarioEconomico(dados){
+  var body=document.getElementById('ce-body');
+  var html='';
+
+  // ─── Retrospectiva ───
+  html+='<div class="card" style="margin-bottom:16px;padding:20px">';
+  html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:var(--white);margin-bottom:14px">Retrospectiva — Semana '+ceFmtDateBR(dados.semanaAnterior.de)+' a '+ceFmtDateBR(dados.semanaAnterior.ate)+'</div>';
+
+  // Índices
+  if(dados.retrospectiva.length){
+    html+='<div class="table-wrap" style="border:none"><table style="font-size:13px"><thead><tr><th style="padding:6px 12px">Ativo</th><th style="padding:6px 12px;text-align:right">Preço</th><th style="padding:6px 12px;text-align:right">Var%</th></tr></thead><tbody>';
+    dados.retrospectiva.forEach(function(r){
+      var cor=r.regularMarketChangePercent>=0?'#00e676':'#ff1744';
+      html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 12px;color:#fff;font-weight:500">'+(r.shortName||r.symbol)+'</td>';
+      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:#fff">'+(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—')+'</td>';
+      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+cor+'">'+(r.regularMarketChangePercent>=0?'+':'')+r.regularMarketChangePercent.toFixed(2)+'%</td></tr>';
+    });
+    html+='</tbody></table></div>';
   }
-  sendPM(0);
+
+  // Eventos passados
+  if(dados.semanaAnterior.eventos.length){
+    html+='<div style="margin-top:14px;font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Indicadores Divulgados</div>';
+    html+='<div class="table-wrap" style="border:none"><table style="font-size:12px"><thead><tr><th style="padding:5px 10px">Dia</th><th style="padding:5px 10px">País</th><th style="padding:5px 10px">Evento</th><th style="padding:5px 10px;text-align:right">Atual</th><th style="padding:5px 10px;text-align:right">Estimativa</th><th style="padding:5px 10px;text-align:right">Anterior</th></tr></thead><tbody>';
+    dados.semanaAnterior.eventos.forEach(function(ev){
+      html+='<tr style="border-bottom:1px solid var(--border)">';
+      html+='<td style="padding:5px 10px;color:var(--text3)">'+ceDiaSemana(ev.time||ev.date)+'</td>';
+      html+='<td style="padding:5px 10px"><span style="background:var(--card2);padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600">'+(ev.country||'')+'</span></td>';
+      html+='<td style="padding:5px 10px;color:#fff">'+(ev.event||'')+'</td>';
+      html+='<td style="padding:5px 10px;text-align:right;font-family:DM Mono,monospace;color:#fff">'+(ev.actual!=null?ev.actual+(ev.unit||''):'—')+'</td>';
+      html+='<td style="padding:5px 10px;text-align:right;font-family:DM Mono,monospace;color:var(--text3)">'+(ev.estimate!=null?ev.estimate+(ev.unit||''):'—')+'</td>';
+      html+='<td style="padding:5px 10px;text-align:right;font-family:DM Mono,monospace;color:var(--text3)">'+(ev.prev!=null?ev.prev+(ev.unit||''):'—')+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+
+  // ─── Agenda da semana ───
+  html+='<div class="card" style="margin-bottom:16px;padding:20px">';
+  html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;color:var(--white);margin-bottom:14px">Agenda — Semana '+ceFmtDateBR(dados.semanaAtual.de)+' a '+ceFmtDateBR(dados.semanaAtual.ate)+'</div>';
+
+  if(dados.semanaAtual.eventos.length){
+    html+='<div class="table-wrap" style="border:none"><table style="font-size:12px"><thead><tr><th style="padding:5px 10px">Dia</th><th style="padding:5px 10px">País</th><th style="padding:5px 10px">Evento</th><th style="padding:5px 10px;text-align:center">Impacto</th><th style="padding:5px 10px;text-align:right">Estimativa</th><th style="padding:5px 10px;text-align:right">Anterior</th></tr></thead><tbody>';
+    dados.semanaAtual.eventos.forEach(function(ev){
+      var impCor = (ev.impact==='high'||ev.impact===3)?'#ff1744':'#ffc107';
+      var impTxt = (ev.impact==='high'||ev.impact===3)?'ALTO':'MÉDIO';
+      html+='<tr style="border-bottom:1px solid var(--border)">';
+      html+='<td style="padding:5px 10px;color:var(--text3)">'+ceDiaSemana(ev.time||ev.date)+'</td>';
+      html+='<td style="padding:5px 10px"><span style="background:var(--card2);padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600">'+(ev.country||'')+'</span></td>';
+      html+='<td style="padding:5px 10px;color:#fff">'+(ev.event||'')+'</td>';
+      html+='<td style="padding:5px 10px;text-align:center"><span style="background:'+impCor+'22;color:'+impCor+';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">'+impTxt+'</span></td>';
+      html+='<td style="padding:5px 10px;text-align:right;font-family:DM Mono,monospace;color:var(--text3)">'+(ev.estimate!=null?ev.estimate+(ev.unit||''):'—')+'</td>';
+      html+='<td style="padding:5px 10px;text-align:right;font-family:DM Mono,monospace;color:var(--text3)">'+(ev.prev!=null?ev.prev+(ev.unit||''):'—')+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  } else {
+    html+='<p style="color:var(--text3);font-size:13px">Nenhum evento de alto/médio impacto encontrado para esta semana.</p>';
+  }
+  html+='</div>';
+
+  // ─── Campo Opinião DMF ───
+  html+='<div class="card" style="margin-bottom:16px;padding:20px">';
+  html+='<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:10px">Opinião DMF Investimentos</div>';
+  html+='<textarea id="ce-opiniao" placeholder="Escreva aqui sua análise e recomendações para os clientes..." style="width:100%;min-height:120px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--white);font-size:13px;line-height:1.6;resize:vertical;font-family:inherit" oninput="ceOpiniao=this.value">'+(ceOpiniao||'')+'</textarea>';
+  html+='<p style="font-size:11px;color:var(--text3);margin-top:6px">Este texto será incluído no PDF enviado aos clientes.</p>';
+  html+='</div>';
+
+  body.innerHTML=html;
+}
+
+// ─── Geração do PDF ───
+function gerarPDFCalendario(){
+  if(!ceDataCache){return Promise.reject(new Error('Gere o relatório primeiro'));}
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var w=210,marginL=15,marginR=15,contentW=w-marginL-marginR;
+  var y=15;
+
+  // ─── Header ───
+  doc.setFillColor(13,13,13);
+  doc.rect(0,0,w,45,'F');
+  doc.setFillColor(0,102,255);
+  doc.rect(0,43,w,2,'F');
+
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(255,255,255);
+  doc.text('DMF Investimentos',marginL,y+10);
+  doc.setFontSize(11);doc.setTextColor(150,150,150);
+  doc.text('Calendário Econômico Semanal',marginL,y+18);
+
+  var dataStr=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  doc.setFontSize(9);doc.setTextColor(100,150,255);
+  doc.text(dataStr,w-marginR,y+10,{align:'right'});
+
+  y=52;
+
+  // ─── Retrospectiva ───
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(30,30,30);
+  doc.text('Retrospectiva — '+ceFmtDateBR(ceDataCache.semanaAnterior.de)+' a '+ceFmtDateBR(ceDataCache.semanaAnterior.ate),marginL,y);
+  y+=8;
+
+  // Tabela índices
+  if(ceDataCache.retrospectiva.length){
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(80,80,80);
+    doc.text('Ativo',marginL,y);doc.text('Preço',marginL+80,y);doc.text('Var%',marginL+120,y);
+    y+=1;doc.setDrawColor(200,200,200);doc.line(marginL,y,marginL+contentW,y);y+=4;
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    ceDataCache.retrospectiva.forEach(function(r){
+      if(y>270){doc.addPage();y=20;}
+      doc.setTextColor(30,30,30);
+      doc.text((r.shortName||r.symbol).substring(0,30),marginL,y);
+      doc.text(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—',marginL+80,y);
+      var varPct=r.regularMarketChangePercent||0;
+      if(varPct>=0) doc.setTextColor(0,150,50); else doc.setTextColor(220,30,30);
+      doc.text((varPct>=0?'+':'')+varPct.toFixed(2)+'%',marginL+120,y);
+      y+=5;
+    });
+    y+=4;
+  }
+
+  // Eventos passados
+  if(ceDataCache.semanaAnterior.eventos.length){
+    if(y>240){doc.addPage();y=20;}
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(80,80,80);
+    doc.text('Indicadores Divulgados',marginL,y);y+=5;
+    doc.setFont('helvetica','normal');doc.setFontSize(8);
+    ceDataCache.semanaAnterior.eventos.slice(0,20).forEach(function(ev){
+      if(y>275){doc.addPage();y=20;}
+      doc.setTextColor(100,100,100);doc.text(ceDiaSemana(ev.time||ev.date),marginL,y);
+      doc.text(ev.country||'',marginL+12,y);
+      doc.setTextColor(30,30,30);doc.text((ev.event||'').substring(0,40),marginL+22,y);
+      doc.setTextColor(80,80,80);
+      doc.text('A:'+(ev.actual!=null?ev.actual:'—'),marginL+110,y);
+      doc.text('E:'+(ev.estimate!=null?ev.estimate:'—'),marginL+130,y);
+      doc.text('P:'+(ev.prev!=null?ev.prev:'—'),marginL+150,y);
+      y+=4.5;
+    });
+    y+=6;
+  }
+
+  // ─── Agenda da Semana ───
+  if(y>240){doc.addPage();y=20;}
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(30,30,30);
+  doc.text('Agenda — '+ceFmtDateBR(ceDataCache.semanaAtual.de)+' a '+ceFmtDateBR(ceDataCache.semanaAtual.ate),marginL,y);
+  y+=8;
+
+  if(ceDataCache.semanaAtual.eventos.length){
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(80,80,80);
+    doc.text('Dia',marginL,y);doc.text('País',marginL+12,y);doc.text('Evento',marginL+25,y);doc.text('Impacto',marginL+110,y);doc.text('Est.',marginL+135,y);doc.text('Ant.',marginL+155,y);
+    y+=1;doc.line(marginL,y,marginL+contentW,y);y+=4;
+    doc.setFont('helvetica','normal');doc.setFontSize(8);
+    ceDataCache.semanaAtual.eventos.slice(0,25).forEach(function(ev){
+      if(y>275){doc.addPage();y=20;}
+      doc.setTextColor(100,100,100);doc.text(ceDiaSemana(ev.time||ev.date),marginL,y);
+      doc.text(ev.country||'',marginL+12,y);
+      doc.setTextColor(30,30,30);doc.text((ev.event||'').substring(0,42),marginL+25,y);
+      var isHigh=(ev.impact==='high'||ev.impact===3);
+      if(isHigh) doc.setTextColor(220,30,30); else doc.setTextColor(200,150,0);
+      doc.text(isHigh?'ALTO':'MÉDIO',marginL+110,y);
+      doc.setTextColor(80,80,80);
+      doc.text(ev.estimate!=null?String(ev.estimate):'—',marginL+135,y);
+      doc.text(ev.prev!=null?String(ev.prev):'—',marginL+155,y);
+      y+=4.5;
+    });
+    y+=6;
+  } else {
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(120,120,120);
+    doc.text('Nenhum evento de alto impacto para esta semana.',marginL,y);y+=8;
+  }
+
+  // ─── Opinião DMF ───
+  var opiniao = ceOpiniao || document.getElementById('ce-opiniao')?.value || '';
+  if(opiniao.trim()){
+    if(y>230){doc.addPage();y=20;}
+    doc.setFillColor(240,245,255);
+    doc.roundedRect(marginL,y-3,contentW,Math.min(60,10+opiniao.length*0.15),3,3,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(0,80,200);
+    doc.text('Opinião DMF Investimentos',marginL+5,y+4);
+    y+=10;
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(40,40,40);
+    var linhas=doc.splitTextToSize(opiniao,contentW-10);
+    doc.text(linhas,marginL+5,y);
+    y+=linhas.length*4+8;
+  }
+
+  // ─── Footer ───
+  var pageCount=doc.getNumberOfPages();
+  for(var i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setFontSize(8);doc.setTextColor(150,150,150);
+    doc.text('DMF Investimentos — Relatório gerado automaticamente | '+dataStr,marginL,290);
+    doc.text('Página '+i+'/'+pageCount,w-marginR,290,{align:'right'});
+  }
+
+  // Retornar como base64
+  var pdfOutput = doc.output('datauristring');
+  cePDFBase64 = pdfOutput;
+  return Promise.resolve(pdfOutput);
+}
+
+function previewPDFCalendario(){
+  var btn=document.getElementById('ce-preview-btn');
+  btn.textContent='Gerando PDF...';btn.disabled=true;
+
+  // Atualizar opinião do textarea
+  var ta=document.getElementById('ce-opiniao');
+  if(ta) ceOpiniao=ta.value;
+
+  gerarPDFCalendario().then(function(dataUri){
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Visualizar PDF';btn.disabled=false;
+    // Abrir PDF em nova aba
+    var win=window.open();
+    win.document.write('<html><head><title>Calendário Econômico DMF</title></head><body style="margin:0"><iframe src="'+dataUri+'" style="width:100%;height:100vh;border:none"></iframe></body></html>');
+    win.document.close();
+  }).catch(function(err){
+    alert('Erro ao gerar PDF: '+err.message);
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Visualizar PDF';btn.disabled=false;
+  });
+}
+
+function dispararCalendarioWA(){
+  if(!ceDataCache){alert('Gere o relatório primeiro!');return;}
+  var btn=document.getElementById('ce-wa-btn');
+  btn.textContent='Gerando PDF...';btn.disabled=true;
+
+  // Atualizar opinião
+  var ta=document.getElementById('ce-opiniao');
+  if(ta) ceOpiniao=ta.value;
+
+  gerarPDFCalendario().then(function(dataUri){
+    var destinatarios=clientes.filter(function(c){return c.status==='Ativo'&&c.telefone;});
+    if(!destinatarios.length){alert('Nenhum cliente ativo com telefone!');btn.textContent='Disparar via WhatsApp';btn.disabled=false;return;}
+
+    var enviados=0,erros=0,total=destinatarios.length;
+    // Extrair base64 puro do data URI
+    var pdfBase64=dataUri.replace(/^data:application\/pdf;filename=generated\.pdf;base64,/,'');
+
+    function sendCE(idx){
+      if(idx>=total){
+        btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado para '+enviados+' clientes!';
+        btn.style.background='#00c853';
+        setTimeout(function(){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.style.background='';btn.disabled=false;},5000);
+        db.collection('comunicados').add({titulo:'Calendário Econômico Semanal',conteudo:'PDF enviado — '+ceFmtDateBR(ceDataCache.semanaAtual.de)+' a '+ceFmtDateBR(ceDataCache.semanaAtual.ate),tipo:'WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
+        return;
+      }
+      var c=destinatarios[idx];
+      var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+      btn.textContent='Enviando '+(idx+1)+'/'+total+'...';
+      zapiProxy('send-document/pdf','POST',{
+        phone:num,
+        document:'data:application/pdf;base64,'+pdfBase64,
+        fileName:'Calendario-Economico-DMF-'+ceFmtDate(new Date())+'.pdf',
+        caption:'Calendário Econômico Semanal — DMF Investimentos'
+      }).then(function(data){
+        if(data.zaapId||data.messageId) enviados++; else erros++;
+        setTimeout(function(){sendCE(idx+1);},1200);
+      }).catch(function(){erros++;setTimeout(function(){sendCE(idx+1);},1200);});
+    }
+    sendCE(0);
+  }).catch(function(err){
+    alert('Erro: '+err.message);
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.disabled=false;
+  });
 }
 
 
