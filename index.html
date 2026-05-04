@@ -4503,8 +4503,9 @@ function enviarWhatsAppIndividual(){
       setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
     } else {
       btn.innerHTML=' Erro';btn.style.background='#ff1744';
-      setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},3000);
-      console.error('Z-API error:',data);
+      setTimeout(function(){btn.textContent='Enviar via WhatsApp';btn.style.background='';btn.disabled=false;},5000);
+      console.error('Z-API error:',JSON.stringify(data));
+      alert('Erro Z-API: '+(data.error||data.message||JSON.stringify(data)));
     }
   }).catch(function(e){
     console.error(e);
