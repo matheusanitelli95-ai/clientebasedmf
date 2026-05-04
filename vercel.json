@@ -8,6 +8,9 @@
     },
     "api/zapi.js": {
       "maxDuration": 15
+    },
+    "api/finnhub.js": {
+      "maxDuration": 10
     }
   }
 }
