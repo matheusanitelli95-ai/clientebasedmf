@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   var zapiUrl = 'https://api.z-api.io/instances/' + INSTANCE + '/token/' + TOKEN + '/' + action;
 
   try {
-    var options = { method: req.method, headers: { 'Content-Type': 'application/json' } };
+    var options = { method: req.method, headers: { 'Content-Type': 'application/json', 'Client-Token': TOKEN } };
     if (req.method === 'POST' && req.body) {
       options.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
     }
