@@ -11,7 +11,8 @@ export default async function handler(req, res) {
     return t + '.SA';
   }).filter(Boolean);
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const allowedOrigin = req.headers.origin && req.headers.origin.includes('clientebasedmf.vercel.app') ? req.headers.origin : 'https://clientebasedmf.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Content-Type', 'application/json');
 
   try {
