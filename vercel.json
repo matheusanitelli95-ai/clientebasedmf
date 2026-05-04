@@ -5,6 +5,9 @@
     },
     "api/brapi.js": {
       "maxDuration": 10
+    },
+    "api/zapi.js": {
+      "maxDuration": 15
     }
   }
 }
