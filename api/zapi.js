@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
   const INSTANCE = process.env.ZAPI_INSTANCE;
   const TOKEN = process.env.ZAPI_TOKEN;
+  const CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN;
 
-  if (!INSTANCE || !TOKEN) {
+  if (!INSTANCE || !TOKEN || !CLIENT_TOKEN) {
     return res.status(500).json({ error: 'Credenciais Z-API não configuradas no servidor' });
   }
 
@@ -32,7 +33,7 @@ export default async function handler(req, res) {
   var zapiUrl = 'https://api.z-api.io/instances/' + INSTANCE + '/token/' + TOKEN + '/' + action;
 
   try {
-    var options = { method: req.method, headers: { 'Content-Type': 'application/json', 'Client-Token': TOKEN } };
+    var options = { method: req.method, headers: { 'Content-Type': 'application/json', 'Client-Token': CLIENT_TOKEN } };
     if (req.method === 'POST' && req.body) {
       options.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
     }
