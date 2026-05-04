@@ -6450,14 +6450,20 @@ auth.onAuthStateChanged(function(user){
     db.collection('usuarios').doc(user.email).get().then(function(doc){
       if(doc.exists){
         var data = doc.data();
-        currentPerfil = data.perfil || 'adm';
+        currentPerfil = data.perfil || 'pendente';
         currentClienteVinculado = data.clienteId || null;
       } else {
-        // No user doc found — default to adm (first user)
-        currentPerfil = 'adm';
+        // Novo usuário — criar doc como pendente e bloquear acesso
+        db.collection('usuarios').doc(user.email).set({
+          email: user.email,
+          perfil: 'pendente',
+          criadoEm: new Date().toISOString()
+        });
+        currentPerfil = 'pendente';
       }
-      // Check if pending
+      // Bloquear perfis não autorizados (pendente ou desconhecido)
       if(currentPerfil !== 'adm' && currentPerfil !== 'gestor' && currentPerfil !== 'cliente'){
+        alert('Acesso pendente. Aguarde a aprovação do administrador.');
         auth.signOut();
         return;
       }
@@ -6478,10 +6484,9 @@ auth.onAuthStateChanged(function(user){
       // Now show content
       document.getElementById('main-content').style.visibility='visible';
     }).catch(function(){
-      currentPerfil = 'adm';
-      applyPerfil();
-      loadData();
-      document.getElementById('main-content').style.visibility='visible';
+      // Erro ao buscar perfil — bloquear por segurança
+      alert('Erro ao verificar permissões. Tente novamente.');
+      auth.signOut();
     });
   } else {
     document.getElementById('login-screen').style.display='flex';
