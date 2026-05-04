@@ -40,15 +40,24 @@ export default async function handler(req, res) {
         const rawSym = meta.symbol || sym;
         const cleanSym = rawSym.endsWith('.SA') ? rawSym.slice(0, -3) : rawSym;
 
+        // Calcular variação % — tentar múltiplas fontes
+        var prevClose = meta.previousClose || meta.chartPreviousClose || null;
+        var curPrice = meta.regularMarketPrice;
+        var changePercent = 0;
+        if(prevClose && curPrice && prevClose !== 0){
+          changePercent = ((curPrice - prevClose) / prevClose * 100);
+        }
+
         return {
           symbol: cleanSym,
           shortName: meta.shortName || meta.longName || '',
-          regularMarketPrice: meta.regularMarketPrice,
-          regularMarketChangePercent: meta.previousClose ? ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose * 100) : 0,
+          regularMarketPrice: curPrice,
+          regularMarketChangePercent: changePercent,
+          regularMarketChange: prevClose ? (curPrice - prevClose) : 0,
           regularMarketDayHigh: dayHigh,
           regularMarketDayLow: dayLow,
           regularMarketOpen: meta.regularMarketOpen || (quotes.open && quotes.open[0]) || null,
-          regularMarketPreviousClose: meta.previousClose || null,
+          regularMarketPreviousClose: prevClose,
           regularMarketTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : null,
           regularMarketVolume: meta.regularMarketVolume || null,
           fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh || null,
