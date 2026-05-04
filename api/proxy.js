@@ -8,7 +8,8 @@ export default async function handler(req, res) {
 
   const oplabUrl = 'https://api.oplab.com.br/v3/' + p + (qs ? '?' + qs : '');
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const allowedOrigin = req.headers.origin && req.headers.origin.includes('clientebasedmf.vercel.app') ? req.headers.origin : 'https://clientebasedmf.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Content-Type', 'application/json');
 
   try {
@@ -16,6 +17,6 @@ export default async function handler(req, res) {
     const body = await response.text();
     return res.status(response.status).send(body);
   } catch (error) {
-    return res.status(500).json({ error: error.message, url: oplabUrl });
+    return res.status(500).json({ error: 'Erro interno ao buscar dados' });
   }
 }
