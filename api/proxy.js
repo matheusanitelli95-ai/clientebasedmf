@@ -3,7 +3,10 @@ export default async function handler(req, res) {
   const { p: _, ...otherParams } = req.query;
   const qs = new URLSearchParams(otherParams).toString();
 
-  const TOKEN = 'H018X6kXAGmy//aUJ0QYGNVlqQ5atBGNQ3zIMJYegT/pERLLkIAX8N2XjAy4X5yr--YycfjDvfOf0sFoJLAKUO5A==--YzhiZjc0NWNkNjAwMTFkZWFiZGFmMDVjMWVhYjI4YmM=';
+  const TOKEN = process.env.OPLAB_TOKEN;
+  if (!TOKEN) {
+    return res.status(500).json({ error: 'Token OpLab não configurado no servidor' });
+  }
   const headers = { 'Access-Token': TOKEN };
 
   const oplabUrl = 'https://api.oplab.com.br/v3/' + p + (qs ? '?' + qs : '');
