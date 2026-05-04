@@ -9550,7 +9550,39 @@ function gerarPreMercado(){
     if(btn){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;}
     document.getElementById('pm-wa-btn').style.display='';
     document.getElementById('pm-preview-btn').style.display='';
-    document.getElementById('pm-sub').textContent='Gerado em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    var agora = new Date();
+    document.getElementById('pm-sub').textContent='Gerado em '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+agora.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+    // Auto-salvar como comunicado para os clientes verem na plataforma
+    capturarImagemPM().then(function(imgBase64){
+      db.collection('comunicados').add({
+        titulo:'Pré-Mercado — '+agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+        conteudo:texto.replace(/\*/g,'').replace(/\_/g,'').substring(0,500),
+        imagemBase64:imgBase64,
+        tipo:'pre-mercado',
+        data:today(),
+        visivel:'todos',
+        destaque:'normal',
+        criadoEm:agora.toISOString(),
+        criadoPor:auth.currentUser?auth.currentUser.email:''
+      }).then(function(){
+        console.log('Pré-Mercado salvo nos comunicados');
+      }).catch(function(err){
+        console.error('Erro ao salvar comunicado:',err);
+      });
+    }).catch(function(){
+      // Se falhar a imagem, salva só o texto
+      db.collection('comunicados').add({
+        titulo:'Pré-Mercado — '+agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+        conteudo:texto.replace(/\*/g,'').replace(/\_/g,'').substring(0,500),
+        tipo:'pre-mercado',
+        data:today(),
+        visivel:'todos',
+        destaque:'normal',
+        criadoEm:agora.toISOString(),
+        criadoPor:auth.currentUser?auth.currentUser.email:''
+      });
+    });
   }).catch(function(e){
     body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro ao buscar dados: '+e.message+'</div></div>';
     if(btn){btn.textContent='Gerar Relatório';btn.disabled=false;}

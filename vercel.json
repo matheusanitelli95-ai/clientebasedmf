@@ -11,6 +11,15 @@
     },
     "api/finnhub.js": {
       "maxDuration": 10
+    },
+    "api/cron-premercado.js": {
+      "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron-premercado",
+      "schedule": "30 12 * * 1-5"
+    }
+  ]
 }
