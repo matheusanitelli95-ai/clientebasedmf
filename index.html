@@ -10134,6 +10134,11 @@ function renderCalendarioEconomico(dados){
 function gerarPDFCalendario(){
   if(!ceDataCache){return Promise.reject(new Error('Gere o relatório primeiro'));}
 
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    return Promise.reject(new Error('Biblioteca jsPDF não carregou. Tente recarregar a página (Cmd+Shift+R).'));
+  }
+
+  try {
   var jsPDF = window.jspdf.jsPDF;
   var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   var w=210,marginL=15,marginR=15,contentW=w-marginL-marginR;
@@ -10170,8 +10175,8 @@ function gerarPDFCalendario(){
     ceDataCache.retrospectiva.forEach(function(r){
       if(y>270){doc.addPage();y=20;}
       doc.setTextColor(30,30,30);
-      doc.text((r.shortName||r.symbol).substring(0,30),marginL,y);
-      doc.text(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—',marginL+80,y);
+      doc.text(String(r.shortName||r.symbol||'').substring(0,30),marginL,y);
+      doc.text(String(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—'),marginL+80,y);
       var varPct=r.regularMarketChangePercent||0;
       if(varPct>=0) doc.setTextColor(0,150,50); else doc.setTextColor(220,30,30);
       doc.text((varPct>=0?'+':'')+varPct.toFixed(2)+'%',marginL+120,y);
@@ -10192,9 +10197,9 @@ function gerarPDFCalendario(){
       doc.text(ev.country||'',marginL+12,y);
       doc.setTextColor(30,30,30);doc.text((ev.event||'').substring(0,40),marginL+22,y);
       doc.setTextColor(80,80,80);
-      doc.text('A:'+(ev.actual!=null?ev.actual:'—'),marginL+110,y);
-      doc.text('E:'+(ev.estimate!=null?ev.estimate:'—'),marginL+130,y);
-      doc.text('P:'+(ev.prev!=null?ev.prev:'—'),marginL+150,y);
+      doc.text('A:'+(ev.actual!=null?String(ev.actual):'—'),marginL+110,y);
+      doc.text('E:'+(ev.estimate!=null?String(ev.estimate):'—'),marginL+130,y);
+      doc.text('P:'+(ev.prev!=null?String(ev.prev):'—'),marginL+150,y);
       y+=4.5;
     });
     y+=6;
@@ -10208,14 +10213,14 @@ function gerarPDFCalendario(){
 
   if(ceDataCache.semanaAtual.eventos.length){
     doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(80,80,80);
-    doc.text('Dia',marginL,y);doc.text('País',marginL+12,y);doc.text('Evento',marginL+25,y);doc.text('Impacto',marginL+110,y);doc.text('Est.',marginL+135,y);doc.text('Ant.',marginL+155,y);
+    doc.text('Dia',marginL,y);doc.text(String('País'),marginL+12,y);doc.text('Evento',marginL+25,y);doc.text('Impacto',marginL+110,y);doc.text('Est.',marginL+135,y);doc.text('Ant.',marginL+155,y);
     y+=1;doc.line(marginL,y,marginL+contentW,y);y+=4;
     doc.setFont('helvetica','normal');doc.setFontSize(8);
     ceDataCache.semanaAtual.eventos.slice(0,25).forEach(function(ev){
       if(y>275){doc.addPage();y=20;}
-      doc.setTextColor(100,100,100);doc.text(ceDiaSemana(ev.time||ev.date),marginL,y);
-      doc.text(ev.country||'',marginL+12,y);
-      doc.setTextColor(30,30,30);doc.text((ev.event||'').substring(0,42),marginL+25,y);
+      doc.setTextColor(100,100,100);doc.text(String(ceDiaSemana(ev.time||ev.date)||''),marginL,y);
+      doc.text(String(ev.country||''),marginL+12,y);
+      doc.setTextColor(30,30,30);doc.text(String(ev.event||'').substring(0,42),marginL+25,y);
       var isHigh=(ev.impact==='high'||ev.impact===3);
       if(isHigh) doc.setTextColor(220,30,30); else doc.setTextColor(200,150,0);
       doc.text(isHigh?'ALTO':'MÉDIO',marginL+110,y);
@@ -10258,6 +10263,9 @@ function gerarPDFCalendario(){
   var pdfOutput = doc.output('datauristring');
   cePDFBase64 = pdfOutput;
   return Promise.resolve(pdfOutput);
+  } catch(err) {
+    return Promise.reject(err);
+  }
 }
 
 function previewPDFCalendario(){
