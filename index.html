@@ -6483,10 +6483,20 @@ auth.onAuthStateChanged(function(user){
       }
       // Now show content
       document.getElementById('main-content').style.visibility='visible';
-    }).catch(function(){
-      // Erro ao buscar perfil — bloquear por segurança
-      alert('Erro ao verificar permissões. Tente novamente.');
-      auth.signOut();
+    }).catch(function(err){
+      console.error('Erro ao buscar perfil:', err);
+      // Se o doc do usuario existe no Firestore mas deu erro de rede, tentar de novo
+      // Admin master sempre tem acesso (fallback de emergência)
+      var ADMIN_MASTER = ['matheusanitelli.95@gmail.com'];
+      if(ADMIN_MASTER.indexOf(user.email) >= 0){
+        currentPerfil = 'adm';
+        applyPerfil();
+        loadData();
+        document.getElementById('main-content').style.visibility='visible';
+      } else {
+        alert('Erro ao verificar permissões. Tente novamente.');
+        auth.signOut();
+      }
     });
   } else {
     document.getElementById('login-screen').style.display='flex';
