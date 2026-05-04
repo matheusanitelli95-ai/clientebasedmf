@@ -543,6 +543,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Operações</span></button>
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('noticias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Notícias</span></button>
+      <button class="nav-item" onclick="showView('pre-mercado',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span><span>Pré-Mercado</span></button>
       <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
       <button class="nav-item" onclick="showView('grade-cotacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span><span>Cotações</span></button>
       <button class="nav-item" onclick="showView('opcoes-chain',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg></span><span>Opções</span></button>
@@ -1022,6 +1023,26 @@ textarea.form-input{resize:vertical;min-height:80px}
           <span id="mat-count" style="font-size:12px;color:var(--text3);margin-left:auto"></span>
         </div>
         <div id="materiais-list"></div>
+      </div>
+    </div>
+
+    <!-- PRÉ-MERCADO -->
+    <div class="view" id="view-pre-mercado">
+      <div class="page-header">
+        <div><div class="page-title" style="display:flex;align-items:center;gap:10px">Pré-Mercado <span id="pm-clock" style="font-family:DM Mono,monospace;font-size:13px;color:var(--blue);font-weight:400"></span></div><div class="page-sub" id="pm-sub">Resumo diário antes da abertura</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="gerarPreMercado()" id="pm-gerar-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório</button>
+          <button class="btn-primary" onclick="dispararPreMercadoWA()" id="pm-wa-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div id="pm-body">
+          <div class="empty" style="padding:60px">
+            <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+            <div class="empty-title">Relatório Pré-Mercado</div>
+            <p style="font-size:13px;margin-top:8px;color:var(--text3)">Clique em "Gerar Relatório" para puxar os dados atualizados e criar o resumo do dia.</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -6376,8 +6397,8 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
-  gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
+  adm: ['dashboard','clientes','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha','configuracoes'],
+  gestor: ['dashboard','clientes','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','estrategias','noticias','agendamento','comunicados','simulador','glossario','pre-mercado','panorama','grade-cotacoes','opcoes-chain','materiais-gestao','academy-trilha'],
   cliente: ['minha-carteira','agendamento','comunicados','panorama','grade-cotacoes','opcoes-chain','glossario','estrategias','materiais-cliente']
 };
 
@@ -9382,7 +9403,322 @@ showView = function(v, btn){
   _origShowViewGrade(v, btn);
   if(v==='grade-cotacoes') initGradeCotacoes();
   if(v==='panorama') initPanorama();
+  if(v==='pre-mercado') initPreMercado();
 };
+
+// ═══════════════════════════════════════════════════════════
+// PRÉ-MERCADO — RELATÓRIO DIÁRIO
+// ═══════════════════════════════════════════════════════════
+
+var pmDadosCache = null;
+var pmTextoCache = '';
+var pmInitDone = false;
+
+var PM_TICKERS = {
+  futuros: [
+    {sym:'ES=F', nome:'S&P 500 Fut.'},
+    {sym:'NQ=F', nome:'Nasdaq Fut.'},
+    {sym:'YM=F', nome:'Dow Jones Fut.'},
+    {sym:'RTY=F', nome:'Russell 2000 Fut.'},
+    {sym:'^VIX', nome:'VIX'}
+  ],
+  brasil: [
+    {sym:'^BVSP', nome:'Ibovespa'},
+    {sym:'USDBRL=X', nome:'USD/BRL'}
+  ],
+  cambio: [
+    {sym:'DX-Y.NYB', nome:'DXY (Dólar Index)'},
+    {sym:'EURUSD=X', nome:'EUR/USD'},
+    {sym:'GBPUSD=X', nome:'GBP/USD'}
+  ],
+  commodities: [
+    {sym:'CL=F', nome:'Petróleo WTI'},
+    {sym:'BZ=F', nome:'Petróleo Brent'},
+    {sym:'GC=F', nome:'Ouro'},
+    {sym:'SI=F', nome:'Prata'},
+    {sym:'NG=F', nome:'Gás Natural'}
+  ]
+};
+
+function initPreMercado(){
+  if(pmInitDone) return;
+  pmInitDone = true;
+  // Clock
+  setInterval(function(){
+    var el=document.getElementById('pm-clock');
+    if(el) el.textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  },1000);
+}
+
+function gerarPreMercado(){
+  var btn=document.getElementById('pm-gerar-btn');
+  var body=document.getElementById('pm-body');
+  if(btn){btn.textContent='Gerando...';btn.disabled=true;}
+  body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title">Buscando dados dos mercados...</div></div>';
+
+  // Coletar todos os tickers
+  var allTickers = [];
+  Object.keys(PM_TICKERS).forEach(function(cat){
+    PM_TICKERS[cat].forEach(function(t){ allTickers.push(t.sym); });
+  });
+
+  fetch('/api/brapi?tickers='+encodeURIComponent(allTickers.join(','))).then(function(r){return r.json();}).then(function(data){
+    var results = data.results || [];
+    var bySymbol = {};
+    results.forEach(function(r){ bySymbol[r.symbol] = r; });
+
+    // Mapear de volta com os nomes originais (Yahoo remove sufixos)
+    var dados = {};
+    Object.keys(PM_TICKERS).forEach(function(cat){
+      dados[cat] = [];
+      PM_TICKERS[cat].forEach(function(t){
+        // Tentar match pelo symbol limpo
+        var clean = t.sym.replace('.SA','');
+        var found = bySymbol[clean] || bySymbol[t.sym] || null;
+        if(found){
+          dados[cat].push({
+            nome: t.nome,
+            sym: t.sym,
+            preco: found.regularMarketPrice,
+            var_pct: found.regularMarketChangePercent || 0,
+            var_abs: found.regularMarketChange || 0,
+            high: found.regularMarketDayHigh,
+            low: found.regularMarketDayLow,
+            prevClose: found.regularMarketPreviousClose
+          });
+        }
+      });
+    });
+
+    pmDadosCache = dados;
+
+    // Gerar texto de análise
+    var texto = gerarAnalisePreMercado(dados);
+    pmTextoCache = texto;
+
+    // Render
+    renderPreMercado(dados, texto);
+
+    if(btn){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;}
+    document.getElementById('pm-wa-btn').style.display='';
+    document.getElementById('pm-sub').textContent='Gerado em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }).catch(function(e){
+    body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro ao buscar dados: '+e.message+'</div></div>';
+    if(btn){btn.textContent='Gerar Relatório';btn.disabled=false;}
+  });
+}
+
+function fmtPM(val, decimals){
+  if(val==null) return '—';
+  var d = decimals != null ? decimals : 2;
+  return val.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+
+function gerarAnalisePreMercado(dados){
+  var lines = [];
+  var hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  lines.push('*PRÉ-MERCADO DMF — '+hoje.toUpperCase()+'*');
+  lines.push('');
+
+  // Futuros EUA
+  var futuros = dados.futuros || [];
+  if(futuros.length){
+    lines.push('📊 *FUTUROS EUA*');
+    var esPosCount = 0;
+    futuros.forEach(function(f){
+      var seta = f.var_pct >= 0 ? '🟢' : '🔴';
+      if(f.sym === '^VIX') seta = f.var_pct <= 0 ? '🟢' : '🟡';
+      lines.push(seta+' '+f.nome+': '+fmtPM(f.preco)+' ('+(f.var_pct>=0?'+':'')+fmtPM(f.var_pct)+'%)');
+      if(f.sym !== '^VIX' && f.var_pct >= 0) esPosCount++;
+    });
+    lines.push('');
+
+    // Análise futuros
+    var vix = futuros.find(function(f){return f.sym==='^VIX';});
+    var es = futuros.find(function(f){return f.sym==='ES=F';});
+    if(es){
+      if(es.var_pct > 0.3) lines.push('➡️ Futuros americanos abrem em *alta*, sinalizando apetite por risco.');
+      else if(es.var_pct < -0.3) lines.push('➡️ Futuros americanos abrem em *queda*, cautela no pré-mercado.');
+      else lines.push('➡️ Futuros estáveis, mercado aguardando catalisadores.');
+    }
+    if(vix){
+      if(vix.preco > 25) lines.push('⚠️ VIX elevado ('+fmtPM(vix.preco)+') — volatilidade alta, atenção redobrada.');
+      else if(vix.preco > 20) lines.push('🟡 VIX moderado ('+fmtPM(vix.preco)+') — volatilidade acima da média.');
+      else if(vix.var_pct < -3) lines.push('✅ VIX em queda forte ('+fmtPM(vix.preco)+') — compressão de volatilidade, favorável para alta.');
+    }
+    lines.push('');
+  }
+
+  // Brasil
+  var brasil = dados.brasil || [];
+  if(brasil.length){
+    lines.push('🇧🇷 *BRASIL*');
+    brasil.forEach(function(f){
+      var seta = f.var_pct >= 0 ? '🟢' : '🔴';
+      if(f.sym === 'USDBRL=X') seta = f.var_pct <= 0 ? '🟢' : '🔴'; // real forte = dólar caindo
+      lines.push(seta+' '+f.nome+': '+fmtPM(f.preco, f.sym==='USDBRL=X'?4:2)+' ('+(f.var_pct>=0?'+':'')+fmtPM(f.var_pct)+'%)');
+    });
+    var ibov = brasil.find(function(f){return f.sym==='^BVSP';});
+    var usd = brasil.find(function(f){return f.sym==='USDBRL=X';});
+    if(ibov && usd){
+      if(ibov.var_pct > 0 && usd.var_pct < 0) lines.push('➡️ Cenário positivo para Brasil: Ibovespa subindo e real se valorizando.');
+      else if(ibov.var_pct < 0 && usd.var_pct > 0) lines.push('➡️ Pressão no Brasil: Ibovespa caindo com dólar em alta.');
+    }
+    lines.push('');
+  }
+
+  // Câmbio
+  var cambio = dados.cambio || [];
+  if(cambio.length){
+    lines.push('💱 *CÂMBIO*');
+    cambio.forEach(function(f){
+      var seta = f.var_pct >= 0 ? '🟢' : '🔴';
+      if(f.sym === 'DX-Y.NYB') seta = f.var_pct <= 0 ? '🟢' : '🟡'; // DXY fraco = bom para emergentes
+      lines.push(seta+' '+f.nome+': '+fmtPM(f.preco, f.sym.includes('USD')?4:2)+' ('+(f.var_pct>=0?'+':'')+fmtPM(f.var_pct)+'%)');
+    });
+    var dxy = cambio.find(function(f){return f.sym==='DX-Y.NYB';});
+    if(dxy){
+      if(dxy.var_pct < -0.2) lines.push('➡️ Dólar fraco globalmente — positivo para emergentes e commodities.');
+      else if(dxy.var_pct > 0.2) lines.push('➡️ Dólar se fortalecendo — pressão em emergentes.');
+    }
+    lines.push('');
+  }
+
+  // Commodities
+  var commod = dados.commodities || [];
+  if(commod.length){
+    lines.push('🛢️ *COMMODITIES*');
+    commod.forEach(function(f){
+      var seta = f.var_pct >= 0 ? '🟢' : '🔴';
+      lines.push(seta+' '+f.nome+': US$ '+fmtPM(f.preco)+' ('+(f.var_pct>=0?'+':'')+fmtPM(f.var_pct)+'%)');
+    });
+    var wti = commod.find(function(f){return f.sym==='CL=F';});
+    var ouro = commod.find(function(f){return f.sym==='GC=F';});
+    if(wti && ouro){
+      if(wti.var_pct > 1) lines.push('➡️ Petróleo em alta forte — atenção para Petrobras e inflação.');
+      if(ouro.var_pct > 1) lines.push('➡️ Ouro subindo — mercado buscando proteção.');
+      else if(ouro.var_pct < -1) lines.push('➡️ Ouro em queda — apetite por risco reduz demanda por safe haven.');
+    }
+    lines.push('');
+  }
+
+  // Resumo geral
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━');
+  var esD = (dados.futuros||[]).find(function(f){return f.sym==='ES=F';});
+  var vixD = (dados.futuros||[]).find(function(f){return f.sym==='^VIX';});
+  var ibovD = (dados.brasil||[]).find(function(f){return f.sym==='^BVSP';});
+  var sentimento = 'NEUTRO 🟡';
+  var positivos = 0, negativos = 0;
+  if(esD && esD.var_pct > 0.1) positivos++; else if(esD && esD.var_pct < -0.1) negativos++;
+  if(vixD && vixD.var_pct < 0) positivos++; else if(vixD && vixD.var_pct > 0) negativos++;
+  if(ibovD && ibovD.var_pct > 0) positivos++; else if(ibovD && ibovD.var_pct < 0) negativos++;
+  if(positivos >= 2 && negativos === 0) sentimento = 'POSITIVO 🟢';
+  else if(negativos >= 2 && positivos === 0) sentimento = 'NEGATIVO 🔴';
+  else if(positivos > negativos) sentimento = 'LEVEMENTE POSITIVO 🟢';
+  else if(negativos > positivos) sentimento = 'LEVEMENTE NEGATIVO 🔴';
+
+  lines.push('*Sentimento geral: '+sentimento+'*');
+  lines.push('');
+  lines.push('_DMF Investimentos — Gestão Patrimonial_');
+  lines.push('_Relatório gerado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'_');
+
+  return lines.join('\n');
+}
+
+function renderPreMercado(dados, texto){
+  var body = document.getElementById('pm-body');
+  if(!body) return;
+
+  var html = '';
+
+  // Cards de indicadores principais
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">';
+  var destaques = [];
+  if(dados.futuros) dados.futuros.forEach(function(f){ destaques.push(f); });
+  if(dados.brasil) dados.brasil.forEach(function(f){ destaques.push(f); });
+  destaques.forEach(function(d){
+    var cor = d.var_pct >= 0 ? '#00c853' : '#ff1744';
+    if(d.sym === '^VIX') cor = d.var_pct <= 0 ? '#00c853' : '#f59e0b';
+    if(d.sym === 'USDBRL=X') cor = d.var_pct <= 0 ? '#00c853' : '#ff1744';
+    var decimals = d.sym === 'USDBRL=X' ? 4 : 2;
+    html += '<div class="card" style="padding:14px;text-align:center">'
+      +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">'+d.nome+'</div>'
+      +'<div style="font-size:22px;font-weight:700;font-family:DM Mono,monospace;color:var(--white);margin:6px 0">'+fmtPM(d.preco, decimals)+'</div>'
+      +'<div style="font-size:13px;font-weight:600;font-family:DM Mono,monospace;color:'+cor+'">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</div>'
+      +'</div>';
+  });
+  html += '</div>';
+
+  // Tabelas por categoria
+  Object.keys(PM_TICKERS).forEach(function(cat){
+    var items = dados[cat] || [];
+    if(!items.length) return;
+    var catNomes = {futuros:'Futuros EUA',brasil:'Brasil',cambio:'Câmbio',commodities:'Commodities'};
+    html += '<div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">';
+    html += '<div style="padding:10px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),var(--card))">';
+    html += '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:13px;color:var(--white)">'+(catNomes[cat]||cat)+'</span>';
+    html += '</div>';
+    html += '<div class="table-wrap" style="border:none"><table style="font-size:13px"><thead><tr>'
+      +'<th style="padding:6px 12px">Ativo</th>'
+      +'<th style="padding:6px 12px;text-align:right">Preço</th>'
+      +'<th style="padding:6px 12px;text-align:right">Var%</th>'
+      +'<th style="padding:6px 12px;text-align:right">Variação</th>'
+      +'</tr></thead><tbody>';
+    items.forEach(function(d){
+      var cor = d.var_pct >= 0 ? '#00c853' : '#ff1744';
+      if(d.sym === '^VIX') cor = d.var_pct <= 0 ? '#00c853' : '#f59e0b';
+      if(d.sym === 'USDBRL=X') cor = d.var_pct <= 0 ? '#00c853' : '#ff1744';
+      var dec = (d.sym==='USDBRL=X'||d.sym==='EURUSD=X'||d.sym==='GBPUSD=X')?4:2;
+      html += '<tr style="border-bottom:1px solid var(--border)">'
+        +'<td style="padding:6px 12px;color:var(--white);font-weight:500">'+d.nome+'</td>'
+        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:var(--white)">'+fmtPM(d.preco,dec)+'</td>'
+        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+cor+'">'+(d.var_pct>=0?'+':'')+fmtPM(d.var_pct)+'%</td>'
+        +'<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:'+cor+'">'+(d.var_abs>=0?'+':'')+fmtPM(d.var_abs,dec)+'</td>'
+        +'</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  });
+
+  // Texto da análise
+  html += '<div class="card" style="padding:20px;margin-top:8px">';
+  html += '<div style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:12px">Análise do Dia</div>';
+  html += '<div id="pm-texto" style="font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:Inter,sans-serif">'+texto.replace(/\*/g,'').replace(/\_/g,'')+'</div>';
+  html += '</div>';
+
+  body.innerHTML = html;
+}
+
+function dispararPreMercadoWA(){
+  if(!pmTextoCache){alert('Gere o relatório primeiro!');return;}
+  var btn=document.getElementById('pm-wa-btn');
+  btn.textContent='Enviando...';btn.disabled=true;
+
+  // Buscar clientes ativos com telefone
+  var destinatarios = clientes.filter(function(c){return c.status==='Ativo'&&c.telefone;});
+  if(!destinatarios.length){alert('Nenhum cliente ativo com telefone!');btn.textContent='Disparar via WhatsApp';btn.disabled=false;return;}
+
+  var enviados=0,erros=0,total=destinatarios.length;
+
+  function sendPM(idx){
+    if(idx>=total){
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Enviado para '+enviados+' clientes!';
+      btn.style.background='#00c853';
+      setTimeout(function(){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp';btn.style.background='';btn.disabled=false;},5000);
+      // Log
+      db.collection('comunicados').add({titulo:'Pré-Mercado',conteudo:pmTextoCache.substring(0,200)+'...',tipo:'WhatsApp',data:today(),visivel:'interno',destaque:'normal',criadoEm:new Date().toISOString(),destinatarios:total,enviados:enviados});
+      return;
+    }
+    var c=destinatarios[idx];
+    var num=limparTelefone(c.telefone);if(!num.startsWith('55'))num='55'+num;
+    btn.textContent='Enviando '+(idx+1)+'/'+total+'...';
+    zapiProxy('send-text','POST',{phone:num,message:pmTextoCache}).then(function(data){
+      if(data.zaapId||data.messageId) enviados++; else erros++;
+      setTimeout(function(){sendPM(idx+1);},800);
+    }).catch(function(){erros++;setTimeout(function(){sendPM(idx+1);},800);});
+  }
+  sendPM(0);
+}
+
 
 // ═══════════════════════════════════════════════════════════
 // PANORAMA DO MERCADO
