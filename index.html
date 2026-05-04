@@ -1060,6 +1060,29 @@ textarea.form-input{resize:vertical;min-height:80px}
           <button class="btn-primary" onclick="dispararCalendarioWA()" id="ce-wa-btn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Disparar via WhatsApp</button>
         </div>
       </div>
+      <!-- Filtros -->
+      <div id="ce-filtros" style="display:none;padding:0 20px;margin-bottom:4px">
+        <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Filtros</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:12px;color:var(--text3)">País:</span>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="US" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> EUA</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="BR" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> Brasil</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="EU" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> Europa</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="CN" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> China</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="JP" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> Japão</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="GB" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> UK</label>
+            <label style="font-size:12px;color:var(--white);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="DE" checked onchange="ceAplicarFiltros()" class="ce-filtro-pais" style="accent-color:var(--blue)"> Alemanha</label>
+          </div>
+          <div style="width:1px;height:20px;background:var(--border)"></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:12px;color:var(--text3)">Impacto:</span>
+            <label style="font-size:12px;color:#ff1744;cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="high" checked onchange="ceAplicarFiltros()" class="ce-filtro-impacto" style="accent-color:#ff1744"> Alto</label>
+            <label style="font-size:12px;color:#ffc107;cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="medium" checked onchange="ceAplicarFiltros()" class="ce-filtro-impacto" style="accent-color:#ffc107"> Médio</label>
+            <label style="font-size:12px;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:3px"><input type="checkbox" value="low" onchange="ceAplicarFiltros()" class="ce-filtro-impacto" style="accent-color:var(--text3)"> Baixo</label>
+          </div>
+        </div>
+      </div>
       <div class="page-content">
         <div id="ce-body">
           <div class="empty" style="padding:60px">
@@ -9893,11 +9916,41 @@ function dispararPreMercadoWA(){
 // ═══════════════════════════════════════════════════════════
 
 var ceDataCache = null;
+var ceDataRaw = null; // Todos os eventos sem filtro
 var cePDFBase64 = null;
 var ceOpiniao = '';
 
-// Países de interesse (filtro)
+// Países de interesse (padrão)
 var CE_PAISES = ['US','BR','EU','CN','JP','GB','DE'];
+
+// Ler filtros da UI
+function ceGetFiltros(){
+  var paises=[];var impactos=[];
+  document.querySelectorAll('.ce-filtro-pais:checked').forEach(function(el){paises.push(el.value);});
+  document.querySelectorAll('.ce-filtro-impacto:checked').forEach(function(el){impactos.push(el.value);});
+  return {paises:paises,impactos:impactos};
+}
+
+function ceFilterEvents(events,filtros){
+  return events.filter(function(ev){
+    var paisOk=filtros.paises.indexOf(ev.country)>=0;
+    var imp=ev.impact;
+    // Normalizar impacto (Finnhub pode enviar string ou número)
+    var impStr='low';
+    if(imp==='high'||imp===3) impStr='high';
+    else if(imp==='medium'||imp===2) impStr='medium';
+    var impOk=filtros.impactos.indexOf(impStr)>=0;
+    return paisOk&&impOk;
+  });
+}
+
+function ceAplicarFiltros(){
+  if(!ceDataRaw) return;
+  var filtros=ceGetFiltros();
+  ceDataCache.semanaAnterior.eventos=ceFilterEvents(ceDataRaw.evPassados,filtros);
+  ceDataCache.semanaAtual.eventos=ceFilterEvents(ceDataRaw.evFuturos,filtros);
+  renderCalendarioEconomico(ceDataCache);
+}
 
 // Helpers de data
 function ceGetMonday(d){var dt=new Date(d);var day=dt.getDay();var diff=dt.getDate()-day+(day===0?-6:1);dt.setDate(diff);dt.setHours(0,0,0,0);return dt;}
@@ -9905,17 +9958,13 @@ function ceFmtDate(d){return d.toISOString().split('T')[0];}
 function ceFmtDateBR(str){var p=str.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 function ceDiaSemana(str){var d=new Date(str+'T12:00:00');return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getDay()];}
 
-// Buscar dados do Finnhub
+// Buscar dados do Finnhub (sem filtro — filtragem é feita no front)
 function fetchCalendarioEconomico(from,to){
   return fetch('/api/finnhub?from='+from+'&to='+to)
     .then(function(r){return r.json();})
     .then(function(data){
       // Finnhub retorna { economicCalendar: [...] }
-      var events = data.economicCalendar || data.result || [];
-      // Filtrar por países de interesse e impacto médio/alto
-      return events.filter(function(ev){
-        return CE_PAISES.indexOf(ev.country)>=0 && (ev.impact==='high'||ev.impact==='medium'||ev.impact===3||ev.impact===2);
-      });
+      return data.economicCalendar || data.result || [];
     });
 }
 
@@ -9948,13 +9997,21 @@ function gerarCalendarioEconomico(){
     var evFuturos=results[1];
     var retro=results[2];
 
+    // Guardar raw (sem filtro) para re-filtrar depois
+    ceDataRaw={evPassados:evPassados,evFuturos:evFuturos};
+
+    // Aplicar filtros da UI
+    var filtros=ceGetFiltros();
     ceDataCache={
-      semanaAnterior:{de:ceFmtDate(segundaAnterior),ate:ceFmtDate(sexAnterior),eventos:evPassados},
-      semanaAtual:{de:ceFmtDate(segundaAtual),ate:ceFmtDate(sexAtual),eventos:evFuturos},
+      semanaAnterior:{de:ceFmtDate(segundaAnterior),ate:ceFmtDate(sexAnterior),eventos:ceFilterEvents(evPassados,filtros)},
+      semanaAtual:{de:ceFmtDate(segundaAtual),ate:ceFmtDate(sexAtual),eventos:ceFilterEvents(evFuturos,filtros)},
       retrospectiva:retro
     };
 
     renderCalendarioEconomico(ceDataCache);
+
+    // Mostrar filtros
+    document.getElementById('ce-filtros').style.display='';
 
     btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;
     document.getElementById('ce-preview-btn').style.display='';
