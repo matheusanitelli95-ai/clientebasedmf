@@ -6900,6 +6900,7 @@ function preencherUsrDeCliente(){
 }
 
 function openModalUsuario(id){
+  if(currentPerfil !== 'adm'){ alert('Acesso restrito a administradores.'); return; }
   editingUsrId=id;
   var u=id?usuarios.find(function(x){return x.id===id;}):null;
   document.getElementById('modal-usr-title').textContent=id?'Editar Usuário':'Novo Usuário';
@@ -6930,6 +6931,7 @@ function openModalUsuario(id){
 }
 
 function saveUsuario(){
+  if(currentPerfil !== 'adm'){ alert('Acesso restrito a administradores.'); return; }
   var email=document.getElementById('usr-email').value.trim().toLowerCase();
   if(!email){alert('Email é obrigatório!');return;}
   var perfil=document.getElementById('usr-perfil').value;
@@ -7062,6 +7064,7 @@ function finalizarCadastro(){
 
 // ── Pendentes na tela de Configurações ───────────────────
 function loadUsuarios(){
+  if(currentPerfil !== 'adm') return;
   // Load pendentes
   db.collection('pendentes').where('status','==','pendente').onSnapshot(function(snap){
     var pendentes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
@@ -7127,6 +7130,7 @@ function renderPendentes(pendentes){
 }
 
 function aprovarCliente(p, existingClienteId, perfilEscolhido){
+  if(currentPerfil !== 'adm'){ alert('Apenas administradores podem aprovar usuários.'); return; }
   var perfil = perfilEscolhido || 'cliente';
 
   // ADM e Gestor não precisam de vínculo com cliente
