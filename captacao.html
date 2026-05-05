@@ -490,8 +490,12 @@ function enviarFormulario(){
     fonte: 'Formulário de Captação'
   };
 
+  // FIX: variável no escopo externo para guardar o ID do lead
+  var savedLeadId = '';
+
   // Save to leads collection
   db.collection('leads').add(data).then(function(leadRef){
+    savedLeadId = leadRef.id;
     // Create cliente as Prospecto
     return db.collection('clientes').add({
       nome: nome,
@@ -503,7 +507,7 @@ function enviarFormulario(){
       custodiaRF: 0,
       custodiaRV: 0,
       origem: 'Formulário',
-      leadId: leadRef.id,
+      leadId: savedLeadId,
       criadoEm: new Date().toISOString()
     });
   }).then(function(cliRef){
@@ -513,7 +517,7 @@ function enviarFormulario(){
       descricao: 'Lead via formulário de captação',
       cliente: nome,
       clienteId: cliRef.id,
-      leadId: leadRef.id,
+      leadId: savedLeadId,
       status: 'Aberta',
       prioridade: 'Alta',
       respostas: {
@@ -542,7 +546,7 @@ function enviarFormulario(){
     document.getElementById('progress-text').textContent='Concluído!';
     window.scrollTo({top:0,behavior:'smooth'});
   }).catch(function(e){
-    btn.textContent='🚀 Quero meu diagnóstico';
+    btn.textContent='Quero meu diagnóstico →';
     btn.disabled=false;
     alert('Erro ao enviar. Tente novamente.');
     console.error(e);
