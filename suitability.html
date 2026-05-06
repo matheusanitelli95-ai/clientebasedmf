@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário de Clientes · DMF Investimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--card:#111111;--card2:#1a1a1a;
+  --border:#222222;--border2:#333333;
+  --blue:#ff8c00;--blue-glow:#ff8c0033;
+  --text:#e0e0e0;--text2:#999999;--text3:#555555;
+  --white:#ffffff;--success:#00c853;--danger:#ff1744;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% -5%,#1a1200 0%,transparent 70%)}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:60px 24px 0}
+.logo-wrap{margin-bottom:32px}
+.logo-wrap img{height:56px;width:auto;object-fit:contain}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:#ff8c0015;border:1px solid #ff8c0033;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-family:'DM Sans',sans-serif;font-size:clamp(26px,5vw,42px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:16px;letter-spacing:-.01em}
+.hero h1 span{color:var(--blue)}
+.hero p{font-size:16px;color:var(--text2);max-width:560px;margin:0 auto 16px;line-height:1.6}
+.hero-time{font-size:13px;color:var(--text3);margin-bottom:48px}
+
+/* PROGRESS */
+.progress-wrap{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 24px}
+.progress-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),#ffb347);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.progress-text{font-size:12px;color:var(--text3);white-space:nowrap;font-weight:600}
+
+/* FORM */
+.form-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:40px 24px 80px}
+
+/* SECTIONS */
+.section-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:32px;margin-bottom:16px;
+  opacity:0;transform:translateY(20px);transition:all .4s cubic-bezier(.4,0,.2,1);
+  display:none;
+}
+.section-card.visible{opacity:1;transform:translateY(0);display:block}
+.section-card.done{border-color:#00c85333;background:linear-gradient(135deg,#00c85306,var(--card))}
+
+.s-badge{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.s-title{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.3}
+.s-sub{font-size:13px;color:var(--text3);margin-bottom:28px;line-height:1.5}
+
+/* FORM FIELDS */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.field label .req{color:var(--danger);margin-left:2px}
+.field-input{
+  width:100%;background:#0a0a0a;border:1.5px solid var(--border2);border-radius:10px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
+  padding:12px 14px;outline:none;transition:all .2s;
+}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.field-input::placeholder{color:var(--text3)}
+select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+select.field-input option{background:var(--card);color:var(--text)}
+textarea.field-input{resize:vertical;min-height:80px}
+
+/* SUITABILITY QUESTIONS */
+.sq{margin-bottom:24px}
+.sq:last-child{margin-bottom:0}
+.sq-num{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.sq-title{font-size:15px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:10px}
+.sq-opts{display:flex;flex-direction:column;gap:8px}
+.sq-opt{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 16px;border-radius:10px;
+  border:1.5px solid var(--border);background:var(--card2);
+  cursor:pointer;transition:all .2s;user-select:none;
+}
+.sq-opt:hover{border-color:var(--blue);background:var(--blue-glow)}
+.sq-opt.selected{border-color:var(--blue);background:var(--blue-glow)}
+.sq-dot{
+  width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-top:1px;
+}
+.sq-opt.selected .sq-dot{border-color:var(--blue);background:var(--blue)}
+.sq-opt.selected .sq-dot::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff;display:block}
+.sq-text{font-size:13px;color:var(--text2);line-height:1.4;transition:color .2s}
+.sq-opt.selected .sq-text{color:var(--white);font-weight:500}
+
+/* BUTTONS */
+.btn-next{
+  width:100%;background:var(--blue);color:#000;border:none;border-radius:12px;
+  padding:15px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:24px;letter-spacing:.03em;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-next:hover{background:#ffa333;transform:translateY(-1px);box-shadow:0 8px 24px #ff8c0033}
+.btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* RESULT */
+.result-card{
+  display:none;text-align:center;padding:48px 32px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+}
+.result-card.visible{display:block;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.profile-icon{font-size:72px;margin-bottom:20px}
+.profile-name{font-family:'DM Sans',sans-serif;font-size:32px;font-weight:700;margin-bottom:8px}
+.profile-desc{font-size:15px;color:var(--text2);line-height:1.6;max-width:480px;margin:0 auto 28px}
+.profile-score{font-size:13px;color:var(--text3);margin-bottom:24px}
+.profile-bar-wrap{max-width:400px;margin:0 auto 32px;text-align:left}
+.profile-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.profile-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative}
+.profile-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.profile-bar-segments{display:flex;position:absolute;inset:0}
+.profile-bar-segments div{flex:1;border-right:2px solid var(--bg)}
+.profile-bar-segments div:last-child{border-right:none}
+.profile-details{max-width:440px;margin:0 auto;text-align:left}
+.profile-detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;gap:12px}
+.profile-detail-row:last-child{border-bottom:none}
+.profile-detail-label{color:var(--text3);flex-shrink:0}
+.profile-detail-value{color:var(--white);font-weight:600;text-align:right}
+.success-tag{display:inline-block;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;margin-top:24px}
+
+/* FOOTER */
+.form-footer{text-align:center;padding:24px;color:var(--text3);font-size:12px;position:relative;z-index:1}
+.form-footer a{color:var(--blue);text-decoration:none}
+
+@media(max-width:500px){
+  .field-grid{grid-template-columns:1fr}
+  .field.full{grid-column:1}
+  .hero h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="logo-wrap">
+    <img src="https://raw.githubusercontent.com/matheusanitelli95-ai/clientebasedmf/main/LOGO.DMF.PNG.png" alt="DMF" onerror="this.style.display='none'">
+  </div>
+  <div class="hero-badge">DMF Investimentos · Cadastro Interno</div>
+  <h1>Formulário de <span>Clientes</span></h1>
+  <p>Informações confidenciais para cadastro interno. Preencha todos os campos obrigatórios e responda às perguntas de análise de perfil (suitability).</p>
+  <div class="hero-time">Tempo estimado: 5 minutos · Dados confidenciais</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progress-wrap" style="display:none">
+  <div class="progress-inner">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-text" id="progress-text">Etapa 1 de 3</div>
+  </div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- ══════════ SEÇÃO 1: DADOS CADASTRAIS ══════════ -->
+  <div class="section-card" id="sec1">
+    <div class="s-badge">Etapa 1 de 3</div>
+    <div class="s-title">Dados Cadastrais</div>
+    <div class="s-sub">Informações pessoais do cliente para registro interno.</div>
+
+    <div class="field-grid">
+      <div class="field full">
+        <label>1. Modelo de Contrato <span class="req">*</span></label>
+        <select class="field-input" id="f-modelo" onchange="checkSec1()">
+          <option value="">Selecione...</option>
+          <option>Pessoa Física (PF)</option>
+          <option>Pessoa Jurídica (PJ)</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>2. Nome Completo <span class="req">*</span></label>
+        <input class="field-input" id="f-nome" placeholder="Nome completo do cliente" oninput="checkSec1()">
+      </div>
+      <div class="field">
+        <label>3. CPF <span class="req">*</span></label>
+        <input class="field-input" id="f-cpf" placeholder="000.000.000-00" oninput="maskCPF(this);checkSec1()">
+      </div>
+      <div class="field">
+        <label>4. RG <span class="req">*</span></label>
+        <input class="field-input" id="f-rg" placeholder="Número do RG" oninput="checkSec1()">
+      </div>
+      <div class="field">
+        <label>5. Estado Civil <span class="req">*</span></label>
+        <select class="field-input" id="f-civil" onchange="checkSec1()">
+          <option value="">Selecione...</option>
+          <option>Solteiro(a)</option>
+          <option>Casado(a)</option>
+          <option>Divorciado(a)</option>
+          <option>Viúvo(a)</option>
+          <option>União Estável</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>6. Nacionalidade <span class="req">*</span></label>
+        <input class="field-input" id="f-nac" placeholder="Ex: Brasileiro(a)" value="Brasileiro(a)" oninput="checkSec1()">
+      </div>
+      <div class="field full">
+        <label>7. Endereço Residencial Completo <span class="req">*</span></label>
+        <textarea class="field-input" id="f-end" placeholder="Logradouro, número, complemento, bairro, cidade/UF – CEP: 00000-000" oninput="checkSec1()"></textarea>
+      </div>
+      <div class="field">
+        <label>8. E-mail <span class="req">*</span></label>
+        <input class="field-input" id="f-email" type="email" placeholder="email@exemplo.com" oninput="checkSec1()">
+      </div>
+      <div class="field">
+        <label>9. Celular / Telefone <span class="req">*</span></label>
+        <input class="field-input" id="f-tel" placeholder="(00) 00000-0000" oninput="maskTel(this);checkSec1()">
+      </div>
+      <div class="field">
+        <label>10. Data de Nascimento <span class="req">*</span></label>
+        <input class="field-input" id="f-nasc" type="date" onchange="checkSec1()">
+      </div>
+      <div class="field">
+        <label>11. Profissão</label>
+        <input class="field-input" id="f-prof" placeholder="Ex: Empresário, Médico...">
+      </div>
+    </div>
+
+    <button class="btn-next" id="btn-sec1" onclick="nextSection(1)" disabled>Continuar — Dados da Conta →</button>
+  </div>
+
+  <!-- ══════════ SEÇÃO 2: DADOS DA CONTA ══════════ -->
+  <div class="section-card" id="sec2">
+    <div class="s-badge">Etapa 2 de 3</div>
+    <div class="s-title">Dados da Conta</div>
+    <div class="s-sub">Informações sobre consultoria e corretora.</div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>12. Consultor Responsável <span class="req">*</span></label>
+        <input class="field-input" id="f-consultor" placeholder="Nome do consultor" oninput="checkSec2()">
+      </div>
+      <div class="field">
+        <label>13. Taxa de Consultoria (% anual) <span class="req">*</span></label>
+        <input class="field-input" id="f-taxa" type="number" step="0.01" min="0" max="10" placeholder="Ex: 0.80" oninput="checkSec2()">
+      </div>
+      <div class="field">
+        <label>14. Corretora <span class="req">*</span></label>
+        <select class="field-input" id="f-corretora" onchange="checkSec2()">
+          <option value="">Selecione...</option>
+          <option>XP Investimentos</option>
+          <option>BTG Pactual</option>
+          <option>Inter</option>
+          <option>Safra</option>
+          <option>Genial</option>
+          <option>Nu Invest</option>
+          <option>Itaú</option>
+          <option>Bradesco</option>
+          <option>Outra</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>15. Nº da Conta na Corretora <span class="req">*</span></label>
+        <input class="field-input" id="f-conta" placeholder="Número da conta" oninput="checkSec2()">
+      </div>
+      <div class="field">
+        <label>16. Patrimônio Investido Aproximado</label>
+        <input class="field-input" id="f-patrimonio" placeholder="Ex: 500000" type="number" step="1000">
+      </div>
+      <div class="field">
+        <label>17. Renda Mensal Bruta Aproximada</label>
+        <input class="field-input" id="f-renda" placeholder="Ex: 15000" type="number" step="500">
+      </div>
+    </div>
+
+    <button class="btn-next" id="btn-sec2" onclick="nextSection(2)" disabled>Continuar — Análise de Perfil →</button>
+  </div>
+
+  <!-- ══════════ SEÇÃO 3: SUITABILITY (CVM) ══════════ -->
+  <div class="section-card" id="sec3">
+    <div class="s-badge">Etapa 3 de 3 · Suitability CVM</div>
+    <div class="s-title">Análise de Perfil do Investidor</div>
+    <div class="s-sub">Perguntas obrigatórias conforme Resolução CVM 30/2021. As respostas definem o perfil de risco do cliente.</div>
+
+    <!-- P1: Objetivo -->
+    <div class="sq" id="sq1">
+      <div class="sq-num">Pergunta 1 de 8</div>
+      <div class="sq-title">Qual o seu principal objetivo ao investir seu patrimônio conosco?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq1',this,1)"><div class="sq-dot"></div><div class="sq-text">Preservar meu patrimônio assumindo um menor risco</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq1',this,2)"><div class="sq-dot"></div><div class="sq-text">Uma combinação entre preservação do patrimônio e sua valorização</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq1',this,3)"><div class="sq-dot"></div><div class="sq-text">Maximizar o potencial de ganho assumindo um maior risco</div></div>
+      </div>
+    </div>
+
+    <!-- P2: Horizonte -->
+    <div class="sq" id="sq2">
+      <div class="sq-num">Pergunta 2 de 8</div>
+      <div class="sq-title">Por quanto tempo pretende deixar seus recursos investidos conosco?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq2',this,1)"><div class="sq-dot"></div><div class="sq-text">Até 1 ano</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq2',this,2)"><div class="sq-dot"></div><div class="sq-text">De 1 a 5 anos</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq2',this,3)"><div class="sq-dot"></div><div class="sq-text">Mais de 5 anos</div></div>
+      </div>
+    </div>
+
+    <!-- P3: Necessidade dos recursos -->
+    <div class="sq" id="sq3">
+      <div class="sq-num">Pergunta 3 de 8</div>
+      <div class="sq-title">Em relação aos seus investimentos na DMF, qual é a necessidade dos recursos aplicados?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq3',this,1)"><div class="sq-dot"></div><div class="sq-text">Preciso deste dinheiro como complemento de renda</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq3',this,2)"><div class="sq-dot"></div><div class="sq-text">Eventualmente posso precisar utilizar uma parte dele</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq3',this,3)"><div class="sq-dot"></div><div class="sq-text">Não tenho necessidade imediata deste dinheiro</div></div>
+      </div>
+    </div>
+
+    <!-- P4: Percentual investido -->
+    <div class="sq" id="sq4">
+      <div class="sq-num">Pergunta 4 de 8</div>
+      <div class="sq-title">Qual percentual da sua renda o(a) Sr(a) investe regularmente?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq4',this,1)"><div class="sq-dot"></div><div class="sq-text">Até 10%</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq4',this,2)"><div class="sq-dot"></div><div class="sq-text">De 10% a 20%</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq4',this,3)"><div class="sq-dot"></div><div class="sq-text">Acima de 20%</div></div>
+      </div>
+    </div>
+
+    <!-- P5: Reação a perda -->
+    <div class="sq" id="sq5">
+      <div class="sq-num">Pergunta 5 de 8</div>
+      <div class="sq-title">Por conta de oscilações do mercado, considere que seus investimentos percam 10% do valor aplicado. Neste caso, o que o(a) Sr(a) faria?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq5',this,1)"><div class="sq-dot"></div><div class="sq-text">Não sei o que faria</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq5',this,2)"><div class="sq-dot"></div><div class="sq-text">Venderia toda a posição</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq5',this,3)"><div class="sq-dot"></div><div class="sq-text">Manteria a posição</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq5',this,4)"><div class="sq-dot"></div><div class="sq-text">Aumentaria a posição</div></div>
+      </div>
+    </div>
+
+    <!-- P6: Experiência com produtos -->
+    <div class="sq" id="sq6">
+      <div class="sq-num">Pergunta 6 de 8</div>
+      <div class="sq-title">Em quais dos investimentos abaixo você investiu nos últimos 5 anos ou tem conhecimento devido à sua formação acadêmica ou experiência profissional?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq6',this,1)"><div class="sq-dot"></div><div class="sq-text">Poupança, Fundos DI, CDB, Fundos RF</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq6',this,2)"><div class="sq-dot"></div><div class="sq-text">Fundos Multimercado, Títulos públicos, LCI, LCA</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq6',this,3)"><div class="sq-dot"></div><div class="sq-text">Fundos de Ações, Ações, Fundos Imobiliários, Debêntures, Fundos Cambiais</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq6',this,4)"><div class="sq-dot"></div><div class="sq-text">Fundos de Investimento em Participações (FIP), Derivativos (Futuros, Opções e Swaps)</div></div>
+      </div>
+    </div>
+
+    <!-- P7: Expectativa de renda futura -->
+    <div class="sq" id="sq7">
+      <div class="sq-num">Pergunta 7 de 8</div>
+      <div class="sq-title">Como você descreveria sua expectativa de renda futura para os próximos 5 anos?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq7',this,1)"><div class="sq-dot"></div><div class="sq-text">Minha renda deve diminuir devido a uma aposentadoria, mudança de emprego, diminuição de faturamento etc.</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq7',this,2)"><div class="sq-dot"></div><div class="sq-text">Minha renda deve se manter estável</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq7',this,3)"><div class="sq-dot"></div><div class="sq-text">Minha renda deve aumentar devido a uma promoção, novo emprego, aumento de faturamento etc.</div></div>
+      </div>
+    </div>
+
+    <!-- P8: Derivativos -->
+    <div class="sq" id="sq8">
+      <div class="sq-num">Pergunta 8 de 8</div>
+      <div class="sq-title">Há intenção do(a) Sr(a) realizar operações com derivativos?</div>
+      <div class="sq-opts">
+        <div class="sq-opt" onclick="selectSQ('sq8',this,0)"><div class="sq-dot"></div><div class="sq-text">Não</div></div>
+        <div class="sq-opt" onclick="selectSQ('sq8',this,2)"><div class="sq-dot"></div><div class="sq-text">Sim</div></div>
+      </div>
+    </div>
+
+    <button class="btn-next" id="btn-sec3" onclick="enviarFormulario()" disabled>Enviar e ver perfil →</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-card" id="resultado"></div>
+
+</div>
+
+<div class="form-footer">
+  <p>DMF Investimentos · Formulário de Clientes e Análise de Perfil (Suitability)<br>
+  Em conformidade com a Resolução CVM 30/2021 · Informações confidenciais</p>
+</div>
+
+<script>
+// Firebase
+firebase.initializeApp({
+  apiKey:"AIzaSyB3ao46l0oh52sf3WYFi6LrLLmrPqy_16A",
+  authDomain:"clientebasedmf.firebaseapp.com",
+  projectId:"clientebasedmf",
+  appId:"1:450020125109:web:653e4fbe638dbdd8b6d1fc"
+});
+var db = firebase.firestore();
+
+var totalSections = 3;
+var currentSection = 1;
+var sqRespostas = {};
+
+// ─── Máscaras ───
+function maskCPF(el){
+  var v=el.value.replace(/\D/g,'').substring(0,11);
+  v=v.replace(/(\d{3})(\d)/,'$1.$2');
+  v=v.replace(/(\d{3})(\d)/,'$1.$2');
+  v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  el.value=v;
+}
+function maskTel(el){
+  var v=el.value.replace(/\D/g,'').substring(0,11);
+  v=v.replace(/^(\d{2})(\d)/,'($1) $2');
+  v=v.replace(/(\d{5})(\d)/,'$1-$2');
+  el.value=v;
+}
+
+// ─── Validações por seção ───
+function checkSec1(){
+  var ok = true;
+  if(!document.getElementById('f-modelo').value) ok=false;
+  if(document.getElementById('f-nome').value.trim().length < 3) ok=false;
+  if(document.getElementById('f-cpf').value.replace(/\D/g,'').length !== 11) ok=false;
+  if(!document.getElementById('f-rg').value.trim()) ok=false;
+  if(!document.getElementById('f-civil').value) ok=false;
+  if(!document.getElementById('f-nac').value.trim()) ok=false;
+  if(!document.getElementById('f-end').value.trim()) ok=false;
+  if(!document.getElementById('f-email').value.includes('@')) ok=false;
+  if(document.getElementById('f-tel').value.replace(/\D/g,'').length < 10) ok=false;
+  if(!document.getElementById('f-nasc').value) ok=false;
+  document.getElementById('btn-sec1').disabled = !ok;
+}
+
+function checkSec2(){
+  var ok = true;
+  if(!document.getElementById('f-consultor').value.trim()) ok=false;
+  if(!document.getElementById('f-taxa').value) ok=false;
+  if(!document.getElementById('f-corretora').value) ok=false;
+  if(!document.getElementById('f-conta').value.trim()) ok=false;
+  document.getElementById('btn-sec2').disabled = !ok;
+}
+
+function checkSec3(){
+  // Todas as 8 perguntas respondidas?
+  var ok = true;
+  for(var i=1;i<=8;i++){
+    if(!sqRespostas['sq'+i]) ok=false;
+  }
+  document.getElementById('btn-sec3').disabled = !ok;
+}
+
+// ─── Suitability option select ───
+function selectSQ(id, el, score){
+  var container = document.getElementById(id);
+  container.querySelectorAll('.sq-opt').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+  sqRespostas[id] = {text: el.querySelector('.sq-text').textContent.trim(), score: score};
+  checkSec3();
+}
+
+// ─── Navegação entre seções ───
+function nextSection(n){
+  var current = document.getElementById('sec'+n);
+  if(current){
+    current.classList.add('done');
+    setTimeout(function(){ current.classList.remove('visible'); current.style.display='none'; }, 300);
+  }
+  currentSection = n+1;
+  document.getElementById('progress-wrap').style.display = '';
+  updateProgress();
+  setTimeout(function(){
+    var next = document.getElementById('sec'+currentSection);
+    if(next){
+      next.style.display='block';
+      setTimeout(function(){ next.classList.add('visible'); }, 50);
+      next.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }, 350);
+}
+
+function updateProgress(){
+  var pct = Math.round(((currentSection-1)/totalSections)*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-text').textContent = 'Etapa '+currentSection+' de '+totalSections;
+}
+
+// ─── Cálculo do perfil ───
+function calcularPerfil(){
+  var totalScore = 0;
+  var maxScore = 0;
+  // Perguntas 1-7: máx 3 pts cada = 21
+  // Pergunta 5: máx 4 pts
+  // Pergunta 6: máx 4 pts
+  // Pergunta 8: 0 ou 2 pts
+  var maximos = {sq1:3, sq2:3, sq3:3, sq4:3, sq5:4, sq6:4, sq7:3, sq8:2};
+  for(var i=1;i<=8;i++){
+    var key='sq'+i;
+    var r=sqRespostas[key];
+    if(r) totalScore += r.score;
+    maxScore += maximos[key];
+  }
+
+  var pct = (totalScore/maxScore)*100;
+  var perfil, cor, icone, desc;
+
+  if(pct <= 30){
+    perfil='Conservador'; cor='#00c853'; icone='🛡️';
+    desc='Perfil que prioriza a segurança do patrimônio, com preferência por investimentos de baixa volatilidade como renda fixa, CDBs e títulos públicos. Aceita retornos menores em troca de previsibilidade e proteção do capital.';
+  } else if(pct <= 55){
+    perfil='Moderado'; cor='#ff8c00'; icone='⚖️';
+    desc='Perfil que busca equilíbrio entre segurança e rentabilidade. Aceita uma parcela de risco calculado para potencializar ganhos, mantendo base sólida em renda fixa com alocação parcial em renda variável e fundos multimercado.';
+  } else if(pct <= 80){
+    perfil='Arrojado'; cor='#f59e0b'; icone='📈';
+    desc='Perfil com boa tolerância a risco, buscando retornos acima da média. Confortável com oscilações de curto prazo. Ações, FIIs, ETFs e operações estruturadas podem compor parcela significativa da carteira.';
+  } else {
+    perfil='Agressivo'; cor='#ff1744'; icone='🚀';
+    desc='Perfil com alta tolerância a risco e conhecimento avançado. Busca maximizar retornos e está preparado para lidar com perdas expressivas. Derivativos, operações alavancadas e estratégias sofisticadas fazem parte do universo de investimentos.';
+  }
+  return {perfil:perfil, cor:cor, icone:icone, desc:desc, score:totalScore, maxScore:maxScore, pct:pct};
+}
+
+// ─── Envio ───
+function enviarFormulario(){
+  var btn=document.getElementById('btn-sec3');
+  btn.textContent='Salvando...'; btn.disabled=true;
+
+  var resultado = calcularPerfil();
+
+  // Montar dados cadastrais
+  var dados = {
+    modelo: document.getElementById('f-modelo').value,
+    nome: document.getElementById('f-nome').value.trim(),
+    cpf: document.getElementById('f-cpf').value.trim(),
+    rg: document.getElementById('f-rg').value.trim(),
+    estadoCivil: document.getElementById('f-civil').value,
+    nacionalidade: document.getElementById('f-nac').value.trim(),
+    endereco: document.getElementById('f-end').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    telefone: document.getElementById('f-tel').value.trim(),
+    dataNascimento: document.getElementById('f-nasc').value,
+    profissao: document.getElementById('f-prof').value.trim(),
+    consultor: document.getElementById('f-consultor').value.trim(),
+    taxaConsultoria: parseFloat(document.getElementById('f-taxa').value) || 0,
+    corretora: document.getElementById('f-corretora').value,
+    contaCorretora: document.getElementById('f-conta').value.trim(),
+    patrimonioInvestido: parseFloat(document.getElementById('f-patrimonio').value) || 0,
+    rendaMensal: parseFloat(document.getElementById('f-renda').value) || 0,
+    // Suitability
+    perfilResultado: resultado.perfil,
+    pontuacao: resultado.score,
+    pontuacaoMaxima: resultado.maxScore,
+    percentual: Math.round(resultado.pct),
+    suitability: {},
+    criadoEm: new Date().toISOString(),
+    origem: 'formulario-clientes'
+  };
+
+  // Salvar respostas do suitability
+  var nomes = ['Objetivo','Horizonte','Necessidade dos recursos','Percentual investido','Reação a perda','Experiência com produtos','Expectativa renda futura','Intenção derivativos'];
+  for(var i=1;i<=8;i++){
+    var r=sqRespostas['sq'+i];
+    if(r) dados.suitability['p'+i+'_'+nomes[i-1].replace(/ /g,'_').toLowerCase()] = r.text;
+  }
+
+  var savedId = '';
+  db.collection('suitability').add(dados).then(function(ref){
+    savedId = ref.id;
+    // Tentar atualizar o cliente pelo CPF
+    var cpfLimpo = dados.cpf.replace(/\D/g,'');
+    return db.collection('clientes').where('cpf','==',cpfLimpo).limit(1).get();
+  }).then(function(snap){
+    if(snap && !snap.empty){
+      return snap.docs[0].ref.update({
+        perfilSuitability: resultado.perfil,
+        suitabilityId: savedId,
+        suitabilityData: new Date().toISOString(),
+        corretora: dados.corretora,
+        contaCorretora: dados.contaCorretora,
+        taxaConsultoria: dados.taxaConsultoria,
+        consultor: dados.consultor
+      });
+    }
+  }).then(function(){
+    mostrarResultado(resultado, dados.nome);
+  }).catch(function(err){
+    console.error('Erro:', err);
+    mostrarResultado(resultado, dados.nome);
+  });
+}
+
+function mostrarResultado(r, nome){
+  var sec3=document.getElementById('sec3');
+  if(sec3){sec3.classList.remove('visible');sec3.style.display='none';}
+  document.getElementById('progress-wrap').style.display='none';
+
+  var el=document.getElementById('resultado');
+  var barColors=['#00c853','#ff8c00','#f59e0b','#ff1744'];
+  var barLabels=['Conservador','Moderado','Arrojado','Agressivo'];
+
+  var html='<div class="profile-icon">'+r.icone+'</div>';
+  html+='<div style="font-size:14px;color:var(--text3);margin-bottom:4px">'+nome+'</div>';
+  html+='<div class="profile-name" style="color:'+r.cor+'">'+r.perfil+'</div>';
+  html+='<div class="profile-desc">'+r.desc+'</div>';
+  html+='<div class="profile-score">Pontuação: '+r.score+' de '+r.maxScore+' pontos ('+Math.round(r.pct)+'%)</div>';
+
+  // Barra visual
+  html+='<div class="profile-bar-wrap"><div class="profile-bar-labels">';
+  barLabels.forEach(function(l){html+='<span>'+l+'</span>';});
+  html+='</div><div class="profile-bar"><div class="profile-bar-segments">';
+  barColors.forEach(function(c){html+='<div style="background:'+c+'22"></div>';});
+  html+='</div><div class="profile-bar-fill" style="width:0%;background:'+r.cor+'"></div></div></div>';
+
+  // Detalhes das respostas
+  html+='<div class="profile-details">';
+  var labels=['Objetivo','Horizonte','Necessidade','% Investido','Reação a Perda','Experiência','Renda Futura','Derivativos'];
+  for(var i=1;i<=8;i++){
+    var resp=sqRespostas['sq'+i];
+    var txt=resp?resp.text:'—';
+    if(txt.length>55) txt=txt.substring(0,52)+'...';
+    html+='<div class="profile-detail-row"><span class="profile-detail-label">'+labels[i-1]+'</span><span class="profile-detail-value">'+txt+'</span></div>';
+  }
+  html+='</div>';
+
+  html+='<div class="success-tag" style="background:'+r.cor+'22;border:1px solid '+r.cor+'44;color:'+r.cor+'">Cadastro e perfil registrados com sucesso ✓</div>';
+
+  el.innerHTML=html;
+  el.classList.add('visible');
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+
+  setTimeout(function(){
+    el.querySelector('.profile-bar-fill').style.width=Math.round(r.pct)+'%';
+  },300);
+}
+
+// Iniciar
+document.addEventListener('DOMContentLoaded',function(){
+  var sec1=document.getElementById('sec1');
+  sec1.style.display='block';
+  setTimeout(function(){sec1.classList.add('visible');},100);
+});
+</script>
+</body>
+</html>
