@@ -2420,6 +2420,8 @@ var fmtFull=function(v){
   return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);
 };
 var fmtNum=function(v){return new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v)||0);};
+var fmtPct=function(v,d){d=d||2;return Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';};
+var fmtPctSinal=function(v,d){d=d||2;var n=Number(v||0);return (n>=0?'+':'')+n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';};
 var fmtDate=function(s){
   if(!s||s==='—')return'—';
   if(s.includes('/'))return s; // already formatted
@@ -2484,7 +2486,7 @@ function loadClienteData(){
 
 function loadData(){
   db.collection('profissionais').onSnapshot(function(snap){
-    profissionais=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    profissionais=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
     updateProfSelect();renderProfissionais();
   });
   db.collection('clientes').onSnapshot(function(snap){
@@ -2493,7 +2495,7 @@ function loadData(){
       c.custodiaTotal=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
       c.patrimonio=c.custodiaTotal;
       return c;
-    });
+    }).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
     renderClientes();renderDashboard();renderCRM();renderAlertas();
     document.getElementById('clientes-sub').textContent=clientes.length+' clientes cadastrados';
   });
@@ -3557,7 +3559,7 @@ function renderBlackDetalhe(){
   document.getElementById('black-cli-acumulado').textContent=fmtFull(totalAcum);
   document.getElementById('black-cli-acumulado').style.color=totalAcum>=0?'#00c853':'#ff1744';
   document.getElementById('black-cli-media').textContent=fmtFull(media);
-  document.getElementById('black-cli-retorno').textContent=retorno.toFixed(2)+'%';
+  document.getElementById('black-cli-retorno').textContent=fmtPct(retorno);
   document.getElementById('black-cli-retorno').style.color=retorno>=0?'#c084fc':'#ff1744';
   document.getElementById('black-cli-patrimonio').textContent=fmtFull(patrimonio);
 
@@ -3608,10 +3610,10 @@ function renderBlackDetalhe(){
     ops.forEach(function(o){ runAcum+=(o.vendas||0)-(o.compras||0); if(o.ano===op.ano&&o.mes===op.mes) acumVal=runAcum; });
 
     var tr=document.createElement('tr');
-    var ibovPct=op.ibov?op.ibov.toFixed(2)+'%':'—';
-    var cdiPct=op.cdi?op.cdi.toFixed(2)+'%':'—';
-    var dmfPct=patrimonio?(saldo/patrimonio*100).toFixed(2)+'%':'—';
-    var acumPct=patrimonio?(acumVal/patrimonio*100).toFixed(2)+'%':'—';
+    var ibovPct=op.ibov?fmtPct(op.ibov):'—';
+    var cdiPct=op.cdi?fmtPct(op.cdi):'—';
+    var dmfPct=patrimonio?fmtPct(saldo/patrimonio*100):'—';
+    var acumPct=patrimonio?fmtPct(acumVal/patrimonio*100):'—';
 
     tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
       +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#00c853':'#ff1744')+'">'+fmtFull(saldo)+'</td>'
@@ -6243,7 +6245,7 @@ function gerarDRE(){
     var margemRow = document.createElement('div');
     margemRow.style='margin-top:16px;padding:14px 16px;background:'+(margem>=0?'#00c85311':'#ff174411')+';border:1px solid '+(margem>=0?'#00c85333':'#ff174433')+';border-radius:10px;display:flex;justify-content:space-between';
     margemRow.innerHTML='<span style="font-size:13px;color:var(--text2)">Margem Líquida</span>'
-      +'<span style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:'+(margem>=0?'#00c853':'#ff1744')+'">'+margem.toFixed(1)+'%</span>';
+      +'<span style="font-family:DM Mono,monospace;font-size:16px;font-weight:700;color:'+(margem>=0?'#00c853':'#ff1744')+'">'+fmtPct(margem,1)+'</span>';
     dreCard.appendChild(margemRow);
     el.appendChild(dreCard);
 
@@ -6266,7 +6268,7 @@ function gerarDRE(){
         +'<td style="font-family:DM Mono,monospace;color:#00c853;font-size:12px">'+fmtFull(m.recTotal)+'</td>'
         +'<td style="font-family:DM Mono,monospace;color:#ff1744;font-size:12px">'+fmtFull(m.custoTotal)+'</td>'
         +'<td style="font-family:DM Mono,monospace;font-weight:600;color:'+(lb>=0?'#00c853':'#ff1744')+'">'+fmtFull(lb)+'</td>'
-        +'<td style="color:'+(mg>=0?'#00c853':'#ff1744')+';font-size:12px">'+mg.toFixed(1)+'%</td>';
+        +'<td style="color:'+(mg>=0?'#00c853':'#ff1744')+';font-size:12px">'+fmtPct(mg,1)+'</td>';
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
@@ -6769,7 +6771,7 @@ function loadMinhasOperacoes(){
       acum+=saldo;
       acumIbov+=op.ibov||0;
       acumCdi+=op.cdi||0;
-      var pctMes=pat?(saldo/pat*100).toFixed(2)+'%':'—';
+      var pctMes=pat?fmtPct(saldo/pat*100):'—';
       labels.push(MESES[op.mes-1]+'/'+op.ano);
       acumArr.push(Number(acum.toFixed(2)));
       ibovArr.push(Number(acumIbov.toFixed(2)));
@@ -7473,7 +7475,7 @@ function renderAtivosCliente(ativos, cotacoes){
   var ge=document.getElementById('mc-ganho');
   if(ge){
     var sinal = ganhoTotal>=0?'+':'';
-    ge.textContent=sinal+fmtFull(ganhoTotal)+' ('+ganhoPctTotal.toFixed(1)+'%)';
+    ge.textContent=sinal+fmtFull(ganhoTotal)+' ('+fmtPct(ganhoPctTotal,1)+')';
     ge.style.color=ganhoTotal>=0?'#00c853':'#ff1744';
   }
 
@@ -7516,7 +7518,7 @@ function renderAtivosCliente(ativos, cotacoes){
     left += '<span style="font-weight:700;color:var(--white);font-size:14px">'+a.raw.nome+'</span>';
     if(a.cot){
       var corVar = a.cot.changePct>=0?'#00c853':'#ff1744';
-      left += '<span style="font-size:11px;font-family:DM Mono,monospace;color:'+corVar+'">'+(a.cot.changePct>=0?'+':'')+a.cot.changePct.toFixed(2)+'%</span>';
+      left += '<span style="font-size:11px;font-family:DM Mono,monospace;color:'+corVar+'">'+fmtPctSinal(a.cot.changePct)+'</span>';
     }
     left += '</div>';
     left += '<div style="font-size:11px;color:var(--text3);margin-top:3px">'+(a.raw.tipo||a.raw.categoria||'');
@@ -7538,7 +7540,7 @@ function renderAtivosCliente(ativos, cotacoes){
       +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:15px;font-weight:700">'+fmtFull(a.valorAtual)+'</div>';
     if(a.investido > 0 && (a.cot || a.pm)){
       right += '<div style="font-size:11px;font-family:DM Mono,monospace;color:'+corGanho+';margin-top:2px">'
-        +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+a.ganhoPct.toFixed(1)+'%)</div>';
+        +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+fmtPct(a.ganhoPct,1)+')</div>';
     }
     right += '</div>';
 
@@ -9291,7 +9293,7 @@ function renderGradeCotacoes(cotacoes){
             h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;'+(idx?'border-top:1px solid var(--border);':'')+'">'
               +'<div style="display:flex;align-items:center;gap:6px">'+logo+'<span style="font-size:12px;font-weight:600;color:var(--white)">'+item.symbol+'</span></div>'
               +'<div style="display:flex;align-items:center;gap:8px"><span style="font-family:DM Mono,monospace;font-size:11px;color:var(--text2)">'+fmtNum(item.regularMarketPrice)+'</span>'
-              +'<span style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+cor+'">'+(v>=0?'+':'')+v.toFixed(2)+'%</span></div></div>';
+              +'<span style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+cor+'">'+fmtPctSinal(v)+'</span></div></div>';
           } else {
             // Ano
             var cor2 = tipo==='alta'?'#00c853':'#ff1744';
@@ -9340,7 +9342,7 @@ function renderGradeCotacoes(cotacoes){
       +'<span style="font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:var(--white)">'+grupo.nome+'</span>'
       +'<span style="font-size:11px;color:var(--text3)">'+tickers.length+' ativos</span></div>'
       +'<div style="display:flex;align-items:center;gap:10px">'
-      +'<span style="font-family:DM Mono,monospace;font-weight:700;font-size:13px;color:'+corMedia+'">'+(mediaVar>=0?'+':'')+mediaVar.toFixed(2)+'%</span>'
+      +'<span style="font-family:DM Mono,monospace;font-weight:700;font-size:13px;color:'+corMedia+'">'+fmtPctSinal(mediaVar)+'</span>'
       +'<button class="btn-ghost" style="padding:3px 8px;font-size:10px" onclick="editarGrupoGrade(\''+grupo.id+'\')">Editar</button>'
       +'<button class="btn-dsm" style="padding:3px 8px;font-size:10px" onclick="confirmDelete(function(){db.collection(\'grade_grupos\').doc(\''+grupo.id+'\').delete()})">×</button>'
       +'</div></div>';
@@ -9382,7 +9384,7 @@ function renderGradeCotacoes(cotacoes){
       html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'#ff8c0008\'" onmouseout="this.style.background=\'transparent\'">'
         +'<td style="padding:8px 12px;font-weight:700;color:var(--white)">'+logo+c.symbol+displayName+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:600;color:var(--white)">'+fmtNum(c.regularMarketPrice)+'</td>'
-        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+fmtPctSinal(varPct)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketDayHigh)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketDayLow)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtNum(c.regularMarketOpen)+'</td>'
@@ -10083,8 +10085,8 @@ function renderCalendarioEconomico(dados){
     dados.retrospectiva.forEach(function(r){
       var cor=r.regularMarketChangePercent>=0?'#00e676':'#ff1744';
       html+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 12px;color:#fff;font-weight:500">'+(r.shortName||r.symbol)+'</td>';
-      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:#fff">'+(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—')+'</td>';
-      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+cor+'">'+(r.regularMarketChangePercent>=0?'+':'')+r.regularMarketChangePercent.toFixed(2)+'%</td></tr>';
+      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;color:#fff">'+(r.regularMarketPrice?r.regularMarketPrice.toFixed(2).replace('.',','):'—')+'</td>';
+      html+='<td style="padding:6px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+cor+'">'+fmtPctSinal(r.regularMarketChangePercent)+'</td></tr>';
     });
     html+='</tbody></table></div>';
   }
@@ -10189,10 +10191,10 @@ function gerarPDFCalendario(){
       if(y>270){doc.addPage();y=20;}
       doc.setTextColor(30,30,30);
       doc.text(String(r.shortName||r.symbol||'').substring(0,30),marginL,y);
-      doc.text(String(r.regularMarketPrice?r.regularMarketPrice.toFixed(2):'—'),marginL+80,y);
+      doc.text(String(r.regularMarketPrice?r.regularMarketPrice.toFixed(2).replace('.',','):'—'),marginL+80,y);
       var varPct=r.regularMarketChangePercent||0;
       if(varPct>=0) doc.setTextColor(0,150,50); else doc.setTextColor(220,30,30);
-      doc.text((varPct>=0?'+':'')+varPct.toFixed(2)+'%',marginL+120,y);
+      doc.text(fmtPctSinal(varPct),marginL+120,y);
       y+=5;
     });
     y+=4;
@@ -10527,7 +10529,7 @@ function renderPanorama(allData){
         +'<td style="padding:8px 12px;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+d.symbol+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:600;color:var(--white)">'+fmtPanoramaNum(d.preco)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:600;color:'+corVar+'">'+fmtPanoramaNum(varAbs, true)+'</td>'
-        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+(d.variacao>=0?'+':'')+d.variacao.toFixed(2)+'%</td>'
+        +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-weight:700;color:'+corVar+'"><span style="font-size:10px">'+seta+'</span> '+fmtPctSinal(d.variacao)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtPanoramaNum(d.maxDia)+'</td>'
         +'<td style="padding:8px 12px;text-align:right;font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+fmtPanoramaNum(d.minDia)+'</td>'
         +'<td style="padding:8px 12px;text-align:center;font-size:11px;color:var(--text3)">'+d.hora+'</td>'
@@ -10643,15 +10645,15 @@ function renderOpcoesAssetHeader(){
     +'</div>'
     +'<div style="display:flex;align-items:baseline;gap:12px">'
     +'<span style="font-family:DM Mono,monospace;font-size:22px;font-weight:700;color:var(--white)">'+fmtNum(a.close)+'</span>'
-    +'<span style="font-family:DM Mono,monospace;font-size:15px;font-weight:700;color:'+corVar+'">'+seta+' '+(varPct>=0?'+':'')+varPct.toFixed(2)+'%</span>'
+    +'<span style="font-family:DM Mono,monospace;font-size:15px;font-weight:700;color:'+corVar+'">'+seta+' '+fmtPctSinal(varPct)+'</span>'
     +'</div>'
     +'<div style="display:flex;gap:20px;flex-wrap:wrap;margin-left:auto">'
     +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Abertura</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+fmtNum(a.open)+'</div></div>'
     +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Máxima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#00c85388">'+fmtNum(a.high)+'</div></div>'
     +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Mínima</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#ff174488">'+fmtNum(a.low)+'</div></div>'
     +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Volume</div><div style="font-family:DM Mono,monospace;font-size:13px;color:var(--text2)">'+(a.volume?Number(a.volume).toLocaleString('pt-BR'):'—')+'</div></div>'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">IV Atual</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#f59e0b">'+(a.iv_current?(a.iv_current*100).toFixed(1)+'%':'—')+'</div></div>'
-    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">EWMA</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#a78bfa">'+(a.ewma_current?(a.ewma_current*100).toFixed(1)+'%':'—')+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">IV Atual</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#f59e0b">'+(a.iv_current?fmtPct(a.iv_current*100,1):'—')+'</div></div>'
+    +'<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">EWMA</div><div style="font-family:DM Mono,monospace;font-size:13px;color:#a78bfa">'+(a.ewma_current?fmtPct(a.ewma_current*100,1):'—')+'</div></div>'
     +'</div></div></div>';
 }
 
@@ -10749,7 +10751,7 @@ function renderOpcoesChain(series, symbol){
           +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#00c853;font-size:11px">'+fmtNum(c.bid)+'</td>'
           +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:#ff1744;font-size:11px">'+fmtNum(c.ask)+'</td>'
           +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(c.volume ? Number(c.volume).toLocaleString('pt-BR') : '—')+'</td>'
-          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:'+cVarCor+';font-size:10px">'+(cVar?(cVar>=0?'+':'')+cVar.toFixed(1)+'%':'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgCall+';text-align:right;font-family:DM Mono,monospace;color:'+cVarCor+';font-size:10px">'+(cVar?fmtPctSinal(cVar,1):'—')+'</td>'
           +'<td style="padding:4px 6px;background:'+bgCall+';text-align:center;font-size:10px;border-right:1px solid var(--border)">'+(c.market_maker?'<span style="color:#f59e0b" title="Market Maker">★</span>':'')+'</td>';
       } else {
         html += '<td colspan="7" style="padding:4px 6px;color:var(--text3);font-size:10px;text-align:center;border-right:1px solid var(--border)">—</td>';
@@ -10767,7 +10769,7 @@ function renderOpcoesChain(series, symbol){
           +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#00c853;font-size:11px">'+fmtNum(p.bid)+'</td>'
           +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:#ff1744;font-size:11px">'+fmtNum(p.ask)+'</td>'
           +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:var(--text3);font-size:11px">'+(p.volume ? Number(p.volume).toLocaleString('pt-BR') : '—')+'</td>'
-          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:'+pVarCor+';font-size:10px">'+(pVar?(pVar>=0?'+':'')+pVar.toFixed(1)+'%':'—')+'</td>'
+          +'<td style="padding:4px 6px;background:'+bgPut+';text-align:right;font-family:DM Mono,monospace;color:'+pVarCor+';font-size:10px">'+(pVar?fmtPctSinal(pVar,1):'—')+'</td>'
           +'<td style="padding:4px 6px;background:'+bgPut+';text-align:center;font-size:10px">'+(p.market_maker?'<span style="color:#f59e0b" title="Market Maker">★</span>':'')+'</td>';
       } else {
         html += '<td colspan="7" style="padding:4px 6px;color:var(--text3);font-size:10px;text-align:center;border-left:1px solid var(--border)">—</td>';
