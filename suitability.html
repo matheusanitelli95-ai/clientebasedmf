@@ -586,29 +586,30 @@ function enviarFormulario(){
     if(r) dados.suitability['p'+i+'_'+nomes[i-1].replace(/ /g,'_').toLowerCase()] = r.text;
   }
 
-  var savedId = '';
   db.collection('suitability').add(dados).then(function(ref){
-    savedId = ref.id;
-    // Tentar atualizar o cliente pelo CPF
-    var cpfLimpo = dados.cpf.replace(/\D/g,'');
-    return db.collection('clientes').where('cpf','==',cpfLimpo).limit(1).get();
-  }).then(function(snap){
-    if(snap && !snap.empty){
-      return snap.docs[0].ref.update({
-        perfilSuitability: resultado.perfil,
-        suitabilityId: savedId,
-        suitabilityData: new Date().toISOString(),
-        corretora: dados.corretora,
-        contaCorretora: dados.contaCorretora,
-        taxaConsultoria: dados.taxaConsultoria,
-        consultor: dados.consultor
-      });
-    }
-  }).then(function(){
+    // Salvo com sucesso — mostrar resultado
     mostrarResultado(resultado, dados.nome);
+    // Tentar atualizar cliente pelo CPF (opcional, pode falhar sem problema)
+    try {
+      var cpfLimpo = dados.cpf.replace(/\D/g,'');
+      db.collection('clientes').where('cpf','==',cpfLimpo).limit(1).get().then(function(snap){
+        if(snap && !snap.empty){
+          snap.docs[0].ref.update({
+            perfilSuitability: resultado.perfil,
+            suitabilityId: ref.id,
+            suitabilityData: new Date().toISOString(),
+            corretora: dados.corretora,
+            contaCorretora: dados.contaCorretora,
+            taxaConsultoria: dados.taxaConsultoria,
+            consultor: dados.consultor
+          }).catch(function(){});
+        }
+      }).catch(function(){});
+    } catch(e){}
   }).catch(function(err){
-    console.error('Erro:', err);
-    mostrarResultado(resultado, dados.nome);
+    console.error('Erro ao salvar:', err);
+    alert('Erro ao salvar. Tente novamente. Se o problema persistir, entre em contato com a DMF.');
+    btn.textContent='Enviar e ver perfil →'; btn.disabled=false;
   });
 }
 
