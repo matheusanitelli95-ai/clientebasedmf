@@ -222,7 +222,7 @@ textarea.field-input{resize:vertical;min-height:80px}
       </div>
       <div class="field">
         <label>10. Data de Nascimento <span class="req">*</span></label>
-        <input class="field-input" id="f-nasc" type="date" onchange="checkSec1()">
+        <input class="field-input" id="f-nasc" placeholder="DD/MM/AAAA" maxlength="10" oninput="maskData(this);checkSec1()">
       </div>
       <div class="field">
         <label>11. Profissão</label>
@@ -246,7 +246,7 @@ textarea.field-input{resize:vertical;min-height:80px}
       </div>
       <div class="field">
         <label>13. Taxa de Consultoria (% anual) <span class="req">*</span></label>
-        <input class="field-input" id="f-taxa" type="number" step="0.01" min="0" max="10" placeholder="Ex: 0.80" oninput="checkSec2()">
+        <input class="field-input" id="f-taxa" placeholder="Ex: 0,80" oninput="checkSec2()">
       </div>
       <div class="field">
         <label>14. Corretora <span class="req">*</span></label>
@@ -269,11 +269,11 @@ textarea.field-input{resize:vertical;min-height:80px}
       </div>
       <div class="field">
         <label>16. Patrimônio Investido Aproximado</label>
-        <input class="field-input" id="f-patrimonio" placeholder="Ex: 500000" type="number" step="1000">
+        <input class="field-input" id="f-patrimonio" placeholder="Ex: 500.000,00" oninput="maskDinheiro(this)">
       </div>
       <div class="field">
         <label>17. Renda Mensal Bruta Aproximada</label>
-        <input class="field-input" id="f-renda" placeholder="Ex: 15000" type="number" step="500">
+        <input class="field-input" id="f-renda" placeholder="Ex: 15.000,00" oninput="maskDinheiro(this)">
       </div>
     </div>
 
@@ -416,6 +416,27 @@ function maskTel(el){
   v=v.replace(/(\d{5})(\d)/,'$1-$2');
   el.value=v;
 }
+function maskData(el){
+  var v=el.value.replace(/\D/g,'').substring(0,8);
+  if(v.length>4) v=v.replace(/(\d{2})(\d{2})(\d{1,4})/,'$1/$2/$3');
+  else if(v.length>2) v=v.replace(/(\d{2})(\d{1,2})/,'$1/$2');
+  el.value=v;
+}
+function maskDinheiro(el){
+  var v=el.value.replace(/\D/g,'');
+  if(!v){el.value='';return;}
+  var num=parseInt(v,10);
+  var reais=Math.floor(num/100);
+  var centavos=num%100;
+  var parteInteira=reais.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  el.value=parteInteira+','+String(centavos).padStart(2,'0');
+}
+function parseBRL(str){
+  if(!str) return 0;
+  var s=str.replace(/\./g,'').replace(',','.');
+  var n=parseFloat(s);
+  return isNaN(n)?0:n;
+}
 
 // ─── Validações por seção ───
 function checkSec1(){
@@ -429,7 +450,8 @@ function checkSec1(){
   if(!document.getElementById('f-end').value.trim()) ok=false;
   if(!document.getElementById('f-email').value.includes('@')) ok=false;
   if(document.getElementById('f-tel').value.replace(/\D/g,'').length < 10) ok=false;
-  if(!document.getElementById('f-nasc').value) ok=false;
+  var nascVal=document.getElementById('f-nasc').value;
+  if(nascVal.length!==10||!/^\d{2}\/\d{2}\/\d{4}$/.test(nascVal)) ok=false;
   document.getElementById('btn-sec1').disabled = !ok;
 }
 
@@ -542,11 +564,11 @@ function enviarFormulario(){
     dataNascimento: document.getElementById('f-nasc').value,
     profissao: document.getElementById('f-prof').value.trim(),
     consultor: document.getElementById('f-consultor').value.trim(),
-    taxaConsultoria: parseFloat(document.getElementById('f-taxa').value) || 0,
+    taxaConsultoria: parseBRL(document.getElementById('f-taxa').value),
     corretora: document.getElementById('f-corretora').value,
     contaCorretora: document.getElementById('f-conta').value.trim(),
-    patrimonioInvestido: parseFloat(document.getElementById('f-patrimonio').value) || 0,
-    rendaMensal: parseFloat(document.getElementById('f-renda').value) || 0,
+    patrimonioInvestido: parseBRL(document.getElementById('f-patrimonio').value),
+    rendaMensal: parseBRL(document.getElementById('f-renda').value),
     // Suitability
     perfilResultado: resultado.perfil,
     pontuacao: resultado.score,
