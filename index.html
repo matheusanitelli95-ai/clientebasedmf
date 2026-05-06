@@ -813,7 +813,9 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="page-title" id="black-detalhe-title">—</div>
           <div class="page-sub" id="black-detalhe-sub">—</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn-secondary" id="btn-hide-nomes2" onclick="toggleBlackHide('nomes')" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Ocultar Nomes</button>
+          <button class="btn-secondary" id="btn-hide-valores2" onclick="toggleBlackHide('valores')" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Ocultar Valores</button>
           <button class="btn-secondary" onclick="openModalBlackLanc('simplificado')">+ Simplificado</button>
           <button class="btn-secondary" onclick="openModalBlackLanc('detalhado')">+ Detalhado</button>
           <button class="btn-secondary" onclick="openImportPlanilha()">Importar Planilha</button>
@@ -3425,18 +3427,29 @@ function getVencimentoFromCodigo(codigo, anoVenc){
 
 // ── Ocultar nomes/valores ─────────────────────────────────
 var blackHideNomes=false, blackHideValores=false;
+function syncHideBtns(){
+  var eyeOpen='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var eyeClosed='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+  var dollarIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+  ['btn-hide-nomes','btn-hide-nomes2'].forEach(function(id){
+    var b=document.getElementById(id);if(!b)return;
+    b.style.background=blackHideNomes?'var(--blue)':'';b.style.color=blackHideNomes?'#000':'';
+    b.innerHTML=(blackHideNomes?eyeOpen+' Mostrar Nomes':eyeClosed+' Ocultar Nomes');
+  });
+  ['btn-hide-valores','btn-hide-valores2'].forEach(function(id){
+    var b=document.getElementById(id);if(!b)return;
+    b.style.background=blackHideValores?'var(--blue)':'';b.style.color=blackHideValores?'#000':'';
+    b.innerHTML=(blackHideValores?eyeOpen+' Mostrar Valores':dollarIcon+' Ocultar Valores');
+  });
+}
 function toggleBlackHide(tipo){
-  if(tipo==='nomes'){
-    blackHideNomes=!blackHideNomes;
-    var btn=document.getElementById('btn-hide-nomes');
-    if(btn){btn.style.background=blackHideNomes?'var(--blue)':'';btn.style.color=blackHideNomes?'#000':'';btn.innerHTML=(blackHideNomes?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mostrar Nomes':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Ocultar Nomes');}
-  } else {
-    blackHideValores=!blackHideValores;
-    var btn=document.getElementById('btn-hide-valores');
-    if(btn){btn.style.background=blackHideValores?'var(--blue)':'';btn.style.color=blackHideValores?'#000':'';btn.innerHTML=(blackHideValores?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mostrar Valores':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Ocultar Valores');}
-  }
+  if(tipo==='nomes') blackHideNomes=!blackHideNomes;
+  else blackHideValores=!blackHideValores;
+  syncHideBtns();
   loadBlackOperacoes();
   if(currentBlackClienteId) renderBlackDetalhe();
+  // Update detail title
+  if(blackHideNomes){document.getElementById('black-detalhe-title').textContent='●●●●●●●●';}
 }
 function maskNome(nome){return blackHideNomes?'●●●●●●●●':nome;}
 function maskVal(val){return blackHideValores?'R$ ●●●●':fmtFull(val);}
