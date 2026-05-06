@@ -786,7 +786,11 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="view" id="view-black-operacoes">
       <div class="page-header">
         <div><div class="page-title">Operações DMF Black</div><div class="page-sub">Controle de operações com opções por cliente</div></div>
-        <button class="btn-primary" onclick="openBlackClienteSelector()">+ Adicionar Cliente</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn-secondary" id="btn-hide-nomes" onclick="toggleBlackHide('nomes')" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Ocultar Nomes</button>
+          <button class="btn-secondary" id="btn-hide-valores" onclick="toggleBlackHide('valores')" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Ocultar Valores</button>
+          <button class="btn-primary" onclick="openBlackClienteSelector()">+ Adicionar Cliente</button>
+        </div>
       </div>
       <div class="page-content">
         <!-- KPIs gerais -->
@@ -3419,6 +3423,25 @@ function getVencimentoFromCodigo(codigo, anoVenc){
   return anoVenc+'-'+String(mes).padStart(2,'0')+'-15'; // approx
 }
 
+// ── Ocultar nomes/valores ─────────────────────────────────
+var blackHideNomes=false, blackHideValores=false;
+function toggleBlackHide(tipo){
+  if(tipo==='nomes'){
+    blackHideNomes=!blackHideNomes;
+    var btn=document.getElementById('btn-hide-nomes');
+    if(btn){btn.style.background=blackHideNomes?'var(--blue)':'';btn.style.color=blackHideNomes?'#000':'';btn.innerHTML=(blackHideNomes?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mostrar Nomes':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Ocultar Nomes');}
+  } else {
+    blackHideValores=!blackHideValores;
+    var btn=document.getElementById('btn-hide-valores');
+    if(btn){btn.style.background=blackHideValores?'var(--blue)':'';btn.style.color=blackHideValores?'#000':'';btn.innerHTML=(blackHideValores?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mostrar Valores':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Ocultar Valores');}
+  }
+  loadBlackOperacoes();
+  if(currentBlackClienteId) renderBlackDetalhe();
+}
+function maskNome(nome){return blackHideNomes?'●●●●●●●●':nome;}
+function maskVal(val){return blackHideValores?'R$ ●●●●':fmtFull(val);}
+function maskValCompact(val){return blackHideValores?'R$ ●●●':fmt(val);}
+
 // ── Load ──────────────────────────────────────────────────
 function loadBlackOperacoes(){
   db.collection('black_operacoes').onSnapshot(function(snap){
@@ -3455,9 +3478,9 @@ function renderBlackDashboard(ops){
     });
   });
   document.getElementById('black-kpi-clientes').textContent=list.length;
-  document.getElementById('black-kpi-acumulado').textContent=fmt(totAcum);
-  document.getElementById('black-kpi-mes').textContent=fmt(totMes);
-  document.getElementById('black-kpi-custos').textContent=fmt(totCustos);
+  document.getElementById('black-kpi-acumulado').textContent=blackHideValores?'R$ ●●●':fmt(totAcum);
+  document.getElementById('black-kpi-mes').textContent=blackHideValores?'R$ ●●●':fmt(totMes);
+  document.getElementById('black-kpi-custos').textContent=blackHideValores?'R$ ●●●':fmt(totCustos);
 
   var el=document.getElementById('black-clientes-list');
   el.innerHTML='';
@@ -3476,13 +3499,13 @@ function renderBlackDashboard(ops){
     card.onmouseout=function(){this.style.borderColor='var(--border)';};
     var av=document.createElement('div');
     av.style='width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#cc7000,#ff8c00);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:#fff;flex-shrink:0';
-    av.textContent=initials(c.nome);
+    av.textContent=blackHideNomes?'●●':initials(c.nome);
     var info=document.createElement('div');info.style='flex:1';
-    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+c.nome+'</div><div style="font-size:11px;color:var(--text3)">'+meses+' meses operados</div>';
+    info.innerHTML='<div style="font-family:Syne,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">'+maskNome(c.nome)+'</div><div style="font-size:11px;color:var(--text3)">'+meses+' meses operados</div>';
     var stats=document.createElement('div');stats.style='display:flex;gap:28px;align-items:center';
-    stats.innerHTML='<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Acumulado</div><div style="font-family:DM Mono,monospace;color:#00c853;font-size:16px;font-weight:700">'+fmtFull(acum)+'</div></div>'
-      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Custos</div><div style="font-family:DM Mono,monospace;color:#ff1744;font-size:14px;font-weight:600">'+fmtFull(custos)+'</div></div>'
-      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Líquido</div><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:700">'+fmtFull(liquido)+'</div></div>';
+    stats.innerHTML='<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Acumulado</div><div style="font-family:DM Mono,monospace;color:#00c853;font-size:16px;font-weight:700">'+maskVal(acum)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Custos</div><div style="font-family:DM Mono,monospace;color:#ff1744;font-size:14px;font-weight:600">'+maskVal(custos)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Líquido</div><div style="font-family:DM Mono,monospace;color:var(--blue);font-size:16px;font-weight:700">'+maskVal(liquido)+'</div></div>';
     var arrow=document.createElement('div');arrow.style='color:var(--text3);font-size:18px';arrow.textContent='→';
     (function(cid,cnome){card.onclick=function(){openBlackCliente(cid,cnome);};;})(c.id,c.nome);
     card.appendChild(av);card.appendChild(info);card.appendChild(stats);card.appendChild(arrow);
@@ -3508,7 +3531,7 @@ function addBlackCliente(){
 // ── Detalhe ───────────────────────────────────────────────
 function openBlackCliente(clienteId,clienteNome){
   currentBlackClienteId=clienteId;
-  document.getElementById('black-detalhe-title').textContent=clienteNome;
+  document.getElementById('black-detalhe-title').textContent=maskNome(clienteNome);
   document.getElementById('black-detalhe-sub').textContent='Histórico de operações com opções';
   showView('black-detalhe',null);
   db.collection('black_operacoes').where('clienteId','==',clienteId).onSnapshot(function(snap){
@@ -3556,18 +3579,18 @@ function renderBlackDetalhe(){
   var patrimonio=cli?(cli.custodiaRF||0)+(cli.custodiaRV||0):0;
   var retorno=patrimonio?((totalAcum/patrimonio)*100):0;
 
-  document.getElementById('black-cli-acumulado').textContent=fmtFull(totalAcum);
+  document.getElementById('black-cli-acumulado').textContent=blackHideValores?'R$ ●●●●':fmtFull(totalAcum);
   document.getElementById('black-cli-acumulado').style.color=totalAcum>=0?'#00c853':'#ff1744';
-  document.getElementById('black-cli-media').textContent=fmtFull(media);
-  document.getElementById('black-cli-retorno').textContent=fmtPct(retorno);
+  document.getElementById('black-cli-media').textContent=blackHideValores?'R$ ●●●●':fmtFull(media);
+  document.getElementById('black-cli-retorno').textContent=blackHideValores?'●●%':fmtPct(retorno);
   document.getElementById('black-cli-retorno').style.color=retorno>=0?'#c084fc':'#ff1744';
-  document.getElementById('black-cli-patrimonio').textContent=fmtFull(patrimonio);
+  document.getElementById('black-cli-patrimonio').textContent=blackHideValores?'R$ ●●●●':fmtFull(patrimonio);
 
   // Load config (margem/notional)
   db.collection('black_config').doc(currentBlackClienteId).get().then(function(doc){
     var cfg=doc.exists?doc.data():{};
-    document.getElementById('black-cli-margem').textContent=fmtFull(cfg.margem||0);
-    document.getElementById('black-cli-notional').textContent=fmtFull(cfg.notional||0);
+    document.getElementById('black-cli-margem').textContent=blackHideValores?'R$ ●●●●':fmtFull(cfg.margem||0);
+    document.getElementById('black-cli-notional').textContent=blackHideValores?'R$ ●●●●':fmtFull(cfg.notional||0);
   }).catch(function(){});
 
   // Chart
@@ -3616,9 +3639,9 @@ function renderBlackDetalhe(){
     var acumPct=patrimonio?fmtPct(acumVal/patrimonio*100):'—';
 
     tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#00c853':'#ff1744')+'">'+fmtFull(saldo)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--blue)">'+fmtFull(op.carteiraTotal||0)+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'#00c853':'#ff1744')+'">'+fmtFull(acumVal)+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#00c853':'#ff1744')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(saldo))+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--blue)">'+(blackHideValores?'R$ ●●●●':fmtFull(op.carteiraTotal||0))+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'#00c853':'#ff1744')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(acumVal))+'</td>'
       +'<td style="font-size:12px;color:'+(saldo>=0?'#00c853':'#ff1744')+'">'+dmfPct+'</td>'
       +'<td style="font-size:12px;color:#00c853">'+ibovPct+'</td>'
       +'<td style="font-size:12px;color:#f59e0b">'+cdiPct+'</td>'
@@ -8820,10 +8843,10 @@ function renderBlackDashboard2(){
 
   // Update KPI elements
   var setEl = function(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; };
-  setEl('bkd-acum', fmtFull(acumTotal));
-  setEl('bkd-mes', (saldoMes>=0?'+':'')+fmtFull(saldoMes));
-  setEl('bkd-trim', (saldoTrim>=0?'+':'')+fmtFull(saldoTrim));
-  setEl('bkd-retorno', fmtFull(retornoMedio));
+  setEl('bkd-acum', blackHideValores?'R$ ●●●●':fmtFull(acumTotal));
+  setEl('bkd-mes', blackHideValores?'R$ ●●●●':(saldoMes>=0?'+':'')+fmtFull(saldoMes));
+  setEl('bkd-trim', blackHideValores?'R$ ●●●●':(saldoTrim>=0?'+':'')+fmtFull(saldoTrim));
+  setEl('bkd-retorno', blackHideValores?'R$ ●●●●':fmtFull(retornoMedio));
 
   // Color KPIs
   var mesEl = document.getElementById('bkd-mes');
@@ -8886,11 +8909,11 @@ function renderBlackDashboard2(){
     var row = document.createElement('div');
     row.style = 'display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)';
     row.innerHTML = '<div style="font-family:DM Mono,monospace;font-size:11px;color:var(--text3);width:20px;text-align:right">'+(i+1)+'</div>'
-      +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px">'+r.nome+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px">'+maskNome(r.nome)+'</div>'
       +'<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">'
       +'<div style="height:100%;width:'+pct+'%;background:'+cor+';border-radius:2px;transition:width .4s"></div>'
       +'</div></div>'
-      +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:'+cor+';white-space:nowrap">'+fmtFull(r.acum)+'</div>';
+      +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:'+cor+';white-space:nowrap">'+(blackHideValores?'R$ ●●●●':fmtFull(r.acum))+'</div>';
     rankEl.appendChild(row);
   });
 }
