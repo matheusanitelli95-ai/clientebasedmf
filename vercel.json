@@ -14,12 +14,19 @@
     },
     "api/cron-premercado.js": {
       "maxDuration": 30
+    },
+    "api/backup.js": {
+      "maxDuration": 60
     }
   },
   "crons": [
     {
       "path": "/api/cron-premercado",
       "schedule": "30 12 * * 1-5"
+    },
+    {
+      "path": "/api/backup",
+      "schedule": "0 6 * * 0"
     }
   ]
 }
