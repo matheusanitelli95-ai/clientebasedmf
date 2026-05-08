@@ -11,7 +11,7 @@
   gf.href = 'https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap';
   document.head.appendChild(gf);
 
-  // 2. Inject CSS â faithful replica of Construtor de Capital style
+  // 2. Inject CSS — faithful replica of Construtor de Capital style
   var css = document.createElement('style');
   css.textContent = `
     :root {
@@ -66,7 +66,7 @@
       font-size: 13px; font-weight: 700; color: var(--amber);
       letter-spacing: 0.8px; text-transform: uppercase;
     }
-    .pnm-sh::before { content: "â  "; }
+    .pnm-sh::before { content: "█  "; }
 
     /* Section wrapper */
     .pnm-sec { margin-bottom: 16px; }
@@ -133,11 +133,11 @@
 
   // 3. Helpers
   function fmt(v) {
-    if (typeof v !== 'number' || isNaN(v)) return 'â';
+    if (typeof v !== 'number' || isNaN(v)) return '—';
     return typeof fmtPanoramaNum === 'function' ? fmtPanoramaNum(v) : v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
   function fmtVar(v) {
-    if (typeof v !== 'number' || isNaN(v)) return 'â';
+    if (typeof v !== 'number' || isNaN(v)) return '—';
     return (v > 0 ? '+' : '') + v.toFixed(2) + '%';
   }
   function varCls(v) {
@@ -145,7 +145,7 @@
     return v > 0 ? 'pnm-gr' : v < 0 ? 'pnm-rd' : 'pnm-dm';
   }
   function badge(v) {
-    if (typeof v !== 'number') return '<span class="pnm-badge pnm-bnt">â</span>';
+    if (typeof v !== 'number') return '<span class="pnm-badge pnm-bnt">—</span>';
     var c = v > 0 ? 'pnm-bp' : v < 0 ? 'pnm-bn' : 'pnm-bnt';
     return '<span class="pnm-badge ' + c + '">' + fmtVar(v) + '</span>';
   }
@@ -153,15 +153,15 @@
   // Ticker categorization
   var CAT = {
     'INDICES_BR': {
-      label: 'ÃNDICES BRASIL',
+      label: 'ÍNDICES BRASIL',
       tickers: ['IBOV','IFIX','SMLL','IDIV','IBXX']
     },
     'ACOES_BR': {
-      label: 'AÃÃES B3 â DESTAQUES',
+      label: 'AÇÕES B3 — DESTAQUES',
       tickers: ['PETR4','VALE3','ITUB4','BBDC4','BBAS3','WEGE3','RENT3','ABEV3','MGLU3','SUZB3','B3SA3','ELET3','ELET6','JBSS3','HAPV3','RDOR3','PRIO3','CSAN3','GGBR4','CSNA3','EMBR3','LREN3','VIVT3','TOTS3','RADL3','RAIL3']
     },
     'MOEDAS': {
-      label: 'MOEDAS & CÃMBIO',
+      label: 'MOEDAS & CÂMBIO',
       tickers: ['USDBRL','EURBRL','GBPBRL','EURUSD','GBPUSD','USDJPY','DXY']
     },
     'COMMODITIES': {
@@ -169,7 +169,7 @@
       tickers: ['PETR','BRENT','WTI','CL','GC','SI','OURO','GOLD','PRATA','SILVER','SOJA','MILHO','CAFE','IRON','HG','NG']
     },
     'INDICES_GLOBAL': {
-      label: 'ÃNDICES GLOBAIS',
+      label: 'ÍNDICES GLOBAIS',
       tickers: ['SP500','SPX','DOWI','DJI','IXIC','NDX','COMP','VIX','FTSE','DAX','CAC','NIKKEI','N225','HSI','SSEC','STOXX','STOXX50','KOSPI','ASX','RUSSELL','RTY','NQ','ES','YM']
     },
     'JUROS': {
@@ -239,11 +239,11 @@
     var h = '<table class="pnm-tbl"><thead><tr>';
     h += '<td style="width:65px">TICKER</td>';
     h += '<td>NOME</td>';
-    h += '<td style="width:85px">PREÃO</td>';
+    h += '<td style="width:85px">PREÇO</td>';
     h += '<td style="width:70px">VAR %</td>';
     h += '<td style="width:85px">ABERTURA</td>';
-    h += '<td style="width:75px">MÃX</td>';
-    h += '<td style="width:75px">MÃN</td>';
+    h += '<td style="width:75px">MÁX</td>';
+    h += '<td style="width:75px">MÍN</td>';
     h += '<td style="width:90px">VOLUME</td>';
     h += '</tr></thead><tbody>';
     items.forEach(function(d) {
@@ -300,7 +300,7 @@
       }
     });
     html += '<div class="pnm-news-bar">';
-    html += '<strong>PANORAMA DO MERCADO</strong> Â· ' + newsItems.slice(0, 12).join(' Â· ');
+    html += '<strong>PANORAMA DO MERCADO</strong> · ' + newsItems.slice(0, 12).join(' · ');
     html += '</div>';
 
     // === CATEGORIZED SECTIONS ===
@@ -320,8 +320,8 @@
     var timeStr = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
     var dateStr = now.toLocaleDateString('pt-BR');
     html += '<div class="pnm-footer">';
-    html += '<span>DMF Â· Panorama do Mercado</span>';
-    html += '<span>' + dateStr + ' Â· ' + timeStr + '</span>';
+    html += '<span>DMF · Panorama do Mercado</span>';
+    html += '<span>' + dateStr + ' · ' + timeStr + '</span>';
     html += '</div>';
 
     container.innerHTML = html;
