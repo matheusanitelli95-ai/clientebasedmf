@@ -11,7 +11,7 @@
   gf.href = 'https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap';
   document.head.appendChild(gf);
 
-  // 2. Inject CSS — faithful replica of Construtor de Capital style
+  // 2. Inject CSS â faithful replica of Construtor de Capital style
   var css = document.createElement('style');
   css.textContent = `
     :root {
@@ -66,7 +66,7 @@
       font-size: 13px; font-weight: 700; color: var(--amber);
       letter-spacing: 0.8px; text-transform: uppercase;
     }
-    .pnm-sh::before { content: "\2588  "; }
+    .pnm-sh::before { content: "â  "; }
 
     /* Section wrapper */
     .pnm-sec { margin-bottom: 16px; }
@@ -133,11 +133,11 @@
 
   // 3. Helpers
   function fmt(v) {
-    if (typeof v !== 'number' || isNaN(v)) return '—';
+    if (typeof v !== 'number' || isNaN(v)) return 'â';
     return typeof fmtPanoramaNum === 'function' ? fmtPanoramaNum(v) : v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
   function fmtVar(v) {
-    if (typeof v !== 'number' || isNaN(v)) return '—';
+    if (typeof v !== 'number' || isNaN(v)) return 'â';
     return (v > 0 ? '+' : '') + v.toFixed(2) + '%';
   }
   function varCls(v) {
@@ -145,7 +145,7 @@
     return v > 0 ? 'pnm-gr' : v < 0 ? 'pnm-rd' : 'pnm-dm';
   }
   function badge(v) {
-    if (typeof v !== 'number') return '<span class="pnm-badge pnm-bnt">—</span>';
+    if (typeof v !== 'number') return '<span class="pnm-badge pnm-bnt">â</span>';
     var c = v > 0 ? 'pnm-bp' : v < 0 ? 'pnm-bn' : 'pnm-bnt';
     return '<span class="pnm-badge ' + c + '">' + fmtVar(v) + '</span>';
   }
@@ -153,15 +153,15 @@
   // Ticker categorization
   var CAT = {
     'INDICES_BR': {
-      label: 'ÍNDICES BRASIL',
+      label: 'ÃNDICES BRASIL',
       tickers: ['IBOV','IFIX','SMLL','IDIV','IBXX']
     },
     'ACOES_BR': {
-      label: 'AÇÕES B3 — DESTAQUES',
+      label: 'AÃÃES B3 â DESTAQUES',
       tickers: ['PETR4','VALE3','ITUB4','BBDC4','BBAS3','WEGE3','RENT3','ABEV3','MGLU3','SUZB3','B3SA3','ELET3','ELET6','JBSS3','HAPV3','RDOR3','PRIO3','CSAN3','GGBR4','CSNA3','EMBR3','LREN3','VIVT3','TOTS3','RADL3','RAIL3']
     },
     'MOEDAS': {
-      label: 'MOEDAS & CÂMBIO',
+      label: 'MOEDAS & CÃMBIO',
       tickers: ['USDBRL','EURBRL','GBPBRL','EURUSD','GBPUSD','USDJPY','DXY']
     },
     'COMMODITIES': {
@@ -169,7 +169,7 @@
       tickers: ['PETR','BRENT','WTI','CL','GC','SI','OURO','GOLD','PRATA','SILVER','SOJA','MILHO','CAFE','IRON','HG','NG']
     },
     'INDICES_GLOBAL': {
-      label: 'ÍNDICES GLOBAIS',
+      label: 'ÃNDICES GLOBAIS',
       tickers: ['SP500','SPX','DOWI','DJI','IXIC','NDX','COMP','VIX','FTSE','DAX','CAC','NIKKEI','N225','HSI','SSEC','STOXX','STOXX50','KOSPI','ASX','RUSSELL','RTY','NQ','ES','YM']
     },
     'JUROS': {
@@ -185,6 +185,7 @@
   function categorize(allData) {
     var result = {};
     var used = {};
+    // First pass: match known tickers to categories
     var catOrder = ['INDICES_BR','ACOES_BR','COMMODITIES','MOEDAS','INDICES_GLOBAL','JUROS','CRIPTO'];
     catOrder.forEach(function(catKey) {
       var cat = CAT[catKey];
@@ -199,6 +200,7 @@
         result[catKey] = { label: cat.label, items: items };
       }
     });
+    // Second pass: any remaining tickers go to "OUTROS"
     var outros = [];
     Object.keys(allData).forEach(function(tk) {
       if (!used[tk]) {
@@ -211,12 +213,14 @@
     return result;
   }
 
+  // Pick top tickers for the ticker bar
   function pickTopTickers(allData) {
     var priority = ['IBOV','USDBRL','PETR4','VALE3','SP500','BTC','DXY','VIX','WEGE3','BBAS3','ITUB4','BBDC4'];
     var picked = [];
     for (var i = 0; i < priority.length && picked.length < 6; i++) {
       if (allData[priority[i]]) picked.push(allData[priority[i]]);
     }
+    // If less than 6, fill with whatever is available
     if (picked.length < 6) {
       var pickedSyms = {};
       picked.forEach(function(d){ pickedSyms[d.symbol] = true; });
@@ -230,15 +234,16 @@
     return picked;
   }
 
+  // Build table HTML
   function buildTable(items) {
     var h = '<table class="pnm-tbl"><thead><tr>';
     h += '<td style="width:65px">TICKER</td>';
     h += '<td>NOME</td>';
-    h += '<td style="width:85px">PREÇO</td>';
+    h += '<td style="width:85px">PREÃO</td>';
     h += '<td style="width:70px">VAR %</td>';
     h += '<td style="width:85px">ABERTURA</td>';
-    h += '<td style="width:75px">MÁX</td>';
-    h += '<td style="width:75px">MÍN</td>';
+    h += '<td style="width:75px">MÃX</td>';
+    h += '<td style="width:75px">MÃN</td>';
     h += '<td style="width:90px">VOLUME</td>';
     h += '</tr></thead><tbody>';
     items.forEach(function(d) {
@@ -258,6 +263,7 @@
     return h;
   }
 
+  // 4. Override renderPanorama
   window.renderPanorama = function(allData) {
     window.__panoramaData = allData;
     var body = document.getElementById('panorama-body');
@@ -272,6 +278,7 @@
 
     var html = '';
 
+    // === TICKER BAR ===
     var topTickers = pickTopTickers(allData);
     html += '<div class="pnm-ticker-bar">';
     topTickers.forEach(function(d) {
@@ -284,6 +291,7 @@
     });
     html += '</div>';
 
+    // === NEWS BAR ===
     var newsItems = [];
     Object.keys(allData).forEach(function(tk) {
       var d = allData[tk];
@@ -292,9 +300,10 @@
       }
     });
     html += '<div class="pnm-news-bar">';
-    html += '<strong>PANORAMA DO MERCADO</strong> · ' + newsItems.slice(0, 12).join(' · ');
+    html += '<strong>PANORAMA DO MERCADO</strong> Â· ' + newsItems.slice(0, 12).join(' Â· ');
     html += '</div>';
 
+    // === CATEGORIZED SECTIONS ===
     var cats = categorize(allData);
     var catOrder = ['INDICES_BR','ACOES_BR','COMMODITIES','MOEDAS','INDICES_GLOBAL','JUROS','CRIPTO','OUTROS'];
     catOrder.forEach(function(catKey) {
@@ -306,12 +315,13 @@
       html += '</div>';
     });
 
+    // === FOOTER ===
     var now = new Date();
     var timeStr = now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
     var dateStr = now.toLocaleDateString('pt-BR');
     html += '<div class="pnm-footer">';
-    html += '<span>DMF · Panorama do Mercado</span>';
-    html += '<span>' + dateStr + ' · ' + timeStr + '</span>';
+    html += '<span>DMF Â· Panorama do Mercado</span>';
+    html += '<span>' + dateStr + ' Â· ' + timeStr + '</span>';
     html += '</div>';
 
     container.innerHTML = html;
