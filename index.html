@@ -6974,10 +6974,12 @@ function toggleUsrPerfil(){
   if(profWrap) profWrap.style.display = perfil!=='cliente' ? 'flex' : 'none';
   if(cliWrap) cliWrap.style.display = perfil==='cliente' ? 'flex' : 'none';
   if(cliIdWrap) cliIdWrap.style.display = perfil==='cliente' ? 'flex' : 'none';
-  // Clear fields when switching
-  document.getElementById('usr-nome').value = '';
-  document.getElementById('usr-email').value = '';
-  document.getElementById('usr-cliente-id').value = '';
+  // Limpar campos apenas se for novo usuário (não editando)
+  if(!editingUsrId){
+    document.getElementById('usr-nome').value = '';
+    document.getElementById('usr-email').value = '';
+    document.getElementById('usr-cliente-id').value = '';
+  }
 }
 
 function preencherUsrDeProfissional(){
@@ -7049,8 +7051,8 @@ function saveUsuario(){
     clienteNome:clienteNome,
     atualizadoEm:new Date().toISOString()
   };
-  // Use email as document ID for easy lookup on login
-  db.collection('usuarios').doc(email).set(data).then(function(){
+  // Use email as document ID for easy lookup on login (merge para não perder uid e outros campos)
+  db.collection('usuarios').doc(email).set(data,{merge:true}).then(function(){
     closeModal('modal-usuario');
   });
 }
