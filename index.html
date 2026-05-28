@@ -516,7 +516,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div id="app-screen">
 <div class="app-layout">
 
-  <div class="sidebar">
+  <div class="sidebar" id="main-sidebar" style="visibility:hidden">
     <div class="sidebar-logo">
       <img src="https://raw.githubusercontent.com/matheusanitelli95-ai/clientebasedmf/main/LOGO.DMF.PNG.png" alt="DMF" class="dmf-logo-img" style="height:36px;width:auto;object-fit:contain" onerror="this.style.display='none';document.getElementById('logo-fallback-sidebar').style.display='inline-flex'">
       <div id="logo-fallback-sidebar" class="dmf-logo-sm" style="display:none">
@@ -2510,11 +2510,9 @@ function loadData(){
 
 // NAV
 function showView(v,btn){
-  // Security: block company views for clients
-  if(currentPerfil === 'cliente'){
-    var clienteMenus = PERFIL_MENUS.cliente || [];
-    if(clienteMenus.indexOf(v) < 0) return;
-  }
+  // Security: block views not in user's PERFIL_MENUS
+  var allowedMenus = PERFIL_MENUS[currentPerfil];
+  if(allowedMenus && allowedMenus.indexOf(v) < 0) return;
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});
   var viewEl = document.getElementById('view-'+v);
@@ -6546,6 +6544,9 @@ auth.onAuthStateChanged(function(user){
         var dashView = document.getElementById('view-dashboard');
         if(dashView) dashView.classList.add('active');
       }
+      // Só mostra sidebar e conteúdo DEPOIS do perfil aplicado
+      var sb = document.getElementById('main-sidebar');
+      if(sb) sb.style.visibility='visible';
       document.getElementById('main-content').style.visibility='visible';
     }
 
