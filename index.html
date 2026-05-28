@@ -9264,46 +9264,46 @@ function refreshGradeCotacoes(){
       };
     });
 
-    // Buscar dados complementares do Yahoo Finance para TODOS os tickers
-    // (tickers faltantes + dados de 52 semanas que o OpLab não fornece)
-    console.log('Buscando dados complementares do Yahoo Finance para todos os tickers...');
-    fetch('/api/brapi?tickers=' + encodeURIComponent(allTickers.join(','))).then(function(r){
-      if(!r.ok) throw new Error('Yahoo HTTP ' + r.status);
-      return r.json();
-    }).then(function(yahooData){
-      var results = yahooData.results || [];
-      results.forEach(function(r){
-        if(cotacoes[r.symbol]){
-          // Ticker já veio do OpLab — só complementar dados de 52 semanas
-          cotacoes[r.symbol].fiftyTwoWeekHigh = r.fiftyTwoWeekHigh || cotacoes[r.symbol].fiftyTwoWeekHigh;
-          cotacoes[r.symbol].fiftyTwoWeekLow = r.fiftyTwoWeekLow || cotacoes[r.symbol].fiftyTwoWeekLow;
-        } else {
-          // Ticker não veio do OpLab — usar dados completos do Yahoo
-          cotacoes[r.symbol] = {
-            symbol: r.symbol,
-            shortName: r.shortName || '',
-            regularMarketPrice: r.regularMarketPrice,
-            regularMarketChangePercent: r.regularMarketChangePercent || 0,
-            regularMarketDayHigh: r.regularMarketDayHigh,
-            regularMarketDayLow: r.regularMarketDayLow,
-            regularMarketOpen: r.regularMarketOpen,
-            regularMarketPreviousClose: r.regularMarketPreviousClose,
-            regularMarketTime: r.regularMarketTime ? new Date(r.regularMarketTime).toISOString() : null,
-            regularMarketVolume: r.regularMarketVolume,
-            fiftyTwoWeekHigh: r.fiftyTwoWeekHigh || null,
-            fiftyTwoWeekLow: r.fiftyTwoWeekLow || null,
-            logourl: null,
-            bid: null,
-            ask: null,
-            _isCurrency: false
-          };
-        }
+    // Buscar dados complementares da Mais Retorno para tickers faltantes
+    // (ETFs, cripto, índices que o OpLab não cobre)
+    var tickersFaltantes = allTickers.filter(function(t){ return !cotacoes[t]; });
+    console.log('Tickers faltantes para Mais Retorno:', tickersFaltantes.length);
+    if(tickersFaltantes.length > 0){
+      fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(tickersFaltantes.join(','))).then(function(r){
+        if(!r.ok) throw new Error('MaisRetorno HTTP ' + r.status);
+        return r.json();
+      }).then(function(mrData){
+        var results = mrData.results || [];
+        results.forEach(function(r){
+          if(!cotacoes[r.symbol]){
+            cotacoes[r.symbol] = {
+              symbol: r.symbol,
+              shortName: r.shortName || '',
+              regularMarketPrice: r.regularMarketPrice,
+              regularMarketChangePercent: r.regularMarketChangePercent || 0,
+              regularMarketDayHigh: r.regularMarketDayHigh,
+              regularMarketDayLow: r.regularMarketDayLow,
+              regularMarketOpen: r.regularMarketOpen,
+              regularMarketPreviousClose: r.regularMarketPreviousClose,
+              regularMarketTime: r.regularMarketTime,
+              regularMarketVolume: r.regularMarketVolume,
+              fiftyTwoWeekHigh: null,
+              fiftyTwoWeekLow: null,
+              logourl: null,
+              bid: null,
+              ask: null,
+              _isCurrency: false
+            };
+          }
+        });
+        renderGradeCotacoes(cotacoes);
+      }).catch(function(e2){
+        console.warn('Mais Retorno fallback falhou:', e2.message);
+        renderGradeCotacoes(cotacoes);
       });
+    } else {
       renderGradeCotacoes(cotacoes);
-    }).catch(function(e2){
-      console.warn('Yahoo fallback falhou:', e2.message);
-      renderGradeCotacoes(cotacoes);
-    });
+    }
   }).catch(function(e){
     console.error('OpLab quote error:', e);
     if(btn){btn.textContent='Atualizar';btn.disabled=false;}
@@ -9544,27 +9544,27 @@ var pmInitDone = false;
 
 var PM_TICKERS = {
   futuros: [
-    {sym:'ES=F', nome:'S&P 500 Fut.'},
-    {sym:'NQ=F', nome:'Nasdaq Fut.'},
-    {sym:'YM=F', nome:'Dow Jones Fut.'},
-    {sym:'RTY=F', nome:'Russell 2000 Fut.'},
-    {sym:'^VIX', nome:'VIX'}
+    {sym:'ES=F', nome:'S&P 500 Fut.', _yahoo:true},
+    {sym:'NQ=F', nome:'Nasdaq Fut.', _yahoo:true},
+    {sym:'YM=F', nome:'Dow Jones Fut.', _yahoo:true},
+    {sym:'RTY=F', nome:'Russell 2000 Fut.', _yahoo:true},
+    {sym:'^VIX', nome:'VIX', _yahoo:true}
   ],
   brasil: [
-    {sym:'^BVSP', nome:'Ibovespa'},
-    {sym:'USDBRL=X', nome:'USD/BRL'}
+    {sym:'IBOV', nome:'Ibovespa'},
+    {sym:'DOLAR', nome:'USD/BRL'}
   ],
   cambio: [
-    {sym:'DX-Y.NYB', nome:'DXY (Dólar Index)'},
-    {sym:'EURUSD=X', nome:'EUR/USD'},
-    {sym:'GBPUSD=X', nome:'GBP/USD'}
+    {sym:'DX-Y.NYB', nome:'DXY (Dólar Index)', _yahoo:true},
+    {sym:'EURUSD=X', nome:'EUR/USD', _yahoo:true},
+    {sym:'GBPUSD=X', nome:'GBP/USD', _yahoo:true}
   ],
   commodities: [
-    {sym:'CL=F', nome:'Petróleo WTI'},
-    {sym:'BZ=F', nome:'Petróleo Brent'},
-    {sym:'GC=F', nome:'Ouro'},
-    {sym:'SI=F', nome:'Prata'},
-    {sym:'NG=F', nome:'Gás Natural'}
+    {sym:'CL=F', nome:'Petróleo WTI', _yahoo:true},
+    {sym:'BZ=F', nome:'Petróleo Brent', _yahoo:true},
+    {sym:'GC=F', nome:'Ouro', _yahoo:true},
+    {sym:'SI=F', nome:'Prata', _yahoo:true},
+    {sym:'NG=F', nome:'Gás Natural', _yahoo:true}
   ]
 };
 
@@ -9590,17 +9590,35 @@ function gerarPreMercado(){
     PM_TICKERS[cat].forEach(function(t){ allTickers.push(t.sym); });
   });
 
-  fetch('/api/brapi?tickers='+encodeURIComponent(allTickers.join(','))).then(function(r){return r.json();}).then(function(data){
-    var results = data.results || [];
-    var bySymbol = {};
-    results.forEach(function(r){ bySymbol[r.symbol] = r; });
+  // Separar tickers: Mais Retorno (Brasil) vs Yahoo (internacionais)
+  var mrTickers = [];
+  var yahooTickers = [];
+  Object.keys(PM_TICKERS).forEach(function(cat){
+    PM_TICKERS[cat].forEach(function(t){
+      if(t._yahoo) yahooTickers.push(t.sym);
+      else mrTickers.push(t.sym);
+    });
+  });
 
-    // Mapear de volta com os nomes originais (Yahoo remove sufixos)
+  // Buscar em paralelo: Mais Retorno + Yahoo
+  var mrPromise = mrTickers.length > 0
+    ? fetch('/api/maisretorno?action=quotes&tickers='+encodeURIComponent(mrTickers.join(','))).then(function(r){return r.json();}).catch(function(){return {results:[]};})
+    : Promise.resolve({results:[]});
+  var yahooPromise = yahooTickers.length > 0
+    ? fetch('/api/brapi?tickers='+encodeURIComponent(yahooTickers.join(','))).then(function(r){return r.json();}).catch(function(){return {results:[]};})
+    : Promise.resolve({results:[]});
+
+  Promise.all([mrPromise, yahooPromise]).then(function(responses){
+    var bySymbol = {};
+    // Mais Retorno results
+    (responses[0].results || []).forEach(function(r){ bySymbol[r.symbol] = r; });
+    // Yahoo results
+    (responses[1].results || []).forEach(function(r){ bySymbol[r.symbol] = r; });
+
     var dados = {};
     Object.keys(PM_TICKERS).forEach(function(cat){
       dados[cat] = [];
       PM_TICKERS[cat].forEach(function(t){
-        // Tentar match pelo symbol limpo
         var clean = t.sym.replace('.SA','');
         var found = bySymbol[clean] || bySymbol[t.sym] || null;
         if(found){
@@ -9619,12 +9637,8 @@ function gerarPreMercado(){
     });
 
     pmDadosCache = dados;
-
-    // Gerar texto de análise
     var texto = gerarAnalisePreMercado(dados);
     pmTextoCache = texto;
-
-    // Render
     renderPreMercado(dados, texto);
 
     if(btn){btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Gerar Relatório';btn.disabled=false;}
@@ -9632,8 +9646,6 @@ function gerarPreMercado(){
     document.getElementById('pm-preview-btn').style.display='';
     var agora = new Date();
     document.getElementById('pm-sub').textContent='Gerado em '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+agora.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-    // Comunicado do Pré-Mercado é postado automaticamente pelo cron às 9h30 (api/cron-premercado.js)
   }).catch(function(e){
     body.innerHTML='<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro ao buscar dados: '+e.message+'</div></div>';
     if(btn){btn.textContent='Gerar Relatório';btn.disabled=false;}
@@ -10083,12 +10095,22 @@ function fetchCalendarioEconomico(from,to){
     });
 }
 
-// Buscar retrospectiva de mercado (usa brapi.js com índices da semana passada)
+// Buscar retrospectiva de mercado (Mais Retorno para Brasil + Yahoo para internacionais)
 function fetchRetrospectiva(){
-  var tickers = '^BVSP,^GSPC,^NDX,^DJI,USDBRL=X,CL=F,GC=F,^VIX';
-  return fetch('/api/brapi?tickers='+encodeURIComponent(tickers))
-    .then(function(r){return r.json();})
-    .then(function(data){return data.results||[];});
+  var mrTickers = 'IBOV,DOLAR';
+  var yahooTickers = '^GSPC,^NDX,^DJI,CL=F,GC=F,^VIX';
+  return Promise.all([
+    fetch('/api/maisretorno?action=quotes&tickers='+encodeURIComponent(mrTickers)).then(function(r){return r.json();}).catch(function(){return {results:[]};}),
+    fetch('/api/brapi?tickers='+encodeURIComponent(yahooTickers)).then(function(r){return r.json();}).catch(function(){return {results:[]};})
+  ]).then(function(responses){
+    var all = (responses[0].results||[]).concat(responses[1].results||[]);
+    // Renomear IBOV de volta para ^BVSP e DOLAR para USDBRL=X para compatibilidade
+    all.forEach(function(r){
+      if(r.symbol === 'IBOV') r.symbol = '^BVSP';
+      if(r.symbol === 'DOLAR') r.symbol = 'USDBRL=X';
+    });
+    return all;
+  });
 }
 
 function gerarCalendarioEconomico(){
