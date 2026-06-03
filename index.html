@@ -7532,6 +7532,17 @@ function renderAtivosCliente(ativos, cotacoes){
   var ganhoTotal = totalAtualizado - totalInvestido;
   var ganhoPctTotal = totalInvestido > 0 ? ((ganhoTotal/totalInvestido)*100) : 0;
 
+  // Sincronizar patrimônio atualizado no documento do cliente (para o admin ver)
+  if(currentClienteVinculado && totalAtualizado > 0){
+    db.collection('clientes').doc(currentClienteVinculado).update({
+      patrimonio: Math.round(totalAtualizado * 100) / 100,
+      custodiaTotal: Math.round(totalAtualizado * 100) / 100,
+      custodiaRF: Math.round(totalAtualizado * 100) / 100,
+      valorInvestido: Math.round(totalInvestido * 100) / 100,
+      ultimaAtualizacaoCarteira: new Date().toISOString()
+    }).catch(function(e){ console.log('Sync patrimonio error:', e); });
+  }
+
   // Atualizar KPIs
   var pe=document.getElementById('mc-patrimonio');
   if(pe){pe.textContent=fmtFull(totalAtualizado);pe.style.color='#00c853';}
