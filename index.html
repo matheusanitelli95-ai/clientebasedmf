@@ -2666,12 +2666,29 @@ function renderCarteira(){
     var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     if(!ativos.length){el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><div class="empty-title">Nenhum ativo cadastrado</div><p style="font-size:13px;margin-top:4px">Clique em "+ Adicionar Ativo" para incluir posições</p></div>';return;}
     var byType={},total=0;
-    ativos.forEach(function(a){byType[a.tipo]=(byType[a.tipo]||0)+(a.valor||0);total+=a.valor||0;});
+    ativos.forEach(function(a){
+      // Calcular valor: usar campo valor, ou quantidade × preçoMédio
+      var val = a.valor || ((a.quantidade||0) * (a.precoMedio||0));
+      a._valorCalc = val;
+      byType[a.tipo]=(byType[a.tipo]||0)+val;
+      total+=val;
+    });
     var html='<div class="grid-3" style="margin-bottom:20px">';
     Object.keys(byType).forEach(function(t,i){html+='<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" style="font-size:18px">'+fmt(byType[t])+'</div><div class="kpi-label">'+t+'</div></div><div class="kpi-accent" style="background:'+COLORS[i%COLORS.length]+'"></div></div>';});
+    // Atualizar patrimônio no header se a aba carteira calculou um total > 0
+    if(total > 0 && currentClienteId){
+      var headerPat = document.querySelector('#client-header-card div[style*="text-align:right"] div[style*="font-size:24px"]');
+      if(headerPat) headerPat.textContent = fmtFull(total);
+      // Sincronizar no Firestore para manter atualizado
+      db.collection('clientes').doc(currentClienteId).update({
+        patrimonio: Math.round(total*100)/100,
+        custodiaTotal: Math.round(total*100)/100,
+        custodiaRF: Math.round(total*100)/100
+      }).catch(function(){});
+    }
     html+='</div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Posição Atual</div><div style="font-family:DM Mono,monospace;color:#00c853;font-weight:600;font-size:14px">Total: '+fmtFull(total)+'</div></div>';
-    ativos.sort(function(a,b){return(b.valor||0)-(a.valor||0);}).forEach(function(a){
-      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a.valor||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')">'+icon('trash')+'</button></div></div>';
+    ativos.sort(function(a,b){return(b._valorCalc||0)-(a._valorCalc||0);}).forEach(function(a){
+      html+='<div class="asset-row"><div><div class="asset-name">'+a.nome+'</div><div class="asset-type">'+a.tipo+(a.dataAplicacao?' · '+fmtDate(a.dataAplicacao):'')+(a.obs?' · '+a.obs:'')+(a.quantidade?' · Qtd: '+a.quantidade:'')+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="asset-value">'+fmtFull(a._valorCalc||0)+'</div><button class="btn-dsm" onclick="deleteAtivo(\''+a.id+'\')">'+icon('trash')+'</button></div></div>';
     });
     html+='</div>';
     el.innerHTML=html;
