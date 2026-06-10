@@ -546,7 +546,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('agendamento',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Agendamento</span></button>
       <div class="nav-section">Ferramentas</div>
       <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
-      <button class="nav-item" onclick="showView('opcoes-chain',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg></span><span>Opções</span></button>
+
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Simulador IF</span></button>
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
@@ -6524,9 +6524,9 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','opcoes-chain','materiais-gestao','academy-trilha','configuracoes','consultorias'],
-  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','opcoes-chain','materiais-gestao','academy-trilha','consultorias'],
-  cliente: ['minha-carteira','agendamento','panorama','opcoes-chain','glossario','estrategias','materiais-cliente']
+  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','materiais-gestao','academy-trilha','configuracoes','consultorias'],
+  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','crm','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','materiais-gestao','academy-trilha','consultorias'],
+  cliente: ['minha-carteira','agendamento','panorama','glossario','estrategias','materiais-cliente']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -6696,7 +6696,6 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-conta','minha-conta','Minha Conta',false));
     clienteNav.appendChild(mkSec('DMF Black'));
     clienteNav.appendChild(mkBtn('cnav-operacoes','minhas-operacoes','Operações',false));
-    clienteNav.appendChild(mkBtn('cnav-opcoes','opcoes-chain','Opções',false));
     clienteNav.appendChild(mkSec('DMF'));
     clienteNav.appendChild(mkBtn('cnav-agendamento','agendamento','Agendamento',false));
     clienteNav.appendChild(mkBtn('cnav-comunicados','comunicados','Comunicados',false));
@@ -7600,21 +7599,23 @@ function renderAtivosCliente(ativos, cotacoes){
 
   ativosRender.forEach(function(a){
     var row=document.createElement('div');
-    row.style='display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;gap:12px;flex-wrap:wrap';
+    row.className='asset-row';
+    row.style.gap='12px';
+    row.style.flexWrap='wrap';
 
-    // Coluna esquerda: nome + detalhes
+    // Coluna esquerda: nome + detalhes (usa classes padrão do admin)
     var left = '<div style="flex:1;min-width:180px">'
       +'<div style="display:flex;align-items:center;gap:8px">';
     if(a.cot && a.cot.logo){
-      left += '<img src="'+a.cot.logo+'" style="width:24px;height:24px;border-radius:6px;background:#fff" onerror="this.style.display=\'none\'">';
+      left += '<img src="'+a.cot.logo+'" style="width:22px;height:22px;border-radius:6px;background:#fff" onerror="this.style.display=\'none\'">';
     }
-    left += '<span style="font-weight:700;color:var(--white);font-size:14px">'+a.raw.nome+'</span>';
+    left += '<span class="asset-name">'+a.raw.nome+'</span>';
     if(a.cot){
       var corVar = a.cot.changePct>=0?'#00c853':'#ff1744';
-      left += '<span style="font-size:11px;font-family:DM Mono,monospace;color:'+corVar+'">'+fmtPctSinal(a.cot.changePct)+'</span>';
+      left += '<span style="font-size:11px;font-family:DM Mono,monospace;font-weight:500;color:'+corVar+'">'+fmtPctSinal(a.cot.changePct)+'</span>';
     }
     left += '</div>';
-    left += '<div style="font-size:11px;color:var(--text3);margin-top:3px">'+(a.raw.tipo||a.raw.categoria||'');
+    left += '<div class="asset-type">'+(a.raw.tipo||a.raw.categoria||'');
     if(a.qtde) left += ' · Qtd: '+a.qtde.toLocaleString('pt-BR');
     if(a.pm) left += ' · PM: '+fmtFull(a.pm);
     left += '</div></div>';
@@ -7622,25 +7623,25 @@ function renderAtivosCliente(ativos, cotacoes){
     // Coluna centro: cotação atual (se tiver)
     var center = '';
     if(a.cot){
-      center = '<div style="text-align:center;min-width:100px">'
-        +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Cotação</div>'
-        +'<div style="font-family:DM Mono,monospace;font-size:14px;color:var(--white);font-weight:600">'+fmtFull(a.precoAtual)+'</div></div>';
+      center = '<div style="text-align:center;min-width:90px">'
+        +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Cotação</div>'
+        +'<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--white);font-weight:500">'+fmtFull(a.precoAtual)+'</div></div>';
     }
 
-    // Coluna direita: valor atualizado + ganho
+    // Coluna direita: valor atualizado + ganho (usa classe padrão)
     var corGanho = a.ganho>=0?'#00c853':'#ff1744';
-    var right = '<div style="text-align:right;min-width:140px">'
-      +'<div style="font-family:DM Mono,monospace;color:var(--blue);font-size:15px;font-weight:700">'+fmtFull(a.valorAtual)+'</div>';
+    var right = '<div style="text-align:right;min-width:130px">'
+      +'<div class="asset-value">'+fmtFull(a.valorAtual)+'</div>';
     if(a.investido > 0 && (a.cot || a.pm)){
-      right += '<div style="font-size:11px;font-family:DM Mono,monospace;color:'+corGanho+';margin-top:2px">'
+      right += '<div style="font-size:11px;font-family:DM Mono,monospace;font-weight:500;color:'+corGanho+';margin-top:2px">'
         +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+fmtPct(a.ganhoPct,1)+')</div>';
     }
     right += '</div>';
 
-    // Botões Editar + Excluir
+    // Botões Editar + Excluir (usa mesma linguagem visual do admin)
     var actionsHtml = '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-      +'<button class="btn-edit-ativo" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;border-radius:6px;cursor:pointer;font-weight:600">Editar</button>'
-      +'<button class="btn-del-ativo" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;background:#ff174422;color:#ff1744;border:1px solid #ff174444;border-radius:6px;cursor:pointer;font-weight:600">Excluir</button>'
+      +'<button class="btn-edit-ativo btn-dsm" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;font-family:DM Sans,sans-serif;font-weight:600;background:var(--card2);color:var(--blue);border:1px solid var(--border);border-radius:6px;cursor:pointer">Editar</button>'
+      +'<button class="btn-del-ativo btn-dsm" data-id="'+a.raw.id+'" style="padding:5px 12px;font-size:11px;font-family:DM Sans,sans-serif;font-weight:600;background:var(--card2);color:#ff1744;border:1px solid var(--border);border-radius:6px;cursor:pointer">Excluir</button>'
       +'</div>';
 
     row.innerHTML = left + center + right + actionsHtml;
@@ -9262,7 +9263,6 @@ function refreshGradeCotacoes(){
   // OpLab: buscar todos de uma vez via /market/quote
   oplabFetch('/market/quote?tickers=' + encodeURIComponent(allTickers.join(','))).then(function(data){
     var items = Array.isArray(data) ? data : (data.data || data.results || []);
-    console.log('OpLab quote response (' + items.length + ' items):', items.length ? JSON.stringify(items[0]) : 'vazio');
 
     var cotacoes = {};
     items.forEach(function(r){
@@ -9285,47 +9285,7 @@ function refreshGradeCotacoes(){
         _isCurrency: (r.symbol||'').indexOf('BRL') > 0 && (r.symbol||'').length <= 6
       };
     });
-
-    // Buscar dados complementares da Mais Retorno para tickers faltantes
-    // (ETFs, cripto, índices que o OpLab não cobre)
-    var tickersFaltantes = allTickers.filter(function(t){ return !cotacoes[t]; });
-    console.log('Tickers faltantes para Mais Retorno:', tickersFaltantes.length);
-    if(tickersFaltantes.length > 0){
-      fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(tickersFaltantes.join(','))).then(function(r){
-        if(!r.ok) throw new Error('MaisRetorno HTTP ' + r.status);
-        return r.json();
-      }).then(function(mrData){
-        var results = mrData.results || [];
-        results.forEach(function(r){
-          if(!cotacoes[r.symbol]){
-            cotacoes[r.symbol] = {
-              symbol: r.symbol,
-              shortName: r.shortName || '',
-              regularMarketPrice: r.regularMarketPrice,
-              regularMarketChangePercent: r.regularMarketChangePercent || 0,
-              regularMarketDayHigh: r.regularMarketDayHigh,
-              regularMarketDayLow: r.regularMarketDayLow,
-              regularMarketOpen: r.regularMarketOpen,
-              regularMarketPreviousClose: r.regularMarketPreviousClose,
-              regularMarketTime: r.regularMarketTime,
-              regularMarketVolume: r.regularMarketVolume,
-              fiftyTwoWeekHigh: null,
-              fiftyTwoWeekLow: null,
-              logourl: null,
-              bid: null,
-              ask: null,
-              _isCurrency: false
-            };
-          }
-        });
-        renderGradeCotacoes(cotacoes);
-      }).catch(function(e2){
-        console.warn('Mais Retorno fallback falhou:', e2.message);
-        renderGradeCotacoes(cotacoes);
-      });
-    } else {
-      renderGradeCotacoes(cotacoes);
-    }
+    renderGradeCotacoes(cotacoes);
   }).catch(function(e){
     console.error('OpLab quote error:', e);
     if(btn){btn.textContent='Atualizar';btn.disabled=false;}
@@ -10700,7 +10660,7 @@ function fmtPanoramaNum(v, comSinal){
 }
 
 // ═══════════════════════════════════════════════════════════
-// GRADE DE OPÇÕES (OPTIONS CHAIN) — via OpLab API
+// GRADE DE OPÇÕES (OPTIONS CHAIN) — em manutenção
 // Uma única chamada /market/instruments/series/{symbol}
 // retorna tudo: ativo + séries + strikes + calls + puts
 // ═══════════════════════════════════════════════════════════
@@ -10722,51 +10682,12 @@ function buscarOpcoesChain(){
   var body = document.getElementById('opcoes-chain-body');
   var sub = document.getElementById('opcoes-sub');
   if(btn){btn.textContent='Buscando...';btn.disabled=true;}
-  if(body) body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:14px">Buscando opções de '+ticker+' via OpLab...</div></div>';
-
-  // Uma única chamada retorna tudo: ativo + séries com strikes/calls/puts
-  // bs=true adiciona Black-Scholes (gregas) — precisa da taxa de juros (irate)
-  oplabFetch('/market/instruments/series/' + encodeURIComponent(ticker) + '?bs=true&irate=14.75').then(function(data){
-    console.log('OpLab series response keys:', Object.keys(data));
-    console.log('OpLab series count:', (data.series||[]).length);
-    if(data.series && data.series.length) console.log('OpLab first series:', JSON.stringify(data.series[0]).substring(0, 1500));
-
-    // Salvar dados do ativo para o header
-    opcoesAssetData = data;
-    renderOpcoesAssetHeader();
-
-    var series = data.series || [];
-    if(!series.length){
-      if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
-      body.innerHTML='<div class="card" style="padding:20px">'
-        +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:16px;color:var(--warn);margin-bottom:12px">Nenhum vencimento encontrado</div>'
-        +'<div style="font-size:13px;color:var(--text2)">Não foram encontradas séries de opções para '+ticker+' no OpLab.</div>'
-        +'<div style="font-size:11px;color:var(--text3);margin-top:8px">Verifique se o ticker está correto (ex: PETR4, VALE3, BBDC4).</div>'
-        +'</div>';
-      return;
-    }
-
-    // Filtrar séries vencidas
-    var hoje = new Date(); hoje.setHours(0,0,0,0);
-    series = series.filter(function(s){
-      return !s.due_date || new Date(s.due_date) >= hoje;
-    });
-
-    opcoesChainData = series;
-    mostrarFiltrosOpcoes();
-    aplicarFiltrosOpcoes();
-    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
-    if(sub) sub.textContent = series.length + ' vencimento(s) para ' + ticker;
-
-  }).catch(function(e){
-    console.error('OpLab series error:', e);
-    if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
-    body.innerHTML='<div class="card" style="padding:20px;text-align:center">'
-      +'<div style="color:#ff1744;font-weight:600;margin-bottom:8px">Erro ao buscar opções via OpLab</div>'
-      +'<div style="font-size:12px;color:var(--text3)">'+e.message+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);margin-top:8px">Verifique o console (F12) para detalhes.</div>'
-      +'</div>';
-  });
+  if(btn){btn.textContent='Buscar Opções';btn.disabled=false;}
+  body.innerHTML='<div class="card" style="padding:30px;text-align:center">'
+    +'<div style="font-family:Syne,sans-serif;font-weight:700;font-size:16px;color:var(--blue);margin-bottom:12px">Cadeia de Opções</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:8px">Funcionalidade em manutenção — migração de provedor de dados em andamento.</div>'
+    +'<div style="font-size:11px;color:var(--text3)">Em breve disponível com dados atualizados.</div>'
+    +'</div>';
 }
 
 function renderOpcoesAssetHeader(){
