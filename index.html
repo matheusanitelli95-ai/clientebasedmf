@@ -6617,6 +6617,9 @@ function applyPerfil(){
     document.querySelectorAll('.nav-item, .nav-section').forEach(function(el){
       el.style.display='none';
     });
+    // Remove badge ADM/Gestor se existir (evita residuo de cache/sessão anterior)
+    var oldChip = document.getElementById('user-chip-perfil');
+    if(oldChip) oldChip.remove();
     return;
   }
 
@@ -7438,6 +7441,32 @@ function isTickerLike(nome){
   return /^[A-Z]{2,6}\d{0,2}(F)?$/.test(n) && n.length >= 2 && n.length <= 8;
 }
 
+function fetchMRCotacoesFallback(tickers, callback){
+  // Fallback: buscar cotações via Mais Retorno quando OpLab falhar
+  fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(tickers.join(','))).then(function(r){
+    if(!r.ok) throw new Error('MR HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){
+    var results = data.results || [];
+    results.forEach(function(r){
+      cotacoesCache[r.symbol] = {
+        price: r.regularMarketPrice,
+        change: r.regularMarketChange||0,
+        changePct: r.regularMarketChangePercent||0,
+        prevClose: r.regularMarketPreviousClose||0,
+        logo: r.logourl||'',
+        name: r.shortName||'',
+        time: r.regularMarketTime||''
+      };
+    });
+    if(results.length) cotacoesCacheTime = Date.now();
+    callback(cotacoesCache);
+  }).catch(function(e2){
+    console.warn('MR cotações fallback erro:', e2.message||e2);
+    callback(cotacoesCache);
+  });
+}
+
 function fetchOplabCotacoes(tickers, callback){
   if(!tickers.length){ callback({}); return; }
   // Checar cache
@@ -7460,11 +7489,18 @@ function fetchOplabCotacoes(tickers, callback){
         time: r.time ? new Date(r.time).toISOString() : ''
       };
     });
+    // Verificar se conseguiu cotações — se não, tentar MR
+    var encontrados = tickers.filter(function(t){ return cotacoesCache[t]; });
+    if(encontrados.length === 0 && tickers.length > 0){
+      console.warn('OpLab retornou 0 cotações, tentando Mais Retorno...');
+      fetchMRCotacoesFallback(tickers, callback);
+      return;
+    }
     cotacoesCacheTime = Date.now();
     callback(cotacoesCache);
   }).catch(function(e){
-    console.warn('OpLab cotações erro:', e.message||e);
-    callback(cotacoesCache);
+    console.warn('OpLab cotações erro:', e.message||e, '— tentando Mais Retorno...');
+    fetchMRCotacoesFallback(tickers, callback);
   });
 }
 
@@ -7581,7 +7617,7 @@ function renderAtivosCliente(ativos, cotacoes){
       statusEl.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="#00c853" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/></svg>'+tickersEncontrados+' cotaç'+(tickersEncontrados>1?'ões atualizadas':'ão atualizada')+(time?' · '+time:'');
     } else if(tickersBuscados>0){
       statusEl.style.display='block';
-      statusEl.innerHTML='<span style="color:#f59e0b">Cotações indisponíveis — verifique o token OpLab nas Configurações</span>';
+      statusEl.innerHTML='<span style="color:#f59e0b">Cotações temporariamente indisponíveis — valores calculados com preço médio</span>';
     } else {
       statusEl.style.display='none';
     }
