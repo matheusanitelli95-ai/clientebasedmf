@@ -1573,8 +1573,8 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="form-grid">
             <div class="form-group"><label>Tipo</label><select class="form-input" id="fc-tipo"><option>PF</option><option>PJ</option></select></div>
             <div class="form-group"><label>CPF / CNPJ</label><input class="form-input" id="fc-cpf" placeholder="000.000.000-00"></div>
-            <div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="fc-nasc" type="date"></div>
-            <div class="form-group"><label>Data de Entrada</label><input class="form-input" id="fc-entrada" type="date"></div>
+            <div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="fc-nasc" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
+            <div class="form-group"><label>Data de Entrada</label><input class="form-input" id="fc-entrada" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
             <div class="form-group"><label>E-mail</label><input class="form-input" id="fc-email" type="email" placeholder="email@exemplo.com"></div>
             <div class="form-group"><label>Telefone / WhatsApp</label><input class="form-input" id="fc-tel" placeholder="(11) 99999-9999"></div>
           </div>
@@ -1661,7 +1661,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="form-group"><label>Quantidade</label><input class="form-input" id="fa-qtde" type="number" placeholder="Ex: 100"></div>
       <div class="form-group"><label>Preço Médio</label><input class="form-input" id="fa-valor" type="number" step="0.01" placeholder="0,00"></div>
-      <div class="form-group"><label>Data de Aplicação</label><input class="form-input" id="fa-data" type="date"></div>
+      <div class="form-group"><label>Data de Aplicação</label><input class="form-input" id="fa-data" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
       <div class="form-group form-full"><label>Observação (vencimento, taxa...)</label><input class="form-input" id="fa-obs" placeholder="Opcional"></div>
     </div>
     <div class="modal-actions">
@@ -1679,10 +1679,10 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="modal-close" onclick="closeModal('modal-contato')">×</button>
     </div>
     <div class="form-grid">
-      <div class="form-group"><label>Data</label><input class="form-input" id="fct-data" type="date"></div>
+      <div class="form-group"><label>Data</label><input class="form-input" id="fct-data" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
       <div class="form-group"><label>Tipo</label><select class="form-input" id="fct-tipo"><option>Ligação</option><option>Reunião</option><option>WhatsApp</option><option>E-mail</option><option>Zoom</option><option>Visita</option></select></div>
       <div class="form-group form-full"><label>Resumo *</label><textarea class="form-input" id="fct-texto" placeholder="O que foi discutido neste contato?"></textarea></div>
-      <div class="form-group form-full"><label>Próximo Contato Agendado</label><input class="form-input" id="fct-proximo" type="date"></div>
+      <div class="form-group form-full"><label>Próximo Contato Agendado</label><input class="form-input" id="fct-proximo" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-contato')">Cancelar</button>
@@ -1772,7 +1772,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="form-group">
         <label>Data do Pagamento</label>
-        <input class="form-input" id="fl-data" type="date">
+        <input class="form-input" id="fl-data" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
       </div>
       <div class="form-group form-full">
         <label>Observação</label>
@@ -2008,7 +2008,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <option><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> DMF Academy</option>
         </select>
       </div>
-      <div class="form-group"><label>Data</label><input class="form-input" id="com-data" type="date"></div>
+      <div class="form-group"><label>Data</label><input class="form-input" id="com-data" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
       <div class="form-group form-full"><label>Título *</label><input class="form-input" id="com-titulo" placeholder="Título do comunicado"></div>
       <div class="form-group form-full"><label>Conteúdo *</label><textarea class="form-input" id="com-conteudo" rows="6" placeholder="Conteúdo do comunicado..."></textarea></div>
       <div class="form-group"><label>Visível para</label>
@@ -2145,7 +2145,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-grid">
       <div class="form-group form-full"><label>Cliente</label><select class="form-input" id="reu-cliente"></select></div>
-      <div class="form-group"><label>Data</label><input class="form-input" id="reu-data" type="date"></div>
+      <div class="form-group"><label>Data</label><input class="form-input" id="reu-data" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>
       <div class="form-group"><label>Horário</label><input class="form-input" id="reu-hora" type="time"></div>
       <div class="form-group"><label>Tipo</label>
         <select class="form-input" id="reu-tipo">
@@ -2428,6 +2428,108 @@ var fmtDate=function(s){
 };
 var today=function(){return new Date().toISOString().split('T')[0];};
 var daysDiff=function(d){if(!d)return 9999;return Math.floor((new Date()-new Date(d))/86400000);};
+
+/* ===== PATCH GLOBAL: Forçar TODOS inputs de data para DD/MM/AAAA ===== */
+(function(){
+  var _origVal = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+
+  function mascaraDataBR(input){
+    var raw = _origVal.get.call(input).replace(/\D/g,'').substring(0,8);
+    var v = '';
+    if(raw.length >= 5) v = raw.substring(0,2)+'/'+raw.substring(2,4)+'/'+raw.substring(4);
+    else if(raw.length >= 3) v = raw.substring(0,2)+'/'+raw.substring(2);
+    else v = raw;
+    _origVal.set.call(input, v);
+    if(v.length === 10){
+      var pp = v.split('/');
+      input._isoDate = pp[2]+'-'+pp[1]+'-'+pp[0];
+    } else {
+      input._isoDate = '';
+    }
+  }
+
+  window._patchDateInput = function(input){
+    if(input._brPatched) return;
+    input._brPatched = true;
+    var curVal = '';
+    if(input.type === 'date'){
+      curVal = _origVal.get.call(input) || '';
+      input.type = 'text';
+    } else {
+      curVal = input._isoDate || _origVal.get.call(input) || '';
+    }
+    input.placeholder = 'DD/MM/AAAA';
+    input.maxLength = 10;
+    input.autocomplete = 'off';
+    input._isoDate = '';
+
+    // Set initial display value
+    if(curVal && /^\d{4}-\d{2}-\d{2}$/.test(curVal)){
+      input._isoDate = curVal;
+      var p = curVal.split('-');
+      _origVal.set.call(input, p[2]+'/'+p[1]+'/'+p[0]);
+    } else if(curVal && /^\d{2}\/\d{2}\/\d{4}$/.test(curVal)){
+      var pp = curVal.split('/');
+      input._isoDate = pp[2]+'-'+pp[1]+'-'+pp[0];
+      _origVal.set.call(input, curVal);
+    }
+
+    input.addEventListener('input', function(){ mascaraDataBR(this); });
+
+    // Override .value: getter returns ISO (YYYY-MM-DD), setter accepts both formats
+    Object.defineProperty(input, 'value', {
+      get: function(){ return this._isoDate || ''; },
+      set: function(v){
+        if(!v || v === '' || v === '—'){
+          this._isoDate = '';
+          _origVal.set.call(this, '');
+          return;
+        }
+        if(/^\d{4}-\d{2}-\d{2}$/.test(v)){
+          this._isoDate = v;
+          var p = v.split('-');
+          _origVal.set.call(this, p[2]+'/'+p[1]+'/'+p[0]);
+        } else if(/^\d{2}\/\d{2}\/\d{4}$/.test(v)){
+          var pp = v.split('/');
+          this._isoDate = pp[2]+'-'+pp[1]+'-'+pp[0];
+          _origVal.set.call(this, v);
+        } else {
+          this._isoDate = v;
+          _origVal.set.call(this, v);
+        }
+      },
+      configurable: true,
+      enumerable: true
+    });
+  };
+
+  // Patch all existing date inputs on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('input[data-brdate="1"]').forEach(window._patchDateInput);
+  });
+
+  // MutationObserver for dynamically created date inputs (consultorias modals, etc.)
+  function initObserver(){
+    var target = document.body || document.documentElement;
+    var obs = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        m.addedNodes.forEach(function(n){
+          if(n.nodeType !== 1) return;
+          if(n.tagName === 'INPUT' && n.dataset.brdate === '1'){
+            window._patchDateInput(n);
+          }
+          if(n.querySelectorAll){
+            n.querySelectorAll('input[data-brdate="1"]').forEach(window._patchDateInput);
+          }
+        });
+      });
+    });
+    obs.observe(target, { childList: true, subtree: true });
+  }
+  if(document.body) initObserver();
+  else document.addEventListener('DOMContentLoaded', initObserver);
+})();
+/* ===== FIM PATCH DATAS BR ===== */
 
 var STATUS_C={Ativo:'#00c853',Inativo:'#ff1744',Prospecto:'#f59e0b'};
 var PERFIL_C={Conservador:'#ff8c00',Moderado:'#00c853',Arrojado:'#f59e0b',Agressivo:'#ff1744'};
@@ -5548,7 +5650,7 @@ function openModalTarefaEquipe(){
   fg.innerHTML='<div class="form-group form-full"><label>Título</label><input class="form-input" id="te-titulo" placeholder="Descreva a tarefa..."></div>'
     +'<div class="form-group"><label>Responsável</label><select class="form-input" id="te-resp">'+respOpts+'</select></div>'
     +'<div class="form-group"><label>Prioridade</label><select class="form-input" id="te-prio"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>'
-    +'<div class="form-group"><label>Prazo</label><input class="form-input" id="te-prazo" type="date"></div>'
+    +'<div class="form-group"><label>Prazo</label><input class="form-input" id="te-prazo" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>'
     +'<div class="form-group"><label>Categoria</label><input class="form-input" id="te-cat" placeholder="Ex: Comercial, Operação, Admin..." list="te-cat-list"><datalist id="te-cat-list"><option value="Comercial"><option value="Operacional"><option value="Administrativo"><option value="Compliance"><option value="Financeiro"><option value="Marketing"></datalist></div>'
     +'<div class="form-group"><label>Status</label><select class="form-input" id="te-status"><option>A fazer</option><option>Em andamento</option><option>Aguardando</option></select></div>'
     +'<div class="form-group"><label>Recorrência</label><select class="form-input" id="te-recorrencia"><option value="">Nenhuma</option><option value="Diária">Diária</option><option value="Semanal">Semanal</option><option value="Quinzenal">Quinzenal</option><option value="Mensal">Mensal</option></select></div>'
@@ -6780,7 +6882,7 @@ function buildMinhaContaView(){
     +'<div class="form-grid">'
     +'<div class="form-group form-full"><label>Nome completo *</label><input class="form-input" id="mc-nome" placeholder="Nome completo"></div>'
     +'<div class="form-group"><label>CPF *</label><input class="form-input" id="mc-cpf" placeholder="000.000.000-00"></div>'
-    +'<div class="form-group"><label>Data de Nascimento *</label><input class="form-input" id="mc-nasc" type="date"></div>'
+    +'<div class="form-group"><label>Data de Nascimento *</label><input class="form-input" id="mc-nasc" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>'
     +'<div class="form-group"><label>Email *</label><input class="form-input" id="mc-email" type="email" placeholder="seu@email.com"></div>'
     +'<div class="form-group"><label>Telefone / WhatsApp *</label><input class="form-input" id="mc-tel" placeholder="(11) 99999-9999"></div>'
     +'<div class="form-group"><label>Banco / Corretora</label><select class="form-input" id="mc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Outro</option></select></div>'
