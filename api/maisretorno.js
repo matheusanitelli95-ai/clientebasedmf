@@ -8,8 +8,8 @@ export default async function handler(req, res) {
     : 'https://clientebasedmf.vercel.app';
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Content-Type', 'application/json');
-  // Cache agressivo para evitar hits repetidos na API
-  res.setHeader('Cache-Control', 's-maxage=180, stale-while-revalidate=600');
+  // Cache 24h na CDN da Vercel — cotações atualizam 1x por dia
+  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=43200');
 
   const API_KEY = process.env.MR_API_KEY;
   if (!API_KEY) {
@@ -170,7 +170,14 @@ const INDEX_MAP = {
   'CDI': 'cdi:idx', 'USDBRL=X': 'dolar:idx', 'USDBRL': 'dolar:idx',
   'DOLAR': 'dolar:idx', 'SP500': 'sp500:idx', 'IFIX': 'ifix:idx',
   'IPCA': 'ipca:idx', 'SELIC': 'selic:idx', 'IDIV': 'idiv:idx',
-  'SMLL': 'smll:idx', 'IGPM': 'igpm:idx'
+  'SMLL': 'smll:idx', 'IGPM': 'igpm:idx',
+  // Setoriais B3
+  'ICON': 'icon:idx', 'IEE': 'iee:idx', 'IMAT': 'imat:idx',
+  'INDX': 'indx:idx', 'IFNC': 'ifnc:idx', 'IMOB': 'imob:idx',
+  'UTIL': 'util:idx',
+  // ETFs brasileiros
+  'BOVA11': 'bova11:b3', 'IVVB11': 'ivvb11:b3', 'SMAL11': 'smal11:b3',
+  'HASH11': 'hash11:b3', 'XFIX11': 'xfix11:b3'
 };
 
 const CRYPTO_TICKERS = ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'AVAX', 'MATIC', 'LINK', 'UNI', 'DOGE', 'XRP', 'BNB', 'WBTC'];
