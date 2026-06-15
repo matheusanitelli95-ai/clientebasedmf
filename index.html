@@ -7506,7 +7506,7 @@ var OPLAB_TOKEN = 'H018X6kXAGmy//aUJ0QYGNVlqQ5atBGNQ3zIMJYegT/pERLLkIAX8N2XjAy4X
 var OPLAB_BASE = '/api/proxy'; // Proxy via Vercel serverless → api.oplab.com.br/v3
 var cotacoesCache = {};
 var cotacoesCacheTime = 0;
-var COTACOES_CACHE_TTL = 5 * 60 * 1000; // 5 min
+var COTACOES_CACHE_TTL = 30 * 60 * 1000; // 30 min cache local (server cacheia 24h)
 
 function oplabFetch(path){
   // path vem como "/market/quote?tickers=X" — separar path e query
@@ -7550,9 +7550,11 @@ function isTickerLike(nome){
   return /^[A-Z]{2,6}\d{0,2}(F)?$/.test(n) && n.length >= 2 && n.length <= 8;
 }
 
-function fetchMRCotacoesFallback(tickers, callback){
-  // Fallback: buscar cotações via Mais Retorno quando OpLab falhar
-  fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(tickers.join(','))).then(function(r){
+// ─── Fonte PRIMÁRIA: Mais Retorno (cobertura ampla, cache 24h no servidor) ───
+function fetchMRCotacoes(tickers, callback){
+  // Ordenar tickers para maximizar cache hits na CDN (mesma URL = mesmo cache)
+  var sortedTickers = tickers.slice().sort();
+  fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(sortedTickers.join(','))).then(function(r){
     if(!r.ok) throw new Error('MR HTTP ' + r.status);
     return r.json();
   }).then(function(data){
@@ -7565,52 +7567,68 @@ function fetchMRCotacoesFallback(tickers, callback){
         prevClose: r.regularMarketPreviousClose||0,
         logo: r.logourl||'',
         name: r.shortName||'',
-        time: r.regularMarketTime||''
+        time: r.regularMarketTime||'',
+        _source: 'maisretorno'
       };
     });
-    if(results.length) cotacoesCacheTime = Date.now();
-    callback(cotacoesCache);
-  }).catch(function(e2){
-    console.warn('MR cotações fallback erro:', e2.message||e2);
-    callback(cotacoesCache);
-  });
-}
-
-function fetchOplabCotacoes(tickers, callback){
-  if(!tickers.length){ callback({}); return; }
-  // Checar cache
-  var agora = Date.now();
-  if(agora - cotacoesCacheTime < COTACOES_CACHE_TTL){
-    var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
-    if(todosCached){ callback(cotacoesCache); return; }
-  }
-  // Buscar todos de uma vez via /market/quote?tickers=X,Y,Z
-  oplabFetch('/market/quote?tickers=' + encodeURIComponent(tickers.join(','))).then(function(data){
-    var items = Array.isArray(data) ? data : (data.data || data.results || []);
-    items.forEach(function(r){
-      cotacoesCache[r.symbol] = {
-        price: r.close,
-        change: 0,
-        changePct: r.variation||0,
-        prevClose: 0,
-        logo: '',
-        name: r.name||'',
-        time: r.time ? new Date(r.time).toISOString() : ''
-      };
-    });
-    // Verificar se conseguiu cotações — se não, tentar MR
-    var encontrados = tickers.filter(function(t){ return cotacoesCache[t]; });
-    if(encontrados.length === 0 && tickers.length > 0){
-      console.warn('OpLab retornou 0 cotações, tentando Mais Retorno...');
-      fetchMRCotacoesFallback(tickers, callback);
+    // Verificar tickers que MR não retornou — tentar OpLab como fallback
+    var naoEncontrados = tickers.filter(function(t){ return !cotacoesCache[t]; });
+    if(naoEncontrados.length > 0){
+      console.log('MR retornou ' + results.length + '/' + tickers.length + ' — tentando OpLab para: ' + naoEncontrados.join(','));
+      fetchOplabFallback(naoEncontrados, function(){
+        cotacoesCacheTime = Date.now();
+        callback(cotacoesCache);
+      });
       return;
     }
     cotacoesCacheTime = Date.now();
     callback(cotacoesCache);
   }).catch(function(e){
-    console.warn('OpLab cotações erro:', e.message||e, '— tentando Mais Retorno...');
-    fetchMRCotacoesFallback(tickers, callback);
+    console.warn('MR cotações erro:', e.message||e, '— tentando OpLab...');
+    fetchOplabFallback(tickers, function(){
+      cotacoesCacheTime = Date.now();
+      callback(cotacoesCache);
+    });
   });
+}
+
+// ─── Fonte FALLBACK: OpLab (para ativos que MR não cobrir) ───
+function fetchOplabFallback(tickers, callback){
+  if(!tickers.length){ callback(); return; }
+  oplabFetch('/market/quote?tickers=' + encodeURIComponent(tickers.join(','))).then(function(data){
+    var items = Array.isArray(data) ? data : (data.data || data.results || []);
+    items.forEach(function(r){
+      if(!cotacoesCache[r.symbol]){
+        cotacoesCache[r.symbol] = {
+          price: r.close,
+          change: 0,
+          changePct: r.variation||0,
+          prevClose: 0,
+          logo: '',
+          name: r.name||'',
+          time: r.time ? new Date(r.time).toISOString() : '',
+          _source: 'oplab'
+        };
+      }
+    });
+    callback();
+  }).catch(function(e){
+    console.warn('OpLab fallback erro:', e.message||e);
+    callback();
+  });
+}
+
+// ─── Função principal de cotações (chamada pelo resto do app) ───
+function fetchOplabCotacoes(tickers, callback){
+  if(!tickers.length){ callback({}); return; }
+  // Checar cache local (30 min)
+  var agora = Date.now();
+  if(agora - cotacoesCacheTime < COTACOES_CACHE_TTL){
+    var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
+    if(todosCached){ callback(cotacoesCache); return; }
+  }
+  // Buscar via Mais Retorno (primária) → OpLab (fallback)
+  fetchMRCotacoes(tickers, callback);
 }
 
 // ─── Ocultar Valores (Cliente) ───────────────────────────
