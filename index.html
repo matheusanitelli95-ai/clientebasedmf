@@ -6806,12 +6806,6 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-cotacoes','grade-cotacoes','Cotações',false));
     clienteNav.appendChild(mkBtn('cnav-glossario','glossario','Glossário',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
-    clienteNav.appendChild(mkSec('DMF Academy'));
-    clienteNav.appendChild(mkBtn('cnav-materiais','materiais-cliente','Materiais',false));
-    // Trilha do cliente desabilitada — descomentar para liberar:
-    // clienteNav.appendChild(mkBtn('cnav-trilha','academy-trilha-cliente','Trilha',false));
-    clienteNav.appendChild(mkSec('Suporte'));
-    clienteNav.appendChild(mkBtn('cnav-chamados','chamados','Abrir Chamado',false));
 
     nav.appendChild(clienteNav);
   }
@@ -6862,7 +6856,10 @@ function buildMinhaCarteiraView(){
   div.className = 'view';
   div.id = 'view-minha-carteira';
   div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Carteira</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div>'
-    +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Adicionar Ativo</button></div>'
+    +'<div style="display:flex;gap:8px;align-items:center">'
+    +'<button class="btn-secondary" id="mc-toggle-valores" onclick="toggleClienteValores()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ocultar Valores</button>'
+    +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Adicionar Ativo</button>'
+    +'</div></div>'
     +'<div class="page-content">'
     +'<div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">'
     +'<div class="kpi-card"><div style="margin-bottom:10px"><div class="kpi-val" id="mc-patrimonio" style="font-size:20px">R$0</div><div class="kpi-label">Valor Atualizado</div></div><div class="kpi-accent" style="background:#00c853"></div></div>'
@@ -7608,6 +7605,24 @@ function fetchOplabCotacoes(tickers, callback){
   });
 }
 
+// ─── Ocultar Valores (Cliente) ───────────────────────────
+var clienteHideValores = false;
+function toggleClienteValores(){
+  clienteHideValores = !clienteHideValores;
+  var btn = document.getElementById('mc-toggle-valores');
+  if(btn){
+    var eyeOpen = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var eyeClosed = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    btn.innerHTML = (clienteHideValores ? eyeClosed+' Mostrar Valores' : eyeOpen+' Ocultar Valores');
+    btn.style.background = clienteHideValores ? 'var(--blue)' : '';
+    btn.style.color = clienteHideValores ? '#000' : '';
+  }
+  // Re-renderizar com valores ocultos
+  loadMinhaCarteira();
+}
+function mcMask(val){ return clienteHideValores ? 'R$ ●●●●' : fmtFull(val); }
+function mcMaskCompact(val){ return clienteHideValores ? 'R$ ●●●' : fmt(val); }
+
 // ─── Minha Carteira ──────────────────────────────────────
 function loadMinhaCarteira(){
   if(!currentClienteVinculado) return;
@@ -7621,7 +7636,7 @@ function loadMinhaCarteira(){
     var ops=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     var acum=ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
     var acumEl=document.getElementById('mc-acumulado');
-    if(acumEl){acumEl.textContent=fmtFull(acum);acumEl.style.color=acum>=0?'#00c853':'#ff1744';}
+    if(acumEl){acumEl.textContent=mcMask(acum);acumEl.style.color=acum>=0?'#00c853':'#ff1744';}
   });
   // Load ativos + cotações
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
@@ -7701,13 +7716,17 @@ function renderAtivosCliente(ativos, cotacoes){
 
   // Atualizar KPIs
   var pe=document.getElementById('mc-patrimonio');
-  if(pe){pe.textContent=fmtFull(totalAtualizado);pe.style.color='#00c853';}
+  if(pe){pe.textContent=mcMask(totalAtualizado);pe.style.color='#00c853';}
   var ie=document.getElementById('mc-investido');
-  if(ie) ie.textContent=fmtFull(totalInvestido);
+  if(ie) ie.textContent=mcMask(totalInvestido);
   var ge=document.getElementById('mc-ganho');
   if(ge){
-    var sinal = ganhoTotal>=0?'+':'';
-    ge.textContent=sinal+fmtFull(ganhoTotal)+' ('+fmtPct(ganhoPctTotal,1)+')';
+    if(clienteHideValores){
+      ge.textContent='R$ ●●●●';
+    } else {
+      var sinal = ganhoTotal>=0?'+':'';
+      ge.textContent=sinal+fmtFull(ganhoTotal)+' ('+fmtPct(ganhoPctTotal,1)+')';
+    }
     ge.style.color=ganhoTotal>=0?'#00c853':'#ff1744';
   }
 
@@ -7765,16 +7784,20 @@ function renderAtivosCliente(ativos, cotacoes){
     if(a.cot){
       center = '<div style="text-align:center;min-width:90px">'
         +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Cotação</div>'
-        +'<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--white);font-weight:500">'+fmtFull(a.precoAtual)+'</div></div>';
+        +'<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--white);font-weight:500">'+mcMask(a.precoAtual)+'</div></div>';
     }
 
     // Coluna direita: valor atualizado + ganho (usa classe padrão)
     var corGanho = a.ganho>=0?'#00c853':'#ff1744';
     var right = '<div style="text-align:right;min-width:130px">'
-      +'<div class="asset-value">'+fmtFull(a.valorAtual)+'</div>';
+      +'<div class="asset-value">'+mcMask(a.valorAtual)+'</div>';
     if(a.investido > 0 && (a.cot || a.pm)){
-      right += '<div style="font-size:11px;font-family:DM Mono,monospace;font-weight:500;color:'+corGanho+';margin-top:2px">'
-        +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+fmtPct(a.ganhoPct,1)+')</div>';
+      if(clienteHideValores){
+        right += '<div style="font-size:11px;font-family:DM Mono,monospace;font-weight:500;color:'+corGanho+';margin-top:2px">R$ ●●●●</div>';
+      } else {
+        right += '<div style="font-size:11px;font-family:DM Mono,monospace;font-weight:500;color:'+corGanho+';margin-top:2px">'
+          +(a.ganho>=0?'+':'')+fmtFull(a.ganho)+' ('+fmtPct(a.ganhoPct,1)+')</div>';
+      }
     }
     right += '</div>';
 
