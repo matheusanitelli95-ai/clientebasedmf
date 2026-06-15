@@ -143,14 +143,19 @@ function renderConsultorias(){
 
     if(ma !== currentMes1 && ma !== currentMes2) return;
 
-    var hoje = new Date();
-    hoje.setHours(0,0,0,0);
-    var dReuniao = new Date(dataReuniao + 'T12:00:00');
-
-    var status = dReuniao <= hoje ? 'realizada' : 'agendada';
+    // Comparar datas como strings ISO (YYYY-MM-DD) — evita bugs de fuso horário
+    var hojeStr = new Date().toISOString().split('T')[0];
+    var status;
+    if(r.registradaManualmente){
+      status = 'realizada'; // Marcada manualmente = sempre realizada
+    } else {
+      status = dataReuniao <= hojeStr ? 'realizada' : 'agendada';
+    }
 
     // Se já tem uma consultoria para esse mês, preferir a mais recente
-    if(!mapCons[cId][ma] || dataReuniao > mapCons[cId][ma].data){
+    // Prioridade: realizada > agendada > sem
+    var prioridade = { 'realizada': 2, 'agendada': 1, 'sem': 0 };
+    if(!mapCons[cId][ma] || prioridade[status] > prioridade[mapCons[cId][ma].status] || (status === mapCons[cId][ma].status && dataReuniao > mapCons[cId][ma].data)){
       mapCons[cId][ma] = { status: status, data: dataReuniao, hora: r.hora || '', reuniaoId: r._id };
     }
   });
