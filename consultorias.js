@@ -264,14 +264,20 @@ function buildMesCol(c, ma, info){
   var html = '<div class="cons-mes">';
   html += '<div class="cons-mes-label">'+nomeMesAno(ma)+'</div>';
 
+  var cid = escapeHtml(c.id);
+  var cnome = escapeHtml(c.nome);
+
   if(info.status === 'realizada'){
     html += '<span class="cons-badge cons-badge-done">✅ Realizada</span>';
     if(info.data) html += '<span class="cons-badge-date">'+formatarDataBR(info.data)+(info.hora ? ' às '+info.hora : '')+'</span>';
   } else if(info.status === 'agendada'){
-    html += '<span class="cons-badge cons-badge-scheduled">📅 Agendada</span>';
+    html += '<span class="cons-badge cons-badge-scheduled" onclick="window._consMarcarRealizada(\''+cid+'\',\''+cnome+'\',\''+ma+'\')" title="Clique para marcar como realizada" style="cursor:pointer">📅 Agendada</span>';
     if(info.data) html += '<span class="cons-badge-date">'+formatarDataBR(info.data)+(info.hora ? ' às '+info.hora : '')+'</span>';
   } else {
-    html += '<span class="cons-badge cons-badge-none" onclick="window._consAgendar(\''+escapeHtml(c.id)+'\',\''+escapeHtml(c.nome)+'\',\''+ma+'\')" title="Clique para agendar">❌ Sem</span>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    html += '<span class="cons-badge cons-badge-none" onclick="window._consAgendar(\''+cid+'\',\''+cnome+'\',\''+ma+'\')" title="Agendar consultoria futura" style="cursor:pointer">📅 Agendar</span>';
+    html += '<span class="cons-badge cons-badge-done" onclick="window._consMarcarRealizada(\''+cid+'\',\''+cnome+'\',\''+ma+'\')" title="Registrar consultoria já realizada" style="cursor:pointer;opacity:.7">✅ Já fiz</span>';
+    html += '</div>';
   }
 
   html += '</div>';
@@ -376,6 +382,75 @@ window._consAgendar = function(clienteId, clienteNome, mesAno){
 function diasNoMes(ano, mes){
   return new Date(ano, mes + 1, 0).getDate();
 }
+
+/* ─── MARCAR COMO REALIZADA ─── */
+window._consMarcarRealizada = function(clienteId, clienteNome, mesAno){
+  var p = parseMesAno(mesAno);
+  var hoje = new Date();
+  var defaultDate;
+  if(p.ano === hoje.getFullYear() && p.mes === hoje.getMonth()){
+    defaultDate = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  } else {
+    // Último dia do mês passado ou dia 15
+    defaultDate = p.ano+'-'+String(p.mes+1).padStart(2,'0')+'-15';
+  }
+
+  var overlay = document.createElement('div');
+  overlay.className = 'cons-modal-overlay';
+  overlay.onclick = function(e){ if(e.target===overlay) document.body.removeChild(overlay); };
+
+  var modal = document.createElement('div');
+  modal.className = 'cons-modal';
+  modal.innerHTML = '<h3>Registrar Consultoria Realizada</h3>'
+    +'<label>Cliente</label>'
+    +'<input type="text" value="'+escapeHtml(clienteNome)+'" readonly style="opacity:.7">'
+    +'<label>Data em que foi realizada</label>'
+    +'<input type="date" id="cons-modal-data-real" value="'+defaultDate+'" min="'+p.ano+'-'+String(p.mes+1).padStart(2,'0')+'-01" max="'+p.ano+'-'+String(p.mes+1).padStart(2,'0')+'-'+diasNoMes(p.ano,p.mes)+'">'
+    +'<label>Formato</label>'
+    +'<select id="cons-modal-formato-real"><option value="Online">Online</option><option value="Presencial">Presencial</option><option value="Telefone">Telefone</option></select>'
+    +'<label>Observações (opcional)</label>'
+    +'<input type="text" id="cons-modal-obs-real" placeholder="Ex: revisão de carteira concluída">'
+    +'<div class="cons-modal-btns">'
+    +'<button class="cons-modal-cancel" onclick="this.closest(\'.cons-modal-overlay\').remove()">Cancelar</button>'
+    +'<button class="cons-modal-save" id="cons-modal-salvar-real" style="background:#10B981">Registrar</button>'
+    +'</div>';
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  document.getElementById('cons-modal-salvar-real').onclick = function(){
+    var data = document.getElementById('cons-modal-data-real').value;
+    var formato = document.getElementById('cons-modal-formato-real').value;
+    var obs = document.getElementById('cons-modal-obs-real').value;
+
+    if(!data){ alert('Selecione a data!'); return; }
+
+    // Salvar com data no passado pra que o sistema reconheça como "realizada"
+    var reuniao = {
+      clienteId: clienteId,
+      clienteNome: clienteNome,
+      data: data,
+      hora: '',
+      tipo: 'Consultoria',
+      formato: formato,
+      obs: obs,
+      registradaManualmente: true,
+      criadoEm: new Date().toISOString()
+    };
+
+    this.textContent = 'Salvando...';
+    this.disabled = true;
+
+    db.collection('reunioes').add(reuniao).then(function(){
+      overlay.remove();
+      showToast('Consultoria registrada como realizada para '+clienteNome);
+    }).catch(function(e){
+      alert('Erro ao registrar: '+e.message);
+      document.getElementById('cons-modal-salvar-real').textContent = 'Registrar';
+      document.getElementById('cons-modal-salvar-real').disabled = false;
+    });
+  };
+};
 
 function showToast(msg){
   var t = document.createElement('div');
