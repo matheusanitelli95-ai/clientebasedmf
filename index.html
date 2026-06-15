@@ -6803,6 +6803,13 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-panorama','panorama','Panorama',false));
     clienteNav.appendChild(mkBtn('cnav-glossario','glossario','Glossário',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
+    clienteNav.appendChild(mkBtn('cnav-simulador','simulador','Simulador IF',false));
+    clienteNav.appendChild(mkSec('Ferramentas'));
+    var b3Btn = document.createElement('button');
+    b3Btn.className = 'nav-item';
+    b3Btn.innerHTML = '<span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Simulador B3</span>';
+    b3Btn.onclick = function(){ window.open('https://simulador.b3.com.br/','_blank'); };
+    clienteNav.appendChild(b3Btn);
 
     nav.appendChild(clienteNav);
   }
@@ -6841,6 +6848,7 @@ function showClienteView(viewId, btn){
   if(viewId==='comunicados') loadComunicados();
   if(viewId==='glossario') loadGlossario();
   if(viewId==='estrategias') setTimeout(renderEst, 50);
+  if(viewId==='simulador') setTimeout(calcSimulador, 50);
   if(viewId==='noticias') loadNoticias&&loadNoticias();
   if(viewId==='grade-cotacoes') initGradeCotacoes();
   if(viewId==='opcoes-chain') initOpcoesChain();
