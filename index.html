@@ -6816,6 +6816,11 @@ function showClientePortal(){
     nav.appendChild(clienteNav);
   }
 
+  // Re-exibir itens do menu cliente (podem ter sido escondidos pelo querySelectorAll acima)
+  document.querySelectorAll('#cliente-nav .nav-item, #cliente-nav .nav-section').forEach(function(el){
+    el.style.display = '';
+  });
+
   if(!document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
   if(!document.getElementById('view-minha-conta')) buildMinhaContaView();
   if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
