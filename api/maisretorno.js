@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     const baseUrl = 'https://data.maisretorno.com/mr-data/v4/api';
     const headers = { 'X-API-Key': API_KEY };
 
+    // ─── SEARCH ───────────────────────────────────────────
     if (action === 'search') {
       const query = req.query.query || '';
       const resp = await fetch(baseUrl + '/search/' + encodeURIComponent(query) + '?has_quotes=true', { headers });
@@ -33,14 +34,49 @@ export default async function handler(req, res) {
       }
     }
 
+    // ─── STATS (com suporte a details e datas) ────────────
     if (action === 'stats') {
       const identifier = req.query.identifier || '';
-      const resp = await fetch(baseUrl + '/stats/' + identifier, { headers });
+      const params = [];
+      if (req.query.details === 'true') params.push('details=true');
+      if (req.query.start_date) params.push('start_date=' + req.query.start_date);
+      if (req.query.end_date) params.push('end_date=' + req.query.end_date);
+      const qs = params.length ? '?' + params.join('&') : '';
+      const resp = await fetch(baseUrl + '/stats/' + identifier + qs, { headers });
       const data = await resp.json();
       return res.status(200).json(data);
     }
 
-    // Debug mode
+    // ─── DRAWDOWN ─────────────────────────────────────────
+    if (action === 'drawdown') {
+      const identifier = req.query.identifier || '';
+      const params = [];
+      if (req.query.start_date) params.push('start_date=' + req.query.start_date);
+      if (req.query.end_date) params.push('end_date=' + req.query.end_date);
+      const qs = params.length ? '?' + params.join('&') : '';
+      const resp = await fetch(baseUrl + '/drawdown/' + identifier + qs, { headers });
+      const data = await resp.json();
+      return res.status(200).json(data);
+    }
+
+    // ─── HISTORY (quotes com datas customizadas, 1 ticker) ─
+    if (action === 'history') {
+      const ticker = (req.query.ticker || '').trim();
+      if (!ticker) return res.status(200).json({ quotes: [] });
+      const identifier = toIdentifierFn(ticker);
+      const params = [];
+      if (req.query.start_date) params.push('start_date=' + req.query.start_date);
+      if (req.query.end_date) params.push('end_date=' + req.query.end_date);
+      const qs = params.length ? '?' + params.join('&') : '';
+      const resp = await fetch(baseUrl + '/quotes/' + identifier + qs, { headers });
+      if (!resp.ok) return res.status(200).json({ quotes: [], error: 'HTTP ' + resp.status });
+      const data = await resp.json();
+      data._ticker = ticker.toUpperCase();
+      data._identifier = identifier;
+      return res.status(200).json(data);
+    }
+
+    // ─── DEBUG ─────────────────────────────────────────────
     if (action === 'debug') {
       const ticker = (req.query.tickers || 'PETR4').split(',')[0].trim();
       const identifier = toIdentifierFn(ticker);
@@ -65,14 +101,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // action === 'quotes' (default)
+    // ─── QUOTES (cotações recentes, múltiplos tickers) ────
     const tickers = (req.query.tickers || '').split(',').map(t => t.trim()).filter(Boolean);
     if (!tickers.length) return res.status(200).json({ results: [] });
 
-    // Últimos 7 dias para garantir pelo menos 2 pregões
+    // Usar datas customizadas se fornecidas, senão últimos 7 dias
     const today = new Date();
-    const endDate = today.toISOString().slice(0, 10);
-    const startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const endDate = req.query.end_date || today.toISOString().slice(0, 10);
+    const startDate = req.query.start_date || new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
     // Requisições SEQUENCIAIS com delay para evitar rate limit 429
     const results = [];
@@ -88,7 +124,6 @@ export default async function handler(req, res) {
         const resp = await fetch(url, { headers });
 
         if (resp.status === 429) {
-          // Rate limited — esperar mais e tentar de novo
           console.log('[MR] Rate limited on', identifier, '- waiting 500ms and retrying');
           await sleep(500);
           const retry = await fetch(url, { headers });
@@ -175,7 +210,7 @@ const INDEX_MAP = {
   'ICON': 'icon:idx', 'IEE': 'iee:idx', 'IMAT': 'imat:idx',
   'INDX': 'indx:idx', 'IFNC': 'ifnc:idx', 'IMOB': 'imob:idx',
   'UTIL': 'util:idx',
-  // ETFs brasileiros
+  // ETFs brasileiros populares
   'BOVA11': 'bova11:b3', 'IVVB11': 'ivvb11:b3', 'SMAL11': 'smal11:b3',
   'HASH11': 'hash11:b3', 'XFIX11': 'xfix11:b3'
 };
