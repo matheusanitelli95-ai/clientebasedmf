@@ -2585,6 +2585,16 @@ function loadClienteData(){
   });
 }
 
+var _dashRenderTimer=null;
+function _debouncedDashRender(){
+  if(_dashRenderTimer) clearTimeout(_dashRenderTimer);
+  _dashRenderTimer=setTimeout(function(){
+    _dashRenderTimer=null;
+    renderClientes();renderDashboard();renderCRM();renderAlertas();
+    var sub=document.getElementById('clientes-sub');
+    if(sub) sub.textContent=clientes.length+' clientes cadastrados';
+  }, 300);
+}
 function loadData(){
   db.collection('profissionais').onSnapshot(function(snap){
     profissionais=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
@@ -2597,8 +2607,7 @@ function loadData(){
       c.patrimonio=c.custodiaTotal;
       return c;
     }).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
-    renderClientes();renderDashboard();renderCRM();renderAlertas();
-    document.getElementById('clientes-sub').textContent=clientes.length+' clientes cadastrados';
+    _debouncedDashRender();
   });
 }
 
@@ -2612,6 +2621,7 @@ function showView(v,btn){
   var viewEl = document.getElementById('view-'+v);
   if(viewEl) viewEl.classList.add('active');
   if(btn)btn.classList.add('active');
+  if(v==='dashboard') renderDashboard();
 }
 
 function showTab(t,btn){
@@ -2629,6 +2639,8 @@ function openModal(id){document.getElementById(id).style.display='flex';}
 
 // DASHBOARD
 function renderDashboard(){
+  var dashView=document.getElementById('view-dashboard');
+  if(dashView && !dashView.classList.contains('active')) return;
   var total=clientes.length;
   var cust=clientes.reduce(function(s,c){return s+(c.custodiaTotal||0);},0);
   var ativos=clientes.filter(function(c){return c.status==='Ativo';}).length;
