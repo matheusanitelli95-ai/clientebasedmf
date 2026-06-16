@@ -6865,6 +6865,7 @@ function buildMinhaCarteiraView(){
   div.id = 'view-minha-carteira';
   div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Carteira</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div>'
     +'<div style="display:flex;gap:8px;align-items:center">'
+    +'<button class="btn-secondary" id="btn-analise-carteira" onclick="abrirAnaliseCarteira()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analisar Carteira</button>'
     +'<button class="btn-secondary" id="mc-toggle-valores" onclick="toggleClienteValores()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ocultar Valores</button>'
     +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Adicionar Ativo</button>'
     +'</div></div>'
@@ -11693,6 +11694,7 @@ if(_origShowClientePortal){
 
 </script>
 <script src="panorama-v6.js"></script>
+<script src="carteira-analise.js"></script>
 <script src="consultorias.js"></script>
 </body>
 </html>
