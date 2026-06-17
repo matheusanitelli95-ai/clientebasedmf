@@ -7705,10 +7705,13 @@ function isTickerLike(nome){
 }
 
 // ─── Fonte PRIMÁRIA: Mais Retorno (cobertura ampla, cache 24h no servidor) ───
-function fetchMRCotacoes(tickers, callback){
+// intlTickers: lista de tickers internacionais (USD) que devem ir via Yahoo
+function fetchMRCotacoes(tickers, callback, intlTickers){
   // Ordenar tickers para maximizar cache hits na CDN (mesma URL = mesmo cache)
   var sortedTickers = tickers.slice().sort();
-  fetch('/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(sortedTickers.join(','))).then(function(r){
+  var url = '/api/maisretorno?action=quotes&tickers=' + encodeURIComponent(sortedTickers.join(','));
+  if(intlTickers && intlTickers.length) url += '&intl=' + encodeURIComponent(intlTickers.join(','));
+  fetch(url).then(function(r){
     if(!r.ok) throw new Error('MR HTTP ' + r.status);
     return r.json();
   }).then(function(data){
@@ -7722,7 +7725,8 @@ function fetchMRCotacoes(tickers, callback){
         logo: r.logourl||'',
         name: r.shortName||'',
         time: r.regularMarketTime||'',
-        _source: 'maisretorno'
+        currency: r.currency||'BRL',
+        _source: r._source||'maisretorno'
       };
     });
     // Verificar tickers que MR não retornou — tentar OpLab como fallback
@@ -7773,7 +7777,7 @@ function fetchOplabFallback(tickers, callback){
 }
 
 // ─── Função principal de cotações (chamada pelo resto do app) ───
-function fetchOplabCotacoes(tickers, callback){
+function fetchOplabCotacoes(tickers, callback, intlTickers){
   if(!tickers.length){ callback({}); return; }
   // Checar cache local (30 min)
   var agora = Date.now();
@@ -7782,7 +7786,7 @@ function fetchOplabCotacoes(tickers, callback){
     if(todosCached){ callback(cotacoesCache); return; }
   }
   // Buscar via Mais Retorno (primária) → OpLab (fallback)
-  fetchMRCotacoes(tickers, callback);
+  fetchMRCotacoes(tickers, callback, intlTickers);
 }
 
 // ─── Ocultar Valores (Cliente) ───────────────────────────
@@ -7836,11 +7840,21 @@ function _loadMinhaCarteiraReal(){
   // Load ativos + cotações
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
     var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-    // Extrair tickers para buscar cotação
+    // Extrair tickers para buscar cotação + detectar internacionais
     var tickers = [];
+    var intlTickers = [];
     ativos.forEach(function(a){
       var ticker = (a.nome||'').trim().toUpperCase();
-      if(isTickerLike(ticker) && tickers.indexOf(ticker)<0) tickers.push(ticker);
+      if(isTickerLike(ticker) && tickers.indexOf(ticker)<0){
+        tickers.push(ticker);
+        // Detectar ativo internacional: moeda USD/EUR ou tipo Internacional/BDR sem número (ETF americano)
+        var moeda = (a.moeda||'').toUpperCase();
+        var tipo = (a.tipo||'').toLowerCase();
+        var isIntl = moeda === 'USD' || moeda === 'EUR' || tipo === 'internacional';
+        // Tickers sem número geralmente são internacionais (VOO, VT, SGOV, TFLO, SPY, QQQ)
+        if(!isIntl && /^[A-Z]{2,5}$/.test(ticker) && !/\d/.test(ticker)) isIntl = true;
+        if(isIntl && intlTickers.indexOf(ticker)<0) intlTickers.push(ticker);
+      }
     });
     if(tickers.length){
       // Usar cache se ainda válido
@@ -7856,7 +7870,7 @@ function _loadMinhaCarteiraReal(){
         _mcCotacoesCache = cotacoes;
         _mcCotacoesCacheTime = Date.now();
         renderAtivosCliente(ativos, cotacoes);
-      });
+      }, intlTickers);
     } else {
       renderAtivosCliente(ativos, {});
     }
@@ -8164,9 +8178,11 @@ function renderAtivosCliente(ativos, cotacoes){
     // Coluna centro: cotação atual (se tiver)
     var center = '';
     if(a.cot){
+      var moedaSym = (a.cot.currency||'BRL')==='USD'?'US$ ':((a.cot.currency||'BRL')==='EUR'?'€ ':'R$ ');
+      var cotStr = clienteHideValores?moedaSym+'●●●●':moedaSym+a.precoAtual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
       center = '<div style="text-align:center;min-width:90px">'
         +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Cotação</div>'
-        +'<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--white);font-weight:500">'+mcMask(a.precoAtual)+'</div></div>';
+        +'<div style="font-family:DM Mono,monospace;font-size:13px;color:var(--white);font-weight:500">'+cotStr+'</div></div>';
     }
 
     // Coluna direita: valor atualizado + ganho (usa classe padrão)
