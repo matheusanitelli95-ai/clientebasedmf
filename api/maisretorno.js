@@ -110,10 +110,15 @@ export default async function handler(req, res) {
     const endDate = req.query.end_date || today.toISOString().slice(0, 10);
     const startDate = req.query.start_date || new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
+    // Separar tickers nacionais (B3) de internacionais (USD)
+    const intlFlag = req.query.intl || ''; // tickers internacionais passados explicitamente
+    const intlTickers = intlFlag ? intlFlag.split(',').map(t => t.trim().toUpperCase()).filter(Boolean) : [];
+    const brTickers = tickers.filter(t => intlTickers.indexOf(t.toUpperCase()) < 0);
+
     // Requisições SEQUENCIAIS com delay para evitar rate limit 429
     const results = [];
-    for (let i = 0; i < tickers.length; i++) {
-      const ticker = tickers[i];
+    for (let i = 0; i < brTickers.length; i++) {
+      const ticker = brTickers[i];
       const identifier = toIdentifierFn(ticker);
 
       // Delay entre requisições (150ms) — exceto a primeira
@@ -157,9 +162,48 @@ export default async function handler(req, res) {
       }
     }
 
+    // ─── ETFs/ações internacionais via Yahoo Finance ───────
+    if (intlTickers.length) {
+      try {
+        const yahooSymbols = intlTickers.join(',');
+        const yahooUrl = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(yahooSymbols) + '&fields=symbol,shortName,regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketPreviousClose,regularMarketTime';
+        const yResp = await fetch(yahooUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        if (yResp.ok) {
+          const yData = await yResp.json();
+          const yQuotes = (yData.quoteResponse && yData.quoteResponse.result) || [];
+          yQuotes.forEach(q => {
+            results.push({
+              symbol: q.symbol,
+              shortName: q.shortName || q.symbol,
+              regularMarketPrice: q.regularMarketPrice || 0,
+              regularMarketChangePercent: q.regularMarketChangePercent || 0,
+              regularMarketChange: q.regularMarketChange || 0,
+              regularMarketPreviousClose: q.regularMarketPreviousClose || 0,
+              regularMarketDayHigh: q.regularMarketDayHigh || null,
+              regularMarketDayLow: q.regularMarketDayLow || null,
+              regularMarketOpen: q.regularMarketOpen || null,
+              regularMarketTime: q.regularMarketTime ? new Date(q.regularMarketTime * 1000).toISOString() : null,
+              regularMarketVolume: q.regularMarketVolume || null,
+              fiftyTwoWeekHigh: q.fiftyTwoWeekHigh || null,
+              fiftyTwoWeekLow: q.fiftyTwoWeekLow || null,
+              logourl: null,
+              currency: q.currency || 'USD',
+              _source: 'yahoo'
+            });
+          });
+        } else {
+          console.error('[Yahoo] HTTP', yResp.status, 'for', yahooSymbols);
+        }
+      } catch(e) {
+        console.error('[Yahoo] Exception:', e.message);
+      }
+    }
+
     return res.status(200).json({
       results,
-      _debug: { totalTickers: tickers.length, returned: results.length, startDate, endDate }
+      _debug: { totalTickers: tickers.length, brTickers: brTickers.length, intlTickers: intlTickers.length, returned: results.length, startDate, endDate }
     });
 
   } catch (error) {
