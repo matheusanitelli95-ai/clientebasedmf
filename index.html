@@ -3935,11 +3935,35 @@ function renderBlackDetalhe(){
         plugins:{
           legend:{display:false},
           tooltip:{
+            mode:'index',
+            intersect:false,
+            backgroundColor:'rgba(15,15,25,0.95)',
+            borderColor:'rgba(255,140,0,0.3)',
+            borderWidth:1,
+            titleFont:{weight:'bold',size:12},
+            bodyFont:{size:11},
+            padding:12,
+            cornerRadius:8,
+            displayColors:true,
+            boxPadding:4,
             callbacks:{
+              title:function(items){ return items[0]?items[0].label:''; },
               label:function(ctx){
                 var v=ctx.parsed.y;
-                if(ctx.datasetIndex<=2) return ctx.dataset.label+': R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
-                return ctx.dataset.label+': '+v.toFixed(2)+'%';
+                if(ctx.datasetIndex===0) return ' Resultado: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                if(ctx.datasetIndex===1) return ' Média: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                if(ctx.datasetIndex===2) return ' DMF Acum: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                if(ctx.datasetIndex===3) return ' IBOV: '+v.toFixed(2)+'%';
+                if(ctx.datasetIndex===4) return ' CDI: '+v.toFixed(2)+'%';
+                return ctx.dataset.label+': '+v.toFixed(2);
+              },
+              afterBody:function(items){
+                var idx=items[0]?items[0].dataIndex:0;
+                var dmf=dmfData[idx]||0,ibv=ibovData[idx]||0,cd=cdiData[idx]||0;
+                var lines=['─────────────────────'];
+                if(ibv!==0) lines.push('DMF vs IBOV: '+(dmf-ibv>=0?'+':'')+(dmf-ibv).toFixed(2)+'%');
+                if(cd!==0) lines.push('DMF vs CDI: '+(dmf-cd>=0?'+':'')+(dmf-cd).toFixed(2)+'%');
+                return lines;
               }
             }
           }
@@ -6993,7 +7017,8 @@ function showClientePortal(){
       'simulador':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
       'chamados':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
       'grade-cotacoes':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
-      'opcoes-chain':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg>'
+      'opcoes-chain':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"/><line x1="6" y1="6" x2="6" y2="15" stroke-width="4"/><line x1="18" y1="3" x2="18" y2="21"/><line x1="18" y1="9" x2="18" y2="18" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="12" y1="10" x2="12" y2="14" stroke-width="4"/></svg>',
+      'controle-opcoes':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>'
     };
     function mkBtn(id, view, label, active){
       var btn = document.createElement('button');
@@ -7012,7 +7037,7 @@ function showClientePortal(){
     }
 
     clienteNav.appendChild(mkSec('Minha Conta'));
-    clienteNav.appendChild(mkBtn('cnav-carteira','minha-carteira','Carteira',true));
+    clienteNav.appendChild(mkBtn('cnav-carteira','minha-carteira','Minha Carteira',true));
     clienteNav.appendChild(mkBtn('cnav-conta','minha-conta','Minha Conta',false));
     clienteNav.appendChild(mkSec('DMF Black'));
     clienteNav.appendChild(mkBtn('cnav-operacoes','minhas-operacoes','Operações',false));
@@ -7263,11 +7288,38 @@ function loadMinhasOperacoes(){
           plugins:{
             legend:{display:false},
             tooltip:{
+              mode:'index',
+              intersect:false,
+              backgroundColor:'rgba(15,15,25,0.95)',
+              borderColor:'rgba(255,140,0,0.3)',
+              borderWidth:1,
+              titleFont:{weight:'bold',size:12},
+              bodyFont:{size:11},
+              padding:12,
+              cornerRadius:8,
+              displayColors:true,
+              boxPadding:4,
               callbacks:{
+                title:function(items){
+                  return items[0] ? items[0].label : '';
+                },
                 label:function(ctx){
                   var v=ctx.parsed.y;
-                  if(ctx.datasetIndex<=2) return ctx.dataset.label+': R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
-                  return ctx.dataset.label+': '+v.toFixed(2)+'%';
+                  if(ctx.datasetIndex===0) return ' Resultado: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                  if(ctx.datasetIndex===1) return ' Média: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                  if(ctx.datasetIndex===2) return ' DMF Acum: R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+                  if(ctx.datasetIndex===3) return ' IBOV: '+v.toFixed(2)+'%';
+                  if(ctx.datasetIndex===4) return ' CDI: '+v.toFixed(2)+'%';
+                  return ctx.dataset.label+': '+v.toFixed(2);
+                },
+                afterBody:function(items){
+                  var idx=items[0]?items[0].dataIndex:0;
+                  var dmf=acumArr[idx]||0, ibov=ibovArr[idx]||0, cdi=cdiArr[idx]||0;
+                  var lines=[];
+                  lines.push('─────────────────────');
+                  if(ibov!==0) lines.push('DMF vs IBOV: '+(dmf-ibov>=0?'+':'')+(dmf-ibov).toFixed(2)+'%');
+                  if(cdi!==0) lines.push('DMF vs CDI: '+(dmf-cdi>=0?'+':'')+(dmf-cdi).toFixed(2)+'%');
+                  return lines;
                 }
               }
             }
@@ -7993,7 +8045,36 @@ var CORES_TIPO_MC = {
   'Debênture':'#f472b6','CRI':'#c084fc','CRA':'#a78bfa','Previdência':'#fb923c',
   'Fundo DI':'#94a3b8','Fundo':'#38bdf8','Outro':'#64748b'
 };
+// Cores por subcategoria conceitual (não por produto)
+var CORES_SUBCAT_MC = {
+  'Ações':'#ff8c00','FIIs':'#a855f7','ETFs':'#3b82f6','BDRs':'#ef4444',
+  'Cripto':'#f59e0b','Internacional':'#10b981',
+  'Títulos Públicos':'#14b8a6','Títulos Privados':'#8b5cf6',
+  'Pós-fixado':'#6b7280','Prefixado':'#f472b6','Híbrido (IPCA+)':'#c084fc',
+  'Previdência':'#fb923c','Fundos':'#38bdf8','Outro':'#64748b'
+};
 var _mcMetasAlocacao = {};
+
+// Mapeia tipo do Firestore → subcategoria conceitual
+function _mapTipoToSubcat(tipo, categoria){
+  var t = (tipo||'').toLowerCase();
+  var c = (categoria||'').toLowerCase();
+  // Renda Variável
+  if(t==='ação') return 'Ações';
+  if(t==='fii') return 'FIIs';
+  if(t==='etf' && c.indexOf('variável')>=0) return 'ETFs';
+  if(t==='etf de rf' || (t==='etf' && c.indexOf('fixa')>=0)) return 'Títulos Públicos';
+  if(t==='bdr') return 'BDRs';
+  if(t==='cripto') return 'Cripto';
+  if(t==='internacional') return 'Internacional';
+  // Renda Fixa
+  if(t==='tesouro direto') return 'Títulos Públicos';
+  if(t==='cdb'||t==='lci'||t==='lca'||t==='debênture'||t==='cri'||t==='cra') return 'Títulos Privados';
+  if(t==='fundo di') return 'Pós-fixado';
+  if(t==='previdência') return 'Previdência';
+  if(t==='fundo') return 'Fundos';
+  return 'Outro';
+}
 
 function renderAlocacaoPanel(ativosRender, totalAtualizado){
   var panel = document.getElementById('mc-alocacao-panel');
@@ -8002,59 +8083,75 @@ function renderAlocacaoPanel(ativosRender, totalAtualizado){
 
   // Carregar metas do localStorage
   var clienteId = currentClienteVinculado;
-  try { _mcMetasAlocacao = JSON.parse(localStorage.getItem('dmf_metas_mc_'+clienteId)) || {}; } catch(e){ _mcMetasAlocacao = {}; }
+  try { _mcMetasAlocacao = JSON.parse(localStorage.getItem('dmf_metas_mc_v2_'+clienteId)) || {}; } catch(e){ _mcMetasAlocacao = {}; }
 
-  // Agrupar por tipo e categoria
-  var porTipo={}, porCat={};
+  // Agrupar por CATEGORIA (RF/RV) e SUBCATEGORIA conceitual
+  var porCat={}, porSubcat={}, porProduto={};
   ativosRender.forEach(function(a){
-    var tipo = a.raw.tipo || 'Outro';
     var cat = a.raw.categoria || 'Outros';
-    porTipo[tipo] = (porTipo[tipo]||0) + a.valorAtual;
+    var subcat = _mapTipoToSubcat(a.raw.tipo, a.raw.categoria);
+    var produto = a.raw.tipo || 'Outro';
     porCat[cat] = (porCat[cat]||0) + a.valorAtual;
+    porSubcat[subcat] = (porSubcat[subcat]||0) + a.valorAtual;
+    // Agrupar subcategorias por categoria
+    if(!porProduto[cat]) porProduto[cat] = {};
+    porProduto[cat][subcat] = (porProduto[cat][subcat]||0) + a.valorAtual;
   });
   var total = totalAtualizado || 1;
-  var tiposSorted = Object.keys(porTipo).sort(function(a,b){return porTipo[b]-porTipo[a];});
 
-  // ─ SVG Donut ─
-  var svg = '<svg viewBox="0 0 200 200" style="width:160px;height:160px">';
+  // ─── DONUT por CATEGORIA (RF vs RV) ───
+  var catCores = {'Renda Fixa':'#3b82f6','Renda Variável':'#ff8c00','Outros':'#64748b'};
+  var catSorted = Object.keys(porCat).sort(function(a,b){return porCat[b]-porCat[a];});
+  var svg = '<svg viewBox="0 0 200 200" style="width:150px;height:150px">';
   var cx=100,cy=100,r=80,r2=55,sa=-90;
-  tiposSorted.forEach(function(t){
-    var pct = porTipo[t]/total;
-    if(pct <= 0) return;
+  catSorted.forEach(function(c){
+    var pct=porCat[c]/total; if(pct<=0)return;
     var ang=pct*360,ea=sa+ang,la=ang>180?1:0;
     var s1=Math.PI*sa/180,s2=Math.PI*ea/180;
-    var cor=CORES_TIPO_MC[t]||'#64748b';
+    var cor=catCores[c]||'#64748b';
     svg+='<path d="M'+(cx+r*Math.cos(s1))+','+(cy+r*Math.sin(s1))+' A'+r+','+r+' 0 '+la+',1 '+(cx+r*Math.cos(s2))+','+(cy+r*Math.sin(s2))+' L'+(cx+r2*Math.cos(s2))+','+(cy+r2*Math.sin(s2))+' A'+r2+','+r2+' 0 '+la+',0 '+(cx+r2*Math.cos(s1))+','+(cy+r2*Math.sin(s1))+' Z" fill="'+cor+'" opacity="0.85"/>';
     sa=ea;
   });
-  // Centro: número de tipos
-  svg+='<text x="100" y="95" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="22" font-weight="700" font-family="DM Mono,monospace">'+tiposSorted.length+'</text>';
-  svg+='<text x="100" y="115" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="10" font-family="DM Sans,sans-serif">classes</text>';
+  svg+='<text x="100" y="100" text-anchor="middle" dominant-baseline="middle" fill="rgba(255,255,255,0.9)" font-size="11" font-weight="600" font-family="DM Sans,sans-serif">RF / RV</text>';
   svg+='</svg>';
 
-  // ─ Legenda com percentuais ─
+  // ─── Legenda RF / RV com breakdown de subcategorias ───
   var leg='';
-  tiposSorted.forEach(function(t){
-    var pct=(porTipo[t]/total*100);
-    if(pct<0.1) return;
-    var cor=CORES_TIPO_MC[t]||'#64748b';
-    var val=clienteHideValores?'R$ ●●●●':mcMask(porTipo[t]);
-    leg+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0">';
-    leg+='<div style="width:10px;height:10px;border-radius:50%;background:'+cor+';flex-shrink:0"></div>';
-    leg+='<span style="font-size:12px;color:var(--text2);flex:1">'+t+'</span>';
-    leg+='<span style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace;min-width:80px;text-align:right">'+val+'</span>';
-    leg+='<span style="font-size:12px;font-weight:600;color:var(--text);font-family:DM Mono,monospace;min-width:50px;text-align:right">'+pct.toFixed(1)+'%</span>';
+  catSorted.forEach(function(cat){
+    var catPct=(porCat[cat]/total*100);
+    var catVal=clienteHideValores?'R$ ●●●●':mcMask(porCat[cat]);
+    var catCor=catCores[cat]||'#64748b';
+    leg+='<div style="margin-bottom:10px">';
+    leg+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;margin-bottom:2px">';
+    leg+='<div style="width:12px;height:12px;border-radius:3px;background:'+catCor+';flex-shrink:0"></div>';
+    leg+='<span style="font-size:13px;font-weight:700;color:'+catCor+';flex:1">'+cat+'</span>';
+    leg+='<span style="font-size:12px;font-weight:700;color:'+catCor+';font-family:DM Mono,monospace">'+catPct.toFixed(1)+'%</span>';
+    leg+='</div>';
+    // Subcategorias dentro desta categoria
+    var subs = porProduto[cat] || {};
+    var subKeys = Object.keys(subs).sort(function(a,b){return subs[b]-subs[a];});
+    subKeys.forEach(function(sub){
+      var sPct=(subs[sub]/total*100);
+      var sVal=clienteHideValores?'●●●●':mcMask(subs[sub]);
+      var sCor=CORES_SUBCAT_MC[sub]||'#64748b';
+      leg+='<div style="display:flex;align-items:center;gap:8px;padding:2px 0 2px 20px">';
+      leg+='<div style="width:8px;height:8px;border-radius:50%;background:'+sCor+';flex-shrink:0"></div>';
+      leg+='<span style="font-size:11px;color:var(--text2);flex:1">'+sub+'</span>';
+      leg+='<span style="font-size:10px;color:var(--text3);font-family:DM Mono,monospace;min-width:70px;text-align:right">'+sVal+'</span>';
+      leg+='<span style="font-size:11px;font-weight:600;color:var(--text);font-family:DM Mono,monospace;min-width:45px;text-align:right">'+sPct.toFixed(1)+'%</span>';
+      leg+='</div>';
+    });
     leg+='</div>';
   });
 
-  // ─ Barra RF vs RV ─
+  // ─── Barra RF vs RV ───
   var rfPct = (porCat['Renda Fixa']||0)/total*100;
   var rvPct = (porCat['Renda Variável']||0)/total*100;
   var outroPct = 100 - rfPct - rvPct;
   var barra='<div style="margin-top:12px">';
   barra+='<div style="display:flex;justify-content:space-between;margin-bottom:6px">';
-  barra+='<span style="font-size:11px;color:#3b82f6;font-weight:600">Renda Fixa '+rfPct.toFixed(0)+'%</span>';
-  barra+='<span style="font-size:11px;color:#ff8c00;font-weight:600">Renda Variável '+rvPct.toFixed(0)+'%</span>';
+  barra+='<span style="font-size:11px;color:#3b82f6;font-weight:600">RF '+rfPct.toFixed(0)+'%</span>';
+  barra+='<span style="font-size:11px;color:#ff8c00;font-weight:600">RV '+rvPct.toFixed(0)+'%</span>';
   barra+='</div>';
   barra+='<div style="height:10px;border-radius:5px;overflow:hidden;display:flex;background:var(--border)">';
   if(rfPct>0) barra+='<div style="width:'+rfPct+'%;background:#3b82f6;height:100%"></div>';
@@ -8062,52 +8159,79 @@ function renderAlocacaoPanel(ativosRender, totalAtualizado){
   if(outroPct>0.5) barra+='<div style="width:'+outroPct+'%;background:#64748b;height:100%"></div>';
   barra+='</div></div>';
 
-  // ─ Metas de Alocação ─
+  // ─── Metas de Alocação — por CATEGORIA primeiro, depois subcategoria ───
   var metas='<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">';
-  metas+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;font-weight:700;color:var(--text)">Metas de Alocação</span><span style="font-size:9px;color:var(--text3)">Edite os campos para definir suas metas</span></div>';
-  tiposSorted.forEach(function(t){
-    var pctAt=(porTipo[t]/total*100);
-    if(pctAt<0.1) return;
-    var meta = _mcMetasAlocacao[t]||0;
-    var diff = pctAt - meta;
-    var dCor = meta===0?'var(--text3)':(Math.abs(diff)<=3?'#00c853':(diff>0?'#f59e0b':'#ff1744'));
-    var dStr = meta===0?'—':(diff>=0?'+':'')+diff.toFixed(1)+'%';
-    var cor=CORES_TIPO_MC[t]||'#64748b';
+  metas+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:12px;font-weight:700;color:var(--text)">Metas de Alocação</span><span style="font-size:9px;color:var(--text3)">Edite as metas</span></div>';
+
+  // Macro: RF e RV
+  ['Renda Fixa','Renda Variável'].forEach(function(cat){
+    var catPct = (porCat[cat]||0)/total*100;
+    var catCor = catCores[cat];
+    var metaCat = _mcMetasAlocacao['cat_'+cat]||0;
+    var diffCat = catPct - metaCat;
+    var dCorCat = metaCat===0?'var(--text3)':(Math.abs(diffCat)<=3?'#00c853':(diffCat>0?'#f59e0b':'#ff1744'));
+    var dStrCat = metaCat===0?'—':(diffCat>=0?'+':'')+diffCat.toFixed(1)+'%';
+    metas+='<div style="margin-bottom:10px">';
     metas+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
-    metas+='<div style="width:8px;height:8px;border-radius:50%;background:'+cor+';flex-shrink:0"></div>';
-    metas+='<span style="font-size:11px;color:var(--text2);width:80px;flex-shrink:0">'+t+'</span>';
-    metas+='<div style="flex:1;position:relative;height:14px;background:var(--border);border-radius:3px;overflow:visible">';
-    metas+='<div style="width:'+Math.min(pctAt,100)+'%;height:100%;background:'+cor+'33;border-radius:3px"></div>';
-    if(meta>0) metas+='<div style="position:absolute;left:'+Math.min(meta,100)+'%;top:-1px;height:calc(100% + 2px);width:2px;background:'+cor+';border-radius:1px"></div>';
+    metas+='<div style="width:10px;height:10px;border-radius:3px;background:'+catCor+';flex-shrink:0"></div>';
+    metas+='<span style="font-size:12px;color:'+catCor+';font-weight:700;flex:1">'+cat+'</span>';
+    metas+='<div style="flex:2;position:relative;height:16px;background:var(--border);border-radius:4px;overflow:visible">';
+    metas+='<div style="width:'+Math.min(catPct,100)+'%;height:100%;background:'+catCor+'33;border-radius:4px"></div>';
+    if(metaCat>0) metas+='<div style="position:absolute;left:'+Math.min(metaCat,100)+'%;top:-2px;height:calc(100% + 4px);width:2px;background:'+catCor+';border-radius:1px"></div>';
     metas+='</div>';
-    metas+='<span style="font-size:10px;color:var(--text);width:32px;text-align:right;font-family:DM Mono,monospace">'+pctAt.toFixed(0)+'%</span>';
+    metas+='<span style="font-size:11px;color:var(--text);width:35px;text-align:right;font-family:DM Mono,monospace;font-weight:600">'+catPct.toFixed(0)+'%</span>';
     metas+='<span style="color:var(--text3);font-size:9px">/</span>';
-    metas+='<input type="number" min="0" max="100" step="5" value="'+meta+'" data-tipo-mc="'+t+'" onchange="atualizarMetaMC(this)" style="width:34px;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10px;text-align:center;padding:2px;font-family:DM Mono,monospace">';
-    metas+='<span style="font-size:10px;color:'+dCor+';width:42px;text-align:right;font-family:DM Mono,monospace">'+dStr+'</span>';
+    metas+='<input type="number" min="0" max="100" step="5" value="'+metaCat+'" data-tipo-mc="cat_'+cat+'" onchange="atualizarMetaMC(this)" style="width:36px;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;text-align:center;padding:2px;font-family:DM Mono,monospace">';
+    metas+='<span style="font-size:10px;color:'+dCorCat+';width:45px;text-align:right;font-family:DM Mono,monospace">'+dStrCat+'</span>';
+    metas+='</div>';
+
+    // Subcategorias dentro desta categoria
+    var subs = porProduto[cat] || {};
+    var subKeys = Object.keys(subs).sort(function(a,b){return subs[b]-subs[a];});
+    subKeys.forEach(function(sub){
+      var sPct=(subs[sub]/total*100);
+      var sCor=CORES_SUBCAT_MC[sub]||'#64748b';
+      var metaSub=_mcMetasAlocacao['sub_'+sub]||0;
+      var diffSub=sPct-metaSub;
+      var dCorSub=metaSub===0?'var(--text3)':(Math.abs(diffSub)<=3?'#00c853':(diffSub>0?'#f59e0b':'#ff1744'));
+      var dStrSub=metaSub===0?'—':(diffSub>=0?'+':'')+diffSub.toFixed(1)+'%';
+      metas+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;padding-left:18px">';
+      metas+='<div style="width:6px;height:6px;border-radius:50%;background:'+sCor+';flex-shrink:0"></div>';
+      metas+='<span style="font-size:10px;color:var(--text2);flex:1">'+sub+'</span>';
+      metas+='<div style="flex:2;position:relative;height:10px;background:var(--border);border-radius:3px;overflow:visible">';
+      metas+='<div style="width:'+Math.min(sPct,100)+'%;height:100%;background:'+sCor+'33;border-radius:3px"></div>';
+      if(metaSub>0) metas+='<div style="position:absolute;left:'+Math.min(metaSub,100)+'%;top:-1px;height:calc(100% + 2px);width:2px;background:'+sCor+';border-radius:1px"></div>';
+      metas+='</div>';
+      metas+='<span style="font-size:10px;color:var(--text);width:30px;text-align:right;font-family:DM Mono,monospace">'+sPct.toFixed(0)+'%</span>';
+      metas+='<span style="color:var(--text3);font-size:8px">/</span>';
+      metas+='<input type="number" min="0" max="100" step="5" value="'+metaSub+'" data-tipo-mc="sub_'+sub+'" onchange="atualizarMetaMC(this)" style="width:32px;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:9px;text-align:center;padding:2px;font-family:DM Mono,monospace">';
+      metas+='<span style="font-size:9px;color:'+dCorSub+';width:42px;text-align:right;font-family:DM Mono,monospace">'+dStrSub+'</span>';
+      metas+='</div>';
+    });
     metas+='</div>';
   });
   metas+='</div>';
 
-  // ─ Montar HTML ─
+  // ─── Montar HTML ───
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
 
-  // Card esquerdo: Donut + Legenda
+  // Card esquerdo: Donut CATEGORIA + Legenda hierárquica
   html+='<div class="card" style="padding:20px;border:1px solid var(--border)">';
-  html+='<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Composição por Subcategoria</div>';
-  html+='<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Distribuição atual do patrimônio</div>';
-  html+='<div style="display:flex;align-items:center;gap:20px">';
+  html+='<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Composição da Carteira</div>';
+  html+='<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Por categoria e subcategoria</div>';
+  html+='<div style="display:flex;align-items:flex-start;gap:20px">';
   html+='<div style="flex-shrink:0">'+svg+'</div>';
-  html+='<div style="flex:1;max-height:200px;overflow-y:auto">'+leg+'</div>';
+  html+='<div style="flex:1;max-height:250px;overflow-y:auto">'+leg+'</div>';
   html+='</div>';
   html+=barra;
   html+='</div>';
 
-  // Card direito: Metas
+  // Card direito: Metas hierárquicas
   html+='<div class="card" style="padding:20px;border:1px solid var(--border)">';
   html+='<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Alocação vs Metas</div>';
   html+='<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Barra = atual · Linha = meta definida</div>';
 
-  // Resumo rápido em cards menores
+  // Mini-cards RF/RV
   var rfVal = clienteHideValores?'●●●●':mcMask(porCat['Renda Fixa']||0);
   var rvVal = clienteHideValores?'●●●●':mcMask(porCat['Renda Variável']||0);
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
@@ -8126,15 +8250,16 @@ function atualizarMetaMC(input){
   var tipo=input.getAttribute('data-tipo-mc');
   _mcMetasAlocacao[tipo]=parseFloat(input.value)||0;
   var clienteId=currentClienteVinculado;
-  if(clienteId) try{localStorage.setItem('dmf_metas_mc_'+clienteId,JSON.stringify(_mcMetasAlocacao));}catch(e){}
-  // Re-render do painel (sem recarregar tudo)
-  // Apenas ajustar diferenças visualmente via DOM
-  var row = input.closest('div[style*="margin-bottom:6px"]');
+  if(clienteId) try{localStorage.setItem('dmf_metas_mc_v2_'+clienteId,JSON.stringify(_mcMetasAlocacao));}catch(e){}
+  // Atualizar diferença visualmente
+  var row = input.closest('div[style*="margin-bottom"]');
   if(row){
     var spans = row.querySelectorAll('span');
     var lastSpan = spans[spans.length-1];
-    if(lastSpan){
-      var pctAt = parseFloat(row.querySelector('span[style*="text-align:right"]').textContent);
+    if(lastSpan && lastSpan.style.fontFamily){
+      var pctSpans = row.querySelectorAll('span[style*="text-align:right"]');
+      var pctAt = 0;
+      pctSpans.forEach(function(s){ var v=parseFloat(s.textContent); if(!isNaN(v)&&v>0) pctAt=v; });
       var meta = parseFloat(input.value)||0;
       var diff = pctAt - meta;
       var dCor = meta===0?'var(--text3)':(Math.abs(diff)<=3?'#00c853':(diff>0?'#f59e0b':'#ff1744'));
