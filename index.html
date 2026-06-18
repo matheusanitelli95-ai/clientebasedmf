@@ -7396,7 +7396,7 @@ function renderUsuarios(){
     el.innerHTML='<div class="empty"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="empty-title">Nenhum usuário cadastrado</div><p style="font-size:13px;margin-top:4px">Adicione usuários e defina seus perfis de acesso</p></div>';
     return;
   }
-  usuarios.forEach(function(u){
+  usuarios.slice().sort(function(a,b){return(a.nome||a.email||'').localeCompare(b.nome||b.email||'');}).forEach(function(u){
     var cor = PERFIL_COR[u.perfil]||'#999999';
     var card = document.createElement('div');
     card.style='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;transition:border-color .2s';
