@@ -7477,9 +7477,13 @@ function saveUsuario(){
   var email=document.getElementById('usr-email').value.trim().toLowerCase();
   if(!email){alert('Email é obrigatório!');return;}
   var perfil=document.getElementById('usr-perfil').value;
-  var clienteSel=document.getElementById('usr-cliente-id');
-  var clienteId=clienteSel.value||'';
-  var clienteNome=clienteId&&clienteSel.selectedIndex>0?clienteSel.options[clienteSel.selectedIndex].text:'';
+  var clienteId=document.getElementById('usr-cliente-id').value||'';
+  var clienteNome='';
+  if(clienteId){
+    var cliSelEl=document.getElementById('usr-cli-sel');
+    if(cliSelEl&&cliSelEl.selectedIndex>0) clienteNome=cliSelEl.options[cliSelEl.selectedIndex].textContent;
+    if(!clienteNome){var cMatch=clientes.find(function(c){return c.id===clienteId;});if(cMatch)clienteNome=cMatch.nome||'';}
+  }
   var data={
     email:email,
     nome:document.getElementById('usr-nome').value,
