@@ -548,6 +548,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
 
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
+      <button class="nav-item" onclick="showView('controle-opcoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span><span>Controle de Opções</span></button>
       <button class="nav-item" onclick="window.open('https://simulador.b3.com.br/','_blank')"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Simulador B3</span></button>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Simulador IF</span></button>
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
@@ -995,6 +996,69 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <!-- Feed -->
         <div id="comunicados-list"></div>
+      </div>
+    </div>
+
+    <!-- CONTROLE DE OPÇÕES -->
+    <div class="view" id="view-controle-opcoes">
+      <div class="page-header">
+        <div><div class="page-title">Controle de Opções</div><div class="page-sub">Painel para acompanhamento de estruturas com calls e puts</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="opcoes-data-atual" style="color:var(--text-muted);font-size:12px"></span>
+        </div>
+      </div>
+      <div class="page-content">
+        <!-- KPIs -->
+        <div class="kpi-grid" style="margin-bottom:16px">
+          <div class="kpi-card" style="--c:#ff8c00"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumNotional">R$ 0</div><div class="kpi-label">Notional Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div></div><div class="kpi-accent" style="background:var(--blue)"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumEstrutura">R$ 0</div><div class="kpi-label">Valor em Prêmio</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div><div class="kpi-accent" style="background:#7c3aed"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumRelacao">0,0%</div><div class="kpi-label">Estrutura / Notional</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div></div><div class="kpi-accent" style="background:#3b82f6"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumPnl">R$ 0</div><div class="kpi-label">P&L Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+        </div>
+        <!-- Formulário Nova Posição -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:14px">Nova posição</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;align-items:end">
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Ativo</label><input id="opc_f_ativo" class="input" placeholder="BOVA11" list="opc_ativos_dl" style="width:100%"><datalist id="opc_ativos_dl"><option value="BOVA11"><option value="PETR4"><option value="VALE3"><option value="ITUB4"><option value="BBAS3"></datalist></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Cotação do Ativo</label><input id="opc_f_cotacao" type="number" step="0.01" class="input" placeholder="178,50" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Ticker da Opção</label><input id="opc_f_ticker" class="input" placeholder="BOVAK180" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Tipo</label><select id="opc_f_tipo" class="input" style="width:100%"><option value="CALL">CALL</option><option value="PUT">PUT</option></select></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Direção</label><select id="opc_f_direcao" class="input" style="width:100%"><option value="Compra">Compra (Long)</option><option value="Venda">Venda (Short)</option></select></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Strike</label><input id="opc_f_strike" type="number" step="0.01" class="input" placeholder="180,00" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Quantidade</label><input id="opc_f_qtd" type="number" step="1" class="input" placeholder="2000" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Atual</label><input id="opc_f_premioAtual" type="number" step="0.01" class="input" placeholder="3,50" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Vencimento</label><input id="opc_f_vencimento" type="date" class="input" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Negociado</label><input id="opc_f_premioNeg" type="number" step="0.01" class="input" placeholder="4,20" style="width:100%"></div>
+            <div style="display:flex;align-items:end"><button class="btn-primary" onclick="opcAddPosicao()" style="width:100%;padding:9px 14px">+ Adicionar</button></div>
+          </div>
+        </div>
+        <!-- Tabela de Posições -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:14px">Posições</div>
+          <div style="overflow-x:auto">
+            <table class="tbl">
+              <thead><tr>
+                <th style="text-align:left">Ativo</th><th>Cotação</th><th style="text-align:left">Opção</th><th style="text-align:left">Tipo</th>
+                <th style="text-align:left">Direção</th><th style="text-align:left">Equiv. Econômica</th>
+                <th>Strike</th><th>Qtd</th><th>Prêmio Atual</th><th style="text-align:left">Venc.</th><th>Prêmio Neg.</th>
+                <th>Notional</th><th>Valor Estrutura</th><th>Estr./Not.</th>
+                <th>Distância</th><th style="text-align:left">Moneyness</th><th>Intrínseco</th><th>Extrínseco</th>
+                <th>Extr./Prêmio</th><th>Dias</th><th>P&L</th><th></th>
+              </tr></thead>
+              <tbody id="opc-tbody"></tbody>
+            </table>
+            <div id="opc-empty" style="text-align:center;color:var(--text-muted);padding:40px 0;font-size:13px">Nenhuma posição cadastrada ainda.</div>
+          </div>
+        </div>
+        <!-- Gráficos -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Visão Gráfica</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+            <div style="height:260px;position:relative"><canvas id="opc-chartEstrutura"></canvas></div>
+            <div style="height:260px;position:relative"><canvas id="opc-chartIntrinsExtr"></canvas></div>
+            <div style="height:260px;position:relative"><canvas id="opc-chartPnl"></canvas></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2631,6 +2695,7 @@ function showView(v,btn){
   if(viewEl) viewEl.classList.add('active');
   if(btn)btn.classList.add('active');
   if(v==='dashboard') renderDashboard();
+  if(v==='controle-opcoes') initControleOpcoes();
 }
 
 function showTab(t,btn){
@@ -6736,9 +6801,9 @@ var usuarios = [];
 var editingUsrId = null;
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','configuracoes','consultorias'],
-  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','consultorias'],
-  cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','materiais-cliente','chamados']
+  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','controle-opcoes','configuracoes','consultorias'],
+  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','controle-opcoes','consultorias'],
+  cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -6914,6 +6979,7 @@ function showClientePortal(){
     clienteNav.appendChild(mkSec('Ferramentas'));
     clienteNav.appendChild(mkBtn('cnav-panorama','panorama','Panorama',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
+    clienteNav.appendChild(mkBtn('cnav-controle-opcoes','controle-opcoes','Controle de Opções',false));
     var b3Btn = document.createElement('button');
     b3Btn.className = 'nav-item';
     b3Btn.innerHTML = '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Simulador B3</span>';
@@ -6968,6 +7034,7 @@ function showClienteView(viewId, btn){
   if(viewId==='chamados') loadChamados();
   if(viewId==='materiais-cliente') loadMateriais();
   if(viewId==='academy-trilha-cliente') renderAcademyTrilhaCliente();
+  if(viewId==='controle-opcoes') initControleOpcoes();
 }
 
 function buildMinhaCarteiraView(){
@@ -12038,6 +12105,183 @@ if(_origShowClientePortal){
     _origShowClientePortal();
     initAcademyProgress();
   };
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLE DE OPÇÕES
+// ═══════════════════════════════════════════════════════════
+var _opcPosicoes = [];
+var _opcStorageKey = 'dmf_opcoes_v2';
+var _opcChartEst, _opcChartIntr, _opcChartPnl;
+var _opcInitialized = false;
+
+function initControleOpcoes(){
+  if(!_opcInitialized){
+    _opcPosicoes = JSON.parse(localStorage.getItem(_opcStorageKey) || '[]');
+    _opcInitialized = true;
+  }
+  var dtEl = document.getElementById('opcoes-data-atual');
+  if(dtEl) dtEl.textContent = 'Atualizado em ' + new Date().toLocaleDateString('pt-BR');
+  opcRender();
+}
+
+function _opcCalc(p){
+  var notional = p.strike * p.qtd;
+  var valorEstrutura = p.premioAtual * p.qtd;
+  var relacao = notional ? valorEstrutura / notional : 0;
+  var distancia = p.cotacao ? (p.strike - p.cotacao) / p.cotacao : 0;
+  var moneyness;
+  if(p.tipo==='CALL'){
+    moneyness = p.cotacao > p.strike ? 'ITM' : (p.cotacao === p.strike ? 'ATM' : 'OTM');
+  } else {
+    moneyness = p.cotacao < p.strike ? 'ITM' : (p.cotacao === p.strike ? 'ATM' : 'OTM');
+  }
+  var intrinsico = p.tipo==='CALL' ? Math.max(p.cotacao - p.strike, 0) : Math.max(p.strike - p.cotacao, 0);
+  var extrinsico = Math.max(p.premioAtual - intrinsico, 0);
+  var extrPctPremio = p.premioAtual ? extrinsico / p.premioAtual : 0;
+  var dias = '-';
+  if(p.vencimento){
+    var ms = new Date(p.vencimento) - new Date(new Date().toDateString());
+    dias = Math.round(ms / 86400000);
+  }
+  var direcao = p.direcao || 'Compra';
+  var pnl = direcao==='Compra' ? (p.premioAtual - p.premioNeg)*p.qtd : (p.premioNeg - p.premioAtual)*p.qtd;
+  var eqDirecao;
+  if(p.tipo==='CALL'){ eqDirecao = direcao==='Compra' ? 'long' : 'short'; }
+  else { eqDirecao = direcao==='Compra' ? 'short' : 'long'; }
+  return { notional:notional, valorEstrutura:valorEstrutura, relacao:relacao, distancia:distancia, moneyness:moneyness, intrinsico:intrinsico, extrinsico:extrinsico, extrPctPremio:extrPctPremio, dias:dias, pnl:pnl, eqDirecao:eqDirecao };
+}
+
+var _opcFmtMoney = function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); };
+var _opcFmtMoney2 = function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2}); };
+var _opcFmtPct = function(v){ return (v*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'; };
+var _opcFmtDate = function(s){ if(!s) return '-'; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; };
+
+function _opcMoneynessTag(m){
+  if(m==='ITM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,197,94,.15);color:#22c55e">Dentro (ITM)</span>';
+  if(m==='ATM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,158,11,.15);color:#f59e0b">No dinheiro</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(239,68,68,.15);color:#ef4444">Fora (OTM)</span>';
+}
+function _opcTipoTag(t){
+  if(t==='CALL') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(59,130,246,.15);color:#3b82f6">CALL</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(236,72,153,.15);color:#ec4899">PUT</span>';
+}
+function _opcDirecaoTag(d){
+  if(d==='Compra') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,211,238,.15);color:#22d3ee">Compra</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,158,11,.15);color:#f59e0b">Venda</span>';
+}
+function _opcEquivCell(p,c){
+  var tagColor = c.eqDirecao==='long' ? '#22c55e' : '#f59e0b';
+  var tagBg = c.eqDirecao==='long' ? 'rgba(34,197,94,.15)' : 'rgba(245,158,11,.15)';
+  var label = c.eqDirecao==='long' ? '≈ Comprado no ativo' : '≈ Vendido no ativo';
+  var detail = p.qtd.toLocaleString('pt-BR')+' '+p.ativo+' a '+_opcFmtMoney2(p.strike);
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:'+tagBg+';color:'+tagColor+'">'+label+'</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">'+detail+'</div>';
+}
+
+function opcAddPosicao(){
+  var g = function(id){ return document.getElementById(id).value; };
+  var ativo = g('opc_f_ativo').trim();
+  var cotacao = parseFloat(g('opc_f_cotacao'));
+  var ticker = g('opc_f_ticker').trim();
+  var tipo = g('opc_f_tipo');
+  var direcao = g('opc_f_direcao');
+  var strike = parseFloat(g('opc_f_strike'));
+  var qtd = parseFloat(g('opc_f_qtd'));
+  var premioAtual = parseFloat(g('opc_f_premioAtual'));
+  var vencimento = g('opc_f_vencimento');
+  var premioNeg = parseFloat(g('opc_f_premioNeg'));
+  if(!ativo||isNaN(cotacao)||!ticker||isNaN(strike)||isNaN(qtd)||isNaN(premioAtual)||isNaN(premioNeg)){
+    alert('Preencha todos os campos antes de adicionar.'); return;
+  }
+  _opcPosicoes.push({id:Date.now(),ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg});
+  localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
+  ['opc_f_ativo','opc_f_cotacao','opc_f_ticker','opc_f_strike','opc_f_qtd','opc_f_premioAtual','opc_f_vencimento','opc_f_premioNeg'].forEach(function(id){ document.getElementById(id).value=''; });
+  opcRender();
+}
+
+function opcRemovePosicao(id){
+  _opcPosicoes = _opcPosicoes.filter(function(p){ return p.id !== id; });
+  localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
+  opcRender();
+}
+
+function opcRender(){
+  var tbody = document.getElementById('opc-tbody');
+  var emptyEl = document.getElementById('opc-empty');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  emptyEl.style.display = _opcPosicoes.length ? 'none' : 'block';
+  var totalNotional=0, totalEstrutura=0, totalPnl=0;
+  _opcPosicoes.forEach(function(p){
+    var c = _opcCalc(p);
+    totalNotional += c.notional;
+    totalEstrutura += c.valorEstrutura;
+    totalPnl += c.pnl;
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="text-align:left"><strong>'+p.ativo+'</strong></td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(p.cotacao)+'</td>'
+      +'<td style="text-align:left">'+p.ticker+'</td>'
+      +'<td style="text-align:left">'+_opcTipoTag(p.tipo)+'</td>'
+      +'<td style="text-align:left">'+_opcDirecaoTag(p.direcao||'Compra')+'</td>'
+      +'<td style="text-align:left">'+_opcEquivCell(p,c)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(p.strike)+'</td>'
+      +'<td style="text-align:right">'+p.qtd.toLocaleString('pt-BR')+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(p.premioAtual)+'</td>'
+      +'<td style="text-align:left">'+_opcFmtDate(p.vencimento)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(p.premioNeg)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney(c.notional)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney(c.valorEstrutura)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtPct(c.relacao)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtPct(c.distancia)+'</td>'
+      +'<td style="text-align:left">'+_opcMoneynessTag(c.moneyness)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(c.intrinsico)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtMoney2(c.extrinsico)+'</td>'
+      +'<td style="text-align:right">'+_opcFmtPct(c.extrPctPremio)+'</td>'
+      +'<td style="text-align:right">'+c.dias+'</td>'
+      +'<td style="text-align:right;font-weight:600;color:'+(c.pnl>=0?'#22c55e':'#3b82f6')+'">'+_opcFmtMoney(c.pnl)+'</td>'
+      +'<td><button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px" title="Remover">✕</button></td>';
+    tbody.appendChild(tr);
+  });
+  document.getElementById('opc-sumNotional').textContent = _opcFmtMoney(totalNotional);
+  document.getElementById('opc-sumEstrutura').textContent = _opcFmtMoney(totalEstrutura);
+  document.getElementById('opc-sumRelacao').textContent = totalNotional ? _opcFmtPct(totalEstrutura/totalNotional) : '0,0%';
+  var pnlEl = document.getElementById('opc-sumPnl');
+  pnlEl.textContent = _opcFmtMoney(totalPnl);
+  pnlEl.style.color = totalPnl >= 0 ? '#22c55e' : '#3b82f6';
+  opcRenderCharts();
+}
+
+function opcRenderCharts(){
+  var calcs = _opcPosicoes.map(_opcCalc);
+  var labels = _opcPosicoes.map(function(p){ return p.ativo+' '+p.tipo+' '+p.strike; });
+  var gridColor = 'rgba(255,255,255,0.06)';
+  var tickColor = '#8a93a6';
+  var totalNot = calcs.reduce(function(s,c){ return s+c.notional; },0);
+  var totalEst = calcs.reduce(function(s,c){ return s+c.valorEstrutura; },0);
+  var resto = Math.max(totalNot - totalEst, 0);
+  if(_opcChartEst) _opcChartEst.destroy();
+  var ctx1 = document.getElementById('opc-chartEstrutura');
+  if(ctx1) _opcChartEst = new Chart(ctx1, {
+    type:'pie',
+    data:{labels:['Valor da Estrutura (Prêmio)','Notional restante'],datasets:[{data:[totalEst,resto],backgroundColor:['#7c3aed','#3b82f6'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor}},title:{display:true,text:'Estrutura vs. Notional',color:'#e9edf5'}}}
+  });
+  var sumIntr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].intrinsico*p.qtd; },0);
+  var sumExtr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].extrinsico*p.qtd; },0);
+  if(_opcChartIntr) _opcChartIntr.destroy();
+  var ctx2 = document.getElementById('opc-chartIntrinsExtr');
+  if(ctx2) _opcChartIntr = new Chart(ctx2, {
+    type:'doughnut',
+    data:{labels:['Valor Intrínseco','Valor Extrínseco'],datasets:[{data:[sumIntr,sumExtr],backgroundColor:['#22c55e','#f59e0b'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor}},title:{display:true,text:'Intrínseco x Extrínseco',color:'#e9edf5'}}}
+  });
+  if(_opcChartPnl) _opcChartPnl.destroy();
+  var ctx3 = document.getElementById('opc-chartPnl');
+  if(ctx3 && labels.length) _opcChartPnl = new Chart(ctx3, {
+    type:'bar',
+    data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'#22c55e':'#3b82f6';})}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'P&L por posição',color:'#e9edf5'}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{color:gridColor},ticks:{color:tickColor}}}}
+  });
 }
 
 </script>
