@@ -634,17 +634,16 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th style="width:36px"><input type="checkbox" id="check-all" onclick="toggleAllClientes(this)" style="accent-color:var(--blue);cursor:pointer"></th>
               <th onclick="sortClientes('nome')">Nome ↕</th>
               <th>Nível</th>
               <th onclick="sortClientes('responsavel')">Profissional</th>
               <th onclick="sortClientes('objetivo')">Objetivo</th>
               <th onclick="sortClientes('perfil')">Perfil</th>
-              <th onclick="sortClientes('patrimonio')">Patrimônio em Ativos ↕</th>
+              <th onclick="sortClientes('patrimonio')">Patrimônio ↕</th>
               <th onclick="sortClientes('status')">Status</th>
               <th>Ações</th>
             </tr></thead>
-            <tbody id="table-clientes"><tr><td colspan="10" style="text-align:center;padding:48px;color:var(--text3)">Carregando...</td></tr></tbody>
+            <tbody id="table-clientes"><tr><td colspan="8" style="text-align:center;padding:48px;color:var(--text3)">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -2832,11 +2831,11 @@ function renderClientes(){
     return typeof va==='number'?(cliSortAsc?va-vb:vb-va):(cliSortAsc?String(va||'').localeCompare(String(vb||'')):String(vb||'').localeCompare(String(va||'')));
   });
   var tb=document.getElementById('table-clientes');
-  if(!f.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Nenhum cliente encontrado</td></tr>';return;}
+  if(!f.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Nenhum cliente encontrado</td></tr>';return;}
   tb.innerHTML=f.map(function(c){
     var sc=STATUS_C[c.status]||'#424242';
-    var rf=c.custodiaRF||0,rv=c.custodiaRV||0;
-    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+( c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#ff8c00">'+fmtFull(rf)+'</td><td style="font-family:DM Mono,monospace;font-size:12px;color:#c084fc">'+fmtFull(rv)+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#00c853;font-weight:500">'+fmtFull(rf+rv)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
+    var pat=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
+    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+(c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#00c853;font-weight:500">'+fmtFull(pat)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
   }).join('');
 }
 
