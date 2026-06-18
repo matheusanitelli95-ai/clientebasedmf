@@ -7389,15 +7389,7 @@ function renderUsuarios(){
     var db2=document.createElement('button');db2.className='btn-dsm';db2.style='padding:5px 10px;font-size:12px';
     db2.textContent='Excluir';
     (function(uid){db2.onclick=function(){confirmDelete(function(){db.collection('usuarios').doc(uid).delete();});};})(u.id);
-    actions.appendChild(eb);actions.appendChild(rb);actions.appendChild(db2);
-
-    // Reenviar senha button
-    var reenvBtn = document.createElement('button');
-    reenvBtn.className = 'btn-ghost';
-    reenvBtn.style = 'padding:5px 10px;font-size:11px;color:var(--blue)';
-    reenvBtn.textContent = 'Reenviar acesso';
-    (function(email){ reenvBtn.onclick = function(){ reenviarAcesso(email); }; })(u.email);
-    actions.insertBefore(reenvBtn, actions.firstChild);
+    actions.appendChild(rb);actions.appendChild(eb);actions.appendChild(db2);
     card.appendChild(av);card.appendChild(info);card.appendChild(badge);card.appendChild(actions);
     el.appendChild(card);
   });
@@ -7495,6 +7487,9 @@ function saveUsuario(){
   // Use email as document ID for easy lookup on login (merge para não perder uid e outros campos)
   db.collection('usuarios').doc(email).set(data,{merge:true}).then(function(){
     closeModal('modal-usuario');
+  }).catch(function(err){
+    console.error('Erro ao salvar usuário:', err);
+    alert('Erro ao salvar: ' + err.message);
   });
 }
 
