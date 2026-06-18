@@ -1005,6 +1005,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div><div class="page-title">Controle de Opções</div><div class="page-sub">Painel para acompanhamento de estruturas com calls e puts</div></div>
         <div style="display:flex;gap:8px;align-items:center">
           <span id="opcoes-data-atual" style="color:var(--text-muted);font-size:12px"></span>
+          <button class="btn-primary" onclick="document.getElementById('opc-form-panel').style.display=document.getElementById('opc-form-panel').style.display==='none'?'block':'none'" style="padding:7px 16px;font-size:12px">+ Nova Posição</button>
         </div>
       </div>
       <div class="page-content">
@@ -1015,49 +1016,89 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumRelacao">0,0%</div><div class="kpi-label">Estrutura / Notional</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div></div><div class="kpi-accent" style="background:#3b82f6"></div></div>
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumPnl">R$ 0</div><div class="kpi-label">P&L Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
         </div>
-        <!-- Formulário Nova Posição -->
-        <div class="card" style="margin-bottom:16px">
-          <div class="section-title" style="margin-bottom:14px">Nova posição</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;align-items:end">
+
+        <!-- Formulário Nova Posição (colapsável) -->
+        <div id="opc-form-panel" class="card" style="margin-bottom:16px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="section-title" style="margin:0">Nova posição</div>
+            <button onclick="document.getElementById('opc-form-panel').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 8px">✕</button>
+          </div>
+          <!-- Linha 1: Ativo + Opção -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px">
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Ativo</label><input id="opc_f_ativo" class="input" placeholder="BOVA11" list="opc_ativos_dl" style="width:100%"><datalist id="opc_ativos_dl"><option value="BOVA11"><option value="PETR4"><option value="VALE3"><option value="ITUB4"><option value="BBAS3"></datalist></div>
-            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Cotação do Ativo</label><input id="opc_f_cotacao" type="number" step="0.01" class="input" placeholder="178,50" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Cotação do Ativo</label><input id="opc_f_cotacao" type="number" step="0.01" class="input" placeholder="178.50" style="width:100%"></div>
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Ticker da Opção</label><input id="opc_f_ticker" class="input" placeholder="BOVAK180" style="width:100%"></div>
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Tipo</label><select id="opc_f_tipo" class="input" style="width:100%"><option value="CALL">CALL</option><option value="PUT">PUT</option></select></div>
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Direção</label><select id="opc_f_direcao" class="input" style="width:100%"><option value="Compra">Compra (Long)</option><option value="Venda">Venda (Short)</option></select></div>
-            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Strike</label><input id="opc_f_strike" type="number" step="0.01" class="input" placeholder="180,00" style="width:100%"></div>
+          </div>
+          <!-- Linha 2: Valores -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px">
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Strike</label><input id="opc_f_strike" type="number" step="0.01" class="input" placeholder="180.00" style="width:100%"></div>
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Quantidade</label><input id="opc_f_qtd" type="number" step="1" class="input" placeholder="2000" style="width:100%"></div>
-            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Atual</label><input id="opc_f_premioAtual" type="number" step="0.01" class="input" placeholder="3,50" style="width:100%"></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Atual</label><input id="opc_f_premioAtual" type="number" step="0.01" class="input" placeholder="3.50" style="width:100%"></div>
             <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Vencimento</label><input id="opc_f_vencimento" type="date" class="input" style="width:100%"></div>
-            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Negociado</label><input id="opc_f_premioNeg" type="number" step="0.01" class="input" placeholder="4,20" style="width:100%"></div>
-            <div style="display:flex;align-items:end"><button class="btn-primary" onclick="opcAddPosicao()" style="width:100%;padding:9px 14px">+ Adicionar</button></div>
+            <div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Prêmio Negociado</label><input id="opc_f_premioNeg" type="number" step="0.01" class="input" placeholder="4.20" style="width:100%"></div>
+          </div>
+          <!-- Botão -->
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn-primary" onclick="opcAddPosicao()" style="padding:10px 28px;font-size:13px">+ Adicionar Posição</button>
           </div>
         </div>
+
         <!-- Tabela de Posições -->
         <div class="card" style="margin-bottom:16px">
-          <div class="section-title" style="margin-bottom:14px">Posições</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="section-title" style="margin:0">Posições</div>
+            <span style="font-size:11px;color:var(--text-muted)" id="opc-count">0 posições</span>
+          </div>
           <div style="overflow-x:auto">
-            <table class="tbl">
+            <table class="tbl" id="opc-table" style="font-size:12px">
               <thead><tr>
-                <th style="text-align:left">Ativo</th><th>Cotação</th><th style="text-align:left">Opção</th><th style="text-align:left">Tipo</th>
-                <th style="text-align:left">Direção</th><th style="text-align:left">Equiv. Econômica</th>
-                <th>Strike</th><th>Qtd</th><th>Prêmio Atual</th><th style="text-align:left">Venc.</th><th>Prêmio Neg.</th>
-                <th>Notional</th><th>Valor Estrutura</th><th>Estr./Not.</th>
-                <th>Distância</th><th style="text-align:left">Moneyness</th><th>Intrínseco</th><th>Extrínseco</th>
-                <th>Extr./Prêmio</th><th>Dias</th><th>P&L</th><th></th>
+                <th style="text-align:left;min-width:60px">Ativo</th>
+                <th style="text-align:left;min-width:70px">Opção</th>
+                <th style="text-align:center;min-width:50px">Tipo</th>
+                <th style="text-align:center;min-width:60px">Direção</th>
+                <th style="text-align:right;min-width:55px">Cotação</th>
+                <th style="text-align:right;min-width:55px">Strike</th>
+                <th style="text-align:right;min-width:50px">Qtd</th>
+                <th style="text-align:right;min-width:65px">Prêmio At.</th>
+                <th style="text-align:right;min-width:65px">Prêmio Neg.</th>
+                <th style="text-align:center;min-width:70px">Venc.</th>
+                <th style="text-align:right;min-width:50px">Dias</th>
+                <th style="text-align:center;min-width:80px">Moneyness</th>
+                <th style="text-align:right;min-width:70px">Distância</th>
+                <th style="text-align:right;min-width:80px">Notional</th>
+                <th style="text-align:right;min-width:80px">Estrutura</th>
+                <th style="text-align:right;min-width:60px">Est./Not.</th>
+                <th style="text-align:right;min-width:65px">Intríns.</th>
+                <th style="text-align:right;min-width:65px">Extríns.</th>
+                <th style="text-align:right;min-width:80px">P&L</th>
+                <th style="text-align:left;min-width:130px">Equiv. Econômica</th>
+                <th style="width:32px"></th>
               </tr></thead>
               <tbody id="opc-tbody"></tbody>
             </table>
-            <div id="opc-empty" style="text-align:center;color:var(--text-muted);padding:40px 0;font-size:13px">Nenhuma posição cadastrada ainda.</div>
+            <div id="opc-empty" style="text-align:center;color:var(--text-muted);padding:50px 0;font-size:13px">
+              <div style="font-size:28px;margin-bottom:8px;opacity:.4">📊</div>
+              Nenhuma posição cadastrada.<br><span style="font-size:12px;opacity:.7">Clique em "+ Nova Posição" para começar.</span>
+            </div>
           </div>
         </div>
-        <!-- Gráficos -->
-        <div class="card">
-          <div class="section-title" style="margin-bottom:14px">Visão Gráfica</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
-            <div style="height:260px;position:relative"><canvas id="opc-chartEstrutura"></canvas></div>
-            <div style="height:260px;position:relative"><canvas id="opc-chartIntrinsExtr"></canvas></div>
-            <div style="height:260px;position:relative"><canvas id="opc-chartPnl"></canvas></div>
+
+        <!-- Gráficos — 2 colunas (pie + donut) + 1 inteira (barras P&L) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="card">
+            <div class="section-title" style="margin-bottom:8px">Estrutura vs. Notional</div>
+            <div style="height:240px;position:relative"><canvas id="opc-chartEstrutura"></canvas></div>
           </div>
+          <div class="card">
+            <div class="section-title" style="margin-bottom:8px">Intrínseco x Extrínseco</div>
+            <div style="height:240px;position:relative"><canvas id="opc-chartIntrinsExtr"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title" style="margin-bottom:8px">P&L por posição</div>
+          <div style="height:220px;position:relative"><canvas id="opc-chartPnl"></canvas></div>
         </div>
       </div>
     </div>
@@ -12196,6 +12237,7 @@ function opcAddPosicao(){
   _opcPosicoes.push({id:Date.now(),ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg});
   localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
   ['opc_f_ativo','opc_f_cotacao','opc_f_ticker','opc_f_strike','opc_f_qtd','opc_f_premioAtual','opc_f_vencimento','opc_f_premioNeg'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('opc-form-panel').style.display='none';
   opcRender();
 }
 
@@ -12208,38 +12250,43 @@ function opcRemovePosicao(id){
 function opcRender(){
   var tbody = document.getElementById('opc-tbody');
   var emptyEl = document.getElementById('opc-empty');
+  var tblEl = document.getElementById('opc-table');
   if(!tbody) return;
   tbody.innerHTML = '';
   emptyEl.style.display = _opcPosicoes.length ? 'none' : 'block';
+  if(tblEl) tblEl.style.display = _opcPosicoes.length ? '' : 'none';
+  var countEl = document.getElementById('opc-count');
+  if(countEl) countEl.textContent = _opcPosicoes.length + ' posiç' + (_opcPosicoes.length===1?'ão':'ões');
   var totalNotional=0, totalEstrutura=0, totalPnl=0;
   _opcPosicoes.forEach(function(p){
     var c = _opcCalc(p);
     totalNotional += c.notional;
     totalEstrutura += c.valorEstrutura;
     totalPnl += c.pnl;
+    var diasColor = typeof c.dias==='number' ? (c.dias<=7?'#ef4444':(c.dias<=30?'#f59e0b':'var(--text)')) : 'var(--text-muted)';
+    var pnlBg = c.pnl>=0 ? 'rgba(34,197,94,.08)' : 'rgba(59,130,246,.08)';
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td style="text-align:left"><strong>'+p.ativo+'</strong></td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(p.cotacao)+'</td>'
-      +'<td style="text-align:left">'+p.ticker+'</td>'
-      +'<td style="text-align:left">'+_opcTipoTag(p.tipo)+'</td>'
-      +'<td style="text-align:left">'+_opcDirecaoTag(p.direcao||'Compra')+'</td>'
-      +'<td style="text-align:left">'+_opcEquivCell(p,c)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(p.strike)+'</td>'
-      +'<td style="text-align:right">'+p.qtd.toLocaleString('pt-BR')+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(p.premioAtual)+'</td>'
-      +'<td style="text-align:left">'+_opcFmtDate(p.vencimento)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(p.premioNeg)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney(c.notional)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney(c.valorEstrutura)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtPct(c.relacao)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtPct(c.distancia)+'</td>'
-      +'<td style="text-align:left">'+_opcMoneynessTag(c.moneyness)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(c.intrinsico)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtMoney2(c.extrinsico)+'</td>'
-      +'<td style="text-align:right">'+_opcFmtPct(c.extrPctPremio)+'</td>'
-      +'<td style="text-align:right">'+c.dias+'</td>'
-      +'<td style="text-align:right;font-weight:600;color:'+(c.pnl>=0?'#22c55e':'#3b82f6')+'">'+_opcFmtMoney(c.pnl)+'</td>'
-      +'<td><button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px" title="Remover">✕</button></td>';
+    tr.innerHTML = '<td style="text-align:left"><strong style="color:var(--blue)">'+p.ativo+'</strong></td>'
+      +'<td style="text-align:left;color:var(--text-muted)">'+p.ticker+'</td>'
+      +'<td style="text-align:center">'+_opcTipoTag(p.tipo)+'</td>'
+      +'<td style="text-align:center">'+_opcDirecaoTag(p.direcao||'Compra')+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(p.cotacao)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(p.strike)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+p.qtd.toLocaleString('pt-BR')+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(p.premioAtual)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(p.premioNeg)+'</td>'
+      +'<td style="text-align:center;font-variant-numeric:tabular-nums">'+_opcFmtDate(p.vencimento)+'</td>'
+      +'<td style="text-align:right;color:'+diasColor+';font-weight:600;font-variant-numeric:tabular-nums">'+c.dias+'</td>'
+      +'<td style="text-align:center">'+_opcMoneynessTag(c.moneyness)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtPct(c.distancia)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney(c.notional)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney(c.valorEstrutura)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtPct(c.relacao)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(c.intrinsico)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(c.extrinsico)+'</td>'
+      +'<td style="text-align:right;font-weight:700;color:'+(c.pnl>=0?'#22c55e':'#3b82f6')+';background:'+pnlBg+';font-variant-numeric:tabular-nums">'+_opcFmtMoney(c.pnl)+'</td>'
+      +'<td style="text-align:left;font-size:11px">'+_opcEquivCell(p,c)+'</td>'
+      +'<td style="text-align:center"><button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:.5;transition:all .15s" onmouseover="this.style.color=\'#ef4444\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Remover">✕</button></td>';
     tbody.appendChild(tr);
   });
   document.getElementById('opc-sumNotional').textContent = _opcFmtMoney(totalNotional);
@@ -12264,7 +12311,7 @@ function opcRenderCharts(){
   if(ctx1) _opcChartEst = new Chart(ctx1, {
     type:'pie',
     data:{labels:['Valor da Estrutura (Prêmio)','Notional restante'],datasets:[{data:[totalEst,resto],backgroundColor:['#7c3aed','#3b82f6'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor}},title:{display:true,text:'Estrutura vs. Notional',color:'#e9edf5'}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:11}}},title:{display:false}}}
   });
   var sumIntr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].intrinsico*p.qtd; },0);
   var sumExtr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].extrinsico*p.qtd; },0);
@@ -12273,14 +12320,14 @@ function opcRenderCharts(){
   if(ctx2) _opcChartIntr = new Chart(ctx2, {
     type:'doughnut',
     data:{labels:['Valor Intrínseco','Valor Extrínseco'],datasets:[{data:[sumIntr,sumExtr],backgroundColor:['#22c55e','#f59e0b'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor}},title:{display:true,text:'Intrínseco x Extrínseco',color:'#e9edf5'}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:11}}},title:{display:false}}}
   });
   if(_opcChartPnl) _opcChartPnl.destroy();
   var ctx3 = document.getElementById('opc-chartPnl');
   if(ctx3 && labels.length) _opcChartPnl = new Chart(ctx3, {
     type:'bar',
-    data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'#22c55e':'#3b82f6';})}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'P&L por posição',color:'#e9edf5'}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{color:gridColor},ticks:{color:tickColor}}}}
+    data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'#22c55e':'#3b82f6';}),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},title:{display:false}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}}}}
   });
 }
 
