@@ -12484,13 +12484,30 @@ if(_origShowClientePortal){
 // CONTROLE DE OPÇÕES
 // ═══════════════════════════════════════════════════════════
 var _opcPosicoes = [];
-var _opcStorageKey = 'dmf_opcoes_v2';
 var _opcChartEst, _opcChartIntr, _opcChartPnl;
 var _opcInitialized = false;
+var _opcUnsubscribe = null;
 
 function initControleOpcoes(){
   if(!_opcInitialized){
-    _opcPosicoes = JSON.parse(localStorage.getItem(_opcStorageKey) || '[]');
+    // Listener Firestore real-time para posições de opções
+    if(_opcUnsubscribe) _opcUnsubscribe();
+    _opcUnsubscribe = db.collection('opcoes_posicoes').orderBy('criadoEm','desc').onSnapshot(function(snap){
+      _opcPosicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      opcRender();
+    }, function(err){
+      console.error('Erro ao carregar opções:', err);
+      // Fallback: tenta localStorage legado
+      var legado = localStorage.getItem('dmf_opcoes_v2');
+      if(legado){
+        try {
+          _opcPosicoes = JSON.parse(legado);
+          opcRender();
+          // Migrar dados legados para Firestore
+          _opcMigrarLegado(_opcPosicoes);
+        } catch(e){}
+      }
+    });
     _opcInitialized = true;
   }
   var dtEl = document.getElementById('opcoes-data-atual');
@@ -12597,23 +12614,26 @@ function opcAddPosicao(){
   if(!ativo||isNaN(cotacao)||!ticker||isNaN(strike)||isNaN(qtd)||isNaN(premioAtual)||isNaN(premioNeg)){
     alert('Preencha todos os campos antes de adicionar.'); return;
   }
+  var posData = {ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg,atualizadoEm:new Date().toISOString()};
   if(_opcEditingId){
-    // Modo edição: atualiza posição existente
-    var idx = _opcPosicoes.findIndex(function(p){ return p.id === _opcEditingId; });
-    if(idx !== -1){
-      _opcPosicoes[idx] = {id:_opcEditingId,ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg};
-    }
+    // Modo edição: atualiza posição existente no Firestore
+    db.collection('opcoes_posicoes').doc(_opcEditingId).update(posData).catch(function(err){
+      alert('Erro ao atualizar posição: ' + err.message);
+    });
     _opcEditingId = null;
     document.getElementById('opc-form-title').textContent = 'Nova posição';
     document.getElementById('opc-form-btn').textContent = '+ Adicionar Posição';
   } else {
-    // Modo adição: cria nova posição
-    _opcPosicoes.push({id:Date.now(),ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg});
+    // Modo adição: cria nova posição no Firestore
+    posData.criadoEm = new Date().toISOString();
+    posData.criadoPor = firebase.auth().currentUser ? firebase.auth().currentUser.email : '';
+    db.collection('opcoes_posicoes').add(posData).catch(function(err){
+      alert('Erro ao salvar posição: ' + err.message);
+    });
   }
-  localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
   ['opc_f_ativo','opc_f_cotacao','opc_f_ticker','opc_f_strike','opc_f_qtd','opc_f_premioAtual','opc_f_vencimento','opc_f_premioNeg'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('opc-form-panel').style.display='none';
-  opcRender();
+  // onSnapshot atualiza automaticamente via listener
 }
 
 function opcEditPosicao(id){
@@ -12648,9 +12668,28 @@ function opcCancelEdit(){
 }
 
 function opcRemovePosicao(id){
-  _opcPosicoes = _opcPosicoes.filter(function(p){ return p.id !== id; });
-  localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
-  opcRender();
+  if(!confirm('Deseja remover esta posição?')) return;
+  db.collection('opcoes_posicoes').doc(id).delete().catch(function(err){
+    alert('Erro ao remover posição: ' + err.message);
+  });
+  // onSnapshot atualiza automaticamente via listener
+}
+
+// Migração de dados legados do localStorage para Firestore
+function _opcMigrarLegado(posicoes){
+  if(!posicoes || !posicoes.length) return;
+  var batch = db.batch();
+  posicoes.forEach(function(p){
+    var ref = db.collection('opcoes_posicoes').doc();
+    var data = {ativo:p.ativo||'',cotacao:p.cotacao||0,ticker:p.ticker||'',tipo:p.tipo||'CALL',direcao:p.direcao||'Compra',strike:p.strike||0,qtd:p.qtd||0,premioAtual:p.premioAtual||0,vencimento:p.vencimento||'',premioNeg:p.premioNeg||0,criadoEm:new Date().toISOString(),criadoPor:firebase.auth().currentUser?firebase.auth().currentUser.email:'',atualizadoEm:new Date().toISOString(),migradoDe:'localStorage'};
+    batch.set(ref, data);
+  });
+  batch.commit().then(function(){
+    console.log('Migração localStorage → Firestore concluída (' + posicoes.length + ' posições)');
+    localStorage.removeItem('dmf_opcoes_v2');
+  }).catch(function(err){
+    console.error('Erro na migração:', err);
+  });
 }
 
 function opcRender(){
