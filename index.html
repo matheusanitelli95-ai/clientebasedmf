@@ -1014,13 +1014,14 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumEstrutura">R$ 0</div><div class="kpi-label">Valor em Prêmio</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div><div class="kpi-accent" style="background:#7c3aed"></div></div>
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumRelacao">0,0%</div><div class="kpi-label">Estrutura / Notional</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div></div><div class="kpi-accent" style="background:#3b82f6"></div></div>
           <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumPnl">R$ 0</div><div class="kpi-label">P&L Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div><div class="kpi-accent" style="background:#22c55e"></div></div>
+          <div class="kpi-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="kpi-val" id="opc-sumMargem">R$ 0</div><div class="kpi-label">Margem Total</div></div><div class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div><div class="kpi-accent" style="background:#f59e0b"></div></div>
         </div>
 
         <!-- Formulário Nova Posição (colapsável) -->
         <div id="opc-form-panel" class="card" style="margin-bottom:16px;display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div class="section-title" style="margin:0">Nova posição</div>
-            <button onclick="document.getElementById('opc-form-panel').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 8px">✕</button>
+            <div class="section-title" style="margin:0" id="opc-form-title">Nova posição</div>
+            <button onclick="opcCancelEdit()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px 8px">✕</button>
           </div>
           <!-- Linha 1: Ativo + Opção -->
           <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px">
@@ -1040,7 +1041,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
           <!-- Botão -->
           <div style="display:flex;justify-content:flex-end">
-            <button class="btn-primary" onclick="opcAddPosicao()" style="padding:10px 28px;font-size:13px">+ Adicionar Posição</button>
+            <button class="btn-primary" onclick="opcAddPosicao()" id="opc-form-btn" style="padding:10px 28px;font-size:13px">+ Adicionar Posição</button>
           </div>
         </div>
 
@@ -1072,8 +1073,9 @@ textarea.form-input{resize:vertical;min-height:80px}
                 <th style="text-align:right;min-width:65px">Intríns.</th>
                 <th style="text-align:right;min-width:65px">Extríns.</th>
                 <th style="text-align:right;min-width:80px">P&L</th>
+                <th style="text-align:right;min-width:80px">Margem</th>
                 <th style="text-align:left;min-width:130px">Equiv. Econômica</th>
-                <th style="width:32px"></th>
+                <th style="width:60px"></th>
               </tr></thead>
               <tbody id="opc-tbody"></tbody>
             </table>
@@ -8245,14 +8247,14 @@ function _loadMinhaCarteiraReal(){
 // ── Painel Visual de Alocação ──────────────────────────────
 var CORES_TIPO_MC = {
   'Ação':'#ff8c00','FII':'#a855f7','ETF':'#3b82f6','ETF de RF':'#60a5fa',
-  'BDR':'#ef4444','Cripto':'#f59e0b','Internacional':'#10b981',
+  'BDR':'#e67e22','Cripto':'#f59e0b','Internacional':'#10b981',
   'CDB':'#6b7280','LCI':'#8b5cf6','LCA':'#7c3aed','Tesouro Direto':'#14b8a6',
   'Debênture':'#f472b6','CRI':'#c084fc','CRA':'#a78bfa','Previdência':'#fb923c',
   'Fundo DI':'#94a3b8','Fundo':'#38bdf8','Outro':'#64748b'
 };
 // Cores por subcategoria conceitual (não por produto)
 var CORES_SUBCAT_MC = {
-  'Ações':'#ff8c00','FIIs':'#a855f7','ETFs':'#3b82f6','BDRs':'#ef4444',
+  'Ações':'#ff8c00','FIIs':'#a855f7','ETFs':'#3b82f6','BDRs':'#e67e22',
   'Cripto':'#f59e0b','Internacional':'#10b981',
   'Títulos Públicos':'#14b8a6','Títulos Privados':'#8b5cf6',
   'Pós-fixado':'#6b7280','Prefixado':'#f472b6','Híbrido (IPCA+)':'#c084fc',
@@ -12520,7 +12522,36 @@ function _opcCalc(p){
   var eqDirecao;
   if(p.tipo==='CALL'){ eqDirecao = direcao==='Compra' ? 'long' : 'short'; }
   else { eqDirecao = direcao==='Compra' ? 'short' : 'long'; }
-  return { notional:notional, valorEstrutura:valorEstrutura, relacao:relacao, distancia:distancia, moneyness:moneyness, intrinsico:intrinsico, extrinsico:extrinsico, extrPctPremio:extrPctPremio, dias:dias, pnl:pnl, eqDirecao:eqDirecao };
+
+  // ── MARGEM ──
+  // Margem só para vendidas
+  var margem = 0;
+  var margemTipo = '';
+  if(direcao==='Venda'){
+    // Verificar se faz parte de uma trava (spread)
+    var trava = _opcPosicoes.find(function(other){
+      return other.id !== p.id && other.ativo === p.ativo && other.tipo === p.tipo
+        && (other.direcao||'Compra')==='Compra' && other.qtd === p.qtd
+        && other.vencimento === p.vencimento;
+    });
+    if(trava){
+      // Trava: margem = diferença entre strikes × quantidade
+      margem = Math.abs(p.strike - trava.strike) * p.qtd;
+      margemTipo = 'Trava';
+    } else {
+      // Margem baseada em moneyness
+      var distAbs = p.cotacao ? Math.abs(p.strike - p.cotacao) / p.cotacao : 0;
+      if(moneyness==='ITM' && distAbs > 0.05){
+        margem = notional * 0.50; margemTipo = 'ITM 50%';
+      } else if(distAbs <= 0.05){
+        margem = notional * 0.20; margemTipo = 'ATM 20%';
+      } else {
+        margem = notional * 0.15; margemTipo = 'OTM 15%';
+      }
+    }
+  }
+
+  return { notional:notional, valorEstrutura:valorEstrutura, relacao:relacao, distancia:distancia, moneyness:moneyness, intrinsico:intrinsico, extrinsico:extrinsico, extrPctPremio:extrPctPremio, dias:dias, pnl:pnl, eqDirecao:eqDirecao, margem:margem, margemTipo:margemTipo };
 }
 
 var _opcFmtMoney = function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); };
@@ -12531,7 +12562,7 @@ var _opcFmtDate = function(s){ if(!s) return '-'; var p=s.split('-'); return p[2
 function _opcMoneynessTag(m){
   if(m==='ITM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,197,94,.15);color:#22c55e">Dentro (ITM)</span>';
   if(m==='ATM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,158,11,.15);color:#f59e0b">No dinheiro</span>';
-  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(239,68,68,.15);color:#ef4444">Fora (OTM)</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(255,140,0,.15);color:#ff8c00">Fora (OTM)</span>';
 }
 function _opcTipoTag(t){
   if(t==='CALL') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(59,130,246,.15);color:#3b82f6">CALL</span>';
@@ -12549,6 +12580,8 @@ function _opcEquivCell(p,c){
   return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:'+tagBg+';color:'+tagColor+'">'+label+'</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">'+detail+'</div>';
 }
 
+var _opcEditingId = null;
+
 function opcAddPosicao(){
   var g = function(id){ return document.getElementById(id).value; };
   var ativo = g('opc_f_ativo').trim();
@@ -12564,11 +12597,54 @@ function opcAddPosicao(){
   if(!ativo||isNaN(cotacao)||!ticker||isNaN(strike)||isNaN(qtd)||isNaN(premioAtual)||isNaN(premioNeg)){
     alert('Preencha todos os campos antes de adicionar.'); return;
   }
-  _opcPosicoes.push({id:Date.now(),ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg});
+  if(_opcEditingId){
+    // Modo edição: atualiza posição existente
+    var idx = _opcPosicoes.findIndex(function(p){ return p.id === _opcEditingId; });
+    if(idx !== -1){
+      _opcPosicoes[idx] = {id:_opcEditingId,ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg};
+    }
+    _opcEditingId = null;
+    document.getElementById('opc-form-title').textContent = 'Nova posição';
+    document.getElementById('opc-form-btn').textContent = '+ Adicionar Posição';
+  } else {
+    // Modo adição: cria nova posição
+    _opcPosicoes.push({id:Date.now(),ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg});
+  }
   localStorage.setItem(_opcStorageKey, JSON.stringify(_opcPosicoes));
   ['opc_f_ativo','opc_f_cotacao','opc_f_ticker','opc_f_strike','opc_f_qtd','opc_f_premioAtual','opc_f_vencimento','opc_f_premioNeg'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('opc-form-panel').style.display='none';
   opcRender();
+}
+
+function opcEditPosicao(id){
+  var p = _opcPosicoes.find(function(pos){ return pos.id === id; });
+  if(!p) return;
+  _opcEditingId = id;
+  // Preencher formulário com dados da posição
+  document.getElementById('opc_f_ativo').value = p.ativo || '';
+  document.getElementById('opc_f_cotacao').value = p.cotacao || '';
+  document.getElementById('opc_f_ticker').value = p.ticker || '';
+  document.getElementById('opc_f_tipo').value = p.tipo || 'CALL';
+  document.getElementById('opc_f_direcao').value = p.direcao || 'Compra';
+  document.getElementById('opc_f_strike').value = p.strike || '';
+  document.getElementById('opc_f_qtd').value = p.qtd || '';
+  document.getElementById('opc_f_premioAtual').value = p.premioAtual || '';
+  document.getElementById('opc_f_vencimento').value = p.vencimento || '';
+  document.getElementById('opc_f_premioNeg').value = p.premioNeg || '';
+  // Alterar título e botão
+  document.getElementById('opc-form-title').textContent = 'Editar posição — ' + p.ativo + ' ' + p.ticker;
+  document.getElementById('opc-form-btn').textContent = '✓ Salvar Alterações';
+  // Mostrar formulário
+  document.getElementById('opc-form-panel').style.display = '';
+  document.getElementById('opc-form-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function opcCancelEdit(){
+  _opcEditingId = null;
+  document.getElementById('opc-form-title').textContent = 'Nova posição';
+  document.getElementById('opc-form-btn').textContent = '+ Adicionar Posição';
+  ['opc_f_ativo','opc_f_cotacao','opc_f_ticker','opc_f_strike','opc_f_qtd','opc_f_premioAtual','opc_f_vencimento','opc_f_premioNeg'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('opc-form-panel').style.display='none';
 }
 
 function opcRemovePosicao(id){
@@ -12587,14 +12663,16 @@ function opcRender(){
   if(tblEl) tblEl.style.display = _opcPosicoes.length ? '' : 'none';
   var countEl = document.getElementById('opc-count');
   if(countEl) countEl.textContent = _opcPosicoes.length + ' posiç' + (_opcPosicoes.length===1?'ão':'ões');
-  var totalNotional=0, totalEstrutura=0, totalPnl=0;
+  var totalNotional=0, totalEstrutura=0, totalPnl=0, totalMargem=0;
   _opcPosicoes.forEach(function(p){
     var c = _opcCalc(p);
     totalNotional += c.notional;
     totalEstrutura += c.valorEstrutura;
     totalPnl += c.pnl;
-    var diasColor = typeof c.dias==='number' ? (c.dias<=7?'#ef4444':(c.dias<=30?'#f59e0b':'var(--text)')) : 'var(--text-muted)';
+    totalMargem += c.margem;
+    var diasColor = typeof c.dias==='number' ? (c.dias<=7?'#ff8c00':(c.dias<=30?'#f59e0b':'var(--text)')) : 'var(--text-muted)';
     var pnlBg = c.pnl>=0 ? 'rgba(34,197,94,.08)' : 'rgba(59,130,246,.08)';
+    var margemCell = c.margem > 0 ? '<span style="color:#f59e0b;font-weight:600" title="'+c.margemTipo+'">'+_opcFmtMoney(c.margem)+'</span>' : '<span style="color:var(--text-muted);opacity:.4">—</span>';
     var tr = document.createElement('tr');
     tr.innerHTML = '<td style="text-align:left"><strong style="color:var(--blue)">'+p.ativo+'</strong></td>'
       +'<td style="text-align:left;color:var(--text-muted)">'+p.ticker+'</td>'
@@ -12615,8 +12693,12 @@ function opcRender(){
       +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(c.intrinsico)+'</td>'
       +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+_opcFmtMoney2(c.extrinsico)+'</td>'
       +'<td style="text-align:right;font-weight:700;color:'+(c.pnl>=0?'#22c55e':'#3b82f6')+';background:'+pnlBg+';font-variant-numeric:tabular-nums">'+_opcFmtMoney(c.pnl)+'</td>'
+      +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+margemCell+'</td>'
       +'<td style="text-align:left;font-size:11px">'+_opcEquivCell(p,c)+'</td>'
-      +'<td style="text-align:center"><button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:.5;transition:all .15s" onmouseover="this.style.color=\'#ef4444\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Remover">✕</button></td>';
+      +'<td style="text-align:center;white-space:nowrap">'
+        +'<button onclick="opcEditPosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;opacity:.5;transition:all .15s;margin-right:4px" onmouseover="this.style.color=\'var(--blue)\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Editar">✎</button>'
+        +'<button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:.5;transition:all .15s" onmouseover="this.style.color=\'#ff8c00\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Remover">✕</button>'
+      +'</td>';
     tbody.appendChild(tr);
   });
   document.getElementById('opc-sumNotional').textContent = _opcFmtMoney(totalNotional);
@@ -12625,6 +12707,11 @@ function opcRender(){
   var pnlEl = document.getElementById('opc-sumPnl');
   pnlEl.textContent = _opcFmtMoney(totalPnl);
   pnlEl.style.color = totalPnl >= 0 ? '#22c55e' : '#3b82f6';
+  var margemEl = document.getElementById('opc-sumMargem');
+  if(margemEl){
+    margemEl.textContent = _opcFmtMoney(totalMargem);
+    margemEl.style.color = totalMargem > 0 ? '#f59e0b' : 'var(--text)';
+  }
   opcRenderCharts();
 }
 
