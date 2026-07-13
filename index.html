@@ -7447,14 +7447,23 @@ function buildMinhasOperacoesView(){
     +'<div style="font-size:10px;color:var(--text3);margin-bottom:10px"><span style="color:#ff8c00">━</span> Acumulado · <span style="display:inline-block;width:10px;height:8px;border-radius:2px;background:#00c85366;vertical-align:middle"></span> Resultado mensal · <span style="color:#ff8c00">┅</span> Média mensal</div>'
     +'<canvas id="mo-chart" height="160"></canvas></div>'
     +'<div class="card"><div class="section-title">Histórico Mensal</div>'
-    +'<div class="table-wrap" style="border:none"><table>'
-    +'<thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>% Mês</th><th>Acumulado</th><th style="text-align:center">Ações</th></tr></thead>'
+    +'<div class="table-wrap" style="border:none"><table id="mo-table-full">'
+    +'<thead><tr>'
+    +'<th class="sortable-th-mo" data-sort="mesano" style="cursor:pointer;user-select:none">Mês/Ano <span class="sort-arrow">▼</span></th>'
+    +'<th class="sortable-th-mo" data-sort="saldo" style="cursor:pointer;user-select:none">Saldo Opções <span class="sort-arrow">▼</span></th>'
+    +'<th class="sortable-th-mo" data-sort="custos" style="cursor:pointer;user-select:none">Custos <span class="sort-arrow">▼</span></th>'
+    +'<th class="sortable-th-mo" data-sort="liquido" style="cursor:pointer;user-select:none">Líquido <span class="sort-arrow">▼</span></th>'
+    +'<th class="sortable-th-mo" data-sort="pctmes" style="cursor:pointer;user-select:none">% Mês <span class="sort-arrow">▼</span></th>'
+    +'<th class="sortable-th-mo" data-sort="acumulado" style="cursor:pointer;user-select:none">Acumulado <span class="sort-arrow">▼</span></th>'
+    +'<th style="text-align:center">Ações</th></tr></thead>'
     +'<tbody id="mo-tbody"></tbody></table></div></div>'
     +'</div>';
   mainContent.appendChild(div);
 }
 
 var moChart = null;
+var _moSortCol = 'mesano';
+var _moSortDir = 'asc';
 
 function loadMinhasOperacoes(){
   if(!currentClienteVinculado) return;
@@ -7474,6 +7483,8 @@ function loadMinhasOperacoes(){
     var tbody = document.getElementById('mo-tbody');
     if(tbody) tbody.innerHTML='';
 
+    // Pré-calcular valores para cada operação (acum sempre cronológico)
+    var opsComCalcMo = [];
     ops.forEach(function(op){
       var saldo=(op.vendas||0)-(op.compras||0);
       var custos=op.custoTotal||0;
@@ -7481,13 +7492,46 @@ function loadMinhasOperacoes(){
       acum+=saldo;
       acumIbov+=op.ibov||0;
       acumCdi+=op.cdi||0;
-      var pctMes=pat?fmtPct(saldo/pat*100):'—';
+      var pctMesNum=pat?(saldo/pat*100):0;
       labels.push(MESES[op.mes-1]+'/'+op.ano);
       acumArr.push(Number(acum.toFixed(2)));
       saldoMensalArr.push(Number(saldo.toFixed(2)));
       ibovArr.push(Number(acumIbov.toFixed(2)));
       cdiArr.push(Number(acumCdi.toFixed(2)));
+      opsComCalcMo.push({op:op, saldo:saldo, custos:custos, liq:liq, acumVal:acum, pctMesNum:pctMesNum});
+    });
 
+    // Sort dinâmico para tabela
+    var dirMo = _moSortDir==='asc' ? 1 : -1;
+    var sortedMo = opsComCalcMo.slice().sort(function(a,b){
+      var va,vb;
+      switch(_moSortCol){
+        case 'mesano': va=a.op.ano*100+a.op.mes; vb=b.op.ano*100+b.op.mes; break;
+        case 'saldo': va=a.saldo; vb=b.saldo; break;
+        case 'custos': va=a.custos; vb=b.custos; break;
+        case 'liquido': va=a.liq; vb=b.liq; break;
+        case 'pctmes': va=a.pctMesNum; vb=b.pctMesNum; break;
+        case 'acumulado': va=a.acumVal; vb=b.acumVal; break;
+        default: va=a.op.ano*100+a.op.mes; vb=b.op.ano*100+b.op.mes;
+      }
+      return va>vb?dirMo:va<vb?-dirMo:0;
+    });
+
+    // Atualizar setas visuais
+    document.querySelectorAll('#mo-table-full .sortable-th-mo').forEach(function(th){
+      var arrow = th.querySelector('.sort-arrow');
+      if(th.dataset.sort === _moSortCol){
+        th.classList.add('sort-active');
+        if(arrow) arrow.textContent = _moSortDir==='asc' ? '▲' : '▼';
+      } else {
+        th.classList.remove('sort-active');
+        if(arrow) arrow.textContent = '▼';
+      }
+    });
+
+    sortedMo.forEach(function(item){
+      var op=item.op, saldo=item.saldo, custos=item.custos, liq=item.liq, acumV=item.acumVal;
+      var pctMes=pat?fmtPct(item.pctMesNum):'—';
       if(tbody){
         var tr=document.createElement('tr');
         tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
@@ -7495,12 +7539,11 @@ function loadMinhasOperacoes(){
           +'<td style="font-family:DM Mono,monospace;color:#ff8c00;font-size:12px">'+fmtFull(custos)+'</td>'
           +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
           +'<td style="font-size:12px;color:'+(saldo>=0?'#00c853':'#ff8c00')+'">'+pctMes+'</td>'
-          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acum>=0?'#00c853':'#ff8c00')+'">'+fmtFull(acum)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumV>=0?'#00c853':'#ff8c00')+'">'+fmtFull(acumV)+'</td>'
           +'<td style="text-align:center;white-space:nowrap">'
           +'<button class="btn-edit-op" style="padding:4px 10px;font-size:11px;background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;border-radius:6px;cursor:pointer;margin-right:4px" data-opid="'+op.id+'">Editar</button>'
           +'<button class="btn-del-op" style="padding:4px 10px;font-size:11px;background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;border-radius:6px;cursor:pointer" data-opid="'+op.id+'">Excluir</button>'
           +'</td>';
-        // Bind edit button
         (function(opData){
           tr.querySelector('.btn-edit-op').onclick=function(){
             currentBlackClienteId = currentClienteVinculado;
@@ -7517,6 +7560,23 @@ function loadMinhasOperacoes(){
         tbody.appendChild(tr);
       }
     });
+
+    // Registrar click nos headers do cliente (uma vez só)
+    if(!window._moSortBound){
+      window._moSortBound = true;
+      document.addEventListener('click', function(e){
+        var th = e.target.closest('.sortable-th-mo[data-sort]');
+        if(!th || !th.closest('#mo-table-full')) return;
+        var col = th.dataset.sort;
+        if(_moSortCol === col){
+          _moSortDir = _moSortDir==='asc' ? 'desc' : 'asc';
+        } else {
+          _moSortCol = col;
+          _moSortDir = 'desc';
+        }
+        loadMinhasOperacoes();
+      });
+    }
 
     // KPIs
     var media = totalMeses?acum/totalMeses:0;
@@ -8549,8 +8609,39 @@ function renderAtivosCliente(ativos, cotacoes){
   var tickersEncontrados = 0;
   var tickersBuscados = 0;
 
+  // ── Consolidar ativos duplicados (mesmo ticker) ──
+  var consolidadoMap = {};
+  var ativosConsolidados = [];
+  ativos.forEach(function(a){
+    var ticker = (a.nome||'').trim().toUpperCase();
+    var chave = ticker + '|' + (a.categoria||'') + '|' + (a.tipo||'');
+    if(ticker && consolidadoMap[chave]){
+      // Já existe — consolidar: somar quantidade, calcular PM ponderado
+      var existing = consolidadoMap[chave];
+      var qtdeAnt = existing.quantidade||0;
+      var pmAnt = existing.precoMedio||0;
+      var qtdeNova = a.quantidade||0;
+      var pmNovo = a.precoMedio||0;
+      var investAnt = qtdeAnt * pmAnt;
+      var investNovo = qtdeNova * pmNovo;
+      var qtdeTotal = qtdeAnt + qtdeNova;
+      existing.quantidade = qtdeTotal;
+      existing.precoMedio = qtdeTotal > 0 ? (investAnt + investNovo) / qtdeTotal : 0;
+      // Guardar IDs de todos os docs consolidados
+      if(!existing._idsConsolidados) existing._idsConsolidados = [existing.id];
+      existing._idsConsolidados.push(a.id);
+      existing._qtdeLotes = (existing._qtdeLotes||1) + 1;
+    } else {
+      // Primeiro registro deste ticker
+      var clone = Object.assign({}, a);
+      clone._qtdeLotes = 1;
+      consolidadoMap[chave] = clone;
+      ativosConsolidados.push(clone);
+    }
+  });
+
   // Preparar dados enriquecidos
-  var ativosRender = ativos.map(function(a){
+  var ativosRender = ativosConsolidados.map(function(a){
     var ticker = (a.nome||'').trim().toUpperCase();
     var qtde = a.quantidade||0;
     var pm = a.precoMedio||0;
@@ -8622,7 +8713,15 @@ function renderAtivosCliente(ativos, cotacoes){
 
   // Header
   var headerRight = document.getElementById('mc-ativos-header-right');
-  if(headerRight) headerRight.innerHTML=ativos.length+' ativo'+(ativos.length>1?'s':'');
+  if(headerRight){
+    var totalOriginal = ativos.length;
+    var totalConsolidado = ativosConsolidados.length;
+    if(totalOriginal !== totalConsolidado){
+      headerRight.innerHTML=totalConsolidado+' ativo'+(totalConsolidado>1?'s':'')+' <span style="font-size:10px;color:var(--text3)">('+totalOriginal+' lotes consolidados)</span>';
+    } else {
+      headerRight.innerHTML=totalOriginal+' ativo'+(totalOriginal>1?'s':'');
+    }
+  }
 
   // Ordenar por categoria > valor atualizado
   ativosRender.sort(function(a,b){
@@ -8667,6 +8766,9 @@ function renderAtivosCliente(ativos, cotacoes){
     left += '<div class="asset-type">'+(a.raw.tipo||a.raw.categoria||'');
     if(a.qtde) left += ' · Qtd: '+a.qtde.toLocaleString('pt-BR');
     if(a.pm) left += ' · PM: '+fmtFull(a.pm);
+    if(a.raw._qtdeLotes && a.raw._qtdeLotes > 1){
+      left += ' · <span style="color:var(--blue);font-weight:600">'+a.raw._qtdeLotes+' lotes</span>';
+    }
     left += '</div></div>';
 
     // Coluna centro: cotação atual (se tiver)
@@ -8705,15 +8807,18 @@ function renderAtivosCliente(ativos, cotacoes){
     (function(ativo){
       row.querySelector('.btn-edit-ativo').onclick = function(e){ e.stopPropagation(); editarAtivoCliente(ativo); };
     })(a.raw);
-    (function(aid){
+    (function(ativo){
+      var ids = ativo._idsConsolidados || [ativo.id];
       row.querySelector('.btn-del-ativo').onclick = function(e){
         e.stopPropagation();
         confirmDelete(function(){
-          db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete()
-            .then(function(){loadMinhaCarteira();});
+          var promises = ids.map(function(aid){
+            return db.collection('clientes').doc(currentClienteVinculado).collection('ativos').doc(aid).delete();
+          });
+          Promise.all(promises).then(function(){loadMinhaCarteira();});
         });
       };
-    })(a.raw.id);
+    })(a.raw);
 
     el.appendChild(row);
   });
