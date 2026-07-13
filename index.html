@@ -249,6 +249,9 @@ th{
   user-select:none;border-bottom:1px solid var(--border);
 }
 th:hover{color:var(--text2)}
+.sort-arrow{font-size:9px;margin-left:3px;opacity:.3;transition:opacity .2s}
+.sortable-th:hover .sort-arrow{opacity:.6}
+.sortable-th.sort-active .sort-arrow{opacity:1;color:var(--blue)}
 td{padding:12px 16px;font-size:13px;color:var(--text2);border-top:1px solid var(--border)}
 tr:hover td{background:#1a1a1a;cursor:pointer}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em}
@@ -859,16 +862,16 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="section-title" style="margin:0">Fechamento Mês x Mês</div>
           </div>
           <div class="table-wrap" style="border:none">
-            <table>
+            <table id="black-table-full">
               <thead><tr>
-                <th>Mês/Ano</th>
-                <th>Operações R$</th>
-                <th>Saldo Opções</th>
-                <th>Acum. R$</th>
-                <th>% DMF</th>
-                <th>% IBOV</th>
-                <th>% CDI</th>
-                <th>Acum. %</th>
+                <th class="sortable-th sort-active" data-sort="mesano" style="cursor:pointer;user-select:none">Mês/Ano <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="operacoes" style="cursor:pointer;user-select:none">Operações R$ <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="saldoopcoes" style="cursor:pointer;user-select:none">Saldo Opções <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="acum" style="cursor:pointer;user-select:none">Acum. R$ <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="dmf" style="cursor:pointer;user-select:none">% DMF <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="ibov" style="cursor:pointer;user-select:none">% IBOV <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="cdi" style="cursor:pointer;user-select:none">% CDI <span class="sort-arrow">▼</span></th>
+                <th class="sortable-th" data-sort="acumpct" style="cursor:pointer;user-select:none">Acum. % <span class="sort-arrow">▼</span></th>
                 <th>Tipo</th>
                 <th>Ações</th>
               </tr></thead>
@@ -3710,6 +3713,8 @@ var blackOps = [];
 var pernaCount = 0;
 var editingBlackId = null;
 var blackCompChart = null;
+var _blackSortCol = 'mesano';
+var _blackSortDir = 'desc';
 
 // ── Helpers ──────────────────────────────────────────────
 function buildYearMonthSelectors(anoId, mesSelId, hiddenId){
@@ -4072,17 +4077,49 @@ function renderBlackDetalhe(){
   var tb=document.getElementById('black-table-mensal');
   tb.innerHTML='';
   var acumRun=0;
-  var sortedDesc=blackOps.slice().sort(function(a,b){return b.ano!==a.ano?b.ano-a.ano:b.mes-a.mes;});
-  sortedDesc.forEach(function(op){
-    var saldo=(op.vendas||0)-(op.compras||0);
-    var custos=op.custoTotal||0;
-    var liquido=saldo-custos;
-    // Calc acum for this op (from sorted asc)
-    var key=op.ano+'-'+op.mes;
-    var acumVal=0;
-    var runAcum=0;
-    ops.forEach(function(o){ runAcum+=(o.vendas||0)-(o.compras||0); if(o.ano===op.ano&&o.mes===op.mes) acumVal=runAcum; });
 
+  // Pré-calcular valores para cada operação (para sort)
+  var opsComCalc = blackOps.slice().map(function(op){
+    var saldo=(op.vendas||0)-(op.compras||0);
+    var acumVal=0; var runAcum=0;
+    ops.forEach(function(o){ runAcum+=(o.vendas||0)-(o.compras||0); if(o.ano===op.ano&&o.mes===op.mes) acumVal=runAcum; });
+    var dmfNum=patrimonio?(saldo/patrimonio*100):0;
+    var acumNum=patrimonio?(acumVal/patrimonio*100):0;
+    return {op:op, saldo:saldo, acumVal:acumVal, dmfNum:dmfNum, acumNum:acumNum, ibovNum:op.ibov||0, cdiNum:op.cdi||0, carteiraTotal:op.carteiraTotal||0};
+  });
+
+  // Sort dinâmico
+  var dir = _blackSortDir==='asc' ? 1 : -1;
+  opsComCalc.sort(function(a,b){
+    var va,vb;
+    switch(_blackSortCol){
+      case 'mesano': va=a.op.ano*100+a.op.mes; vb=b.op.ano*100+b.op.mes; break;
+      case 'operacoes': va=a.saldo; vb=b.saldo; break;
+      case 'saldoopcoes': va=a.carteiraTotal; vb=b.carteiraTotal; break;
+      case 'acum': va=a.acumVal; vb=b.acumVal; break;
+      case 'dmf': va=a.dmfNum; vb=b.dmfNum; break;
+      case 'ibov': va=a.ibovNum; vb=b.ibovNum; break;
+      case 'cdi': va=a.cdiNum; vb=b.cdiNum; break;
+      case 'acumpct': va=a.acumNum; vb=b.acumNum; break;
+      default: va=a.op.ano*100+a.op.mes; vb=b.op.ano*100+b.op.mes;
+    }
+    return va>vb?dir:va<vb?-dir:0;
+  });
+
+  // Atualizar setas visuais nos headers
+  document.querySelectorAll('#black-table-full .sortable-th').forEach(function(th){
+    var arrow = th.querySelector('.sort-arrow');
+    if(th.dataset.sort === _blackSortCol){
+      th.classList.add('sort-active');
+      if(arrow) arrow.textContent = _blackSortDir==='asc' ? '▲' : '▼';
+    } else {
+      th.classList.remove('sort-active');
+      if(arrow) arrow.textContent = '▼';
+    }
+  });
+
+  opsComCalc.forEach(function(item){
+    var op=item.op, saldo=item.saldo, acumVal=item.acumVal;
     var tr=document.createElement('tr');
     var ibovPct=op.ibov?fmtPct(op.ibov):'—';
     var cdiPct=op.cdi?fmtPct(op.cdi):'—';
@@ -4113,6 +4150,23 @@ function renderBlackDetalhe(){
     div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
   });
+
+  // Registrar click nos headers (uma vez só)
+  if(!window._blackSortBound){
+    window._blackSortBound = true;
+    document.addEventListener('click', function(e){
+      var th = e.target.closest('.sortable-th[data-sort]');
+      if(!th || !th.closest('#black-table-full')) return;
+      var col = th.dataset.sort;
+      if(_blackSortCol === col){
+        _blackSortDir = _blackSortDir==='desc' ? 'asc' : 'desc';
+      } else {
+        _blackSortCol = col;
+        _blackSortDir = 'desc';
+      }
+      renderBlackDetalhe();
+    });
+  }
 }
 
 // ── Modais de lançamento ──────────────────────────────────
