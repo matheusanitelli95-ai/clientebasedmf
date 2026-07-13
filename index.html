@@ -12667,11 +12667,80 @@ function initControleOpcoes(){
         } catch(e){}
       }
     });
+
+    // ── Auto-fetch de cotação ao digitar o ativo ──
+    var ativoInput = document.getElementById('opc_f_ativo');
+    var cotInput = document.getElementById('opc_f_cotacao');
+    if(ativoInput && cotInput){
+      var _opcFetchTimer = null;
+      ativoInput.addEventListener('input', function(){
+        clearTimeout(_opcFetchTimer);
+        var ticker = ativoInput.value.trim().toUpperCase();
+        if(!ticker || ticker.length < 3) return;
+        _opcFetchTimer = setTimeout(function(){
+          _opcBuscarCotacao(ticker, cotInput);
+        }, 600);
+      });
+      ativoInput.addEventListener('blur', function(){
+        var ticker = ativoInput.value.trim().toUpperCase();
+        if(ticker && ticker.length >= 3){
+          _opcBuscarCotacao(ticker, cotInput);
+        }
+      });
+    }
+
     _opcInitialized = true;
   }
   var dtEl = document.getElementById('opcoes-data-atual');
   if(dtEl) dtEl.textContent = 'Atualizado em ' + new Date().toLocaleDateString('pt-BR');
   opcRender();
+}
+
+// Buscar cotação em tempo real para o Controle de Opções
+function _opcBuscarCotacao(ticker, cotInput){
+  if(!isTickerLike(ticker)) return;
+  // Se já tem no cache, usa direto
+  if(cotacoesCache[ticker] && cotacoesCache[ticker].price){
+    cotInput.value = cotacoesCache[ticker].price;
+    _opcMostrarStatusCotacao(ticker, cotacoesCache[ticker], true);
+    return;
+  }
+  // Indicador visual de loading
+  _opcMostrarStatusCotacao(ticker, null, false);
+  // Buscar via API
+  fetchOplabCotacoes([ticker], function(cotacoes){
+    if(cotacoes[ticker] && cotacoes[ticker].price){
+      cotInput.value = cotacoes[ticker].price;
+      _opcMostrarStatusCotacao(ticker, cotacoes[ticker], true);
+    } else {
+      _opcMostrarStatusCotacao(ticker, null, true, 'Cotação não encontrada');
+    }
+  });
+}
+
+function _opcMostrarStatusCotacao(ticker, cot, done, errMsg){
+  var statusEl = document.getElementById('opc-cotacao-status');
+  if(!statusEl){
+    // Criar elemento de status abaixo do campo cotação
+    var cotLabel = document.getElementById('opc_f_cotacao');
+    if(!cotLabel) return;
+    statusEl = document.createElement('div');
+    statusEl.id = 'opc-cotacao-status';
+    statusEl.style.cssText = 'font-size:10px;margin-top:3px;min-height:14px;transition:all .2s';
+    cotLabel.parentNode.appendChild(statusEl);
+  }
+  if(!done){
+    statusEl.innerHTML = '<span style="color:var(--blue)">Buscando '+ticker+'...</span>';
+  } else if(errMsg){
+    statusEl.innerHTML = '<span style="color:#f59e0b">'+errMsg+'</span>';
+  } else if(cot){
+    var corVar = (cot.changePct||0) >= 0 ? '#00c853' : '#ff8c00';
+    var sinal = (cot.changePct||0) >= 0 ? '+' : '';
+    statusEl.innerHTML = '<span style="color:#00c853">● </span>'
+      + '<span style="color:var(--text2)">' + (cot.name||ticker) + '</span>'
+      + ' <span style="color:'+corVar+';font-weight:600">'+sinal+(cot.changePct||0).toFixed(2)+'%</span>'
+      + (cot._source ? ' <span style="color:var(--text3)">via '+cot._source+'</span>' : '');
+  }
 }
 
 function _opcCalc(p){
