@@ -12963,8 +12963,8 @@ function opcRender(){
       +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+margemCell+'</td>'
       +'<td style="text-align:left;font-size:11px">'+_opcEquivCell(p,c)+'</td>'
       +'<td style="text-align:center;white-space:nowrap">'
-        +'<button onclick="opcEditPosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;opacity:.5;transition:all .15s;margin-right:4px" onmouseover="this.style.color=\'var(--blue)\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Editar">✎</button>'
-        +'<button onclick="opcRemovePosicao('+p.id+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:.5;transition:all .15s" onmouseover="this.style.color=\'#ff8c00\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Remover">✕</button>'
+        +'<button onclick="opcEditPosicao(\''+p.id+'\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;opacity:.5;transition:all .15s;margin-right:4px" onmouseover="this.style.color=\'var(--blue)\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Editar">✎</button>'
+        +'<button onclick="opcRemovePosicao(\''+p.id+'\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;opacity:.5;transition:all .15s" onmouseover="this.style.color=\'#ff8c00\';this.style.opacity=1" onmouseout="this.style.color=\'var(--text-muted)\';this.style.opacity=.5" title="Remover">✕</button>'
       +'</td>';
     tbody.appendChild(tr);
   });
