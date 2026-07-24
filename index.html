@@ -12653,6 +12653,20 @@ function initControleOpcoes(){
     if(_opcUnsubscribe) _opcUnsubscribe();
     _opcUnsubscribe = db.collection('opcoes_posicoes').orderBy('criadoEm','desc').onSnapshot(function(snap){
       _opcPosicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      // Se Firestore veio vazio, verificar se tem dados legados no localStorage para migrar
+      if(_opcPosicoes.length === 0){
+        var legado = localStorage.getItem('dmf_opcoes_v2');
+        if(legado){
+          try {
+            var posLegadas = JSON.parse(legado);
+            if(posLegadas && posLegadas.length > 0){
+              console.log('Firestore vazio — migrando ' + posLegadas.length + ' posições do localStorage...');
+              _opcMigrarLegado(posLegadas);
+              return; // onSnapshot vai disparar de novo após a migração
+            }
+          } catch(e){}
+        }
+      }
       opcRender();
     }, function(err){
       console.error('Erro ao carregar opções:', err);
@@ -12662,7 +12676,6 @@ function initControleOpcoes(){
         try {
           _opcPosicoes = JSON.parse(legado);
           opcRender();
-          // Migrar dados legados para Firestore
           _opcMigrarLegado(_opcPosicoes);
         } catch(e){}
       }
