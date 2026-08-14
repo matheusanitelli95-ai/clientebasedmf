@@ -7226,20 +7226,24 @@ auth.onAuthStateChanged(function(user){
     if(ADMIN_MASTER.indexOf(user.email) >= 0){
       currentPerfil = 'adm';
       currentClienteVinculado = null;
-      // Tentar carregar clienteId do admin (para Minha Carteira)
-      db.collection('usuarios').doc(user.email).get().then(function(doc){
-        if(doc.exists && doc.data().clienteId){
-          currentClienteVinculado = doc.data().clienteId;
-        } else {
-          _autoDetectClienteId(user.email);
-        }
-      }).catch(function(){ _autoDetectClienteId(user.email); });
-      // Tentar atualizar doc no Firestore (sem bloquear)
+      // PRIMEIRO gravar perfil no Firestore, SÓ DEPOIS iniciar app
       db.collection('usuarios').doc(user.email).set({
         email: user.email,
         perfil: 'adm'
-      },{merge:true}).catch(function(){});
-      iniciarApp();
+      },{merge:true}).then(function(){
+        // Após perfil gravado, carregar clienteId (não bloqueia)
+        db.collection('usuarios').doc(user.email).get().then(function(doc){
+          if(doc.exists && doc.data().clienteId){
+            currentClienteVinculado = doc.data().clienteId;
+          } else {
+            _autoDetectClienteId(user.email);
+          }
+        }).catch(function(){ _autoDetectClienteId(user.email); });
+        iniciarApp();
+      }).catch(function(){
+        // Mesmo se falhar, tenta iniciar
+        iniciarApp();
+      });
       return;
     }
 
