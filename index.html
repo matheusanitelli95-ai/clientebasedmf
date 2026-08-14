@@ -3237,7 +3237,11 @@ function saveAtivo(){
     dataAplicacao:document.getElementById('fa-data').value,
     obs:document.getElementById('fa-obs').value
   };
+  // Save Google Finance ID for reliable cotação lookup
+  if(window._selectedGFinanceId) data.gfinanceId = window._selectedGFinanceId;
   db.collection('clientes').doc(currentClienteId).collection('ativos').add(data);
+  window._selectedGFinanceId = null;
+  window._selectedAtivoName = null;
   closeModal('modal-ativo');
   setTimeout(renderCarteira,600);
 }
@@ -8185,7 +8189,69 @@ function isTickerLike(nome){
   return /^[A-Z]{2,6}\d{0,2}(F)?$/.test(n) && n.length >= 2 && n.length <= 8;
 }
 
-// ─── Fonte PRIMÁRIA: Mais Retorno (cobertura ampla, cache 24h no servidor) ───
+// ─── Fonte GOOGLE FINANCE (cobertura universal: crypto, ETF, BR, intl) ───
+// gfMap: mapa ticker → gfinanceId (do Firestore)
+function fetchGFinanceCotacoes(tickers, callback, gfMap){
+  gfMap = gfMap || {};
+  // Build Google Finance symbols
+  var gfSymbols = [];
+  var gfToTicker = {};
+  tickers.forEach(function(t){
+    var gfId = gfMap[t];
+    if(!gfId){
+      // Try to infer: BR tickers (have digits) → TICKER:BVSP, else try as ticker
+      if(/\d/.test(t)) gfId = t + ':BVMF';
+      else gfId = t; // Will try multiple exchanges on server
+    }
+    gfSymbols.push(gfId);
+    gfToTicker[gfId] = t;
+  });
+
+  if(!gfSymbols.length){ callback(cotacoesCache); return; }
+
+  fetch('/api/gfinance?action=quote&symbols=' + encodeURIComponent(gfSymbols.join(','))).then(function(r){
+    if(!r.ok) throw new Error('GFinance HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){
+    var results = data.results || [];
+    results.forEach(function(r){
+      // Match result back to original ticker
+      var gfId = r._gfinanceId || '';
+      var ticker = gfToTicker[gfId] || r.symbol || '';
+      ticker = ticker.toUpperCase();
+      // Also try without exchange suffix
+      if(!cotacoesCache[ticker]){
+        cotacoesCache[ticker] = {
+          price: r.regularMarketPrice,
+          change: r.regularMarketChange||0,
+          changePct: r.regularMarketChangePercent||0,
+          prevClose: r.regularMarketPreviousClose||0,
+          logo: '',
+          name: r.shortName||'',
+          time: r.regularMarketTime||'',
+          currency: r.currency||'BRL',
+          _source: r._source||'google-finance'
+        };
+      }
+    });
+    // Check missing tickers
+    var missing = tickers.filter(function(t){ return !cotacoesCache[t]; });
+    if(missing.length > 0){
+      console.log('[GFinance] Resolveu ' + (tickers.length - missing.length) + '/' + tickers.length + ' — fallback MR para: ' + missing.join(','));
+      // Detect international among missing
+      var missingIntl = missing.filter(function(t){ return /^[A-Z]{2,5}$/.test(t) && !/\d/.test(t); });
+      fetchMRCotacoes(missing, callback, missingIntl);
+    } else {
+      cotacoesCacheTime = Date.now();
+      callback(cotacoesCache);
+    }
+  }).catch(function(e){
+    console.warn('[GFinance] Erro:', e.message, '— fallback MR');
+    fetchMRCotacoes(tickers, callback);
+  });
+}
+
+// ─── Fonte FALLBACK 1: Mais Retorno (cobertura BR ampla, cache 24h no servidor) ───
 // intlTickers: lista de tickers internacionais (USD) que devem ir via Yahoo
 function fetchMRCotacoes(tickers, callback, intlTickers){
   // Ordenar tickers para maximizar cache hits na CDN (mesma URL = mesmo cache)
@@ -8258,7 +8324,8 @@ function fetchOplabFallback(tickers, callback){
 }
 
 // ─── Função principal de cotações (chamada pelo resto do app) ───
-function fetchOplabCotacoes(tickers, callback, intlTickers){
+// gfMap: opcional, mapa ticker → gfinanceId (para cotação precisa via Google Finance)
+function fetchOplabCotacoes(tickers, callback, intlTickers, gfMap){
   if(!tickers.length){ callback({}); return; }
   // Checar cache local (30 min)
   var agora = Date.now();
@@ -8266,8 +8333,13 @@ function fetchOplabCotacoes(tickers, callback, intlTickers){
     var todosCached = tickers.every(function(t){ return cotacoesCache[t]; });
     if(todosCached){ callback(cotacoesCache); return; }
   }
-  // Buscar via Mais Retorno (primária) → OpLab (fallback)
-  fetchMRCotacoes(tickers, callback, intlTickers);
+  // Google Finance (primária) → MR (fallback) → OpLab (último recurso)
+  if(gfMap && Object.keys(gfMap).length > 0){
+    fetchGFinanceCotacoes(tickers, callback, gfMap);
+  } else {
+    // Sem gfinanceIds, usar pipeline tradicional MR → OpLab
+    fetchMRCotacoes(tickers, callback, intlTickers);
+  }
 }
 
 // ─── Ocultar Valores (Cliente) ───────────────────────────
@@ -8324,17 +8396,24 @@ function _loadMinhaCarteiraReal(){
     // Extrair tickers para buscar cotação + detectar internacionais
     var tickers = [];
     var intlTickers = [];
+    var gfMap = {}; // ticker → gfinanceId (do Firestore)
     ativos.forEach(function(a){
       var ticker = (a.nome||'').trim().toUpperCase();
       if(isTickerLike(ticker) && tickers.indexOf(ticker)<0){
         tickers.push(ticker);
+        // Se tem gfinanceId salvo, usar para cotação precisa
+        if(a.gfinanceId) gfMap[ticker] = a.gfinanceId;
         // Detectar ativo internacional: moeda USD/EUR ou tipo Internacional/BDR sem número (ETF americano)
         var moeda = (a.moeda||'').toUpperCase();
         var tipo = (a.tipo||'').toLowerCase();
         var isIntl = moeda === 'USD' || moeda === 'EUR' || tipo === 'internacional';
         // Tickers sem número geralmente são internacionais (VOO, VT, SGOV, TFLO, SPY, QQQ)
         if(!isIntl && /^[A-Z]{2,5}$/.test(ticker) && !/\d/.test(ticker)) isIntl = true;
-        if(isIntl && intlTickers.indexOf(ticker)<0) intlTickers.push(ticker);
+        if(isIntl){
+          if(intlTickers.indexOf(ticker)<0) intlTickers.push(ticker);
+          // Auto-build gfinanceId for international tickers without one
+          if(!gfMap[ticker]) gfMap[ticker] = ticker;
+        }
       }
     });
     if(tickers.length){
@@ -8351,7 +8430,7 @@ function _loadMinhaCarteiraReal(){
         _mcCotacoesCache = cotacoes;
         _mcCotacoesCacheTime = Date.now();
         renderAtivosCliente(ativos, cotacoes);
-      }, intlTickers);
+      }, intlTickers, gfMap);
     } else {
       renderAtivosCliente(ativos, {});
     }
@@ -8896,6 +8975,10 @@ function saveAtivoCliente(){
     dataAplicacao:(document.getElementById('fa-data')||{}).value||'',
     obs:(document.getElementById('fa-obs')||{}).value||''
   };
+  // Save Google Finance ID for reliable cotação lookup
+  if(window._selectedGFinanceId){
+    dados.gfinanceId = window._selectedGFinanceId;
+  }
   var ref = db.collection('clientes').doc(currentClienteVinculado).collection('ativos');
   var promise;
   if(editandoAtivoId){
@@ -8906,6 +8989,8 @@ function saveAtivoCliente(){
   promise.then(function(){
     closeModal('modal-ativo');
     editandoAtivoId = null;
+    window._selectedGFinanceId = null;
+    window._selectedAtivoName = null;
     setTimeout(loadMinhaCarteira, 500);
   }).catch(function(e){ alert('Erro ao salvar: '+e.message); });
 }
@@ -8922,7 +9007,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var q = inp.value.trim().toUpperCase();
     clearTimeout(_acTimer);
     if(q.length < 2){ list.style.display='none'; return; }
-    _acTimer = setTimeout(function(){ searchOplabTickers(q); }, 300);
+    _acTimer = setTimeout(function(){ searchGFinanceTickers(q); }, 300);
   });
 
   inp.addEventListener('keydown', function(e){
@@ -8953,7 +9038,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-function searchOplabTickers(query){
+function searchGFinanceTickers(query){
   var list = document.getElementById('fa-nome-ac');
   if(!list) return;
 
@@ -8963,13 +9048,13 @@ function searchOplabTickers(query){
     return;
   }
 
-  // OpLab search: /market/instruments/search returns array of instruments
-  oplabFetch('/market/instruments/search?search=' + encodeURIComponent(query)).then(function(data){
-    var items = Array.isArray(data) ? data : (data.data || data.results || []);
-    // Extract ticker symbols, filter to top 8
-    var filtered = items.slice(0, 8).map(function(i){ return i.symbol || i; });
-    _acCache[query] = filtered;
-    renderAcList(list, filtered, query);
+  // Google Finance search (via API endpoint)
+  fetch('/api/gfinance?action=search&q=' + encodeURIComponent(query)).then(function(r){
+    return r.json();
+  }).then(function(data){
+    var items = data.results || [];
+    _acCache[query] = items;
+    renderAcList(list, items, query);
   }).catch(function(){
     list.style.display='none';
   });
@@ -8978,9 +9063,16 @@ function searchOplabTickers(query){
 function renderAcList(list, items, query){
   if(!items.length){ list.style.display='none'; return; }
   var html = '';
-  items.forEach(function(ticker){
-    html += '<div class="autocomplete-item" data-ticker="'+ticker+'">'
-      +'<span class="ac-ticker">'+ticker+'</span>'
+  items.forEach(function(item){
+    var sym = item.symbol || item;
+    var name = item.name || '';
+    var exch = item.exchange || '';
+    var tipo = item.type || '';
+    var gfId = item.gfinanceId || '';
+    html += '<div class="autocomplete-item" data-ticker="'+sym+'" data-gfid="'+gfId+'" data-name="'+name.replace(/"/g,'&quot;')+'" data-type="'+tipo+'" data-exchange="'+exch+'">'
+      +'<span class="ac-ticker">'+sym+'</span>'
+      +'<span class="ac-name" style="flex:1;min-width:0">'+name+'</span>'
+      +'<span style="font-size:9px;color:var(--text3);white-space:nowrap">'+exch+(tipo?' · '+tipo:'')+'</span>'
       +'</div>';
   });
   list.innerHTML = html;
@@ -8992,10 +9084,30 @@ function renderAcList(list, items, query){
       e.preventDefault();
       var inp = document.getElementById('fa-nome');
       inp.value = el.getAttribute('data-ticker');
+      // Store gfinanceId for saving
+      window._selectedGFinanceId = el.getAttribute('data-gfid') || '';
+      window._selectedAtivoName = el.getAttribute('data-name') || '';
       list.style.display='none';
-      // Auto-set to Renda Variável if it's a ticker
+      // Auto-detect categoria + moeda from exchange/type
       var catEl = document.getElementById('fa-categoria');
-      if(catEl) { catEl.value = 'Renda Variável'; updateSubcategoria(); }
+      var moedaEl = document.getElementById('fa-moeda');
+      var tipoEl = el.getAttribute('data-type') || '';
+      var exchEl = el.getAttribute('data-exchange') || '';
+      // Internacional → USD, BR → BRL
+      var isIntl = exchEl.indexOf('NYSE')>=0 || exchEl.indexOf('NASDAQ')>=0 || exchEl.indexOf('BATS')>=0 || exchEl.indexOf('LSE')>=0 || tipoEl==='Cryptocurrency';
+      if(moedaEl && isIntl) moedaEl.value = 'USD';
+      if(catEl){
+        catEl.value = 'Renda Variável';
+        updateSubcategoria();
+        // Auto-set subcategoria
+        var subEl = document.getElementById('fa-tipo');
+        if(subEl){
+          if(tipoEl==='ETF') subEl.value = 'ETF';
+          else if(tipoEl==='Cryptocurrency') subEl.value = 'Cripto';
+          else if(tipoEl==='Equity' || tipoEl==='Stock') subEl.value = 'Ação';
+          else if(exchEl.indexOf('NYSE')>=0 || exchEl.indexOf('NASDAQ')>=0) subEl.value = 'Internacional';
+        }
+      }
     });
   });
 }

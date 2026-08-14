@@ -11,7 +11,7 @@ var CORES_TIPO = {
   'FII':        '#a855f7',
   'ETF':        '#3b82f6',
   'ETF de RF':  '#60a5fa',
-  'BDR':        '#ef4444',
+  'BDR':        '#e67e22',
   'Cripto':     '#f59e0b',
   'Internacional':'#10b981',
   'CDB':        '#6b7280',
@@ -68,6 +68,33 @@ function mrFetchStats(ticker, details){
   var url = '/api/maisretorno?action=stats&identifier=' + encodeURIComponent(id);
   if(details) url += '&details=true';
   return fetch(url).then(function(r){ return r.json(); });
+}
+
+// Google Finance stats (Yahoo Chart API) — para tickers internacionais
+function gfFetchStats(ticker, gfinanceId){
+  var sym = gfinanceId || ticker;
+  var url = '/api/gfinance?action=stats&symbol=' + encodeURIComponent(sym) + '&years=10';
+  return fetch(url).then(function(r){ return r.json(); });
+}
+
+// Detectar se ticker é internacional (sem dados no Mais Retorno)
+function _isInternationalTicker(ticker, ativo){
+  if(!ticker) return false;
+  // Se tem gfinanceId com exchange não-BVSP
+  if(ativo && ativo.gfinanceId){
+    var gf = ativo.gfinanceId;
+    if(gf.indexOf('-USD') >= 0 || gf.indexOf('-BRL') >= 0) return true; // Crypto
+    if(gf.indexOf(':BVSP') >= 0 || gf.indexOf(':BVMF') >= 0) return false; // Brasileiro
+    if(gf.indexOf(':NYSE') >= 0 || gf.indexOf(':NASDAQ') >= 0 || gf.indexOf(':NYSEARCA') >= 0) return true;
+    if(gf.indexOf(':') >= 0) return true; // Qualquer exchange que não é BVSP
+  }
+  // Moeda USD/EUR
+  if(ativo && (ativo.moeda === 'USD' || ativo.moeda === 'EUR')) return true;
+  // Tipo internacional
+  if(ativo && (ativo.tipo||'').toLowerCase() === 'internacional') return true;
+  // Tickers sem número (VOO, QQQ, SPY, TFLO, SGOV, BTC)
+  if(/^[A-Z]{2,5}$/.test(ticker) && !/\d/.test(ticker)) return true;
+  return false;
 }
 
 // ─── ESTADO ──────────────────────────────────────────────
@@ -129,47 +156,97 @@ function fecharAnaliseCarteira(){
 // ─── CARREGAR DADOS ──────────────────────────────────────
 function carregarDadosAnalise(ativos, container){
   var tickers = [];
+  var ativoMap = {}; // ticker → ativo data (para detectar internacional)
   ativos.forEach(function(a){
     var t = (a.nome||'').trim().toUpperCase();
-    if(t && tickers.indexOf(t) < 0) tickers.push(t);
+    if(t && tickers.indexOf(t) < 0){
+      tickers.push(t);
+      ativoMap[t] = a;
+    }
   });
 
-  var allTickers = tickers.concat(['CDI']);
-  var statsPromises = allTickers.map(function(t){
+  // Separar tickers BR e internacionais
+  var brTickers = [];
+  var intlTickers = [];
+  tickers.forEach(function(t){
+    if(_isInternationalTicker(t, ativoMap[t])){
+      intlTickers.push(t);
+    } else {
+      brTickers.push(t);
+    }
+  });
+
+  // CDI sempre via MR
+  var allBR = brTickers.concat(['CDI']);
+
+  // Fase 1: Buscar stats BR via Mais Retorno
+  var brPromises = allBR.map(function(t){
     return mrFetchStats(t, true).then(function(data){
-      return { ticker: t, data: data };
+      // Verificar se MR retornou dados válidos (tem years com dados)
+      var hasData = data && data.years && Object.keys(data.years).length > 0;
+      return { ticker: t, data: hasData ? data : null };
     }).catch(function(){ return { ticker: t, data: null }; });
   });
 
-  Promise.all(statsPromises).then(function(results){
-    var statsMap = {};
-    results.forEach(function(r){ if(r.data) statsMap[r.ticker] = r.data; });
+  // Fase 2: Buscar stats internacionais via Google Finance (Yahoo Chart)
+  var intlPromises = intlTickers.map(function(t){
+    var gfId = ativoMap[t] && ativoMap[t].gfinanceId ? ativoMap[t].gfinanceId : t;
+    return gfFetchStats(t, gfId).then(function(data){
+      var hasData = data && data.years && Object.keys(data.years).length > 0;
+      return { ticker: t, data: hasData ? data : null };
+    }).catch(function(){ return { ticker: t, data: null }; });
+  });
 
-    var ativosComDados = ativos.map(function(a){
-      var t = (a.nome||'').trim().toUpperCase();
-      var classif = classificarAtivoFirestore(a);
-      return {
-        ticker: t,
-        categoria: classif.categoria,
-        tipo: classif.tipo,
-        moeda: classif.moeda,
-        label: classif.label,
-        quantidade: a.quantidade || 0,
-        precoMedio: a.precoMedio || 0,
-        investido: (a.quantidade||0) * (a.precoMedio||0),
-        stats: statsMap[t] || null
-      };
+  Promise.all(brPromises.concat(intlPromises)).then(function(results){
+    var statsMap = {};
+    results.forEach(function(r){
+      if(r.data) statsMap[r.ticker] = r.data;
     });
 
-    _analiseData = {
-      ativos: ativosComDados,
-      statsMap: statsMap,
-      cdi: statsMap['CDI'] || null,
-      tickers: tickers
-    };
-
-    renderAnaliseCompleta(container, _analiseData);
+    // Para tickers BR que MR não retornou, tentar GFinance como fallback
+    var brMissing = brTickers.filter(function(t){ return !statsMap[t]; });
+    if(brMissing.length > 0){
+      var fallbackPromises = brMissing.map(function(t){
+        var gfId = ativoMap[t] && ativoMap[t].gfinanceId ? ativoMap[t].gfinanceId : t + ':BVMF';
+        return gfFetchStats(t, gfId).then(function(data){
+          var hasData = data && data.years && Object.keys(data.years).length > 0;
+          if(hasData) statsMap[t] = data;
+        }).catch(function(){});
+      });
+      Promise.all(fallbackPromises).then(function(){
+        _buildAndRenderAnalise(ativos, statsMap, tickers, container);
+      });
+    } else {
+      _buildAndRenderAnalise(ativos, statsMap, tickers, container);
+    }
   });
+}
+
+function _buildAndRenderAnalise(ativos, statsMap, tickers, container){
+  var ativosComDados = ativos.map(function(a){
+    var t = (a.nome||'').trim().toUpperCase();
+    var classif = classificarAtivoFirestore(a);
+    return {
+      ticker: t,
+      categoria: classif.categoria,
+      tipo: classif.tipo,
+      moeda: classif.moeda,
+      label: classif.label,
+      quantidade: a.quantidade || 0,
+      precoMedio: a.precoMedio || 0,
+      investido: (a.quantidade||0) * (a.precoMedio||0),
+      stats: statsMap[t] || null
+    };
+  });
+
+  _analiseData = {
+    ativos: ativosComDados,
+    statsMap: statsMap,
+    cdi: statsMap['CDI'] || null,
+    tickers: tickers
+  };
+
+  renderAnaliseCompleta(container, _analiseData);
 }
 
 // ─── RENDER COMPLETO ─────────────────────────────────────
@@ -263,9 +340,9 @@ function renderAnaliseKPIs(data){
   var retRisco = avgVol>0 ? Math.abs(retornoAcum/avgVol) : 0;
 
   var h = '<div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">';
-  h += kpiCard('Retorno 12M',(retornoAcum>=0?'+':'')+retornoAcum.toFixed(1)+'%','vs CDI '+cdi12m.toFixed(1)+'%',retornoAcum>=0?'#00c853':'#ff1744');
-  h += kpiCard('Pior Mês',worstDD.toFixed(1)+'%','drawdown máximo mensal','#ff1744');
-  h += kpiCard('Sharpe Médio',avgSharpe.toFixed(2),'ponderado por peso',avgSharpe>=0.5?'#00c853':(avgSharpe>=0?'#f59e0b':'#ff1744'));
+  h += kpiCard('Retorno 12M',(retornoAcum>=0?'+':'')+retornoAcum.toFixed(1)+'%','vs CDI '+cdi12m.toFixed(1)+'%',retornoAcum>=0?'#00c853':'#ff8c00');
+  h += kpiCard('Pior Mês',worstDD.toFixed(1)+'%','drawdown máximo mensal','#ff8c00');
+  h += kpiCard('Sharpe Médio',avgSharpe.toFixed(2),'ponderado por peso',avgSharpe>=0.5?'#00c853':(avgSharpe>=0?'#f59e0b':'#ff8c00'));
   h += kpiCard('Retorno/Risco',retRisco.toFixed(2)+'x','retorno ÷ volatilidade','#3b82f6');
   h += '</div>';
   return h;
@@ -334,9 +411,30 @@ function renderEvolucaoChart(data){
   svg+='<circle cx="'+tX(serieCDI.length-1).toFixed(1)+'" cy="'+tY(lD.valor).toFixed(1)+'" r="3" fill="#6b7280"/>';
   svg+='<text x="'+(W-pR)+'" y="'+(tY(lC.valor)-8).toFixed(1)+'" fill="#ff8c00" font-size="10" text-anchor="end" font-weight="700" font-family="DM Mono,monospace">'+(lC.valor>=100?'+':'')+(lC.valor-100).toFixed(1)+'%</text>';
   svg+='<text x="'+(W-pR)+'" y="'+(tY(lD.valor)-8).toFixed(1)+'" fill="#6b7280" font-size="10" text-anchor="end" font-weight="600" font-family="DM Mono,monospace">CDI '+(lD.valor>=100?'+':'')+(lD.valor-100).toFixed(1)+'%</text>';
+  // ── hover circles (hidden, shown via JS) ──
+  svg+='<circle id="__evo_dotC" cx="0" cy="0" r="5" fill="#ff8c00" opacity="0"/>';
+  svg+='<circle id="__evo_dotD" cx="0" cy="0" r="4" fill="#6b7280" opacity="0"/>';
+  svg+='<line id="__evo_vline" x1="0" y1="'+pT+'" x2="0" y2="'+(pT+cH)+'" stroke="rgba(255,255,255,0.15)" stroke-width="1" opacity="0"/>';
+
+  // ── invisible hover rects for each data point ──
+  var stepW=serieCart.length>1?cW/(serieCart.length-1):cW;
+  serieCart.forEach(function(p,i){
+    var cx=tX(i), x0=i===0?pL:(cx-stepW/2), x1=i===serieCart.length-1?(W-pR):(cx+stepW/2);
+    svg+='<rect x="'+x0.toFixed(1)+'" y="'+pT+'" width="'+(x1-x0).toFixed(1)+'" height="'+cH+'" fill="transparent" data-idx="'+i+'" class="__evo_hover"/>';
+  });
+
   svg+='</svg>';
 
-  return '<div class="card" style="padding:20px;margin-bottom:16px;border:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Evolução da Carteira</span><span style="background:rgba(255,140,0,0.15);color:var(--blue);font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">vs CDI</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:12px">Base 100 · Últimos '+_analiseJanela+' anos · <span style="color:#ff8c00">━</span> Carteira <span style="color:#6b7280">┅</span> CDI</div>'+svg+'</div>';
+  // Serialize data for JS tooltip
+  var jData=[];
+  serieCart.forEach(function(p,i){
+    jData.push({l:p.label,c:p.valor,d:serieCDI[i].valor,cx:tX(i),cyC:tY(p.valor),cyD:tY(serieCDI[i].valor)});
+  });
+
+  var chartId='__evoChart_'+(Math.random()*1e9|0);
+
+  return '<div class="card" style="padding:20px;margin-bottom:16px;border:1px solid var(--border);position:relative"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Evolução da Carteira</span><span style="background:rgba(255,140,0,0.15);color:var(--blue);font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">vs CDI</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:12px">Base 100 · Últimos '+_analiseJanela+' anos · <span style="color:#ff8c00">━</span> Carteira <span style="color:#6b7280">┅</span> CDI</div><div id="'+chartId+'" style="position:relative">'+svg+'<div id="'+chartId+'_tip" style="display:none;position:absolute;pointer-events:none;background:rgba(10,10,10,0.95);border:1px solid #ff8c00;border-radius:8px;padding:10px 14px;font-size:11px;font-family:DM Mono,monospace;z-index:50;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5)"></div></div></div>'
+  +'<script>(function(){var d='+JSON.stringify(jData)+';var wrap=document.getElementById("'+chartId+'");if(!wrap)return;var svg=wrap.querySelector("svg");var tip=document.getElementById("'+chartId+'_tip");var dotC=svg.getElementById("__evo_dotC");var dotD=svg.getElementById("__evo_dotD");var vline=svg.getElementById("__evo_vline");var rects=svg.querySelectorAll(".__evo_hover");rects.forEach(function(r){r.addEventListener("mouseenter",function(){var i=+this.getAttribute("data-idx");var p=d[i];dotC.setAttribute("cx",p.cx.toFixed(1));dotC.setAttribute("cy",p.cyC.toFixed(1));dotC.setAttribute("opacity","1");dotD.setAttribute("cx",p.cx.toFixed(1));dotD.setAttribute("cy",p.cyD.toFixed(1));dotD.setAttribute("opacity","1");vline.setAttribute("x1",p.cx.toFixed(1));vline.setAttribute("x2",p.cx.toFixed(1));vline.setAttribute("opacity","1");var rc=(p.c-100),rd=(p.d-100),diff=rc-rd;tip.innerHTML="<div style=\\"color:var(--text3);margin-bottom:6px;font-weight:600\\">"+p.l+"</div>"+"<div style=\\"display:flex;justify-content:space-between;gap:16px;margin-bottom:3px\\"><span style=\\"color:var(--text3)\\">Carteira</span><span style=\\"color:#ff8c00;font-weight:700\\">"+(rc>=0?"+":"")+rc.toFixed(2)+"%</span></div>"+"<div style=\\"display:flex;justify-content:space-between;gap:16px;margin-bottom:6px\\"><span style=\\"color:var(--text3)\\">CDI</span><span style=\\"color:#6b7280;font-weight:700\\">"+(rd>=0?"+":"")+rd.toFixed(2)+"%</span></div>"+"<div style=\\"border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;display:flex;justify-content:space-between\\"><span style=\\"color:var(--text3)\\">vs CDI</span><span style=\\"color:"+(diff>=0?"#00c853":"#ff8c00")+";font-weight:700\\">"+(diff>=0?"+":"")+diff.toFixed(2)+"%</span></div>";tip.style.display="block";var svgRect=svg.getBoundingClientRect();var wrapRect=wrap.getBoundingClientRect();var xPx=(p.cx/'+W+')*svgRect.width;var tipW=tip.offsetWidth;var left=xPx-tipW/2;if(left<0)left=4;if(left+tipW>wrapRect.width)left=wrapRect.width-tipW-4;tip.style.left=left+"px";tip.style.top="4px";});r.addEventListener("mouseleave",function(){dotC.setAttribute("opacity","0");dotD.setAttribute("opacity","0");vline.setAttribute("opacity","0");tip.style.display="none";});});})()</script>';
 }
 
 // ─── COMPOSIÇÃO (POR TIPO DO CADASTRO) ───────────────────
@@ -400,7 +498,7 @@ function renderMetaAlocacaoCard(data){
     if(pctAt<0.1)return;
     var meta=_metasAlocacao[t]||0;
     var diff=pctAt-meta;
-    var dCor=meta===0?'var(--text3)':(Math.abs(diff)<=3?'#00c853':(diff>0?'#f59e0b':'#ff1744'));
+    var dCor=meta===0?'var(--text3)':(Math.abs(diff)<=3?'#00c853':(diff>0?'#f59e0b':'#ff8c00'));
     var dStr=meta===0?'—':(diff>=0?'+':'')+diff.toFixed(1)+'%';
     var cor=CORES_TIPO[t]||'#64748b';
     rows+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
@@ -439,15 +537,15 @@ function renderDrawdownCard(data){
   ord.slice(0,8).forEach(function(a){
     var wm=a.stats.stats.worst_monthly_return||0;
     var barW=Math.min(Math.abs(wm),60);
-    var cor=CORES_TIPO[a.tipo]||'#ff1744';
+    var cor=CORES_TIPO[a.tipo]||'#ff8c00';
     rows+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
     rows+='<span style="font-size:11px;color:var(--text2);width:65px;flex-shrink:0;font-family:DM Mono,monospace">'+a.ticker+'</span>';
     rows+='<span style="font-size:9px;color:var(--text3);width:50px;flex-shrink:0">'+a.tipo+'</span>';
-    rows+='<div style="flex:1;height:14px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:'+barW+'%;height:100%;background:#ff174466;border-radius:3px"></div></div>';
-    rows+='<span style="font-size:11px;color:#ff1744;font-family:DM Mono,monospace;width:50px;text-align:right">'+wm.toFixed(1)+'%</span>';
+    rows+='<div style="flex:1;height:14px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:'+barW+'%;height:100%;background:#ff8c0066;border-radius:3px"></div></div>';
+    rows+='<span style="font-size:11px;color:#ff8c00;font-family:DM Mono,monospace;width:50px;text-align:right">'+wm.toFixed(1)+'%</span>';
     rows+='</div>';
   });
-  return '<div class="card" style="padding:20px;border:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Drawdown por Ativo</span><span style="background:#ff174422;color:#ff1744;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">RISCO</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">Pior mês histórico de cada ativo</div>'+rows+'</div>';
+  return '<div class="card" style="padding:20px;border:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Drawdown por Ativo</span><span style="background:#ff8c0022;color:#ff8c00;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">RISCO</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">Pior mês histórico de cada ativo</div>'+rows+'</div>';
 }
 
 // ─── DISPERSÃO MENSAL ────────────────────────────────────
@@ -482,8 +580,8 @@ function renderDispersaoCard(data){
     var x=pL+(i/keys.length)*cW+1;
     var bH=maxC>0?(bk[k]/maxC)*cH:0;
     var y=pT+cH-bH;
-    var cor=k>=0?'#00c85366':'#ff174466';
-    var st=k>=0?'#00c853':'#ff1744';
+    var cor=k>=0?'#00c85366':'#ff8c0066';
+    var st=k>=0?'#00c853':'#ff8c00';
     svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+bH.toFixed(1)+'" fill="'+cor+'" stroke="'+st+'" stroke-width="0.5" rx="2"/>';
     if(i%Math.max(1,Math.floor(keys.length/8))===0) svg+='<text x="'+(x+barW/2).toFixed(1)+'" y="'+(H-5)+'" fill="rgba(255,255,255,0.3)" font-size="8" text-anchor="middle" font-family="DM Mono,monospace">'+k+'%</text>';
   });
@@ -558,7 +656,7 @@ function renderMonteCarloCard(data){
 
   var rM=((p50[nM]/pat-1)*100).toFixed(1),rO=((p90[nM]/pat-1)*100).toFixed(1),rP=((p10[nM]/pat-1)*100).toFixed(1);
 
-  return '<div class="card" style="padding:20px;margin-bottom:16px;border:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Monte Carlo — Projeção 24 Meses</span><span style="background:rgba(168,85,247,0.15);color:#a855f7;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">SIMULAÇÃO</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:12px">'+nSim+' simulações · Faixas P10-P90 e P25-P75 · <span style="color:#ff8c00">━</span> Mediana</div>'+svg+'<div style="display:flex;gap:20px;margin-top:10px;font-size:10px;font-family:DM Mono,monospace"><span style="color:var(--text3)">Pessimista (P10): <span style="color:#ff1744">'+rP+'%</span></span><span style="color:var(--text3)">Mediana (P50): <span style="color:#ff8c00">+'+rM+'%</span></span><span style="color:var(--text3)">Otimista (P90): <span style="color:#00c853">+'+rO+'%</span></span></div></div>';
+  return '<div class="card" style="padding:20px;margin-bottom:16px;border:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text)">Monte Carlo — Projeção 24 Meses</span><span style="background:rgba(168,85,247,0.15);color:#a855f7;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px">SIMULAÇÃO</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:12px">'+nSim+' simulações · Faixas P10-P90 e P25-P75 · <span style="color:#ff8c00">━</span> Mediana</div>'+svg+'<div style="display:flex;gap:20px;margin-top:10px;font-size:10px;font-family:DM Mono,monospace"><span style="color:var(--text3)">Pessimista (P10): <span style="color:#ff8c00">'+rP+'%</span></span><span style="color:var(--text3)">Mediana (P50): <span style="color:#ff8c00">+'+rM+'%</span></span><span style="color:var(--text3)">Otimista (P90): <span style="color:#00c853">+'+rO+'%</span></span></div></div>';
 }
 
 // ─── QUILT VIEW ──────────────────────────────────────────
@@ -585,7 +683,7 @@ function quiltRow(l,yrs,anos,cor){
     if(ret===null) h+='<td style="padding:4px 3px;text-align:center;border-bottom:1px solid var(--border)"><span style="color:var(--text3)">—</span></td>';
     else{
       var bg,fg;
-      if(ret>=20){bg='#00c85344';fg='#00c853';}else if(ret>=5){bg='#00c85322';fg='#00c853';}else if(ret>=0){bg='#00c85311';fg='#00c853';}else if(ret>=-10){bg='#ff174411';fg='#ff1744';}else{bg='#ff174433';fg='#ff1744';}
+      if(ret>=20){bg='#00c85344';fg='#00c853';}else if(ret>=5){bg='#00c85322';fg='#00c853';}else if(ret>=0){bg='#00c85311';fg='#00c853';}else if(ret>=-10){bg='#ff8c0011';fg='#ff8c00';}else{bg='#ff8c0033';fg='#ff8c00';}
       h+='<td style="padding:4px 3px;text-align:center;border-bottom:1px solid var(--border)"><span style="display:inline-block;padding:3px 6px;border-radius:4px;background:'+bg+';color:'+fg+';font-size:10px;min-width:44px">'+(ret>=0?'+':'')+ret.toFixed(0)+'%</span></td>';
     }
   });
@@ -601,7 +699,7 @@ function renderStressTest(data){
     if(data.cdi&&data.cdi.years) cdiR=calcRetPeriodo(data.cdi.years,cr.inicio,cr.fim);
     var rC=pT>0?rT/pT:null;
     var rStr=rC!==null?(rC>=0?'+':'')+rC.toFixed(2)+'%':'N/A';
-    var rCor=rC!==null?(rC>=0?'#00c853':'#ff1744'):'var(--text3)';
+    var rCor=rC!==null?(rC>=0?'#00c853':'#ff8c00'):'var(--text3)';
     var cStr=cdiR!==null?'vs CDI '+(cdiR>=0?'+':'')+cdiR.toFixed(2)+'%':'';
     h+='<div class="card" style="padding:14px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text)">'+cr.nome+'</div><div style="font-size:10px;color:var(--text3);margin-bottom:8px">'+cr.desc+'</div><div style="font-size:18px;font-weight:700;color:'+rCor+';font-family:DM Mono,monospace">'+rStr+'</div>'+(cStr?'<div style="font-size:10px;color:var(--text3);margin-top:2px">'+cStr+'</div>':'')+'</div>';
   });
@@ -635,7 +733,7 @@ function renderHeatmapMensal(data){
       var rP=0;
       data.ativos.forEach(function(a){if(a.stats&&a.stats.years&&a.stats.years[y]&&a.stats.years[y][m]!==undefined){var p=totalI>0?a.investido/totalI:1/data.ativos.length;rP+=a.stats.years[y][m]*p;}});
       var bg,fg;
-      if(rP>3){bg='#00c85344';fg='#00c853';}else if(rP>0){bg='#00c85318';fg='#00c853';}else if(rP>-3){bg='#ff174418';fg='#ff1744';}else{bg='#ff174444';fg='#ff1744';}
+      if(rP>3){bg='#00c85344';fg='#00c853';}else if(rP>0){bg='#00c85318';fg='#00c853';}else if(rP>-3){bg='#ff8c0018';fg='#ff8c00';}else{bg='#ff8c0044';fg='#ff8c00';}
       var val=rP!==0?rP.toFixed(1):'—';
       h+='<td style="padding:3px 2px;text-align:center"><span style="display:inline-block;padding:3px 4px;border-radius:3px;background:'+bg+';color:'+fg+';min-width:36px;font-size:9px">'+val+'</span></td>';
     }
