@@ -380,6 +380,9 @@ textarea.form-input{resize:vertical;min-height:80px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .charts-grid,.grid-2{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
+  #ca-grid{grid-template-columns:1fr!important}
+  #ca-kpis{grid-template-columns:repeat(2,1fr)!important}
+  #ca-cenarios{grid-template-columns:repeat(2,1fr)!important}
 }
 </style>
 </head>
@@ -550,6 +553,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="nav-section">Pessoal</div>
       <button class="nav-item" onclick="showView('minha-carteira',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span>Minha Carteira</span></button>
       <button class="nav-item" onclick="showView('minhas-operacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Minhas Operações</span></button>
+      <div class="nav-section">CRM</div>
+      <button class="nav-item" onclick="showView('metas-kpis',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Metas e KPIs</span></button>
       <div class="nav-section">Ferramentas</div>
       <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
 
@@ -557,6 +562,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item" onclick="showView('controle-opcoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span><span>Controle de Opções</span></button>
       <button class="nav-item" onclick="window.open('https://simulador.b3.com.br/','_blank')"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Simulador B3</span></button>
       <button class="nav-item" onclick="showView('simulador',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Simulador IF</span></button>
+      <button class="nav-item" onclick="showView('calc-aposentadoria',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/><path d="M17 7l-10 10"/></svg></span><span>Aposentadoria</span></button>
       <button class="nav-item" onclick="showView('glossario',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Glossário</span></button>
     </div>
     <div class="sidebar-footer">
@@ -2800,6 +2806,14 @@ function showView(v,btn){
   if(v==='minhas-operacoes'){
     if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
     _ensureClienteVinculado(function(){ loadMinhasOperacoes(); });
+  }
+  if(v==='metas-kpis'){
+    if(!document.getElementById('view-metas-kpis')) buildMetasKPIsView();
+    loadMetasKPIs();
+  }
+  if(v==='calc-aposentadoria'){
+    if(!document.getElementById('view-calc-aposentadoria')) buildCalcAposentadoriaView();
+    setTimeout(function(){if(typeof _calcApoInit==='function')_calcApoInit();},100);
   }
 }
 
@@ -7185,9 +7199,9 @@ function _ensureClienteVinculado(callback){
 }
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes'],
-  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes'],
-  cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados']
+  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
+  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
+  cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -13203,6 +13217,586 @@ function opcRenderCharts(){
     data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'#22c55e':'#3b82f6';}),borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},title:{display:false}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}}}}
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// METAS E KPIs — CRM Dashboard
+// ═══════════════════════════════════════════════════════════
+var _metasConfig = null;
+var _metasChartAUM = null;
+var _metasChartPipeline = null;
+
+function buildMetasKPIsView(){
+  var mc = document.getElementById('main-content');
+  var div = document.createElement('div');
+  div.className = 'view';
+  div.id = 'view-metas-kpis';
+  div.innerHTML = '<div class="page-header"><h1>Metas e KPIs</h1><div style="display:flex;gap:8px;align-items:center">' +
+    '<select id="metas-ano" style="background:var(--card);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:13px"></select>' +
+    '<button class="btn-primary" onclick="openModalEditMetas()" style="font-size:12px;padding:6px 14px">Editar Metas</button></div></div>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px" id="metas-cards"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px" id="metas-charts-row">' +
+      '<div class="card" style="padding:20px"><h3 style="margin:0 0 16px;font-size:14px;color:var(--muted)">Evolução AUM (Custódia Total)</h3><div style="position:relative;height:260px"><canvas id="chart-metas-aum"></canvas></div></div>' +
+      '<div class="card" style="padding:20px"><h3 style="margin:0 0 16px;font-size:14px;color:var(--muted)">Pipeline Semanal</h3><div style="position:relative;height:260px"><canvas id="chart-metas-pipeline"></canvas></div></div>' +
+    '</div>' +
+    '<div class="card" style="padding:20px;margin-bottom:24px" id="metas-produtos-section">' +
+      '<h3 style="margin:0 0 16px;font-size:14px;color:var(--muted)">Produtos por Cliente (6+ = meta)</h3>' +
+      '<div id="metas-produtos-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"></div>' +
+    '</div>' +
+    '<div class="card" style="padding:20px" id="metas-nicho-section">' +
+      '<h3 style="margin:0 0 16px;font-size:14px;color:var(--muted)">Distribuição por Nicho</h3>' +
+      '<div id="metas-nicho-grid" style="display:flex;flex-wrap:wrap;gap:12px"></div>' +
+    '</div>' +
+    '<!-- Modal Editar Metas -->' +
+    '<div class="modal-overlay" id="modal-editar-metas" style="display:none">' +
+      '<div class="modal" style="max-width:520px">' +
+        '<div class="modal-header"><h2>Editar Metas</h2><button class="modal-close" onclick="closeModal(\'modal-editar-metas\')">&times;</button></div>' +
+        '<div class="modal-body" id="modal-metas-body" style="max-height:70vh;overflow-y:auto"></div>' +
+        '<div class="modal-footer"><button class="btn-primary" onclick="saveMetasConfig()">Salvar</button></div>' +
+      '</div>' +
+    '</div>';
+  mc.appendChild(div);
+  // Populate year selector
+  var sel = document.getElementById('metas-ano');
+  var anoAtual = new Date().getFullYear();
+  for(var y=anoAtual-1; y<=anoAtual+2; y++){
+    var opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    if(y===anoAtual) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  sel.addEventListener('change', function(){ loadMetasKPIs(); });
+}
+
+function _metaCardHTML(label, atual, meta, prefix, suffix, icon){
+  var pct = meta > 0 ? Math.min((atual/meta)*100, 100) : 0;
+  var pctLabel = meta > 0 ? pct.toFixed(1) : '0.0';
+  var barColor = pct >= 100 ? '#22c55e' : pct >= 60 ? '#ff8c00' : '#ef4444';
+  // Replace red with orange per user rule
+  if(barColor === '#ef4444') barColor = '#ff8c00';
+  var atualStr = prefix + (typeof atual === 'number' ? atual.toLocaleString('pt-BR',{maximumFractionDigits:1}) : atual) + suffix;
+  var metaStr = prefix + (typeof meta === 'number' ? meta.toLocaleString('pt-BR',{maximumFractionDigits:1}) : meta) + suffix;
+  return '<div class="card" style="padding:18px;position:relative;overflow:hidden">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">' + label + '</span>' +
+      '<span style="font-size:11px;color:' + barColor + ';font-weight:600">' + pctLabel + '%</span>' +
+    '</div>' +
+    '<div style="font-size:24px;font-weight:700;color:var(--white);margin-bottom:4px">' + atualStr + '</div>' +
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Meta: ' + metaStr + '</div>' +
+    '<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">' +
+      '<div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;transition:width .6s"></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function loadMetasKPIs(){
+  var anoSel = document.getElementById('metas-ano');
+  var ano = anoSel ? parseInt(anoSel.value) : new Date().getFullYear();
+  // Load metas from Firestore config/metas-{ano}
+  db.collection('config').doc('metas-' + ano).get().then(function(doc){
+    if(doc.exists){
+      _metasConfig = doc.data();
+    } else {
+      // Default metas based on XP Academy worksheet
+      _metasConfig = {
+        ano: ano,
+        novosClientes: 50,
+        captacao: 40000000,
+        aumMeta: ano <= 2026 ? 100000000 : 250000000,
+        ticketMedio: ano <= 2026 ? 700000 : 1000000,
+        feeMedio: 0.65,
+        evasaoMeta: 1,
+        reunioesSemanaMeta: 10,
+        ligacoesSemanaMeta: 100,
+        certificacaoMeta: 'CFP',
+        // Pipeline tracking (weekly counters saved)
+        reunioesSemana: 0,
+        ligacoesSemana: 0,
+        indicacoesPedidas: 0,
+        indicacoesConvertidas: 0
+      };
+    }
+    _renderMetasKPIs(ano);
+  }).catch(function(err){
+    console.warn('Erro ao carregar metas:', err);
+    _metasConfig = { ano: ano, novosClientes: 50, captacao: 40000000, aumMeta: 100000000, ticketMedio: 700000, feeMedio: 0.65, evasaoMeta: 1, reunioesSemanaMeta: 10, ligacoesSemanaMeta: 100, reunioesSemana: 0, ligacoesSemana: 0, indicacoesPedidas: 0, indicacoesConvertidas: 0 };
+    _renderMetasKPIs(ano);
+  });
+}
+
+function _renderMetasKPIs(ano){
+  var m = _metasConfig;
+  var anoAtual = new Date().getFullYear();
+  var anoCorrente = ano === anoAtual;
+
+  // ── Calculate real values from clientes data ──
+  var clientesAtivos = clientes.filter(function(c){ return c.status === 'Ativo'; });
+  var totalClientes = clientesAtivos.length;
+  var aumAtual = clientesAtivos.reduce(function(s,c){ return s + (c.custodiaTotal || 0); }, 0);
+  var ticketAtual = totalClientes > 0 ? aumAtual / totalClientes : 0;
+
+  // Novos clientes no ano: clientes com dataCadastro no ano selecionado
+  var novosNoAno = clientes.filter(function(c){
+    if(!c.dataCadastro) return false;
+    var d = c.dataCadastro;
+    if(d.toDate) d = d.toDate();
+    else if(typeof d === 'string') d = new Date(d);
+    return d.getFullYear() === ano;
+  }).length;
+
+  // Captação: soma de aportes no ano (from financeiro or estimated from AUM growth)
+  // For now, approximate as novosClientes * ticketMedio
+  var captacaoEstimada = novosNoAno * ticketAtual;
+
+  // Evasão: clientes inativos no ano / total inicio do ano
+  var inativos = clientes.filter(function(c){
+    if(c.status !== 'Inativo' && c.status !== 'Encerrado') return false;
+    if(!c.dataEncerramento) return false;
+    var d = c.dataEncerramento;
+    if(d.toDate) d = d.toDate();
+    else if(typeof d === 'string') d = new Date(d);
+    return d.getFullYear() === ano;
+  }).length;
+  var evasaoAtual = totalClientes > 0 ? (inativos / (totalClientes + inativos)) * 100 : 0;
+
+  // ── Render KPI Cards ──
+  var cardsHTML = '';
+  cardsHTML += _metaCardHTML('AUM (Custódia)', aumAtual/1000000, (m.aumMeta||0)/1000000, 'R$ ', ' M');
+  cardsHTML += _metaCardHTML('Novos Clientes', novosNoAno, m.novosClientes||50, '', '');
+  cardsHTML += _metaCardHTML('Captação', captacaoEstimada/1000000, (m.captacao||0)/1000000, 'R$ ', ' M');
+  cardsHTML += _metaCardHTML('Ticket Médio', ticketAtual/1000, (m.ticketMedio||0)/1000, 'R$ ', ' K');
+  cardsHTML += _metaCardHTML('Fee Médio', m.feeMedio||0.65, m.feeMedio||0.65, '', '%');
+  cardsHTML += _metaCardHTML('Evasão', evasaoAtual, m.evasaoMeta||1, '', '%');
+  cardsHTML += _metaCardHTML('Reuniões/Semana', m.reunioesSemana||0, m.reunioesSemanaMeta||10, '', '');
+  cardsHTML += _metaCardHTML('Ligações/Semana', m.ligacoesSemana||0, m.ligacoesSemanaMeta||100, '', '');
+  document.getElementById('metas-cards').innerHTML = cardsHTML;
+
+  // ── AUM Evolution Chart ──
+  _renderMetasChartAUM(aumAtual, m.aumMeta||100000000, ano);
+
+  // ── Pipeline Chart ──
+  _renderMetasPipelineChart(m);
+
+  // ── Produtos por Cliente ──
+  _renderProdutosPorCliente();
+
+  // ── Distribuição por Nicho ──
+  _renderNichoDistribuicao();
+}
+
+function _renderMetasChartAUM(aumAtual, aumMeta, ano){
+  var meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var mesAtual = new Date().getMonth();
+  var anoAtual = new Date().getFullYear();
+  var labels = [];
+  var dataReal = [];
+  var dataMeta = [];
+  for(var i=0; i<12; i++){
+    labels.push(meses[i]);
+    // Meta linear: divide AUM meta por 12 meses
+    dataMeta.push(aumMeta);
+    if(ano < anoAtual || (ano === anoAtual && i <= mesAtual)){
+      // For current/past months, show AUM proportional (simplified)
+      dataReal.push(aumAtual * ((i+1)/Math.max(mesAtual+1,1)));
+    } else {
+      dataReal.push(null);
+    }
+  }
+  // Fix: last real data point = current AUM
+  if(ano === anoAtual && mesAtual < 12) dataReal[mesAtual] = aumAtual;
+
+  var ctx = document.getElementById('chart-metas-aum');
+  if(!ctx) return;
+  if(_metasChartAUM) _metasChartAUM.destroy();
+  var isDark = document.body.classList.contains('dark-theme') || !document.body.classList.contains('light-theme');
+  var gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
+  var tickColor = isDark ? '#999' : '#666';
+  _metasChartAUM = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'AUM Real', data: dataReal, borderColor: '#ff8c00', backgroundColor: 'rgba(255,140,0,0.1)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#ff8c00', spanGaps: false },
+        { label: 'Meta AUM', data: dataMeta, borderColor: '#555', borderDash: [6,4], backgroundColor: 'transparent', pointRadius: 0, tension: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: tickColor, padding: 12, font: { size: 11 } } } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: function(v){ return 'R$ ' + (v/1000000).toFixed(0) + 'M'; } } }
+      }
+    }
+  });
+}
+
+function _renderMetasPipelineChart(m){
+  var ctx = document.getElementById('chart-metas-pipeline');
+  if(!ctx) return;
+  if(_metasChartPipeline) _metasChartPipeline.destroy();
+  var isDark = document.body.classList.contains('dark-theme') || !document.body.classList.contains('light-theme');
+  var gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
+  var tickColor = isDark ? '#999' : '#666';
+  _metasChartPipeline = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Reuniões', 'Ligações', 'Indicações Pedidas', 'Indicações Convertidas'],
+      datasets: [
+        { label: 'Realizado', data: [m.reunioesSemana||0, m.ligacoesSemana||0, m.indicacoesPedidas||0, m.indicacoesConvertidas||0], backgroundColor: '#ff8c00', borderRadius: 4 },
+        { label: 'Meta', data: [m.reunioesSemanaMeta||10, m.ligacoesSemanaMeta||100, m.indicacoesPedidas||0, m.indicacoesConvertidas||0], backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: tickColor, padding: 12, font: { size: 11 } } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function _renderProdutosPorCliente(){
+  var grid = document.getElementById('metas-produtos-grid');
+  if(!grid) return;
+  // Count product types across clients
+  var produtosList = ['Planejamento Financeiro','Planejamento Tributário','Planejamento Sucessório','Gestão de Riscos','Investimentos Globais','Soluções de Alavancagem','Soluções PJ','Planejamento Filantrópico'];
+  var clientesAtivos = clientes.filter(function(c){ return c.status === 'Ativo'; });
+  var totalCli = clientesAtivos.length || 1;
+
+  // Count clients with 6+ products (from ativos subcollection - we track unique asset types)
+  // For now, show the product checklist from XP with placeholder counts
+  var html = '';
+  produtosList.forEach(function(p){
+    // Count clients that have this product field marked true
+    var campo = p.toLowerCase().replace(/\s+/g,'_').replace(/[áàã]/g,'a').replace(/[éê]/g,'e').replace(/[íî]/g,'i').replace(/[óô]/g,'o').replace(/[úû]/g,'u').replace(/ç/g,'c');
+    var count = clientesAtivos.filter(function(c){ return c[campo] || c['produto_'+campo]; }).length;
+    var pct = ((count / totalCli) * 100).toFixed(0);
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px">' +
+      '<div style="width:36px;height:36px;border-radius:8px;background:rgba(255,140,0,0.12);display:flex;align-items:center;justify-content:center;color:#ff8c00;font-weight:700;font-size:13px">' + pct + '%</div>' +
+      '<div><div style="font-size:13px;color:var(--white)">' + p + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">' + count + ' de ' + totalCli + ' clientes</div></div></div>';
+  });
+  grid.innerHTML = html;
+}
+
+function _renderNichoDistribuicao(){
+  var grid = document.getElementById('metas-nicho-grid');
+  if(!grid) return;
+  // Group clients by nicho/profissao field
+  var nichos = {};
+  var clientesAtivos = clientes.filter(function(c){ return c.status === 'Ativo'; });
+  clientesAtivos.forEach(function(c){
+    var nicho = c.profissao || c.nicho || c.segmento || 'Não classificado';
+    nichos[nicho] = (nichos[nicho] || 0) + 1;
+  });
+  var total = clientesAtivos.length || 1;
+  var colors = ['#ff8c00','#22c55e','#3b82f6','#a855f7','#ec4899','#06b6d4','#f59e0b','#6366f1'];
+  var sorted = Object.keys(nichos).sort(function(a,b){ return nichos[b] - nichos[a]; });
+  var html = '';
+  sorted.forEach(function(n, i){
+    var pct = ((nichos[n] / total) * 100).toFixed(1);
+    var cor = colors[i % colors.length];
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg);border-radius:8px;border-left:3px solid ' + cor + '">' +
+      '<div style="font-size:20px;font-weight:700;color:' + cor + ';min-width:45px">' + pct + '%</div>' +
+      '<div><div style="font-size:13px;color:var(--white)">' + n + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">' + nichos[n] + ' cliente' + (nichos[n]>1?'s':'') + '</div></div></div>';
+  });
+  if(sorted.length === 0) html = '<div style="color:var(--muted);font-size:13px">Nenhum cliente com profissão/nicho cadastrado. Adicione o campo "profissao" nos cadastros de clientes.</div>';
+  grid.innerHTML = html;
+}
+
+function openModalEditMetas(){
+  var m = _metasConfig || {};
+  var body = document.getElementById('modal-metas-body');
+  body.innerHTML = '<div style="display:grid;gap:14px">' +
+    _metaInput('Novos Clientes (meta anual)', 'meta-novosClientes', m.novosClientes || 50) +
+    _metaInput('Captação (R$)', 'meta-captacao', m.captacao || 40000000) +
+    _metaInput('AUM Meta (R$)', 'meta-aumMeta', m.aumMeta || 100000000) +
+    _metaInput('Ticket Médio Meta (R$)', 'meta-ticketMedio', m.ticketMedio || 700000) +
+    _metaInput('Fee Médio (%)', 'meta-feeMedio', m.feeMedio || 0.65) +
+    _metaInput('Evasão Meta (%)', 'meta-evasaoMeta', m.evasaoMeta || 1) +
+    _metaInput('Reuniões/Semana (meta)', 'meta-reunioesSemanaMeta', m.reunioesSemanaMeta || 10) +
+    _metaInput('Ligações/Semana (meta)', 'meta-ligacoesSemanaMeta', m.ligacoesSemanaMeta || 100) +
+    '<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Realizado esta semana</div></div>' +
+    _metaInput('Reuniões realizadas', 'meta-reunioesSemana', m.reunioesSemana || 0) +
+    _metaInput('Ligações realizadas', 'meta-ligacoesSemana', m.ligacoesSemana || 0) +
+    _metaInput('Indicações pedidas', 'meta-indicacoesPedidas', m.indicacoesPedidas || 0) +
+    _metaInput('Indicações convertidas', 'meta-indicacoesConvertidas', m.indicacoesConvertidas || 0) +
+  '</div>';
+  openModal('modal-editar-metas');
+}
+
+function _metaInput(label, id, val){
+  return '<div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">' + label + '</label>' +
+    '<input type="number" step="any" id="' + id + '" value="' + val + '" style="width:100%;padding:8px 10px;background:var(--bg);color:var(--white);border:1px solid var(--border);border-radius:6px;font-size:14px"></div>';
+}
+
+function saveMetasConfig(){
+  var anoSel = document.getElementById('metas-ano');
+  var ano = anoSel ? parseInt(anoSel.value) : new Date().getFullYear();
+  var data = {
+    ano: ano,
+    novosClientes: parseFloat(document.getElementById('meta-novosClientes').value) || 0,
+    captacao: parseFloat(document.getElementById('meta-captacao').value) || 0,
+    aumMeta: parseFloat(document.getElementById('meta-aumMeta').value) || 0,
+    ticketMedio: parseFloat(document.getElementById('meta-ticketMedio').value) || 0,
+    feeMedio: parseFloat(document.getElementById('meta-feeMedio').value) || 0,
+    evasaoMeta: parseFloat(document.getElementById('meta-evasaoMeta').value) || 0,
+    reunioesSemanaMeta: parseFloat(document.getElementById('meta-reunioesSemanaMeta').value) || 0,
+    ligacoesSemanaMeta: parseFloat(document.getElementById('meta-ligacoesSemanaMeta').value) || 0,
+    reunioesSemana: parseFloat(document.getElementById('meta-reunioesSemana').value) || 0,
+    ligacoesSemana: parseFloat(document.getElementById('meta-ligacoesSemana').value) || 0,
+    indicacoesPedidas: parseFloat(document.getElementById('meta-indicacoesPedidas').value) || 0,
+    indicacoesConvertidas: parseFloat(document.getElementById('meta-indicacoesConvertidas').value) || 0,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('config').doc('metas-' + ano).set(data, {merge:true}).then(function(){
+    closeModal('modal-editar-metas');
+    _metasConfig = data;
+    _renderMetasKPIs(ano);
+  }).catch(function(err){
+    alert('Erro ao salvar metas: ' + err.message);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// ══ CALCULADORA DE APOSENTADORIA (integrada) ══
+// ═══════════════════════════════════════════════════
+function buildCalcAposentadoriaView(){
+  var div=document.createElement('div');
+  div.className='view';
+  div.id='view-calc-aposentadoria';
+  div.innerHTML='<div class="page-header"><h1>Calculadora de Aposentadoria</h1><p style="color:var(--text-muted);font-size:12px;margin-top:4px">Projecao em valores reais e nominais — ajuste qualquer campo</p></div>'+
+  '<div style="display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:16px" id="ca-grid">'+
+    '<div>'+
+      '<div class="card" style="padding:20px">'+
+        '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Situacao Atual</div>'+
+        '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Patrimonio Atual (R$)</label>'+
+        '<input type="text" id="ca-patrimonio" value="500.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-patrimonio\',\'ca-sld-pat\')">'+
+        '<input type="range" id="ca-sld-pat" min="0" max="10000000" step="50000" value="500000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-pat\',\'ca-patrimonio\')">'+
+        '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Aporte Mensal (R$)</label>'+
+        '<input type="text" id="ca-aporte" value="5.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-aporte\',\'ca-sld-ap\')">'+
+        '<input type="range" id="ca-sld-ap" min="0" max="100000" step="500" value="5000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-ap\',\'ca-aporte\')">'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Idade Atual</label><input type="number" id="ca-idade" value="30" min="18" max="80" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Aposentadoria</label><input type="number" id="ca-idadeApo" value="60" min="30" max="90" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card" style="padding:20px;margin-top:12px">'+
+        '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Taxas e Premissas</div>'+
+        '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Perfil da Carteira</label>'+
+        '<select id="ca-perfil" class="input-field" style="width:100%;margin-bottom:14px;cursor:pointer" onchange="caApplyProfile()">'+
+          '<option value="moderado" selected>Moderado (60% RF / 40% RV)</option>'+
+          '<option value="conservador">Conservador (80% RF / 20% RV)</option>'+
+          '<option value="agressivo">Agressivo (30% RF / 70% RV)</option>'+
+          '<option value="custom">Personalizado</option>'+
+        '</select>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Juros Nom. (% a.a.)</label><input type="number" id="ca-jnom" value="12" step="0.1" class="input-field" style="width:100%" oninput="caToCustom();caCalcReal();caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Inflacao (% a.a.)</label><input type="number" id="ca-inf" value="5" step="0.1" class="input-field" style="width:100%" oninput="caCalcReal();caRecalc()"></div>'+
+        '</div>'+
+        '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px">'+
+          '<div style="font-size:10px;color:#00d68f;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Juro Real (% a.a.)</div>'+
+          '<div id="ca-jreal" style="font-size:18px;font-weight:700;color:#00d68f;margin-top:2px">6,67%</div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Exp. de Vida</label><input type="number" id="ca-expvida" value="95" min="70" max="110" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Volatilidade (%)</label><input type="number" id="ca-vol" value="8" step="0.5" class="input-field" style="width:100%" oninput="caToCustom();caRecalc()"></div>'+
+        '</div>'+
+        '<div style="border-top:1px solid var(--border);margin:12px 0;padding-top:14px">'+
+          '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Cenario Personalizado</div>'+
+          '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Resgate Mensal (R$)</label>'+
+          '<input type="text" id="ca-resgate" value="10.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caRecalc()">'+
+          '<input type="range" id="ca-sld-res" min="0" max="200000" step="500" value="10000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-res\',\'ca-resgate\')">'+
+        '</div>'+
+        '<div style="background:rgba(79,140,255,.06);border:1px solid rgba(79,140,255,.15);border-radius:10px;padding:14px">'+
+          '<div style="font-size:10px;font-weight:700;color:#4f8cff;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Planejamento Reverso</div>'+
+          '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Renda Mensal Desejada (R$)</label>'+
+          '<input type="text" id="ca-rendaalvo" value="15.000" class="input-field" style="width:100%;margin-bottom:10px" oninput="caFmt(this);caRecalc()">'+
+          '<div style="background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.12);border-radius:8px;padding:10px 12px">'+
+            '<div style="font-size:10px;color:#4f8cff;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Aporte Mensal Necessario</div>'+
+            '<div id="ca-aporte-nec" style="font-size:18px;font-weight:800;color:#4f8cff;margin-top:2px">—</div>'+
+            '<div id="ca-aporte-nec-sub" style="font-size:10px;color:var(--text-muted);margin-top:4px"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div id="ca-results" style="display:flex;flex-direction:column;gap:16px">'+
+      '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">'+
+        '<div style="display:flex;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px">'+
+          '<button id="ca-btn-real" class="btn-primary" style="padding:6px 16px;font-size:11px;border-radius:6px" onclick="caSetModo(\'real\')">Valores Reais</button>'+
+          '<button id="ca-btn-nom" class="btn-ghost" style="padding:6px 16px;font-size:11px;border-radius:6px" onclick="caSetModo(\'nominal\')">Valores Nominais</button>'+
+        '</div>'+
+        '<span id="ca-modo-hint" style="font-size:11px;color:var(--text-muted);font-style:italic;flex:1">Poder de compra de hoje</span>'+
+        '<button class="btn-primary" style="padding:8px 18px;font-size:11px;border-radius:8px;display:flex;align-items:center;gap:6px" onclick="caExportPDF()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Exportar PDF</button>'+
+      '</div>'+
+      '<div id="ca-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"></div>'+
+      '<div class="card" style="padding:16px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:12px">Evolucao do Patrimonio <span id="ca-badge1" style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,140,0,.1);color:#ff8c00;font-weight:700;margin-left:6px">REAL</span></div><div style="height:260px;position:relative"><canvas id="ca-chart1"></canvas></div></div>'+
+      '<div style="font-size:11px;color:#ff8c00;font-weight:700;text-transform:uppercase;letter-spacing:1px">Fase de Aposentadoria — 4 Cenarios</div>'+
+      '<div id="ca-cenarios" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"></div>'+
+      '<div class="card" style="padding:16px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:12px">Comparativo na Aposentadoria <span id="ca-badge2" style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,140,0,.1);color:#ff8c00;font-weight:700;margin-left:6px">REAL</span></div><div style="height:260px;position:relative"><canvas id="ca-chart2"></canvas></div></div>'+
+      '<div class="card" style="padding:16px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:12px">Metas Anuais de Patrimonio <span id="ca-badge3" style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,140,0,.1);color:#ff8c00;font-weight:700;margin-left:6px">REAL</span></div>'+
+        '<div id="ca-vol-chips" style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap"></div>'+
+        '<div style="overflow-x:auto;max-height:400px;overflow-y:auto"><table id="ca-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:600px"><thead><tr style="background:var(--card2)"><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)">Ano</th><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Idade</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Aportado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#b07cff;text-transform:uppercase;border-bottom:1px solid var(--border)">Pessimista</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#ff8c00;text-transform:uppercase;border-bottom:1px solid var(--border)">Esperado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#00d68f;text-transform:uppercase;border-bottom:1px solid var(--border)">Otimista</th></tr></thead><tbody id="ca-tbody"></tbody></table></div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+  document.querySelector('.main-content').appendChild(div);
+}
+
+// ─── Calc Aposentadoria Engine ───
+var _caM='real',_caD=null,_caC1=null,_caC2=null;
+function caFmt(el){var p=el.selectionStart,o=el.value.length,d=el.value.replace(/\D/g,'');if(!d){el.value='';return;}el.value=parseInt(d,10).toLocaleString('pt-BR');var n=el.value.length-o;el.setSelectionRange(Math.max(0,p+n),Math.max(0,p+n));}
+function caPC(v){return parseInt(String(v).replace(/\D/g,''),10)||0;}
+function caFB(v){if(Math.abs(v)>=1e9)return'R$ '+(v/1e9).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' B';if(Math.abs(v)>=1e6)return'R$ '+(v/1e6).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M';if(Math.abs(v)>=1e3)return'R$ '+(v/1e3).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})+' mil';return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function caFF(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function caSyncS(a,b){document.getElementById(b).value=caPC(document.getElementById(a).value);caRecalc();}
+function caS2I(a,b){document.getElementById(b).value=parseInt(document.getElementById(a).value).toLocaleString('pt-BR');caRecalc();}
+function caToCustom(){document.getElementById('ca-perfil').value='custom';}
+function caCalcReal(){var n=parseFloat(document.getElementById('ca-jnom').value)||0,i=parseFloat(document.getElementById('ca-inf').value)||0;document.getElementById('ca-jreal').textContent=(((1+n/100)/(1+i/100)-1)*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';}
+var _caPerfis={conservador:{nom:10,vol:4},moderado:{nom:12,vol:8},agressivo:{nom:14.5,vol:16}};
+function caApplyProfile(){var p=document.getElementById('ca-perfil').value;if(p==='custom')return;var c=_caPerfis[p];if(!c)return;document.getElementById('ca-jnom').value=c.nom;document.getElementById('ca-vol').value=c.vol;caCalcReal();caRecalc();}
+function caSetModo(m){_caM=m;document.getElementById('ca-btn-real').className=m==='real'?'btn-primary':'btn-ghost';document.getElementById('ca-btn-nom').className=m==='nominal'?'btn-primary':'btn-ghost';document.getElementById('ca-modo-hint').textContent=m==='real'?'Poder de compra de hoje':'Valores futuros com inflacao';var bt=m==='real'?'REAL':'NOMINAL';['ca-badge1','ca-badge2','ca-badge3'].forEach(function(id){document.getElementById(id).textContent=bt;});if(_caD)caRender();}
+var _caT=null;function caRecalc(){if(_caT)clearTimeout(_caT);_caT=setTimeout(caCalc,80);}
+
+function caCalc(){
+  var P=caPC(document.getElementById('ca-patrimonio').value);
+  var A=caPC(document.getElementById('ca-aporte').value);
+  var idade=parseInt(document.getElementById('ca-idade').value)||30;
+  var idadeApo=parseInt(document.getElementById('ca-idadeApo').value)||60;
+  var nom=parseFloat(document.getElementById('ca-jnom').value)||0;
+  var inf=parseFloat(document.getElementById('ca-inf').value)||0;
+  var expVida=parseInt(document.getElementById('ca-expvida').value)||95;
+  var vol=parseFloat(document.getElementById('ca-vol').value)||0;
+  if(idadeApo<=idade)idadeApo=idade+1;if(expVida<=idadeApo)expVida=idadeApo+1;
+  var rA=((1+nom/100)/(1+inf/100))-1,rM=Math.pow(1+rA,1/12)-1;
+  var anosAcum=idadeApo-idade,mesesAcum=anosAcum*12;
+  var rP=Math.pow(1+Math.max(rA-vol/100,-0.5),1/12)-1,rO=Math.pow(1+rA+vol/100,1/12)-1;
+  var pat=P,patP=P,patO=P,ap=P;
+  var acR=[{a:0,id:idade,v:pat,vP:patP,vO:patO,ap:ap}];
+  for(var m=1;m<=mesesAcum;m++){pat=pat*(1+rM)+A;patP=patP*(1+rP)+A;patO=patO*(1+rO)+A;ap+=A;if(m%12===0)acR.push({a:m/12,id:idade+m/12,v:pat,vP:patP,vO:patO,ap:ap});}
+  var PF=pat,tAp=ap,jrs=PF-tAp,rdM=PF*rM;
+  var acN=acR.map(function(d){var f=Math.pow(1+inf/100,d.a);return{a:d.a,id:d.id,v:d.v*f,vP:d.vP*f,vO:d.vO*f,ap:d.ap*f};});
+  var anosApo=expVida-idadeApo,mesesApo=anosApo*12;
+  function sim(rg){var p=PF,arr=[{a:0,id:idadeApo,v:p}],iz=null;for(var m=1;m<=mesesApo;m++){p=p*(1+rM)-rg;if(p<0&&!iz){iz=idadeApo+m/12;p=0;}if(p<0)p=0;if(m%12===0)arr.push({a:m/12,id:idadeApo+m/12,v:p});}return{d:arr,z:iz};}
+  var r1=PF*rM*0.5,r2=PF*rM,r3=rM>0?PF*rM/(1-Math.pow(1+rM,-mesesApo)):PF/mesesApo;
+  var r4=caPC(document.getElementById('ca-resgate').value);
+  var s1=sim(r1),s2=sim(r2),s3=sim(r3),s4=sim(r4);
+  var p4f=s4.d[s4.d.length-1].v,cS=p4f>0;
+  var cL=cS?'Sustentavel ate '+expVida:'Acaba aos '+(s4.z?s4.z.toFixed(0):'?');
+  function tN(arr){return arr.map(function(d){return{a:d.a,id:d.id,v:d.v*Math.pow(1+inf/100,anosAcum+d.a)};});}
+  var fA=Math.pow(1+inf/100,anosAcum);
+  _caD={idade:idade,idadeApo:idadeApo,expVida:expVida,inf:inf/100,vol:vol,anosAcum:anosAcum,yr:new Date().getFullYear(),
+    pfR:PF,apR:tAp,jR:jrs,rmR:rdM,pfN:PF*fA,apN:tAp*fA,jN:jrs*fA,rmN:rdM*fA,
+    r1R:r1,r2R:r2,r3R:r3,r4R:r4,r1N:r1*fA,r2N:r2*fA,r3N:r3*fA,r4N:r4*fA,
+    acR:acR,acN:acN,s1R:s1.d,s2R:s2.d,s3R:s3.d,s4R:s4.d,
+    s1N:tN(s1.d),s2N:tN(s2.d),s3N:tN(s3.d),s4N:tN(s4.d),
+    p1fR:s1.d[s1.d.length-1].v,p1fN:tN(s1.d)[tN(s1.d).length-1].v,
+    p4fR:p4f,p4fN:tN(s4.d)[tN(s4.d).length-1].v,
+    cS:cS,cL:cL,iz:s4.z,rM:rM};
+  // Reverse planning
+  var rendaAlvo=caPC(document.getElementById('ca-rendaalvo').value);
+  if(rendaAlvo>0&&rM>0){var pN=rendaAlvo/rM,fv=Math.pow(1+rM,mesesAcum),def=pN-P*fv,aN=def>0?def*rM/(fv-1):0;document.getElementById('ca-aporte-nec').textContent=caFF(Math.max(aN,0));document.getElementById('ca-aporte-nec-sub').textContent='Patrimonio-alvo: '+caFB(pN);}
+  else{document.getElementById('ca-aporte-nec').textContent='—';document.getElementById('ca-aporte-nec-sub').textContent='';}
+  caRender();
+}
+
+function caRender(){
+  var d=_caD,N=_caM==='nominal';
+  var pf=N?d.pfN:d.pfR,ap=N?d.apN:d.apR,jr=N?d.jN:d.jR,rm=N?d.rmN:d.rmR;
+  var r1=N?d.r1N:d.r1R,r2=N?d.r2N:d.r2R,r3=N?d.r3N:d.r3R,r4=N?d.r4N:d.r4R;
+  var ac=N?d.acN:d.acR,s1=N?d.s1N:d.s1R,s2=N?d.s2N:d.s2R,s3=N?d.s3N:d.s3R,s4=N?d.s4N:d.s4R;
+  var p1f=N?d.p1fN:d.p1fR,p4f=N?d.p4fN:d.p4fR;
+  var sub=N?'valor futuro nominal':'poder de compra de hoje';
+  // KPIs
+  document.getElementById('ca-kpis').innerHTML=
+    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Patrimonio Apos.</div><div style="font-size:18px;font-weight:700;color:#00d68f">'+caFB(pf)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+sub+'</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Total Aportado</div><div style="font-size:18px;font-weight:700">'+caFB(ap)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+d.anosAcum+' anos</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Juros Ganhos</div><div style="font-size:18px;font-weight:700;color:#ff8c00">'+caFB(jr)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+(d.apR>0?(d.jR/d.apR*100).toFixed(0):'0')+'%</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Renda Mensal</div><div style="font-size:18px;font-weight:700;color:#00d68f">'+caFF(rm)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">juro real</div></div>';
+  // Chart 1 - Acumulacao com cone
+  if(_caC1)_caC1.destroy();
+  _caC1=new Chart(document.getElementById('ca-chart1'),{type:'line',data:{labels:ac.map(function(x){return x.id.toFixed(0)}),datasets:[
+    {label:'Otimista',data:ac.map(function(x){return x.vO}),borderColor:'rgba(0,214,143,.3)',backgroundColor:'rgba(0,214,143,.04)',fill:'+1',tension:.35,pointRadius:0,borderWidth:1,borderDash:[3,3]},
+    {label:'Esperado',data:ac.map(function(x){return x.v}),borderColor:'#ff8c00',backgroundColor:'rgba(255,140,0,.06)',fill:false,tension:.35,pointRadius:0,borderWidth:2.5},
+    {label:'Pessimista',data:ac.map(function(x){return x.vP}),borderColor:'rgba(176,124,255,.3)',backgroundColor:'rgba(176,124,255,.04)',fill:'-1',tension:.35,pointRadius:0,borderWidth:1,borderDash:[3,3]},
+    {label:'Aportado',data:ac.map(function(x){return x.ap}),borderColor:'#444',borderDash:[4,4],backgroundColor:'transparent',tension:0,pointRadius:0,borderWidth:1}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'var(--text-muted)',padding:10,font:{size:9},usePointStyle:true}},tooltip:{backgroundColor:'#1a1a1a',borderColor:'#333',borderWidth:1,padding:10,titleFont:{size:10},bodyFont:{size:10},callbacks:{label:function(c){return c.dataset.label+': '+caFB(c.raw)}}}},scales:{x:{grid:{display:false},ticks:{color:'#555',font:{size:8},maxTicksLimit:10,callback:function(v,i){return ac[i]?ac[i].id.toFixed(0)+' anos':''}}},y:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#555',font:{size:8},callback:function(v){if(Math.abs(v)>=1e9)return(v/1e9).toFixed(1)+'B';if(Math.abs(v)>=1e6)return(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return(v/1e3).toFixed(0)+'k';return v}}}}}});
+  // Cenarios
+  var vP=N?'nominal':'hoje';
+  var cs=[{t:'Conservador',d:'50% do juro real',r:r1,pf:p1f,c:'#00d68f',tg:'Cresce'},{t:'Moderado',d:'100% do juro real',r:r2,pf:s2[s2.length-1].v,c:'#ff8c00',tg:'Estavel'},{t:'Consumo Total',d:'Consome ate '+d.expVida,r:r3,pf:0,c:'#b07cff',tg:'Consome'},{t:'Personalizado',d:caFF(r4)+'/mes',r:r4,pf:p4f,c:'#4f8cff',tg:d.cS?'Sustenta':'Acaba'}];
+  var h='';cs.forEach(function(c){h+='<div class="card" style="padding:16px;border-left:3px solid '+c.c+'"><div style="font-size:9px;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:8px;background:'+c.c+'15;color:'+c.c+';font-weight:700;text-transform:uppercase;letter-spacing:.4px">'+c.tg+'</div><div style="font-size:12px;font-weight:600;color:'+c.c+';margin-bottom:4px">'+c.t+'</div><div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">'+c.d+'</div><div style="font-size:22px;font-weight:800;color:'+c.c+'">'+caFF(c.r)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">por mes ('+vP+')</div><div style="font-size:10px;color:var(--text-muted);margin-top:8px">Anual: '+caFB(c.r*12)+'<br>Patrimonio aos '+d.expVida+': '+caFB(Math.max(c.pf,0))+'</div></div>';});
+  document.getElementById('ca-cenarios').innerHTML=h;
+  // Chart 2 - Aposentadoria
+  if(_caC2)_caC2.destroy();
+  _caC2=new Chart(document.getElementById('ca-chart2'),{type:'line',data:{labels:s1.map(function(x){return x.id.toFixed(0)}),datasets:[
+    {label:'Conservador',data:s1.map(function(x){return x.v}),borderColor:'#00d68f',backgroundColor:'rgba(0,214,143,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
+    {label:'Moderado',data:s2.map(function(x){return x.v}),borderColor:'#ff8c00',borderDash:[5,3],backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2},
+    {label:'Consumo Total',data:s3.map(function(x){return Math.max(x.v,0)}),borderColor:'#b07cff',backgroundColor:'rgba(176,124,255,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
+    {label:'Personalizado',data:s4.map(function(x){return Math.max(x.v,0)}),borderColor:'#4f8cff',borderDash:[6,4],backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'var(--text-muted)',padding:10,font:{size:9},usePointStyle:true}},tooltip:{backgroundColor:'#1a1a1a',borderColor:'#333',borderWidth:1,padding:10,titleFont:{size:10},bodyFont:{size:10},callbacks:{label:function(c){return c.dataset.label+': '+caFB(c.raw)}}}},scales:{x:{grid:{display:false},ticks:{color:'#555',font:{size:8},maxTicksLimit:10,callback:function(v,i){return s1[i]?s1[i].id.toFixed(0)+' anos':''}}},y:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#555',font:{size:8},callback:function(v){if(Math.abs(v)>=1e9)return(v/1e9).toFixed(1)+'B';if(Math.abs(v)>=1e6)return(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return(v/1e3).toFixed(0)+'k';return v}}}}}});
+  // Tabela
+  document.getElementById('ca-vol-chips').innerHTML='<span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(176,124,255,.1);color:#b07cff;font-weight:600">Pessimista (-'+d.vol+'%)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(255,140,0,.1);color:#ff8c00;font-weight:600">Esperado (base)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(0,214,143,.1);color:#00d68f;font-weight:600">Otimista (+'+d.vol+'%)</span>';
+  var rows='';
+  for(var i=0;i<ac.length;i++){var yr=d.yr+ac[i].a,iF=i===ac.length-1;rows+='<tr style="'+(iF?'background:rgba(255,140,0,.04);font-weight:700;border-top:2px solid #ff8c00':'')+'"><td style="padding:7px 12px;text-align:center;border-bottom:1px solid var(--border)">'+yr+'</td><td style="padding:7px 12px;text-align:center;border-bottom:1px solid var(--border)">'+ac[i].id.toFixed(0)+'</td><td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border)">'+caFB(ac[i].ap)+'</td><td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:#b07cff">'+caFB(Math.max(ac[i].vP,0))+'</td><td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:#ff8c00;font-weight:700">'+caFB(ac[i].v)+'</td><td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:#00d68f">'+caFB(ac[i].vO)+'</td></tr>';}
+  document.getElementById('ca-tbody').innerHTML=rows;
+}
+
+function _calcApoInit(){caCalcReal();caCalc();}
+
+function caExportPDF(){
+  var el=document.getElementById('ca-results');
+  if(!el||!_caD)return alert('Calcule primeiro para gerar o PDF.');
+  var btn=document.querySelector('#ca-results button[onclick="caExportPDF()"]');
+  if(btn){btn.disabled=true;btn.innerHTML='<span style="animation:spin 1s linear infinite;display:inline-block">⏳</span> Gerando...';}
+  var d=_caD,N=_caM==='nominal';
+  var pf=N?d.pfN:d.pfR,rm=N?d.rmN:d.rmR;
+  setTimeout(function(){
+    html2canvas(el,{backgroundColor:'#0d0d0d',scale:2,useCORS:true,logging:false,windowWidth:900}).then(function(canvas){
+      var jsPDF=window.jspdf.jsPDF;
+      var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+      // Header
+      doc.setFillColor(10,10,10);doc.rect(0,0,pw,32,'F');
+      doc.setFillColor(255,140,0);doc.rect(0,30,pw,2,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(255,140,0);
+      doc.text('DMF Investimentos',14,16);
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(180,180,180);
+      doc.text('Planejamento de Aposentadoria  |  '+(_caM==='real'?'Valores Reais':'Valores Nominais')+'  |  '+new Date().toLocaleDateString('pt-BR'),14,23);
+      // Summary box
+      var y=38;doc.setFillColor(17,17,17);doc.roundedRect(10,y,pw-20,26,3,3,'F');
+      doc.setFontSize(8);doc.setTextColor(140,140,140);
+      doc.text('Idade: '+d.idade+' → '+d.idadeApo+' anos',16,y+8);
+      doc.text('Patrimonio na aposentadoria: '+caFB(pf),16,y+15);
+      doc.text('Renda mensal (juro real): '+caFF(rm),16,y+22);
+      doc.text('Perfil: '+document.getElementById('ca-perfil').selectedOptions[0].text,pw/2+10,y+8);
+      doc.text('Expectativa de vida: '+d.expVida+' anos',pw/2+10,y+15);
+      doc.text('Volatilidade: '+d.vol+'% a.a.',pw/2+10,y+22);
+      // Canvas image
+      y=70;var imgData=canvas.toDataURL('image/png');
+      var iw=canvas.width,ih=canvas.height,ratio=(pw-20)/iw;
+      var imgH=ih*ratio;
+      // Paginate
+      var availH=ph-y-10,page=0;
+      while(imgH>0){
+        if(page>0){doc.addPage();y=10;}
+        var srcY=page*(availH/ratio);var srcH=Math.min(availH/ratio,ih-srcY);
+        if(srcH<=0)break;
+        var tmpC=document.createElement('canvas');tmpC.width=iw;tmpC.height=srcH;
+        tmpC.getContext('2d').drawImage(canvas,0,srcY,iw,srcH,0,0,iw,srcH);
+        doc.addImage(tmpC.toDataURL('image/png'),'PNG',10,y,pw-20,srcH*ratio);
+        imgH-=availH;page++;
+      }
+      // Footer on last page
+      doc.setFontSize(7);doc.setTextColor(100,100,100);
+      doc.text('Gerado em '+new Date().toLocaleString('pt-BR')+' — DMF Investimentos — Simulacao, nao constitui recomendacao de investimento',pw/2,ph-5,{align:'center'});
+      doc.save('Aposentadoria_DMF_'+new Date().toISOString().slice(0,10)+'.pdf');
+      if(btn){btn.disabled=false;btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Exportar PDF';}
+    }).catch(function(e){console.error('PDF err',e);alert('Erro ao gerar PDF: '+e.message);if(btn){btn.disabled=false;btn.innerHTML='Exportar PDF';}});
+  },200);
 }
 
 </script>
