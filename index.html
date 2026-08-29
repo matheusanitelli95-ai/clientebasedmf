@@ -13569,53 +13569,54 @@ function buildCalcAposentadoriaView(){
   var div=document.createElement('div');
   div.className='view';
   div.id='view-calc-aposentadoria';
-  div.innerHTML='<div class="page-header"><h1>Calculadora de Aposentadoria</h1><p style="color:var(--text-muted);font-size:12px;margin-top:4px">Projecao em valores reais e nominais — ajuste qualquer campo</p></div>'+
+  div.innerHTML='<style>#view-calc-aposentadoria input[type=range]{-webkit-appearance:none;appearance:none;height:6px;background:var(--border2);border-radius:3px;outline:none;cursor:pointer}#view-calc-aposentadoria input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#ff8c00;cursor:pointer;box-shadow:0 0 6px rgba(255,140,0,.4)}#view-calc-aposentadoria input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#ff8c00;cursor:pointer;border:none;box-shadow:0 0 6px rgba(255,140,0,.4)}#view-calc-aposentadoria select.form-input{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23999\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}#view-calc-aposentadoria .form-input{font-size:13px}#view-calc-aposentadoria input[type=number].form-input{-moz-appearance:textfield}#view-calc-aposentadoria input[type=number].form-input::-webkit-inner-spin-button{opacity:.5}</style>'+
+  '<div class="page-header"><h1>Calculadora de Aposentadoria</h1><p style="color:var(--text-muted);font-size:12px;margin-top:4px">Projecao em valores reais e nominais — ajuste qualquer campo</p></div>'+
   '<div style="display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:16px" id="ca-grid">'+
     '<div>'+
       '<div class="card" style="padding:20px">'+
         '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Situacao Atual</div>'+
         '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Patrimonio Atual (R$)</label>'+
-        '<input type="text" id="ca-patrimonio" value="500.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-patrimonio\',\'ca-sld-pat\')">'+
+        '<input type="text" id="ca-patrimonio" value="500.000" class="form-input" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-patrimonio\',\'ca-sld-pat\')">'+
         '<input type="range" id="ca-sld-pat" min="0" max="10000000" step="50000" value="500000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-pat\',\'ca-patrimonio\')">'+
         '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Aporte Mensal (R$)</label>'+
-        '<input type="text" id="ca-aporte" value="5.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-aporte\',\'ca-sld-ap\')">'+
+        '<input type="text" id="ca-aporte" value="5.000" class="form-input" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caSyncS(\'ca-aporte\',\'ca-sld-ap\')">'+
         '<input type="range" id="ca-sld-ap" min="0" max="100000" step="500" value="5000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-ap\',\'ca-aporte\')">'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Idade Atual</label><input type="number" id="ca-idade" value="30" min="18" max="80" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Aposentadoria</label><input type="number" id="ca-idadeApo" value="60" min="30" max="90" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Idade Atual</label><input type="number" id="ca-idade" value="30" min="18" max="80" class="form-input" style="width:100%" oninput="caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Aposentadoria</label><input type="number" id="ca-idadeApo" value="60" min="30" max="90" class="form-input" style="width:100%" oninput="caRecalc()"></div>'+
         '</div>'+
       '</div>'+
       '<div class="card" style="padding:20px;margin-top:12px">'+
         '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Taxas e Premissas</div>'+
         '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Perfil da Carteira</label>'+
-        '<select id="ca-perfil" class="input-field" style="width:100%;margin-bottom:14px;cursor:pointer" onchange="caApplyProfile()">'+
+        '<select id="ca-perfil" class="form-input" style="width:100%;margin-bottom:14px;cursor:pointer" onchange="caApplyProfile()">'+
           '<option value="moderado" selected>Moderado (60% RF / 40% RV)</option>'+
           '<option value="conservador">Conservador (80% RF / 20% RV)</option>'+
           '<option value="agressivo">Agressivo (30% RF / 70% RV)</option>'+
           '<option value="custom">Personalizado</option>'+
         '</select>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Juros Nom. (% a.a.)</label><input type="number" id="ca-jnom" value="12" step="0.1" class="input-field" style="width:100%" oninput="caToCustom();caCalcReal();caRecalc()"></div>'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Inflacao (% a.a.)</label><input type="number" id="ca-inf" value="5" step="0.1" class="input-field" style="width:100%" oninput="caCalcReal();caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Juros Nom. (% a.a.)</label><input type="number" id="ca-jnom" value="12" step="0.1" class="form-input" style="width:100%" oninput="caToCustom();caCalcReal();caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Inflacao (% a.a.)</label><input type="number" id="ca-inf" value="5" step="0.1" class="form-input" style="width:100%" oninput="caCalcReal();caRecalc()"></div>'+
         '</div>'+
         '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px">'+
           '<div style="font-size:10px;color:#00d68f;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Juro Real (% a.a.)</div>'+
           '<div id="ca-jreal" style="font-size:18px;font-weight:700;color:#00d68f;margin-top:2px">6,67%</div>'+
         '</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Exp. de Vida</label><input type="number" id="ca-expvida" value="95" min="70" max="110" class="input-field" style="width:100%" oninput="caRecalc()"></div>'+
-          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Volatilidade (%)</label><input type="number" id="ca-vol" value="8" step="0.5" class="input-field" style="width:100%" oninput="caToCustom();caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Exp. de Vida</label><input type="number" id="ca-expvida" value="95" min="70" max="110" class="form-input" style="width:100%" oninput="caRecalc()"></div>'+
+          '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Volatilidade (%)</label><input type="number" id="ca-vol" value="8" step="0.5" class="form-input" style="width:100%" oninput="caToCustom();caRecalc()"></div>'+
         '</div>'+
         '<div style="border-top:1px solid var(--border);margin:12px 0;padding-top:14px">'+
           '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Cenario Personalizado</div>'+
           '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Resgate Mensal (R$)</label>'+
-          '<input type="text" id="ca-resgate" value="10.000" class="input-field" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caRecalc()">'+
+          '<input type="text" id="ca-resgate" value="10.000" class="form-input" style="width:100%;margin-bottom:6px" oninput="caFmt(this);caRecalc()">'+
           '<input type="range" id="ca-sld-res" min="0" max="200000" step="500" value="10000" style="width:100%;margin-bottom:14px" oninput="caS2I(\'ca-sld-res\',\'ca-resgate\')">'+
         '</div>'+
         '<div style="background:rgba(79,140,255,.06);border:1px solid rgba(79,140,255,.15);border-radius:10px;padding:14px">'+
           '<div style="font-size:10px;font-weight:700;color:#4f8cff;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Planejamento Reverso</div>'+
           '<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Renda Mensal Desejada (R$)</label>'+
-          '<input type="text" id="ca-rendaalvo" value="15.000" class="input-field" style="width:100%;margin-bottom:10px" oninput="caFmt(this);caRecalc()">'+
+          '<input type="text" id="ca-rendaalvo" value="15.000" class="form-input" style="width:100%;margin-bottom:10px" oninput="caFmt(this);caRecalc()">'+
           '<div style="background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.12);border-radius:8px;padding:10px 12px">'+
             '<div style="font-size:10px;color:#4f8cff;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Aporte Mensal Necessario</div>'+
             '<div id="ca-aporte-nec" style="font-size:18px;font-weight:800;color:#4f8cff;margin-top:2px">—</div>'+
