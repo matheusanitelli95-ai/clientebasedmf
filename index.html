@@ -551,9 +551,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="sidebar-nav">
       <div class="nav-section">Principal</div>
-      <button class="nav-item active" onclick="showView('dashboard',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span><span>Dashboard</span></button>
-      <button class="nav-item" onclick="showView('clientes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></button>
-      <button class="nav-item" onclick="showView('profissionais',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span><span>Profissionais</span></button>
+      <button class="nav-item active" onclick="showView('clientes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></button>
       <div class="nav-section">Empresa</div>
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Financeiro</span></button>
       <button class="nav-item" onclick="showView('dre',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>DRE</span></button>
@@ -7225,8 +7223,8 @@ function _ensureClienteVinculado(callback){
 }
 
 var PERFIL_MENUS = {
-  adm: ['dashboard','clientes','cliente-detalhe','profissionais','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
-  gestor: ['dashboard','clientes','cliente-detalhe','profissionais','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
+  adm: ['clientes','cliente-detalhe','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
+  gestor: ['clientes','cliente-detalhe','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
   cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
 };
 
@@ -7253,8 +7251,8 @@ auth.onAuthStateChanged(function(user){
         loadClienteData();
       } else {
         loadData();
-        var dashView = document.getElementById('view-dashboard');
-        if(dashView) dashView.classList.add('active');
+        var clientesView = document.getElementById('view-clientes');
+        if(clientesView) clientesView.classList.add('active');
       }
       // Só mostra sidebar e conteúdo DEPOIS do perfil aplicado
       var sb = document.getElementById('main-sidebar');
