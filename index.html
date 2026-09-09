@@ -4011,13 +4011,15 @@ function renderBlackDetalhe(){
     });
     if(!ops.length) ops = allOps; // fallback to all if no data in period
   }
-  var totalAcum=0,totalCompras=0,totalVendas=0,mesesCount=allOps.length;
-  var acumArr=[];
+  var totalAcum=0,totalCompras=0,totalVendas=0;
+  var acumArr=[],mesesDistintos={};
   allOps.forEach(function(op){
     var s=(op.vendas||0)-(op.compras||0);
     totalAcum+=s; totalCompras+=op.compras||0; totalVendas+=op.vendas||0;
+    mesesDistintos[op.ano+'-'+op.mes]=true;
     acumArr.push({mes:MESES[op.mes-1]+'/'+op.ano,acum:totalAcum,ibov:op.ibov||0,cdi:op.cdi||0});
   });
+  var mesesCount=Object.keys(mesesDistintos).length;
   var media=mesesCount?totalAcum/mesesCount:0;
   var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
   var patrimonio=cli?(cli.custodiaRF||0)+(cli.custodiaRV||0):0;
@@ -7573,10 +7575,12 @@ function loadMinhasOperacoes(){
     var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     ops.sort(function(a,b){ return a.ano!==b.ano?a.ano-b.ano:a.mes-b.mes; });
 
-    var acum=0, totalMeses=ops.length;
+    var acum=0, mesesDist={};
     var acumArr=[],ibovArr=[],cdiArr=[],labels=[];
     var saldoMensalArr=[];
     var acumIbov=0,acumCdi=0;
+    ops.forEach(function(op){mesesDist[op.ano+'-'+op.mes]=true;});
+    var totalMeses=Object.keys(mesesDist).length;
 
     var tbody = document.getElementById('mo-tbody');
     if(tbody) tbody.innerHTML='';
