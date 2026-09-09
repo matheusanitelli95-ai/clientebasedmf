@@ -4039,25 +4039,34 @@ function renderBlackDetalhe(){
     document.getElementById('black-cli-notional').textContent=blackHideValores?'R$ ●●●●':fmtFull(cfg.notional||0);
   }).catch(function(){});
 
-  // Chart Combinado (barras + linhas)
+  // Chart Combinado (barras + linhas) — agrupado por mês
   if(blackCompChart) blackCompChart.destroy();
   var ctx=document.getElementById('black-chart-comp');
   if(ctx&&acumArr.length){
-    var acumIbov=0,acumCdi=0;
-    var ibovData=[],cdiData=[],dmfData=[],labels=[];
-    var saldosMensais=[], mediaLine=[];
-    acumArr.forEach(function(a,i){
-      acumIbov+=a.ibov; acumCdi+=a.cdi;
-      labels.push(a.mes);
-      dmfData.push(Number(a.acum.toFixed(2)));
+    // Agrupar operações por mês
+    var mesMap={},mesOrder=[];
+    allOps.forEach(function(op){
+      var key=op.ano+'-'+String(op.mes).padStart(2,'0');
+      if(!mesMap[key]){mesMap[key]={saldo:0,ibov:0,cdi:0,label:MESES[op.mes-1]+'/'+op.ano};mesOrder.push(key);}
+      mesMap[key].saldo+=(op.vendas||0)-(op.compras||0);
+      mesMap[key].ibov+=op.ibov||0;
+      mesMap[key].cdi+=op.cdi||0;
+    });
+    mesOrder.sort();
+    var acumDmf=0,acumIbov=0,acumCdi=0;
+    var ibovData=[],cdiData=[],dmfData=[],labels=[],saldosMensais=[],mediaLine=[];
+    mesOrder.forEach(function(key){
+      var m=mesMap[key];
+      acumDmf+=m.saldo;acumIbov+=m.ibov;acumCdi+=m.cdi;
+      labels.push(m.label);
+      saldosMensais.push(Number(m.saldo.toFixed(2)));
+      dmfData.push(Number(acumDmf.toFixed(2)));
       ibovData.push(Number(acumIbov.toFixed(2)));
       cdiData.push(Number(acumCdi.toFixed(2)));
-      var op=allOps[i];
-      saldosMensais.push(op?Number(((op.vendas||0)-(op.compras||0)).toFixed(2)):0);
     });
     var mediaVal=media;
     mediaLine=labels.map(function(){return Number(mediaVal.toFixed(2));});
-    var barCols=saldosMensais.map(function(v){return v>=0?'rgba(0,200,83,0.35)':'rgba(255,23,68,0.35)';});
+    var barCols=saldosMensais.map(function(v){return v>=0?'rgba(0,200,83,0.35)':'rgba(255,140,0,0.25)';});
     var barBords=saldosMensais.map(function(v){return v>=0?'#00c853':'#ff8c00';});
 
     blackCompChart=new Chart(ctx.getContext('2d'),{
@@ -7690,23 +7699,43 @@ function loadMinhasOperacoes(){
     if(moMedia) moMedia.textContent=fmtFull(media);
     if(moRet){moRet.textContent=retorno+'%';moRet.style.color=Number(retorno)>=0?'#c084fc':'#ff8c00';}
 
-    // Chart Combinado (cliente)
+    // Chart Combinado (cliente) — agrupado por mês
     if(moChart) moChart.destroy();
     var ctx=document.getElementById('mo-chart');
-    if(ctx&&labels.length){
-      var mediaMensal=acum/totalMeses;
-      var mediaLineMo=labels.map(function(){return Number(mediaMensal.toFixed(2));});
-      var barColorsMo=saldoMensalArr.map(function(v){return v>=0?'rgba(0,200,83,0.35)':'rgba(255,23,68,0.35)';});
-      var barBordersMo=saldoMensalArr.map(function(v){return v>=0?'#00c853':'#ff8c00';});
+    if(ctx&&ops.length){
+      var moMesMap={},moMesOrder=[];
+      ops.forEach(function(op){
+        var key=op.ano+'-'+String(op.mes).padStart(2,'0');
+        if(!moMesMap[key]){moMesMap[key]={saldo:0,ibov:0,cdi:0,label:MESES[op.mes-1]+'/'+op.ano};moMesOrder.push(key);}
+        moMesMap[key].saldo+=(op.vendas||0)-(op.compras||0);
+        moMesMap[key].ibov+=op.ibov||0;
+        moMesMap[key].cdi+=op.cdi||0;
+      });
+      moMesOrder.sort();
+      var moAcDmf=0,moAcIb=0,moAcCd=0;
+      var moChLabels=[],moChSaldos=[],moChAcum=[],moChIbov=[],moChCdi=[];
+      moMesOrder.forEach(function(key){
+        var m=moMesMap[key];
+        moAcDmf+=m.saldo;moAcIb+=m.ibov;moAcCd+=m.cdi;
+        moChLabels.push(m.label);
+        moChSaldos.push(Number(m.saldo.toFixed(2)));
+        moChAcum.push(Number(moAcDmf.toFixed(2)));
+        moChIbov.push(Number(moAcIb.toFixed(2)));
+        moChCdi.push(Number(moAcCd.toFixed(2)));
+      });
+      var mediaMensal=totalMeses?acum/totalMeses:0;
+      var mediaLineMo=moChLabels.map(function(){return Number(mediaMensal.toFixed(2));});
+      var barColorsMo=moChSaldos.map(function(v){return v>=0?'rgba(0,200,83,0.35)':'rgba(255,140,0,0.25)';});
+      var barBordersMo=moChSaldos.map(function(v){return v>=0?'#00c853':'#ff8c00';});
 
       moChart=new Chart(ctx.getContext('2d'),{
         type:'bar',
-        data:{labels:labels,datasets:[
-          {type:'bar',label:'Resultado Mensal',data:saldoMensalArr,backgroundColor:barColorsMo,borderColor:barBordersMo,borderWidth:1,borderRadius:4,barPercentage:0.65,yAxisID:'yBars',order:3},
+        data:{labels:moChLabels,datasets:[
+          {type:'bar',label:'Resultado Mensal',data:moChSaldos,backgroundColor:barColorsMo,borderColor:barBordersMo,borderWidth:1,borderRadius:4,barPercentage:0.65,yAxisID:'yBars',order:3},
           {type:'line',label:'Média Mensal',data:mediaLineMo,borderColor:'#ff8c00',borderWidth:1.5,pointRadius:0,borderDash:[6,3],fill:false,tension:0,yAxisID:'yBars',order:2},
-          {type:'line',label:'DMF Acumulado (R$)',data:acumArr,borderColor:'#ff8c00',backgroundColor:'rgba(255,140,0,0.08)',tension:.4,pointRadius:2,fill:true,yAxisID:'yAcum',order:1},
-          {type:'line',label:'IBOV acum. %',data:ibovArr,borderColor:'#00c853',tension:.4,pointRadius:2,borderDash:[4,4],yAxisID:'yBench',order:1},
-          {type:'line',label:'CDI acum. %',data:cdiArr,borderColor:'#f59e0b',tension:.4,pointRadius:2,borderDash:[2,4],yAxisID:'yBench',order:1}
+          {type:'line',label:'DMF Acumulado (R$)',data:moChAcum,borderColor:'#ff8c00',backgroundColor:'rgba(255,140,0,0.08)',tension:.4,pointRadius:2,fill:true,yAxisID:'yAcum',order:1},
+          {type:'line',label:'IBOV acum. %',data:moChIbov,borderColor:'#00c853',tension:.4,pointRadius:2,borderDash:[4,4],yAxisID:'yBench',order:1},
+          {type:'line',label:'CDI acum. %',data:moChCdi,borderColor:'#f59e0b',tension:.4,pointRadius:2,borderDash:[2,4],yAxisID:'yBench',order:1}
         ]},
         options:{
           plugins:{
