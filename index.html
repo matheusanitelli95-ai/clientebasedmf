@@ -841,12 +841,44 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
       <div class="page-content" style="padding-top:20px">
-        <!-- KPIs do cliente -->
-        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
-          <div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-acumulado" style="font-size:20px;font-weight:700">R$0</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Acumulado</div></div><div class="kpi-accent" style="background:#00c853"></div></div>
-          <div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-media" style="font-size:20px;font-weight:700">R$0</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Média Mensal</div></div><div class="kpi-accent" style="background:#ff8c00"></div></div>
-          <div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-retorno" style="font-size:20px;font-weight:700">0%</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Retorno s/ Patrim.</div></div><div class="kpi-accent" style="background:#7c3aed"></div></div>
-          <div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="black-cli-patrimonio" style="font-size:20px;font-weight:700">R$0</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Patrimônio</div></div><div class="kpi-accent" style="background:#3b82f6"></div></div>
+        <!-- KPIs do cliente — 6 métricas institucionais -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado</div>
+            <div class="kpi-val" id="black-cli-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$0</div>
+            <div id="black-cli-acumulado-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Média Mensal</div>
+            <div class="kpi-val" id="black-cli-media" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$0</div>
+            <div id="black-cli-media-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Retorno s/ Patrim.</div>
+            <div class="kpi-val" id="black-cli-retorno" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">0%</div>
+            <div id="black-cli-retorno-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#a78bfa,#a78bfa44);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Melhor Mês</div>
+            <div class="kpi-val" id="black-cli-melhor" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div>
+            <div id="black-cli-melhor-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Pior Mês</div>
+            <div class="kpi-val" id="black-cli-pior" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div>
+            <div id="black-cli-pior-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
+            <div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Max Drawdown</div>
+            <div class="kpi-val" id="black-cli-drawdown" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div>
+            <div id="black-cli-drawdown-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#64748b,#64748b44);border-radius:var(--radius) var(--radius) 0 0"></div>
+          </div>
         </div>
 
         <!-- Gráfico Desempenho -->
@@ -859,8 +891,8 @@ textarea.form-input{resize:vertical;min-height:80px}
               <button class="tab active" id="chart-filter-all" onclick="setChartPeriod(0)" style="padding:5px 14px;font-size:11px;border-radius:var(--radius-sm)">Tudo</button>
             </div>
           </div>
-          <div style="display:flex;gap:16px;font-size:11px;color:var(--text3);margin-bottom:12px;align-items:center"><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:20px;height:2px;background:#ff8c00;border-radius:1px"></span> Acumulado</span><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:10px;border-radius:3px;background:rgba(0,200,83,0.35);border:1px solid #00c853"></span> Resultado mensal</span><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:20px;height:0;border-top:2px dashed #ff8c00"></span> Média mensal</span></div>
-          <div style="position:relative;height:240px"><canvas id="black-chart-comp"></canvas></div>
+          <div style="display:flex;gap:20px;font-size:11px;color:var(--text3);margin-bottom:14px;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:18px;height:2.5px;background:#fff;border-radius:2px"></span> Acumulado</span><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:10px;border-radius:3px;background:rgba(56,189,248,0.4);border:1px solid rgba(56,189,248,0.7)"></span> Resultado mensal</span><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:18px;height:0;border-top:1.5px dashed rgba(255,255,255,0.3)"></span> Média mensal</span></div>
+          <div style="position:relative;height:260px"><canvas id="black-chart-comp"></canvas></div>
         </div>
 
         <!-- Tabela mensal -->
@@ -3961,12 +3993,67 @@ function renderBlackDetalhe(){
   var patrimonio=cli?(cli.custodiaRF||0)+(cli.custodiaRV||0):0;
   var retorno=patrimonio?((totalAcum/patrimonio)*100):0;
 
+  // Calcular métricas avançadas: melhor/pior mês, drawdown, variação
+  var mesAgg={},mesOrd=[];
+  allOps.forEach(function(op){
+    var k=op.ano+'-'+String(op.mes).padStart(2,'0');
+    if(!mesAgg[k]){mesAgg[k]={saldo:0,label:MESES[op.mes-1]+'/'+op.ano};mesOrd.push(k);}
+    mesAgg[k].saldo+=(op.vendas||0)-(op.compras||0);
+  });
+  mesOrd.sort();
+  var melhorVal=-Infinity,piorVal=Infinity,melhorLabel='',piorLabel='';
+  var peakAcum=0,maxDD=0,ddLabel='',runAcumDD=0;
+  var saldosPorMes=[];
+  mesOrd.forEach(function(k){
+    var m=mesAgg[k];
+    saldosPorMes.push({saldo:m.saldo,label:m.label});
+    if(m.saldo>melhorVal){melhorVal=m.saldo;melhorLabel=m.label;}
+    if(m.saldo<piorVal){piorVal=m.saldo;piorLabel=m.label;}
+    runAcumDD+=m.saldo;
+    if(runAcumDD>peakAcum) peakAcum=runAcumDD;
+    var dd=peakAcum>0?(runAcumDD-peakAcum)/peakAcum*100:0;
+    if(dd<maxDD){maxDD=dd;ddLabel=m.label;}
+  });
+  if(melhorVal===-Infinity) melhorVal=0;
+  if(piorVal===Infinity) piorVal=0;
+
+  // Variação mês-a-mês (último mês vs anterior)
+  var lastSaldo=saldosPorMes.length>=1?saldosPorMes[saldosPorMes.length-1].saldo:0;
+  var prevSaldo=saldosPorMes.length>=2?saldosPorMes[saldosPorMes.length-2].saldo:0;
+  var varPct=prevSaldo!==0?((lastSaldo-prevSaldo)/Math.abs(prevSaldo)*100):0;
+  var varArrow=varPct>=0?'<span style="color:#38bdf8">▲ '+Math.abs(varPct).toFixed(1)+'%</span>':'<span style="color:#ff8c00">▼ '+Math.abs(varPct).toFixed(1)+'%</span>';
+  var varLabel=saldosPorMes.length>=2?' vs mês anterior':'';
+
   document.getElementById('black-cli-acumulado').textContent=blackHideValores?'R$ ●●●●':fmtFull(totalAcum);
-  document.getElementById('black-cli-acumulado').style.color=totalAcum>=0?'#00c853':'#ff8c00';
   document.getElementById('black-cli-media').textContent=blackHideValores?'R$ ●●●●':fmtFull(media);
   document.getElementById('black-cli-retorno').textContent=blackHideValores?'●●%':fmtPct(retorno);
-  document.getElementById('black-cli-retorno').style.color=retorno>=0?'#7c3aed':'#ff8c00';
-  document.getElementById('black-cli-patrimonio').textContent=blackHideValores?'R$ ●●●●':fmtFull(patrimonio);
+
+  // Variação arrows
+  var elAcumVar=document.getElementById('black-cli-acumulado-var');
+  if(elAcumVar) elAcumVar.innerHTML=blackHideValores?'':varArrow+' <span style="color:var(--text3);font-size:10px">'+varLabel+'</span>';
+  var elMediaVar=document.getElementById('black-cli-media-var');
+  if(elMediaVar&&saldosPorMes.length>=2){
+    var prevMedia=saldosPorMes.length>=2?(totalAcum-lastSaldo)/(mesesCount-1||1):0;
+    var mediaVarPct=prevMedia!==0?((media-prevMedia)/Math.abs(prevMedia)*100):0;
+    var mArrow=mediaVarPct>=0?'<span style="color:#38bdf8">▲ '+Math.abs(mediaVarPct).toFixed(1)+'%</span>':'<span style="color:#ff8c00">▼ '+Math.abs(mediaVarPct).toFixed(1)+'%</span>';
+    elMediaVar.innerHTML=blackHideValores?'':mArrow;
+  } else if(elMediaVar){ elMediaVar.innerHTML=''; }
+  var elRetVar=document.getElementById('black-cli-retorno-var');
+  if(elRetVar) elRetVar.innerHTML='';
+
+  // Novos KPIs
+  var elMelhor=document.getElementById('black-cli-melhor');
+  if(elMelhor) elMelhor.textContent=blackHideValores?'R$ ●●●●':(saldosPorMes.length?fmtFull(melhorVal):'—');
+  var elMelhorLbl=document.getElementById('black-cli-melhor-label');
+  if(elMelhorLbl) elMelhorLbl.textContent=blackHideValores?'':melhorLabel;
+  var elPior=document.getElementById('black-cli-pior');
+  if(elPior) elPior.textContent=blackHideValores?'R$ ●●●●':(saldosPorMes.length?fmtFull(piorVal):'—');
+  var elPiorLbl=document.getElementById('black-cli-pior-label');
+  if(elPiorLbl) elPiorLbl.textContent=blackHideValores?'':piorLabel;
+  var elDD=document.getElementById('black-cli-drawdown');
+  if(elDD) elDD.textContent=blackHideValores?'●●%':(saldosPorMes.length?maxDD.toFixed(2)+'%':'—');
+  var elDDLbl=document.getElementById('black-cli-drawdown-label');
+  if(elDDLbl) elDDLbl.textContent=blackHideValores?'':(ddLabel?'desde '+ddLabel:'');
 
   // Chart — agrupado por mês (sem IBOV/CDI)
   if(blackCompChart) blackCompChart.destroy();
@@ -3999,15 +4086,15 @@ function renderBlackDetalhe(){
     });
     var mediaVal=media;
     mediaLine=labels.map(function(){return Number(mediaVal.toFixed(2));});
-    var barCols=saldosMensais.map(function(v){return v>=0?'rgba(0,200,83,0.3)':'rgba(255,140,0,0.2)';});
-    var barBords=saldosMensais.map(function(v){return v>=0?'#00c853':'#ff8c00';});
+    var barCols=saldosMensais.map(function(v){return v>=0?'rgba(56,189,248,0.35)':'rgba(255,140,0,0.25)';});
+    var barBords=saldosMensais.map(function(v){return v>=0?'rgba(56,189,248,0.7)':'rgba(255,140,0,0.6)';});
 
     blackCompChart=new Chart(ctx.getContext('2d'),{
       type:'bar',
       data:{labels:labels,datasets:[
-        {type:'bar',label:'Resultado Mensal',data:saldosMensais,backgroundColor:barCols,borderColor:barBords,borderWidth:1,borderRadius:6,barPercentage:0.55,yAxisID:'yBars',order:3},
-        {type:'line',label:'Média Mensal',data:mediaLine,borderColor:'rgba(255,140,0,0.5)',borderWidth:1.5,pointRadius:0,borderDash:[6,3],fill:false,tension:0,yAxisID:'yBars',order:2},
-        {type:'line',label:'DMF Acumulado (R$)',data:dmfData,borderColor:'#ff8c00',backgroundColor:'rgba(255,140,0,0.06)',tension:.35,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#ff8c00',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2,fill:true,borderWidth:2.5,yAxisID:'yAcum',order:1}
+        {type:'bar',label:'Resultado Mensal',data:saldosMensais,backgroundColor:barCols,borderColor:barBords,borderWidth:1,borderRadius:5,barPercentage:0.5,categoryPercentage:0.7,yAxisID:'yBars',order:3},
+        {type:'line',label:'Média Mensal',data:mediaLine,borderColor:'rgba(255,255,255,0.2)',borderWidth:1,pointRadius:0,borderDash:[5,4],fill:false,tension:0,yAxisID:'yBars',order:2},
+        {type:'line',label:'DMF Acumulado (R$)',data:dmfData,borderColor:'rgba(255,255,255,0.9)',backgroundColor:'rgba(255,255,255,0.04)',tension:.4,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'rgba(255,255,255,0.4)',pointHoverBorderWidth:3,fill:true,borderWidth:2,yAxisID:'yAcum',order:1}
       ]},
       options:{
         responsive:true,
@@ -4017,12 +4104,14 @@ function renderBlackDetalhe(){
           tooltip:{
             mode:'index',
             intersect:false,
-            backgroundColor:'rgba(12,12,14,0.95)',
-            borderColor:'rgba(255,140,0,0.2)',
+            backgroundColor:'rgba(20,20,24,0.96)',
+            borderColor:'rgba(255,255,255,0.08)',
             borderWidth:1,
             titleFont:{family:'Inter,sans-serif',weight:'600',size:12},
+            titleColor:'rgba(255,255,255,0.95)',
             bodyFont:{family:'Inter,sans-serif',size:11},
-            padding:{top:10,right:14,bottom:10,left:14},
+            bodyColor:'rgba(255,255,255,0.7)',
+            padding:{top:12,right:16,bottom:12,left:16},
             cornerRadius:10,
             displayColors:true,
             boxWidth:8,
@@ -4041,12 +4130,12 @@ function renderBlackDetalhe(){
           }
         },
         scales:{
-          x:{ticks:{color:'var(--text3)',font:{family:'Inter,sans-serif',size:10},maxRotation:0,autoSkip:true,maxTicksLimit:12},grid:{display:false},border:{display:false}},
-          yAcum:{type:'linear',position:'left',ticks:{color:'#ff8c00',font:{family:'Inter,sans-serif',size:9},callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(0)+'k':v.toFixed(0));}},grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},border:{display:false}},
-          yBars:{type:'linear',position:'right',ticks:{color:'var(--text3)',font:{family:'Inter,sans-serif',size:9},callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(1)+'k':v.toFixed(0));}},grid:{display:false},border:{display:false}}
+          x:{ticks:{color:'rgba(255,255,255,0.35)',font:{family:'Inter,sans-serif',size:10,weight:'400'},maxRotation:0,autoSkip:true,maxTicksLimit:10,padding:6},grid:{display:false},border:{display:false}},
+          yAcum:{type:'linear',position:'left',ticks:{color:'rgba(255,255,255,0.3)',font:{family:'Inter,sans-serif',size:9},padding:8,callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(0)+'k':v.toFixed(0));}},grid:{color:'rgba(255,255,255,0.04)',lineWidth:1},border:{display:false}},
+          yBars:{type:'linear',position:'right',ticks:{display:false},grid:{display:false},border:{display:false}}
         },
         interaction:{intersect:false,mode:'index'},
-        layout:{padding:{top:4,right:4}}
+        layout:{padding:{top:8,right:8,bottom:4,left:0}}
       }
     });
     window._blackChartRef=blackCompChart;
@@ -4106,14 +4195,14 @@ function renderBlackDetalhe(){
     var acumPct=patrimonio?fmtPct(acumVal/patrimonio*100):'—';
 
     tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#00c853':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(saldo))+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--blue)">'+(blackHideValores?'R$ ●●●●':fmtFull(op.carteiraTotal||0))+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'#00c853':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(acumVal))+'</td>'
-      +'<td style="font-size:12px;color:'+(saldo>=0?'#00c853':'#ff8c00')+'">'+dmfPct+'</td>'
-      +'<td style="font-size:12px;color:#00c853">'+ibovPct+'</td>'
-      +'<td style="font-size:12px;color:#f59e0b">'+cdiPct+'</td>'
-      +'<td style="font-size:12px;color:#c084fc">'+acumPct+'</td>'
-      +'<td><span style="font-size:10px;padding:2px 8px;border-radius:12px;background:'+(op.tipo==='detalhado'?'#ff8c0022':op.tipo==='nota'?'#00c85322':'#c084fc22')+';color:'+(op.tipo==='detalhado'?'#ff8c00':op.tipo==='nota'?'#00c853':'#c084fc')+';font-weight:700">'+(op.tipo==='detalhado'?'Detalhado':op.tipo==='nota'?'Nota':'Simples')+'</span></td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(saldo>=0?'#38bdf8':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(saldo))+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+(blackHideValores?'R$ ●●●●':fmtFull(op.carteiraTotal||0))+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumVal>=0?'rgba(255,255,255,0.9)':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(acumVal))+'</td>'
+      +'<td style="font-size:12px;color:'+(saldo>=0?'#38bdf8':'#ff8c00')+'">'+dmfPct+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">'+ibovPct+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">'+cdiPct+'</td>'
+      +'<td style="font-size:12px;color:#a78bfa">'+acumPct+'</td>'
+      +'<td><span style="font-size:10px;padding:3px 10px;border-radius:12px;background:'+(op.tipo==='detalhado'?'rgba(255,140,0,0.1)':op.tipo==='nota'?'rgba(56,189,248,0.1)':'rgba(167,139,250,0.1)')+';color:'+(op.tipo==='detalhado'?'#ff8c00':op.tipo==='nota'?'#38bdf8':'#a78bfa')+';font-weight:600;letter-spacing:.3px">'+(op.tipo==='detalhado'?'Detalhado':op.tipo==='nota'?'Nota':'Simples')+'</span></td>'
       +'<td></td>';
 
     var td=tr.lastElementChild;
@@ -4129,6 +4218,30 @@ function renderBlackDetalhe(){
     div.appendChild(eb);div.appendChild(db2);td.appendChild(div);
     tb.appendChild(tr);
   });
+
+  // Linha de totalização
+  if(opsComCalc.length){
+    var totSaldo=0,totCart=0,totIbov=0,totCdi=0;
+    opsComCalc.forEach(function(item){totSaldo+=item.saldo;totCart+=item.carteiraTotal;totIbov+=item.ibovNum;totCdi+=item.cdiNum;});
+    var avgSaldo=totSaldo/opsComCalc.length;
+    var avgIbov=totIbov/opsComCalc.length;
+    var avgCdi=totCdi/opsComCalc.length;
+    var lastAcum=opsComCalc.length?opsComCalc[opsComCalc.length-1].acumVal:0;
+    var totDmfPct=patrimonio?fmtPct(totSaldo/patrimonio*100):'—';
+    var totAcumPct=patrimonio?fmtPct(lastAcum/patrimonio*100):'—';
+    var trTot=document.createElement('tr');
+    trTot.style='background:rgba(255,255,255,0.03);border-top:2px solid var(--border);font-weight:600';
+    trTot.innerHTML='<td style="font-weight:700;color:var(--white);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Total / Média</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:'+(totSaldo>=0?'#38bdf8':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(totSaldo)+' <span style="font-size:10px;color:var(--text3);font-weight:400">(Σ) </span><span style="font-size:10px;color:var(--text3);font-weight:400">μ '+fmtFull(avgSaldo)+'</span>')+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--text2)">'+(blackHideValores?'R$ ●●●●':'')+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(totalAcum>=0?'rgba(255,255,255,0.9)':'#ff8c00')+'">'+(blackHideValores?'R$ ●●●●':fmtFull(totalAcum))+'</td>'
+      +'<td style="font-size:12px;color:'+(totSaldo>=0?'#38bdf8':'#ff8c00')+'">'+totDmfPct+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">μ '+fmtPct(avgIbov)+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">μ '+fmtPct(avgCdi)+'</td>'
+      +'<td style="font-size:12px;color:#a78bfa">'+totAcumPct+'</td>'
+      +'<td></td>';
+    tb.appendChild(trTot);
+  }
 
   // Registrar click nos headers (uma vez só)
   if(!window._blackSortBound){
@@ -7465,17 +7578,20 @@ function buildMinhasOperacoesView(){
     +'<button class="btn-primary" onclick="abrirLancamentoCliente(\'nota\')" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Nota de Corretagem</button>'
     +'</div></div>'
     +'<div class="page-content">'
-    +'<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">'
-    +'<div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-acumulado" style="font-size:20px;font-weight:700">R$0</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Acumulado Total</div></div><div class="kpi-accent" style="background:#00c853"></div></div>'
-    +'<div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-media" style="font-size:20px;font-weight:700">R$0</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Média Mensal</div></div><div class="kpi-accent" style="background:#ff8c00"></div></div>'
-    +'<div class="kpi-card" style="position:relative;overflow:hidden"><div style="margin-bottom:10px"><div class="kpi-val" id="mo-retorno" style="font-size:20px;font-weight:700">0%</div><div class="kpi-label" style="font-size:11px;letter-spacing:.3px;text-transform:uppercase;opacity:.7">Retorno s/ Patrimônio</div></div><div class="kpi-accent" style="background:#7c3aed"></div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado Total</div><div class="kpi-val" id="mo-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$0</div><div id="mo-acumulado-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Média Mensal</div><div class="kpi-val" id="mo-media" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$0</div><div id="mo-media-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Retorno s/ Patrimônio</div><div class="kpi-val" id="mo-retorno" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">0%</div><div id="mo-retorno-var" style="font-size:11px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#a78bfa,#a78bfa44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Melhor Mês</div><div class="kpi-val" id="mo-melhor" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div><div id="mo-melhor-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Pior Mês</div><div class="kpi-val" id="mo-pior" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div><div id="mo-pior-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Max Drawdown</div><div class="kpi-val" id="mo-drawdown" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">—</div><div id="mo-drawdown-label" style="font-size:10px;margin-top:4px;color:var(--text3)"></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#64748b,#64748b44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'</div>'
     +'<div class="card" style="margin-bottom:20px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">'
     +'<div class="section-title" style="margin:0">Desempenho DMF</div>'
     +'</div>'
-    +'<div style="display:flex;gap:16px;font-size:11px;color:var(--text3);margin-bottom:12px;align-items:center"><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:20px;height:2px;background:#ff8c00;border-radius:1px"></span> Acumulado</span><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:10px;border-radius:3px;background:rgba(0,200,83,0.35);border:1px solid #00c853"></span> Resultado mensal</span><span style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-block;width:20px;height:0;border-top:2px dashed #ff8c00"></span> Média mensal</span></div>'
-    +'<div style="position:relative;height:240px"><canvas id="mo-chart"></canvas></div></div>'
+    +'<div style="display:flex;gap:20px;font-size:11px;color:var(--text3);margin-bottom:14px;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:18px;height:2.5px;background:#fff;border-radius:2px"></span> Acumulado</span><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:10px;border-radius:3px;background:rgba(56,189,248,0.4);border:1px solid rgba(56,189,248,0.7)"></span> Resultado mensal</span><span style="display:inline-flex;align-items:center;gap:5px"><span style="display:inline-block;width:18px;height:0;border-top:1.5px dashed rgba(255,255,255,0.3)"></span> Média mensal</span></div>'
+    +'<div style="position:relative;height:260px"><canvas id="mo-chart"></canvas></div></div>'
     +'<div class="card"><div class="section-title">Histórico Mensal</div>'
     +'<div class="table-wrap" style="border:none"><table id="mo-table-full">'
     +'<thead><tr>'
@@ -7567,11 +7683,11 @@ function loadMinhasOperacoes(){
       if(tbody){
         var tr=document.createElement('tr');
         tr.innerHTML='<td style="font-weight:600;color:var(--white)">'+MESES[op.mes-1]+'/'+op.ano+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:'+(saldo>=0?'#00c853':'#ff8c00')+'">'+fmtFull(saldo)+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:#ff8c00;font-size:12px">'+fmtFull(custos)+'</td>'
-          +'<td style="font-family:DM Mono,monospace;color:var(--blue);font-weight:600">'+fmtFull(liq)+'</td>'
-          +'<td style="font-size:12px;color:'+(saldo>=0?'#00c853':'#ff8c00')+'">'+pctMes+'</td>'
-          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumV>=0?'#00c853':'#ff8c00')+'">'+fmtFull(acumV)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:'+(saldo>=0?'#38bdf8':'#ff8c00')+'">'+fmtFull(saldo)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:var(--text3);font-size:12px">'+fmtFull(custos)+'</td>'
+          +'<td style="font-family:DM Mono,monospace;color:var(--text2);font-weight:600">'+fmtFull(liq)+'</td>'
+          +'<td style="font-size:12px;color:'+(saldo>=0?'#38bdf8':'#ff8c00')+'">'+pctMes+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acumV>=0?'rgba(255,255,255,0.9)':'#ff8c00')+'">'+fmtFull(acumV)+'</td>'
           +'<td style="text-align:center;white-space:nowrap">'
           +'<button class="btn-edit-op" style="padding:4px 10px;font-size:11px;background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;border-radius:6px;cursor:pointer;margin-right:4px" data-opid="'+op.id+'">Editar</button>'
           +'<button class="btn-del-op" style="padding:4px 10px;font-size:11px;background:#ff8c0022;color:#ff8c00;border:1px solid #ff8c0044;border-radius:6px;cursor:pointer" data-opid="'+op.id+'">Excluir</button>'
@@ -7593,6 +7709,24 @@ function loadMinhasOperacoes(){
       }
     });
 
+    // Linha de totalização (cliente)
+    if(tbody&&sortedMo.length){
+      var moTotSaldo=0,moTotCustos=0,moTotLiq=0;
+      sortedMo.forEach(function(item){moTotSaldo+=item.saldo;moTotCustos+=item.custos;moTotLiq+=item.liq;});
+      var moAvgSaldo=moTotSaldo/sortedMo.length;
+      var moTotPctMes=pat?fmtPct(moTotSaldo/pat*100):'—';
+      var trTotMo=document.createElement('tr');
+      trTotMo.style='background:rgba(255,255,255,0.03);border-top:2px solid var(--border);font-weight:600';
+      trTotMo.innerHTML='<td style="font-weight:700;color:var(--white);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Total / Média</td>'
+        +'<td style="font-family:DM Mono,monospace;color:'+(moTotSaldo>=0?'#38bdf8':'#ff8c00')+'">'+fmtFull(moTotSaldo)+' <span style="font-size:10px;color:var(--text3);font-weight:400">μ '+fmtFull(moAvgSaldo)+'</span></td>'
+        +'<td style="font-family:DM Mono,monospace;color:var(--text3);font-size:12px">'+fmtFull(moTotCustos)+'</td>'
+        +'<td style="font-family:DM Mono,monospace;color:var(--text2);font-weight:600">'+fmtFull(moTotLiq)+'</td>'
+        +'<td style="font-size:12px;color:'+(moTotSaldo>=0?'#38bdf8':'#ff8c00')+'">'+moTotPctMes+'</td>'
+        +'<td style="font-family:DM Mono,monospace;font-weight:700;color:'+(acum>=0?'rgba(255,255,255,0.9)':'#ff8c00')+'">'+fmtFull(acum)+'</td>'
+        +'<td></td>';
+      tbody.appendChild(trTotMo);
+    }
+
     // Registrar click nos headers do cliente (uma vez só)
     if(!window._moSortBound){
       window._moSortBound = true;
@@ -7613,12 +7747,67 @@ function loadMinhasOperacoes(){
     // KPIs
     var media = totalMeses?acum/totalMeses:0;
     var retorno = pat?(acum/pat*100).toFixed(2):0;
-    var moAcum=document.getElementById('mo-acumulado');
-    var moMedia=document.getElementById('mo-media');
-    var moRet=document.getElementById('mo-retorno');
-    if(moAcum){moAcum.textContent=fmtFull(acum);moAcum.style.color=acum>=0?'#00c853':'#ff8c00';}
-    if(moMedia) moMedia.textContent=fmtFull(media);
-    if(moRet){moRet.textContent=retorno+'%';moRet.style.color=Number(retorno)>=0?'#7c3aed':'#ff8c00';}
+    var moAcumEl=document.getElementById('mo-acumulado');
+    var moMediaEl=document.getElementById('mo-media');
+    var moRetEl=document.getElementById('mo-retorno');
+    if(moAcumEl) moAcumEl.textContent=fmtFull(acum);
+    if(moMediaEl) moMediaEl.textContent=fmtFull(media);
+    if(moRetEl) moRetEl.textContent=retorno+'%';
+
+    // Métricas avançadas: melhor/pior mês, drawdown, variação
+    var moMesAgg2={},moMesOrd2=[];
+    ops.forEach(function(op){
+      var k=op.ano+'-'+String(op.mes).padStart(2,'0');
+      if(!moMesAgg2[k]){moMesAgg2[k]={saldo:0,label:MESES[op.mes-1]+'/'+op.ano};moMesOrd2.push(k);}
+      moMesAgg2[k].saldo+=(op.vendas||0)-(op.compras||0);
+    });
+    moMesOrd2.sort();
+    var moMelhorVal=-Infinity,moPiorVal=Infinity,moMelhorLbl='',moPiorLbl='';
+    var moPeak=0,moMaxDD=0,moDDLbl='',moRunDD=0;
+    var moSaldosPM=[];
+    moMesOrd2.forEach(function(k){
+      var m=moMesAgg2[k];
+      moSaldosPM.push({saldo:m.saldo,label:m.label});
+      if(m.saldo>moMelhorVal){moMelhorVal=m.saldo;moMelhorLbl=m.label;}
+      if(m.saldo<moPiorVal){moPiorVal=m.saldo;moPiorLbl=m.label;}
+      moRunDD+=m.saldo;
+      if(moRunDD>moPeak) moPeak=moRunDD;
+      var dd=moPeak>0?(moRunDD-moPeak)/moPeak*100:0;
+      if(dd<moMaxDD){moMaxDD=dd;moDDLbl=m.label;}
+    });
+    if(moMelhorVal===-Infinity) moMelhorVal=0;
+    if(moPiorVal===Infinity) moPiorVal=0;
+
+    // Variação mês-a-mês
+    var moLastS=moSaldosPM.length>=1?moSaldosPM[moSaldosPM.length-1].saldo:0;
+    var moPrevS=moSaldosPM.length>=2?moSaldosPM[moSaldosPM.length-2].saldo:0;
+    var moVarPct=moPrevS!==0?((moLastS-moPrevS)/Math.abs(moPrevS)*100):0;
+    var moVarArrow=moVarPct>=0?'<span style="color:#38bdf8">▲ '+Math.abs(moVarPct).toFixed(1)+'%</span>':'<span style="color:#ff8c00">▼ '+Math.abs(moVarPct).toFixed(1)+'%</span>';
+
+    var elMoAcumVar=document.getElementById('mo-acumulado-var');
+    if(elMoAcumVar) elMoAcumVar.innerHTML=moSaldosPM.length>=2?moVarArrow+' <span style="color:var(--text3);font-size:10px">vs mês anterior</span>':'';
+    var elMoMediaVar=document.getElementById('mo-media-var');
+    if(elMoMediaVar&&moSaldosPM.length>=2){
+      var moPrevMedia=(acum-moLastS)/(totalMeses-1||1);
+      var moMVarPct=moPrevMedia!==0?((media-moPrevMedia)/Math.abs(moPrevMedia)*100):0;
+      var moMArr=moMVarPct>=0?'<span style="color:#38bdf8">▲ '+Math.abs(moMVarPct).toFixed(1)+'%</span>':'<span style="color:#ff8c00">▼ '+Math.abs(moMVarPct).toFixed(1)+'%</span>';
+      elMoMediaVar.innerHTML=moMArr;
+    } else if(elMoMediaVar){ elMoMediaVar.innerHTML=''; }
+    var elMoRetVar=document.getElementById('mo-retorno-var');
+    if(elMoRetVar) elMoRetVar.innerHTML='';
+
+    var elMoMelhor=document.getElementById('mo-melhor');
+    if(elMoMelhor) elMoMelhor.textContent=moSaldosPM.length?fmtFull(moMelhorVal):'—';
+    var elMoMelhorLbl=document.getElementById('mo-melhor-label');
+    if(elMoMelhorLbl) elMoMelhorLbl.textContent=moMelhorLbl;
+    var elMoPior=document.getElementById('mo-pior');
+    if(elMoPior) elMoPior.textContent=moSaldosPM.length?fmtFull(moPiorVal):'—';
+    var elMoPiorLbl=document.getElementById('mo-pior-label');
+    if(elMoPiorLbl) elMoPiorLbl.textContent=moPiorLbl;
+    var elMoDD=document.getElementById('mo-drawdown');
+    if(elMoDD) elMoDD.textContent=moSaldosPM.length?moMaxDD.toFixed(2)+'%':'—';
+    var elMoDDLbl=document.getElementById('mo-drawdown-label');
+    if(elMoDDLbl) elMoDDLbl.textContent=moDDLbl?'desde '+moDDLbl:'';
 
     // Chart Combinado (cliente) — agrupado por mês
     if(moChart) moChart.destroy();
@@ -7642,15 +7831,15 @@ function loadMinhasOperacoes(){
       });
       var mediaMensal=totalMeses?acum/totalMeses:0;
       var mediaLineMo=moChLabels.map(function(){return Number(mediaMensal.toFixed(2));});
-      var barColorsMo=moChSaldos.map(function(v){return v>=0?'rgba(0,200,83,0.3)':'rgba(255,140,0,0.2)';});
-      var barBordersMo=moChSaldos.map(function(v){return v>=0?'#00c853':'#ff8c00';});
+      var barColorsMo=moChSaldos.map(function(v){return v>=0?'rgba(56,189,248,0.35)':'rgba(255,140,0,0.25)';});
+      var barBordersMo=moChSaldos.map(function(v){return v>=0?'rgba(56,189,248,0.7)':'rgba(255,140,0,0.6)';});
 
       moChart=new Chart(ctx.getContext('2d'),{
         type:'bar',
         data:{labels:moChLabels,datasets:[
-          {type:'bar',label:'Resultado Mensal',data:moChSaldos,backgroundColor:barColorsMo,borderColor:barBordersMo,borderWidth:1,borderRadius:6,barPercentage:0.55,yAxisID:'yBars',order:3},
-          {type:'line',label:'Média Mensal',data:mediaLineMo,borderColor:'rgba(255,140,0,0.5)',borderWidth:1.5,pointRadius:0,borderDash:[6,3],fill:false,tension:0,yAxisID:'yBars',order:2},
-          {type:'line',label:'DMF Acumulado (R$)',data:moChAcum,borderColor:'#ff8c00',backgroundColor:'rgba(255,140,0,0.06)',tension:.35,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#ff8c00',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2,fill:true,borderWidth:2.5,yAxisID:'yAcum',order:1}
+          {type:'bar',label:'Resultado Mensal',data:moChSaldos,backgroundColor:barColorsMo,borderColor:barBordersMo,borderWidth:1,borderRadius:5,barPercentage:0.5,categoryPercentage:0.7,yAxisID:'yBars',order:3},
+          {type:'line',label:'Média Mensal',data:mediaLineMo,borderColor:'rgba(255,255,255,0.2)',borderWidth:1,pointRadius:0,borderDash:[5,4],fill:false,tension:0,yAxisID:'yBars',order:2},
+          {type:'line',label:'DMF Acumulado (R$)',data:moChAcum,borderColor:'rgba(255,255,255,0.9)',backgroundColor:'rgba(255,255,255,0.04)',tension:.4,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'rgba(255,255,255,0.4)',pointHoverBorderWidth:3,fill:true,borderWidth:2,yAxisID:'yAcum',order:1}
         ]},
         options:{
           responsive:true,
@@ -7660,12 +7849,14 @@ function loadMinhasOperacoes(){
             tooltip:{
               mode:'index',
               intersect:false,
-              backgroundColor:'rgba(12,12,14,0.95)',
-              borderColor:'rgba(255,140,0,0.2)',
+              backgroundColor:'rgba(20,20,24,0.96)',
+              borderColor:'rgba(255,255,255,0.08)',
               borderWidth:1,
               titleFont:{family:'Inter,sans-serif',weight:'600',size:12},
+              titleColor:'rgba(255,255,255,0.95)',
               bodyFont:{family:'Inter,sans-serif',size:11},
-              padding:{top:10,right:14,bottom:10,left:14},
+              bodyColor:'rgba(255,255,255,0.7)',
+              padding:{top:12,right:16,bottom:12,left:16},
               cornerRadius:10,
               displayColors:true,
               boxWidth:8,
@@ -7684,12 +7875,12 @@ function loadMinhasOperacoes(){
             }
           },
           scales:{
-            x:{ticks:{color:'var(--text3)',font:{family:'Inter,sans-serif',size:10},maxRotation:0,autoSkip:true,maxTicksLimit:12},grid:{display:false},border:{display:false}},
-            yAcum:{type:'linear',position:'left',ticks:{color:'#ff8c00',font:{family:'Inter,sans-serif',size:9},callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(0)+'k':v.toFixed(0));}},grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},border:{display:false}},
-            yBars:{type:'linear',position:'right',ticks:{color:'var(--text3)',font:{family:'Inter,sans-serif',size:9},callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(1)+'k':v.toFixed(0));}},grid:{display:false},border:{display:false}}
+            x:{ticks:{color:'rgba(255,255,255,0.35)',font:{family:'Inter,sans-serif',size:10,weight:'400'},maxRotation:0,autoSkip:true,maxTicksLimit:10,padding:6},grid:{display:false},border:{display:false}},
+            yAcum:{type:'linear',position:'left',ticks:{color:'rgba(255,255,255,0.3)',font:{family:'Inter,sans-serif',size:9},padding:8,callback:function(v){return 'R$'+(v>=1000||v<=-1000?(v/1000).toFixed(0)+'k':v.toFixed(0));}},grid:{color:'rgba(255,255,255,0.04)',lineWidth:1},border:{display:false}},
+            yBars:{type:'linear',position:'right',ticks:{display:false},grid:{display:false},border:{display:false}}
           },
           interaction:{intersect:false,mode:'index'},
-          layout:{padding:{top:4,right:4}}
+          layout:{padding:{top:8,right:8,bottom:4,left:0}}
         }
       });
       window._moChartRef=moChart;
