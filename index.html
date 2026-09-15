@@ -85,7 +85,10 @@ body.light-mode .prof-card{background:var(--card);border-color:var(--border);box
 body.light-mode .check-item{background:var(--card2);border-color:var(--border)}
 body.light-mode .noticia-card{background:var(--card);border-color:var(--border);box-shadow:var(--shadow)}
 body.light-mode .card{box-shadow:var(--shadow)}
-body.light-mode .dmf-logo-img{filter:brightness(0) saturate(100%) invert(40%) sepia(80%) saturate(500%) hue-rotate(190deg) brightness(90%);}
+body.light-mode .dmf-logo-img{filter:brightness(0) saturate(100%) invert(40%) sepia(80%) saturate(500%) hue-rotate(190deg) brightness(90%)}
+body.light-mode #sidebar-toggle-btn{color:var(--text3);border-color:var(--border)}
+body.light-mode #sidebar-toggle-btn:hover{color:var(--text);border-color:var(--border2);background:var(--card2)}
+body.light-mode .sidebar.collapsed .nav-section{background:var(--border)}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -153,6 +156,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
   position:relative;overflow:hidden;
+  transition:width .25s cubic-bezier(.4,0,.2,1),min-width .25s cubic-bezier(.4,0,.2,1);
 }
 .sidebar::after{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
@@ -193,6 +197,38 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .user-email{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .btn-sair{width:100%;background:none;color:var(--text3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;letter-spacing:.01em}
 .btn-sair:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ─── SIDEBAR COLLAPSED ────────────────── */
+.sidebar.collapsed{width:64px;min-width:64px}
+.sidebar.collapsed .sidebar-logo{padding:16px 10px;justify-content:center;gap:0}
+.sidebar.collapsed .sidebar-brand-text{display:none}
+.sidebar.collapsed .sidebar-logo .dmf-logo-img{height:28px}
+.sidebar.collapsed #logo-fallback-sidebar{font-size:14px}
+.sidebar.collapsed .sidebar-collapse-row{justify-content:center;padding:4px 8px 0}
+.sidebar.collapsed #sidebar-toggle-btn svg{transform:rotate(180deg)}
+.sidebar.collapsed .sidebar-nav{padding:10px 8px}
+.sidebar.collapsed .nav-section{font-size:0;height:1px;background:var(--border);padding:0;margin:10px 6px 6px;border-radius:1px;overflow:hidden;letter-spacing:0}
+.sidebar.collapsed .nav-item{justify-content:center;padding:10px;gap:0}
+.sidebar.collapsed .nav-item span:not(.icon){display:none}
+.sidebar.collapsed .nav-item.active::before{display:none}
+.sidebar.collapsed .sidebar-footer{padding:10px 8px}
+.sidebar.collapsed .user-chip{justify-content:center;gap:0;padding:10px}
+.sidebar.collapsed .user-email{display:none}
+.sidebar.collapsed #user-chip-perfil{display:none}
+.sidebar.collapsed #theme-toggle #theme-label{display:none}
+.sidebar.collapsed #theme-toggle{gap:0;padding:8px}
+.sidebar.collapsed .sair-label{display:none}
+.sidebar.collapsed .btn-sair{display:flex;align-items:center;justify-content:center}
+
+/* ─── DASHBOARD TABS (Warren-style) ───── */
+.mc-tab-bar{display:flex;gap:2px;background:var(--card2);border-radius:var(--radius);padding:3px;margin-bottom:20px;border:1px solid var(--border)}
+.mc-tab{flex:1;background:none;border:none;border-radius:calc(var(--radius) - 2px);padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;letter-spacing:-.01em}
+.mc-tab.active{background:var(--card);color:var(--white);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.mc-tab:hover:not(.active){color:var(--text2);background:rgba(255,255,255,.04)}
+body.light-mode .mc-tab:hover:not(.active){background:rgba(0,0,0,.03)}
+body.light-mode .mc-tab.active{box-shadow:var(--shadow)}
+.mc-tab-panel{display:none}
+.mc-tab-panel.active{display:block}
 
 /* ─── MAIN ─────────────────────────────── */
 .main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg)}
@@ -390,8 +426,9 @@ textarea.form-input{resize:vertical;min-height:80px}
 @media(max-width:900px){
   .sidebar{width:64px;min-width:64px}
   .sidebar .nav-item.active::before{display:none}
-  .sidebar-logo span:not(.dmf-logo-sm),.nav-item span:not(.icon),.user-email,.sidebar-tagline{display:none}
+  .sidebar-logo span:not(.dmf-logo-sm),.nav-item span:not(.icon),.user-email,.sidebar-tagline,.sidebar-brand-text,.sair-label{display:none}
   .nav-item{justify-content:center;padding:12px}
+  .sidebar-collapse-row{display:none!important}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .charts-grid,.grid-2{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
@@ -544,10 +581,13 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div id="logo-fallback-sidebar" class="dmf-logo-sm" style="display:none">
         <span class="dmf-logo-bracket">[</span>D<span class="dmf-logo-icon" style="background:var(--blue);width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="12,2 24,8 12,14 0,8" fill="white"/></svg></span>F<span class="dmf-logo-bracket">]</span><span class="dmf-logo-sup" style="font-size:10px;vertical-align:super;color:var(--blue);font-weight:700">3</span>
       </div>
-      <div style="flex:1">
+      <div class="sidebar-brand-text" style="flex:1">
         <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white)">DMF</div>
         <div class="sidebar-tagline">Gestão Patrimonial</div>
       </div>
+    </div>
+    <div class="sidebar-collapse-row" style="padding:4px 12px 0;display:flex;justify-content:flex-end">
+      <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Minimizar menu" style="background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);transition:all .2s;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section">Principal</div>
@@ -587,7 +627,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="btn-ghost" id="theme-toggle" onclick="toggleTheme()" style="width:100%;margin-bottom:8px;justify-content:center;display:flex;align-items:center;gap:6px;font-size:12px">
         <span id="theme-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span id="theme-label">Claro</span>
       </button>
-      <button class="btn-sair" onclick="firebase.auth().signOut()">↩ Sair</button>
+      <button class="btn-sair" onclick="firebase.auth().signOut()"><span class="sair-icon">↩</span><span class="sair-label"> Sair</span></button>
     </div>
   </div>
 
@@ -5871,7 +5911,9 @@ function toggleTheme(){
 function updateThemeBtn(isLight){
   var icon = document.getElementById('theme-icon');
   var label = document.getElementById('theme-label');
-  if(icon) icon.textContent = isLight ? '◑' : '○';
+  if(icon) icon.innerHTML = isLight
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
   if(label) label.textContent = isLight ? 'Escuro' : 'Claro';
 }
 // Apply saved theme on load
@@ -5880,6 +5922,30 @@ function updateThemeBtn(isLight){
   if(saved === 'light'){
     document.body.classList.add('light-mode');
     updateThemeBtn(true);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR COLAPSÁVEL
+// ═══════════════════════════════════════════════════════════
+function toggleSidebar(){
+  var sidebar = document.getElementById('main-sidebar');
+  if(!sidebar) return;
+  var isCollapsed = sidebar.classList.toggle('collapsed');
+  localStorage.setItem('dmf-sidebar-collapsed', isCollapsed ? '1' : '0');
+  var btn = document.getElementById('sidebar-toggle-btn');
+  if(btn) btn.title = isCollapsed ? 'Expandir menu' : 'Minimizar menu';
+}
+// Apply saved sidebar state on load
+(function(){
+  var saved = localStorage.getItem('dmf-sidebar-collapsed');
+  if(saved === '1'){
+    var sidebar = document.getElementById('main-sidebar');
+    if(sidebar){
+      sidebar.classList.add('collapsed');
+      var btn = document.getElementById('sidebar-toggle-btn');
+      if(btn) btn.title = 'Expandir menu';
+    }
   }
 })();
 
@@ -7357,7 +7423,7 @@ function _ensureClienteVinculado(callback){
 var PERFIL_MENUS = {
   adm: ['clientes','cliente-detalhe','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
   gestor: ['clientes','cliente-detalhe','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
-  cliente: ['minha-carteira','minha-conta','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
+  cliente: ['minha-carteira','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -7537,9 +7603,8 @@ function showClientePortal(){
       return d;
     }
 
-    clienteNav.appendChild(mkSec('Minha Conta'));
-    clienteNav.appendChild(mkBtn('cnav-carteira','minha-carteira','Minha Carteira',true));
-    clienteNav.appendChild(mkBtn('cnav-conta','minha-conta','Minha Conta',false));
+    clienteNav.appendChild(mkSec('Principal'));
+    clienteNav.appendChild(mkBtn('cnav-carteira','minha-carteira','Dashboard',true));
     clienteNav.appendChild(mkSec('DMF Black'));
     clienteNav.appendChild(mkBtn('cnav-operacoes','minhas-operacoes','Operações',false));
     clienteNav.appendChild(mkBtn('cnav-agendamento','agendamento','Agendamento',false));
@@ -7564,7 +7629,7 @@ function showClientePortal(){
   });
 
   if(!document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
-  if(!document.getElementById('view-minha-conta')) buildMinhaContaView();
+  // Minha Conta is now embedded in the Dashboard "Dados" tab — no separate view needed
   if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
   if(!document.getElementById('view-chamados')) buildChamadosView();
   if(!document.getElementById('view-materiais-cliente')) buildMateriaisClienteView();
@@ -7609,13 +7674,21 @@ function buildMinhaCarteiraView(){
   var div = document.createElement('div');
   div.className = 'view';
   div.id = 'view-minha-carteira';
-  div.innerHTML = '<div class="page-header"><div><div class="page-title">Minha Carteira</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div>'
+  div.innerHTML = '<div class="page-header"><div><div class="page-title">Meu Dashboard</div><div class="page-sub" id="mc-sub">Bem-vindo!</div></div>'
     +'<div style="display:flex;gap:8px;align-items:center">'
-    +'<button class="btn-secondary" id="btn-analise-carteira" onclick="abrirAnaliseCarteira()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analisar Carteira</button>'
-    +'<button class="btn-secondary" id="mc-toggle-valores" onclick="toggleClienteValores()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ocultar Valores</button>'
-    +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Adicionar Ativo</button>'
+    +'<button class="btn-secondary" id="btn-analise-carteira" onclick="abrirAnaliseCarteira()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analisar</button>'
+    +'<button class="btn-secondary" id="mc-toggle-valores" onclick="toggleClienteValores()" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ocultar</button>'
+    +'<button class="btn-primary" onclick="openModalAtivoCliente()">+ Ativo</button>'
     +'</div></div>'
     +'<div class="page-content">'
+    /* ── Tab bar ── */
+    +'<div class="mc-tab-bar" id="mc-tabs">'
+    +'<button class="mc-tab active" onclick="showMcTab(\'portfolio\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Portfolio</button>'
+    +'<button class="mc-tab" onclick="showMcTab(\'extrato\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Extrato</button>'
+    +'<button class="mc-tab" onclick="showMcTab(\'dados\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Dados</button>'
+    +'</div>'
+    /* ── Portfolio tab ── */
+    +'<div class="mc-tab-panel active" id="mc-tab-portfolio">'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Valor Atualizado</div><div class="kpi-val" id="mc-patrimonio" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Valor Investido</div><div class="kpi-val" id="mc-investido" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
@@ -7623,10 +7696,138 @@ function buildMinhaCarteiraView(){
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado Black</div><div class="kpi-val" id="mc-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#64748b,#64748b44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'</div>'
     +'<div id="mc-cotacao-status" style="font-size:11px;color:var(--text3);margin-bottom:12px;display:none"></div>'
+    +'<div class="card" style="margin-bottom:16px;padding:20px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Evolução Patrimonial</div><div style="font-size:11px;color:var(--text3);margin-bottom:14px">Histórico mensal do patrimônio</div><div style="position:relative;height:220px"><canvas id="mc-evolucao-chart"></canvas></div></div>'
     +'<div id="mc-alocacao-panel" style="display:none;margin-bottom:16px"></div>'
     +'<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Meus Ativos</div><div id="mc-ativos-header-right" style="font-size:12px;color:var(--text3)"></div></div><div id="mc-ativos-list"><div style="display:flex;flex-direction:column;gap:12px"><div class="mc-skel" style="height:48px;background:var(--border);border-radius:8px;animation:mcPulse 1.2s ease-in-out infinite"></div><div class="mc-skel" style="height:48px;background:var(--border);border-radius:8px;animation:mcPulse 1.2s ease-in-out infinite;animation-delay:.2s"></div><div class="mc-skel" style="height:48px;background:var(--border);border-radius:8px;animation:mcPulse 1.2s ease-in-out infinite;animation-delay:.4s"></div></div></div></div>'
+    +'</div>'
+    /* ── Extrato tab ── */
+    +'<div class="mc-tab-panel" id="mc-tab-extrato">'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado Black</div><div class="kpi-val" id="ext-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$ 0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Média Mensal</div><div class="kpi-val" id="ext-media" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$ 0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Meses Registrados</div><div class="kpi-val" id="ext-meses" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#a78bfa,#a78bfa44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'</div>'
+    +'<div class="card" style="margin-bottom:16px;padding:20px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Desempenho DMF Black</div><div style="font-size:11px;color:var(--text3);margin-bottom:14px">Resultado mensal + acumulado</div><div style="position:relative;height:220px"><canvas id="ext-chart"></canvas></div></div>'
+    +'<div class="card"><div class="section-title">Histórico Mensal</div><div class="table-wrap" style="border:none"><table id="ext-table"><thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>Acumulado</th></tr></thead><tbody id="ext-tbody"></tbody></table></div></div>'
+    +'</div>'
+    /* ── Dados tab ── */
+    +'<div class="mc-tab-panel" id="mc-tab-dados">'
+    +'<div class="card" style="padding:24px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px"><div style="font-size:15px;font-weight:700;color:var(--text)">Meus Dados</div><button class="btn-primary" onclick="salvarMinhaConta()" style="padding:6px 16px;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button></div>'
+    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Dados Pessoais</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group form-full"><label>Nome completo *</label><input class="form-input" id="mc-nome" placeholder="Nome completo"></div>'
+    +'<div class="form-group"><label>CPF *</label><input class="form-input" id="mc-cpf" placeholder="000.000.000-00"></div>'
+    +'<div class="form-group"><label>Data de Nascimento *</label><input class="form-input" id="mc-nasc" type="text" data-brdate="1" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off"></div>'
+    +'<div class="form-group"><label>Email *</label><input class="form-input" id="mc-email" type="email" placeholder="seu@email.com"></div>'
+    +'<div class="form-group"><label>Telefone / WhatsApp *</label><input class="form-input" id="mc-tel" placeholder="(11) 99999-9999"></div>'
+    +'<div class="form-group"><label>Banco / Corretora</label><select class="form-input" id="mc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Outro</option></select></div>'
+    +'</div>'
+    +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 12px">Endereço</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group form-full"><label>Endereço *</label><input class="form-input" id="mc-end" placeholder="Rua, número, complemento"></div>'
+    +'<div class="form-group"><label>Cidade *</label><input class="form-input" id="mc-cidade" placeholder="Cidade"></div>'
+    +'<div class="form-group"><label>Estado</label><select class="form-input" id="mc-estado"><option value="">UF</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>'
+    +'<div class="form-group"><label>CEP</label><input class="form-input" id="mc-cep" placeholder="00000-000"></div>'
+    +'</div>'
+    +'<div id="mc-save-msg" style="margin-top:16px;font-size:13px;color:#00c853;display:none">Dados salvos com sucesso</div>'
+    +'</div></div>'
     +'</div>';
   mainContent.appendChild(div);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD TABS — Portfolio / Extrato / Dados
+// ═══════════════════════════════════════════════════════════
+var _mcEvolChart = null;
+var _extChart = null;
+var _extLoaded = false;
+var _dadosLoaded = false;
+
+function showMcTab(tab, btn){
+  ['portfolio','extrato','dados'].forEach(function(t){
+    var panel = document.getElementById('mc-tab-'+t);
+    if(panel) panel.className = 'mc-tab-panel'+(t===tab?' active':'');
+  });
+  document.querySelectorAll('#mc-tabs .mc-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  if(tab==='extrato' && !_extLoaded) loadMcExtrato();
+  if(tab==='dados' && !_dadosLoaded){ _dadosLoaded=true; loadMinhaConta(); }
+}
+
+function loadMcExtrato(){
+  if(!currentClienteVinculado) return;
+  _extLoaded = true;
+  db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
+    var ops=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    ops.sort(function(a,b){
+      var pa=(a.ano||0)*100+(a.mes||0), pb=(b.ano||0)*100+(b.mes||0);
+      return pa-pb;
+    });
+    var acum=0, meses=ops.length, totalLiq=0;
+    var labels=[],dataAcum=[],dataMensal=[];
+    var tbody=document.getElementById('ext-tbody');
+    var rows='';
+    ops.forEach(function(op){
+      var vendas=op.vendas||0, compras=op.compras||0, custos=op.custos||0;
+      var saldo=vendas-compras;
+      var liq=saldo-custos;
+      acum+=liq;
+      totalLiq+=liq;
+      var mesStr=(op.mes<10?'0':'')+op.mes+'/'+op.ano;
+      labels.push(mesStr);
+      dataAcum.push(acum);
+      dataMensal.push(liq);
+      var corLiq=liq>=0?'#38bdf8':'#ff8c00';
+      var corAcum=acum>=0?'#38bdf8':'#ff8c00';
+      rows+='<tr><td>'+mesStr+'</td><td style="font-family:DM Mono,monospace">'+mcMask(saldo)+'</td><td style="font-family:DM Mono,monospace;color:#ff8c00">'+mcMask(custos)+'</td><td style="font-family:DM Mono,monospace;color:'+corLiq+'">'+mcMask(liq)+'</td><td style="font-family:DM Mono,monospace;font-weight:600;color:'+corAcum+'">'+mcMask(acum)+'</td></tr>';
+    });
+    if(tbody) tbody.innerHTML=rows||'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">Nenhuma operação registrada</td></tr>';
+    var media=meses>0?totalLiq/meses:0;
+    var ea=document.getElementById('ext-acumulado');if(ea)ea.textContent=mcMask(acum);
+    var em=document.getElementById('ext-media');if(em)em.textContent=mcMask(media);
+    var emm=document.getElementById('ext-meses');if(emm)emm.textContent=meses;
+    // Chart
+    renderExtChart(labels,dataMensal,dataAcum);
+  });
+}
+
+function renderExtChart(labels,dataMensal,dataAcum){
+  var ctx=document.getElementById('ext-chart');if(!ctx)return;
+  if(_extChart){_extChart.destroy();_extChart=null;}
+  _extChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:labels,
+      datasets:[
+        {type:'line',label:'Acumulado',data:dataAcum,borderColor:'#fff',borderWidth:2,pointRadius:0,tension:.3,yAxisID:'y',order:0,fill:false},
+        {type:'bar',label:'Mensal',data:dataMensal,backgroundColor:dataMensal.map(function(v){return v>=0?'rgba(56,189,248,0.4)':'rgba(255,140,0,0.4)';}),borderColor:dataMensal.map(function(v){return v>=0?'rgba(56,189,248,0.7)':'rgba(255,140,0,0.7)';}),borderWidth:1,borderRadius:4,yAxisID:'y',order:1}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',titleColor:'#fff',bodyColor:'#ddd',borderColor:'#333',borderWidth:1,cornerRadius:8,padding:10}},scales:{x:{ticks:{color:'#71717a',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#71717a',font:{size:10},callback:function(v){return(v/1000).toFixed(0)+'k';}},grid:{color:'rgba(255,255,255,.06)'}}}}
+  });
+}
+
+function renderMcEvolucao(ops){
+  var ctx=document.getElementById('mc-evolucao-chart');if(!ctx)return;
+  if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
+  if(!ops||!ops.length){
+    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Sem dados de evolução ainda</div>';
+    return;
+  }
+  ops.sort(function(a,b){return((a.ano||0)*100+(a.mes||0))-((b.ano||0)*100+(b.mes||0));});
+  var labels=[],vals=[],acum=0;
+  ops.forEach(function(op){
+    var liq=(op.vendas||0)-(op.compras||0)-(op.custos||0);
+    acum+=liq;
+    labels.push((op.mes<10?'0':'')+op.mes+'/'+op.ano);
+    vals.push(acum);
+  });
+  _mcEvolChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:labels,datasets:[{data:vals,borderColor:'#38bdf8',borderWidth:2.5,pointRadius:0,tension:.35,fill:{target:'origin',above:'rgba(56,189,248,0.08)',below:'rgba(255,140,0,0.08)'}}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',titleColor:'#fff',bodyColor:'#ddd',borderColor:'#333',borderWidth:1,cornerRadius:8,padding:10,callbacks:{label:function(c){return'Acumulado: '+mcMask(c.raw);}}}},scales:{x:{ticks:{color:'#71717a',font:{size:10},maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#71717a',font:{size:10},callback:function(v){return(v/1000).toFixed(0)+'k';}},grid:{color:'rgba(255,255,255,.06)'}}}}
+  });
 }
 
 function buildMinhaContaView(){
@@ -8704,6 +8905,8 @@ function _loadMinhaCarteiraReal(){
     var acum=ops.reduce(function(s,op){return s+((op.vendas||0)-(op.compras||0));},0);
     var acumEl=document.getElementById('mc-acumulado');
     if(acumEl) acumEl.textContent=mcMask(acum);
+    // Render evolution chart
+    if(typeof renderMcEvolucao==='function') renderMcEvolucao(ops);
   });
   // Load ativos + cotações
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
