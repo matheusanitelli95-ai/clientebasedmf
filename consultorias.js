@@ -492,41 +492,9 @@ function injectConsultoriasView(){
   }
 }
 
-// Injetar botão no sidebar se necessário
-function injectConsultoriasNav(){
-  // Verificar se já existe
-  if(document.querySelector('[onclick*="showView(\'consultorias\')"]')) return;
-
-  // Encontrar botão de Agendamento no sidebar para inserir depois dele
-  var navItems = document.querySelectorAll('.nav-item');
-  var agendamentoBtn = null;
-  for(var i=0; i<navItems.length; i++){
-    var onclick = navItems[i].getAttribute('onclick') || '';
-    if(onclick.indexOf("'agendamento'") >= 0 || onclick.indexOf('"agendamento"') >= 0){
-      agendamentoBtn = navItems[i];
-      break;
-    }
-  }
-
-  var btnHTML = '<button class="nav-item" onclick="showView(\'consultorias\')">'
-    +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>'
-    +'Consultorias</button>';
-
-  if(agendamentoBtn){
-    agendamentoBtn.insertAdjacentHTML('afterend', btnHTML);
-  }
-}
-
-// Adicionar 'consultorias' ao PERFIL_MENUS se não estiver
-function patchPerfilMenus(){
-  if(!window.PERFIL_MENUS) return;
-  if(window.PERFIL_MENUS.adm && window.PERFIL_MENUS.adm.indexOf('consultorias') < 0){
-    window.PERFIL_MENUS.adm.push('consultorias');
-  }
-  if(window.PERFIL_MENUS.gestor && window.PERFIL_MENUS.gestor.indexOf('consultorias') < 0){
-    window.PERFIL_MENUS.gestor.push('consultorias');
-  }
-}
+// [REMOVIDO] Consultorias migrado para Wealth Planning — botão e PERFIL_MENUS patch desativados
+function injectConsultoriasNav(){}
+function patchPerfilMenus(){}
 
 // Hook no showView para carregar dados quando abrir
 var _origShowView = window.showView;
