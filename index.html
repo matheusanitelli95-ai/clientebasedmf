@@ -14485,8 +14485,8 @@ function buildCalcAposentadoriaView(){
           '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Inflacao (% a.a.)</label><input type="number" id="ca-inf" value="5" step="0.1" class="form-input" style="width:100%" oninput="caCalcReal();caRecalc()"></div>'+
         '</div>'+
         '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px">'+
-          '<div style="font-size:10px;color:#22c55e;text-transform:none;letter-spacing:.5px;font-weight:600">Juro Real (% a.a.)</div>'+
-          '<div id="ca-jreal" style="font-size:18px;font-weight:700;color:#22c55e;margin-top:2px">6,67%</div>'+
+          '<div style="font-size:10px;color:'+(_isLightMode()?'#16a34a':'#22c55e')+';text-transform:none;letter-spacing:.5px;font-weight:600">Juro Real (% a.a.)</div>'+
+          '<div id="ca-jreal" style="font-size:18px;font-weight:700;color:'+(_isLightMode()?'#16a34a':'#22c55e')+';margin-top:2px">6,67%</div>'+
         '</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
           '<div><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Exp. de Vida</label><input type="number" id="ca-expvida" value="95" min="70" max="110" class="form-input" style="width:100%" oninput="caRecalc()"></div>'+
@@ -14516,7 +14516,7 @@ function buildCalcAposentadoriaView(){
       '<div class="card" style="padding:16px"><div style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:.5px;font-weight:600;margin-bottom:12px">Comparativo na Aposentadoria <span id="ca-badge2" style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(26,58,92,.12);color:#1a3a5c;font-weight:700;margin-left:6px">REAL</span></div><div style="height:260px;position:relative"><canvas id="ca-chart2"></canvas></div></div>'+
       '<div class="card" style="padding:16px"><div style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:.5px;font-weight:600;margin-bottom:12px">Metas Anuais de Patrimonio <span id="ca-badge3" style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(26,58,92,.12);color:#1a3a5c;font-weight:700;margin-left:6px">REAL</span></div>'+
         '<div id="ca-vol-chips" style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap"></div>'+
-        '<div style="overflow-x:auto;max-height:400px;overflow-y:auto"><table id="ca-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:600px"><thead><tr style="background:var(--card2)"><th style="padding:8px 8px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border);width:36px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></th><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;letter-spacing:.5px;border-bottom:1px solid var(--border)">Ano</th><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border)">Idade</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border)">Aportado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#7c3aed;text-transform:none;border-bottom:1px solid var(--border)">Pessimista</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#1a3a5c;text-transform:none;border-bottom:1px solid var(--border)">Esperado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#22c55e;text-transform:none;border-bottom:1px solid var(--border)">Otimista</th></tr></thead><tbody id="ca-tbody"></tbody></table></div>'+
+        '<div style="overflow-x:auto;max-height:400px;overflow-y:auto"><table id="ca-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:600px"><thead><tr style="background:var(--card2)"><th style="padding:8px 8px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border);width:36px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></th><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;letter-spacing:.5px;border-bottom:1px solid var(--border)">Ano</th><th style="padding:8px 12px;text-align:center;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border)">Idade</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:var(--text-muted);text-transform:none;border-bottom:1px solid var(--border)">Aportado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:#7c3aed;text-transform:none;border-bottom:1px solid var(--border)">Pessimista</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:'+(_isLightMode()?'#1a3a5c':'#4a90c2')+';text-transform:none;border-bottom:1px solid var(--border)">Esperado</th><th style="padding:8px 12px;text-align:right;font-size:9px;font-weight:700;color:'+(_isLightMode()?'#16a34a':'#22c55e')+';text-transform:none;border-bottom:1px solid var(--border)">Otimista</th></tr></thead><tbody id="ca-tbody"></tbody></table></div>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -14602,11 +14602,14 @@ function caRender(){
   var aportC=light?'#94a3b8':'#475569';
   var navyC=light?'#1a3a5c':'#4a90c2';
   // KPIs
+  var kpiBdr=light?'border:1px solid #e2e8f0;':'';
+  var kpiGreen=light?'#16a34a':'#22c55e';
+  var kpiNeutral=light?'#1e293b':'#e2e8f0';
   document.getElementById('ca-kpis').innerHTML=
-    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Patrimonio Apos.</div><div style="font-size:18px;font-weight:700;color:#22c55e">'+caFB(pf)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+sub+'</div></div>'+
-    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Total Aportado</div><div style="font-size:18px;font-weight:700;color:var(--white)">'+caFB(ap)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+d.anosAcum+' anos</div></div>'+
-    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Juros Ganhos</div><div style="font-size:18px;font-weight:700;color:#22c55e">'+caFB(jr)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+(d.apR>0?(d.jR/d.apR*100).toFixed(0):'0')+'%</div></div>'+
-    '<div class="card" style="padding:14px;text-align:center"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Renda Mensal</div><div style="font-size:18px;font-weight:700;color:#22c55e">'+caFF(rm)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">juro real</div></div>';
+    '<div class="card" style="padding:14px;text-align:center;'+kpiBdr+'"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Patrimonio Apos.</div><div style="font-size:18px;font-weight:700;color:'+kpiGreen+'">'+caFB(pf)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+sub+'</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center;'+kpiBdr+'"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Total Aportado</div><div style="font-size:18px;font-weight:700;color:'+kpiNeutral+'">'+caFB(ap)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+d.anosAcum+' anos</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center;'+kpiBdr+'"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Juros Ganhos</div><div style="font-size:18px;font-weight:700;color:'+kpiGreen+'">'+caFB(jr)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">'+(d.apR>0?(d.jR/d.apR*100).toFixed(0):'0')+'%</div></div>'+
+    '<div class="card" style="padding:14px;text-align:center;'+kpiBdr+'"><div style="font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:.4px;margin-bottom:6px">Renda Mensal</div><div style="font-size:18px;font-weight:700;color:'+kpiGreen+'">'+caFF(rm)+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">juro real</div></div>';
   // Banner Independencia Financeira
   var ifBanner=document.getElementById('ca-if-banner');
   if(!ifBanner){ifBanner=document.createElement('div');ifBanner.id='ca-if-banner';var kpiEl=document.getElementById('ca-kpis');if(kpiEl)kpiEl.parentNode.insertBefore(ifBanner,kpiEl.nextSibling);}
@@ -14648,17 +14651,18 @@ function caRender(){
   }};
   if(_caC1)_caC1.destroy();
   _caC1=new Chart(document.getElementById('ca-chart1'),{type:'line',plugins:[_caIFPlugin],data:{labels:ac.map(function(x){return x.id.toFixed(0)}),datasets:[
-    {label:'Otimista',data:ac.map(function(x){return x.vO}),borderColor:'rgba(34,197,94,.35)',backgroundColor:'rgba(34,197,94,.04)',fill:'+1',tension:.35,pointRadius:0,borderWidth:1,borderDash:[3,3]},
+    {label:'Otimista',data:ac.map(function(x){return x.vO}),borderColor:light?'rgba(22,163,74,.45)':'rgba(34,197,94,.35)',backgroundColor:light?'rgba(22,163,74,.06)':'rgba(34,197,94,.04)',fill:'+1',tension:.35,pointRadius:0,borderWidth:1,borderDash:[3,3]},
     {label:'Esperado',data:ac.map(function(x){return x.v}),borderColor:navyC,backgroundColor:light?'rgba(26,58,92,.06)':'rgba(74,144,194,.06)',fill:false,tension:.35,pointRadius:0,borderWidth:2.5},
     {label:'Pessimista',data:ac.map(function(x){return x.vP}),borderColor:'rgba(124,58,237,.35)',backgroundColor:'rgba(124,58,237,.04)',fill:'-1',tension:.35,pointRadius:0,borderWidth:1,borderDash:[3,3]},
     {label:'Aportado',data:ac.map(function(x){return x.ap}),borderColor:aportC,borderDash:[4,4],backgroundColor:'transparent',tension:0,pointRadius:0,borderWidth:1}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:legendC,padding:10,font:{size:9},usePointStyle:true}},tooltip:{backgroundColor:tipBg,titleColor:tipTxt,bodyColor:tipTxt,borderColor:tipBrd,borderWidth:1,padding:10,titleFont:{size:10},bodyFont:{size:10},callbacks:{label:function(c){return c.dataset.label+': '+caFB(c.raw)}}}},scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:8},maxTicksLimit:10,callback:function(v,i){return ac[i]?ac[i].id.toFixed(0)+' anos':''}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:8},callback:function(v){if(Math.abs(v)>=1e9)return(v/1e9).toFixed(1)+'B';if(Math.abs(v)>=1e6)return(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return(v/1e3).toFixed(0)+'k';return v}}}}}});
   // Cenarios
   var vP=N?'nominal':'hoje';
-  var cs=[{t:'Conservador',d:'50% do juro real',r:r1,pf:p1f,c:'#22c55e',tg:'Cresce'},{t:'Moderado',d:'100% do juro real',r:r2,pf:s2[s2.length-1].v,c:navyC,tg:'Estavel'},{t:'Consumo Total',d:'Consome ate '+d.expVida,r:r3,pf:0,c:'#7c3aed',tg:'Consome'},{t:'Personalizado',d:caFF(r4)+'/mes',r:r4,pf:p4f,c:'#3b82f6',tg:d.cS?'Sustenta':'Acaba'}];
+  var csGreen=light?'#16a34a':'#22c55e';
+  var cs=[{t:'Conservador',d:'50% do juro real',r:r1,pf:p1f,c:csGreen,tg:'Cresce'},{t:'Moderado',d:'100% do juro real',r:r2,pf:s2[s2.length-1].v,c:navyC,tg:'Estavel'},{t:'Consumo Total',d:'Consome ate '+d.expVida,r:r3,pf:0,c:'#7c3aed',tg:'Consome'},{t:'Personalizado',d:caFF(r4)+'/mes',r:r4,pf:p4f,c:'#3b82f6',tg:d.cS?'Sustenta':'Acaba'}];
   var h='';cs.forEach(function(c){
     var bgTag=c.c+'15';
-    h+='<div class="card" style="padding:16px;border-left:3px solid '+c.c+'">';
+    h+='<div class="card" style="padding:16px;border-left:3px solid '+c.c+';'+(light?'border:1px solid #e2e8f0;border-left:3px solid '+c.c+';':'')+'">';
     h+='<div style="font-size:9px;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:8px;background:'+bgTag+';color:'+c.c+';font-weight:700;text-transform:none;letter-spacing:.4px">'+c.tg+'</div>';
     h+='<div style="font-size:13px;font-weight:600;color:'+c.c+';margin-bottom:4px">'+c.t+'</div>';
     h+='<div style="font-size:10px;color:var(--text3);margin-bottom:12px">'+c.d+'</div>';
@@ -14671,25 +14675,26 @@ function caRender(){
   // Chart 2 - Aposentadoria
   if(_caC2)_caC2.destroy();
   _caC2=new Chart(document.getElementById('ca-chart2'),{type:'line',data:{labels:s1.map(function(x){return x.id.toFixed(0)}),datasets:[
-    {label:'Conservador',data:s1.map(function(x){return x.v}),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
+    {label:'Conservador',data:s1.map(function(x){return x.v}),borderColor:csGreen,backgroundColor:light?'rgba(22,163,74,.06)':'rgba(34,197,94,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
     {label:'Moderado',data:s2.map(function(x){return x.v}),borderColor:navyC,borderDash:[5,3],backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2},
     {label:'Consumo Total',data:s3.map(function(x){return Math.max(x.v,0)}),borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
     {label:'Personalizado',data:s4.map(function(x){return Math.max(x.v,0)}),borderColor:'#3b82f6',borderDash:[6,4],backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:legendC,padding:10,font:{size:9},usePointStyle:true}},tooltip:{backgroundColor:tipBg,titleColor:tipTxt,bodyColor:tipTxt,borderColor:tipBrd,borderWidth:1,padding:10,titleFont:{size:10},bodyFont:{size:10},callbacks:{label:function(c){return c.dataset.label+': '+caFB(c.raw)}}}},scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:8},maxTicksLimit:10,callback:function(v,i){return s1[i]?s1[i].id.toFixed(0)+' anos':''}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:8},callback:function(v){if(Math.abs(v)>=1e9)return(v/1e9).toFixed(1)+'B';if(Math.abs(v)>=1e6)return(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return(v/1e3).toFixed(0)+'k';return v}}}}}});
   // Tabela chips
-  document.getElementById('ca-vol-chips').innerHTML='<span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(124,58,237,.1);color:#7c3aed;font-weight:600">Pessimista (-'+d.vol+'%)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(26,58,92,.1);color:'+navyC+';font-weight:600">Esperado (base)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.1);color:#22c55e;font-weight:600">Otimista (+'+d.vol+'%)</span>';
+  var tblGreen=light?'#16a34a':'#22c55e';
+  document.getElementById('ca-vol-chips').innerHTML='<span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(124,58,237,.1);color:#7c3aed;font-weight:600">Pessimista (-'+d.vol+'%)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(26,58,92,.1);color:'+navyC+';font-weight:600">Esperado (base)</span><span style="font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.1);color:'+tblGreen+';font-weight:600">Otimista (+'+d.vol+'%)</span>';
   // Tabela com checkbox
   var rows='';
   for(var i=0;i<ac.length;i++){var yr=d.yr+ac[i].a,iF=i===ac.length-1;
     var trStyle=iF?'background:rgba(26,58,92,.06);font-weight:700;border-top:2px solid '+navyC:'';
     rows+='<tr style="'+trStyle+'">';
-    rows+='<td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border)"><input type="checkbox" style="width:14px;height:14px;cursor:pointer;accent-color:#22c55e" title="Marcar meta como atingida"></td>';
+    rows+='<td style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border)"><input type="checkbox" style="width:14px;height:14px;cursor:pointer;accent-color:'+tblGreen+'" title="Marcar meta como atingida"></td>';
     rows+='<td style="padding:7px 12px;text-align:center;border-bottom:1px solid var(--border)">'+yr+'</td>';
     rows+='<td style="padding:7px 12px;text-align:center;border-bottom:1px solid var(--border)">'+ac[i].id.toFixed(0)+'</td>';
     rows+='<td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border)">'+caFB(ac[i].ap)+'</td>';
     rows+='<td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:#7c3aed">'+caFB(Math.max(ac[i].vP,0))+'</td>';
     rows+='<td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:'+navyC+';font-weight:700">'+caFB(ac[i].v)+'</td>';
-    rows+='<td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:#22c55e">'+caFB(ac[i].vO)+'</td>';
+    rows+='<td style="padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);color:'+tblGreen+'">'+caFB(ac[i].vO)+'</td>';
     rows+='</tr>';
   }
   document.getElementById('ca-tbody').innerHTML=rows;

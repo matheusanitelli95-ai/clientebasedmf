@@ -250,9 +250,14 @@ function wpRenderFilteredResults(rawQuery, resultsDiv) {
   var filtered = wpClientesCache.filter(function(c) {
     if (!clienteTemConsultoria(c)) return false;
     if (!query) return true;
-    return (c.nome || '').toLowerCase().indexOf(query) >= 0
-      || (c.cpf || '').replace(/\D/g,'').indexOf(query.replace(/\D/g,'')) >= 0;
-  }).slice(0, 20);
+    var nome = (c.nome || '').toLowerCase();
+    var cpf = (c.cpf || '').replace(/\D/g,'');
+    var q = query.replace(/\D/g,'');
+    // Match each word of the query independently (allows partial/out-of-order matching)
+    var words = query.split(/\s+/).filter(function(w){ return w.length > 0; });
+    var match = words.every(function(w){ return nome.indexOf(w) >= 0; });
+    return match || (q.length >= 3 && cpf.indexOf(q) >= 0);
+  }).slice(0, 50);
 
   if (filtered.length === 0) {
     resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">' + (query ? 'Nenhum cliente encontrado para "' + query + '"' : 'Nenhum cliente com consultoria ativa') + '</div>';
