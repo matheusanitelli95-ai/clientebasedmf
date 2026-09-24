@@ -1053,11 +1053,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
           <canvas id="bkd-chart" height="100"></canvas>
         </div>
-        <!-- Ranking -->
-        <div class="card">
-          <div class="section-title">Ranking de Performance</div>
-          <div id="bkd-ranking"></div>
-        </div>
+        <!-- Ranking removido -->
       </div>
     </div>
 
@@ -4112,7 +4108,12 @@ function renderBlackDetalhe(){
   var mesesCount=Object.keys(mesesDistintos).length;
   var media=mesesCount?totalAcum/mesesCount:0;
   var cli=clientes.find(function(x){return x.id===currentBlackClienteId;});
-  var patrimonio=cli?(cli.custodiaRF||0)+(cli.custodiaRV||0):0;
+  // Preferir patrimônio da Minha Carteira (mais preciso, com cotações atualizadas)
+  var patrimonio = (cli && cli.patrimonio) ? cli.patrimonio : (cli ? ((cli.custodiaRF||0)+(cli.custodiaRV||0)) : 0);
+  // Se o admin está vendo o próprio detalhe e _mcPatrimonioTotal está disponível, usar
+  if(window._mcPatrimonioTotal && cli && cli.id === currentClienteVinculado){
+    patrimonio = window._mcPatrimonioTotal;
+  }
   var retorno=patrimonio?((totalAcum/patrimonio)*100):0;
 
   // Calcular métricas avançadas: melhor/pior mês, drawdown, variação
@@ -4161,7 +4162,15 @@ function renderBlackDetalhe(){
     elMediaVar.innerHTML=blackHideValores?'':mArrow;
   } else if(elMediaVar){ elMediaVar.innerHTML=''; }
   var elRetVar=document.getElementById('black-cli-retorno-var');
-  if(elRetVar) elRetVar.innerHTML='';
+  if(elRetVar){
+    if(blackHideValores){
+      elRetVar.innerHTML='';
+    } else if(patrimonio > 0){
+      elRetVar.innerHTML='<span style="color:var(--text3);font-size:10px">sobre '+fmtFull(patrimonio)+'</span>';
+    } else {
+      elRetVar.innerHTML='<span style="color:var(--text3);font-size:10px">sem patrimônio cadastrado</span>';
+    }
+  }
 
   // Novos KPIs
   var elMelhor=document.getElementById('black-cli-melhor');
@@ -7689,11 +7698,12 @@ function buildMinhaCarteiraView(){
     +'</div>'
     /* ── Portfolio tab ── */
     +'<div class="mc-tab-panel active" id="mc-tab-portfolio">'
-    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">'
+    +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px">'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Valor Atualizado</div><div class="kpi-val" id="mc-patrimonio" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#ff8c00,#ff8c0044);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Valor Investido</div><div class="kpi-val" id="mc-investido" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Ganho / Perda</div><div class="kpi-val" id="mc-ganho" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#a78bfa,#a78bfa44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado Black</div><div class="kpi-val" id="mc-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#64748b,#64748b44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">P&L Opções</div><div class="kpi-val" id="mc-pnl-opcoes" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$ 0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#22c55e,#22c55e44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'</div>'
     +'<div id="mc-cotacao-status" style="font-size:11px;color:var(--text3);margin-bottom:12px;display:none"></div>'
     +'<div class="card" style="margin-bottom:16px;padding:20px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Evolução Patrimonial</div><div style="font-size:11px;color:var(--text3);margin-bottom:14px">Histórico mensal do patrimônio</div><div style="position:relative;height:220px"><canvas id="mc-evolucao-chart"></canvas></div></div>'
@@ -7906,9 +7916,9 @@ var _moSortDir = 'asc';
 
 function loadMinhasOperacoes(){
   if(!currentClienteVinculado) return;
-  var pat = 0;
   var cli = clientes.find(function(x){ return x.id === currentClienteVinculado; });
-  if(cli) pat = cli.patrimonio||(cli.custodiaRF||0)+(cli.custodiaRV||0);
+  // Preferir patrimônio da Minha Carteira (cotações atualizadas)
+  var pat = window._mcPatrimonioTotal || (cli ? (cli.patrimonio || ((cli.custodiaRF||0)+(cli.custodiaRV||0))) : 0);
 
   db.collection('black_operacoes').where('clienteId','==',currentClienteVinculado).get().then(function(snap){
     var ops = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
@@ -8087,7 +8097,13 @@ function loadMinhasOperacoes(){
       elMoMediaVar.innerHTML=moMArr;
     } else if(elMoMediaVar){ elMoMediaVar.innerHTML=''; }
     var elMoRetVar=document.getElementById('mo-retorno-var');
-    if(elMoRetVar) elMoRetVar.innerHTML='';
+    if(elMoRetVar){
+      if(pat > 0){
+        elMoRetVar.innerHTML='<span style="color:var(--text3);font-size:10px">sobre '+fmtFull(pat)+'</span>';
+      } else {
+        elMoRetVar.innerHTML='<span style="color:var(--text3);font-size:10px">sem patrimônio cadastrado</span>';
+      }
+    }
 
     var elMoMelhor=document.getElementById('mo-melhor');
     if(elMoMelhor) elMoMelhor.textContent=moSaldosPM.length?fmtFull(moMelhorVal):'—';
@@ -8908,6 +8924,29 @@ function _loadMinhaCarteiraReal(){
     // Render evolution chart
     if(typeof renderMcEvolucao==='function') renderMcEvolucao(ops);
   });
+  // Load P&L de Opções para integrar ao patrimônio
+  db.collection('opcoes_posicoes').get().then(function(snap){
+    var posicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    var totalPnl = 0;
+    posicoes.forEach(function(p){
+      if(typeof _opcCalc === 'function'){
+        var c = _opcCalc(p);
+        totalPnl += c.pnl;
+      }
+    });
+    window._opcTotalPnl = totalPnl;
+    var mcPnlEl = document.getElementById('mc-pnl-opcoes');
+    if(mcPnlEl){
+      if(typeof clienteHideValores!=='undefined' && clienteHideValores){
+        mcPnlEl.textContent = 'R$ ●●●●';
+      } else {
+        var sinal = totalPnl >= 0 ? '+' : '';
+        mcPnlEl.textContent = sinal + fmtFull(totalPnl);
+        mcPnlEl.style.color = totalPnl >= 0 ? '#38bdf8' : '#ff8c00';
+      }
+    }
+  }).catch(function(e){ console.log('P&L opcoes load error:', e); });
+
   // Load ativos + cotações
   db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
     var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
@@ -9273,9 +9312,17 @@ function renderAtivosCliente(ativos, cotacoes){
     }).catch(function(e){ console.log('Sync patrimonio error:', e); });
   }
 
+  // Guardar patrimônio global para integração com Operações Black
+  window._mcPatrimonioTotal = totalAtualizado;
+  window._mcInvestidoTotal = totalInvestido;
+
+  // Incluir P&L de Opções no valor atualizado
+  var opcPnl = window._opcTotalPnl || 0;
+  var patrimonioComOpcoes = totalAtualizado + opcPnl;
+
   // Atualizar KPIs
   var pe=document.getElementById('mc-patrimonio');
-  if(pe) pe.textContent=mcMask(totalAtualizado);
+  if(pe) pe.textContent=mcMask(patrimonioComOpcoes);
   var ie=document.getElementById('mc-investido');
   if(ie) ie.textContent=mcMask(totalInvestido);
   var ge=document.getElementById('mc-ganho');
@@ -10734,32 +10781,7 @@ function renderBlackDashboard2(){
     });
   }
 
-  // Ranking
-  var rankEl = document.getElementById('bkd-ranking');
-  if(!rankEl) return;
-  rankEl.innerHTML = '';
-
-  var ranked = Object.values(clienteAcum).sort(function(a,b){ return b.acum-a.acum; });
-  if(!ranked.length){
-    rankEl.innerHTML = '<div class="empty"><div class="empty-title">Nenhuma operação registrada</div></div>';
-    return;
-  }
-
-  var maxAcum = Math.max.apply(null, ranked.map(function(r){ return Math.abs(r.acum); })) || 1;
-
-  ranked.forEach(function(r, i){
-    var pct = Math.abs(r.acum) / maxAcum * 100;
-    var cor = r.acum >= 0 ? '#38bdf8' : '#ff8c00';
-    var row = document.createElement('div');
-    row.style = 'display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)';
-    row.innerHTML = '<div style="font-family:DM Mono,monospace;font-size:11px;color:var(--text3);width:20px;text-align:right">'+(i+1)+'</div>'
-      +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px">'+maskNome(r.nome)+'</div>'
-      +'<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">'
-      +'<div style="height:100%;width:'+pct+'%;background:'+cor+';border-radius:2px;transition:width .4s"></div>'
-      +'</div></div>'
-      +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:'+cor+';white-space:nowrap">'+(blackHideValores?'R$ ●●●●':fmtFull(r.acum))+'</div>';
-    rankEl.appendChild(row);
-  });
+  // Ranking removido
 }
 
 
@@ -13585,6 +13607,7 @@ function opcRender(){
   var countEl = document.getElementById('opc-count');
   if(countEl) countEl.textContent = _opcPosicoes.length + ' posiç' + (_opcPosicoes.length===1?'ão':'ões');
   var totalNotional=0, totalEstrutura=0, totalPnl=0, totalMargem=0;
+  window._opcTotalPnl = 0;
   _opcPosicoes.forEach(function(p){
     var c = _opcCalc(p);
     totalNotional += c.notional;
@@ -13632,6 +13655,19 @@ function opcRender(){
   if(margemEl){
     margemEl.textContent = _opcFmtMoney(totalMargem);
     margemEl.style.color = totalMargem > 0 ? '#f59e0b' : 'var(--text)';
+  }
+  // Armazenar P&L global para integração com Minha Carteira
+  window._opcTotalPnl = totalPnl;
+  // Atualizar KPI de P&L Opções no dashboard do cliente, se visível
+  var mcPnlEl = document.getElementById('mc-pnl-opcoes');
+  if(mcPnlEl){
+    if(typeof clienteHideValores!=='undefined' && clienteHideValores){
+      mcPnlEl.textContent = 'R$ ●●●●';
+    } else {
+      var sinal = totalPnl >= 0 ? '+' : '';
+      mcPnlEl.textContent = sinal + fmtFull(totalPnl);
+      mcPnlEl.style.color = totalPnl >= 0 ? '#38bdf8' : '#ff8c00';
+    }
   }
   opcRenderCharts();
 }
