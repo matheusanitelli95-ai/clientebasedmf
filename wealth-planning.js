@@ -291,7 +291,7 @@ function wpSelectCliente(clienteId) {
         + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
         + '<span>Você está visualizando o Wealth Planning como o cliente <strong style="color:var(--white)">' + (c.nome || '') + '</strong> veria.</span>'
         + '</div>'
-        + wpClienteDashboardHTML(c);
+        + wpClienteDashboardHTML(Object.assign({id: wpSelectedClienteId}, c), true);
     }
   });
 }
@@ -358,7 +358,8 @@ function loadWealthPlanningCliente() {
     }
 
     // Cliente tem consultoria — renderizar dashboard do WP
-    view.innerHTML = wpClienteDashboardHTML(clienteData);
+    clienteData.id = currentClienteVinculado;
+    view.innerHTML = wpClienteDashboardHTML(clienteData, false);
   }).catch(function() {
     view.innerHTML = wpBloqueioHTML();
   });
@@ -380,23 +381,46 @@ function wpBloqueioHTML() {
     + '</div></div>';
 }
 
-// ── Card de módulo WP ────────────────────────────────────
-function wpModuleCard(title, svgIcon, status) {
-  return '<div class="card" style="padding:24px;text-align:center;opacity:' + (status === 'Em breve' ? '.6' : '1') + '">'
-    + '<div style="margin-bottom:8px;display:flex;justify-content:center">' + svgIcon + '</div>'
-    + '<div style="font-size:13px;font-weight:600;color:var(--white)">' + title + '</div>'
-    + '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + status + '</div>'
-    + '</div>';
+// ── Formato moeda ────────────────────────────────────────
+function wpFmtMoeda(v) {
+  if (!v && v !== 0) return 'R$ 0';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-// ── HTML do dashboard WP para cliente ────────────────────
-function wpClienteDashboardHTML(clienteData) {
+// ── WP Tab system ────────────────────────────────────────
+var wpActiveTab = 'resumo';
+function wpShowTab(tab, clienteId, isAdmin) {
+  wpActiveTab = tab;
+  document.querySelectorAll('.wp-tab-btn').forEach(function(b) {
+    b.classList.remove('active');
+    b.style.color = 'var(--text3)';
+    b.style.fontWeight = '400';
+    b.style.borderBottom = '2px solid transparent';
+  });
+  var btn = document.querySelector('.wp-tab-btn[data-tab="' + tab + '"]');
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.color = 'var(--blue)';
+    btn.style.fontWeight = '600';
+    btn.style.borderBottom = '2px solid var(--blue)';
+  }
+  var container = document.getElementById('wp-modules-content');
+  if (!container) return;
+  if (tab === 'resumo') wpRenderResumo(container, clienteId, isAdmin);
+  if (tab === 'objetivos') wpRenderObjetivos(container, clienteId, isAdmin);
+  if (tab === 'seguros') wpRenderSeguros(container, clienteId, isAdmin);
+  if (tab === 'familia') wpRenderFamilia(container, clienteId, isAdmin);
+}
+
+// ── HTML do dashboard WP (admin e cliente) ───────────────
+function wpClienteDashboardHTML(clienteData, isAdmin) {
   var fase = clienteData.faseWP || 'fundacao';
   var faseInfo = WP_FASES.find(function(f) { return f.id === fase; }) || WP_FASES[0];
+  var cid = clienteData.id || '';
 
   return '<div class="page-header">'
     + '<div><div class="page-title">Wealth Planning</div>'
-    + '<div class="page-sub">Seu planejamento financeiro personalizado</div></div>'
+    + '<div class="page-sub">Planejamento financeiro personalizado</div></div>'
     + '</div>'
     + '<div class="page-content">'
     // Fase atual
@@ -404,24 +428,413 @@ function wpClienteDashboardHTML(clienteData) {
     + '<div style="display:flex;align-items:center;gap:16px">'
     + '<div style="width:48px;height:48px;border-radius:12px;background:var(--border);display:flex;align-items:center;justify-content:center">' + faseInfo.icon + '</div>'
     + '<div style="flex:1">'
-    + '<div style="font-size:10px;color:var(--text3);text-transform:none;letter-spacing:-.01em;font-weight:600;margin-bottom:2px">Fase Atual da Jornada</div>'
+    + '<div style="font-size:13px;color:var(--text3);font-weight:400;margin-bottom:2px">Fase atual da jornada</div>'
     + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">' + faseInfo.label + '</div>'
     + '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + faseInfo.desc + '</div>'
     + '</div></div>'
-    // Barra de fases
     + '<div style="display:flex;gap:4px;margin-top:16px">'
     + WP_FASES.map(function(f) {
         var isActive = f.id === fase;
         return '<div style="flex:1;height:4px;border-radius:2px;background:' + (isActive ? 'var(--blue)' : 'var(--border)') + '"></div>';
       }).join('')
     + '</div></div>'
-    // Placeholder para módulos futuros
-    + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">'
-    + wpModuleCard('Objetivos', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', 'Em breve')
-    + wpModuleCard('Orçamento', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--neg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', 'Em breve')
-    + wpModuleCard('Seguros', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', 'Em breve')
-    + wpModuleCard('Grupo Familiar', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 'Em breve')
+    // Resumo financeiro do cadastro
+    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px">'
+    + wpKpiCard('Renda mensal', wpFmtMoeda(clienteData.rendaMensal), 'var(--pos)')
+    + wpKpiCard('Patrimônio', wpFmtMoeda(clienteData.patrimonioDeclarado || clienteData.patrimonio), 'var(--blue)')
+    + wpKpiCard('Dívidas', wpFmtMoeda(clienteData.dividas), 'var(--neg)')
+    + wpKpiCard('Dependentes', (clienteData.dependentes || 0) + ' pessoa' + ((clienteData.dependentes || 0) !== 1 ? 's' : ''), 'var(--ok)')
+    + '</div>'
+    // Tab bar
+    + '<div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0">'
+    + wpTabBtn('resumo', 'Resumo', true)
+    + wpTabBtn('objetivos', 'Objetivos', false)
+    + wpTabBtn('seguros', 'Seguros', false)
+    + wpTabBtn('familia', 'Grupo Familiar', false)
+    + '</div>'
+    + '<div id="wp-modules-content"></div>'
+    + '</div>'
+    + '<script>'
+    + 'wpIsAdminView=' + (isAdmin ? 'true' : 'false') + ';'
+    + 'setTimeout(function(){wpShowTab("resumo","' + cid + '",' + (isAdmin ? 'true' : 'false') + ')},100);'
+    + '</script>';
+}
+
+function wpKpiCard(label, value, color) {
+  return '<div class="card" style="padding:16px">'
+    + '<div style="font-size:13px;color:var(--text3);font-weight:400;margin-bottom:6px">' + label + '</div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:' + color + '">' + value + '</div>'
+    + '</div>';
+}
+
+function wpTabBtn(tab, label, active) {
+  return '<button class="wp-tab-btn' + (active ? ' active' : '') + '" data-tab="' + tab + '" '
+    + 'onclick="wpShowTab(\'' + tab + '\',wpGetCurrentClienteId(),wpIsAdminView)" '
+    + 'style="padding:10px 18px;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;font-size:13px;font-weight:' + (active ? '600' : '400') + ';'
+    + 'color:' + (active ? 'var(--blue)' : 'var(--text3)') + ';border-bottom:2px solid ' + (active ? 'var(--blue)' : 'transparent') + ';transition:all .15s"'
+    + ' onmouseover="this.style.color=\'var(--blue)\'" onmouseout="if(!this.classList.contains(\'active\'))this.style.color=\'var(--text3)\'"'
+    + '>' + label + '</button>';
+}
+
+var wpIsAdminView = false;
+
+function wpGetCurrentClienteId() {
+  // Admin mode: return selected client
+  if (typeof wpSelectedClienteId !== 'undefined' && wpSelectedClienteId) return wpSelectedClienteId;
+  // Client mode: return currentClienteVinculado
+  if (typeof currentClienteVinculado !== 'undefined' && currentClienteVinculado) return currentClienteVinculado;
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: RESUMO
+// ═══════════════════════════════════════════════════════════
+function wpRenderResumo(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando...</div>';
+  var html = '';
+  // Load all subcollections in parallel
+  var pending = 3;
+  var objetivos = [], seguros = [], familia = [];
+  function checkDone() {
+    pending--;
+    if (pending > 0) return;
+    // Build summary
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">';
+    // Objetivos summary
+    html += '<div class="card" style="padding:20px;cursor:pointer" onclick="wpShowTab(\'objetivos\',\'' + clienteId + '\',' + isAdmin + ')">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'
+      + '<span style="font-size:14px;font-weight:600;color:var(--white)">Objetivos</span></div>'
+      + '<div style="font-family:Inter,sans-serif;font-size:24px;font-weight:700;color:var(--white)">' + objetivos.length + '</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-top:4px">' + (objetivos.length === 0 ? 'Nenhum cadastrado' : objetivos.length + ' objetivo' + (objetivos.length > 1 ? 's' : '') + ' definido' + (objetivos.length > 1 ? 's' : '')) + '</div>'
+      + '</div>';
+    // Seguros summary
+    var totalPremio = seguros.reduce(function(s, x) { return s + (x.premioMensal || 0); }, 0);
+    html += '<div class="card" style="padding:20px;cursor:pointer" onclick="wpShowTab(\'seguros\',\'' + clienteId + '\',' + isAdmin + ')">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+      + '<span style="font-size:14px;font-weight:600;color:var(--white)">Seguros</span></div>'
+      + '<div style="font-family:Inter,sans-serif;font-size:24px;font-weight:700;color:var(--white)">' + seguros.length + '</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-top:4px">' + (seguros.length === 0 ? 'Nenhuma apólice' : wpFmtMoeda(totalPremio) + '/mês em prêmios') + '</div>'
+      + '</div>';
+    // Família summary
+    html += '<div class="card" style="padding:20px;cursor:pointer" onclick="wpShowTab(\'familia\',\'' + clienteId + '\',' + isAdmin + ')">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+      + '<span style="font-size:14px;font-weight:600;color:var(--white)">Grupo Familiar</span></div>'
+      + '<div style="font-family:Inter,sans-serif;font-size:24px;font-weight:700;color:var(--white)">' + familia.length + '</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-top:4px">' + (familia.length === 0 ? 'Nenhum membro' : familia.length + ' membro' + (familia.length > 1 ? 's' : '')) + '</div>'
+      + '</div>';
+    html += '</div>';
+    container.innerHTML = html;
+  }
+  db.collection('clientes').doc(clienteId).collection('wp_objetivos').orderBy('criadoEm','desc').get().then(function(snap) {
+    snap.forEach(function(d) { objetivos.push(Object.assign({ id: d.id }, d.data())); });
+    checkDone();
+  }).catch(function() { checkDone(); });
+  db.collection('clientes').doc(clienteId).collection('wp_seguros').orderBy('criadoEm','desc').get().then(function(snap) {
+    snap.forEach(function(d) { seguros.push(Object.assign({ id: d.id }, d.data())); });
+    checkDone();
+  }).catch(function() { checkDone(); });
+  db.collection('clientes').doc(clienteId).collection('wp_familia').orderBy('criadoEm','desc').get().then(function(snap) {
+    snap.forEach(function(d) { familia.push(Object.assign({ id: d.id }, d.data())); });
+    checkDone();
+  }).catch(function() { checkDone(); });
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: OBJETIVOS
+// ═══════════════════════════════════════════════════════════
+var WP_OBJ_TIPOS = ['Aposentadoria','Casa própria','Educação dos filhos','Viagem','Reserva de emergência','Carro','Independência financeira','Outro'];
+var WP_OBJ_PRIORIDADES = ['Alta','Média','Baixa'];
+
+function wpRenderObjetivos(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando objetivos...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_objetivos').orderBy('criadoEm','desc').get().then(function(snap) {
+    var items = [];
+    snap.forEach(function(d) { items.push(Object.assign({ id: d.id }, d.data())); });
+    var html = '';
+    if (isAdmin) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+        + '<div style="font-size:15px;font-weight:700;color:var(--white)">Objetivos Financeiros</div>'
+        + '<button class="btn-primary" onclick="wpAddObjetivo(\'' + clienteId + '\')" style="padding:6px 14px;font-size:12px">+ Novo objetivo</button>'
+        + '</div>';
+    }
+    if (items.length === 0) {
+      html += '<div class="card" style="padding:40px;text-align:center">'
+        + '<div style="color:var(--text3);font-size:13px">' + (isAdmin ? 'Nenhum objetivo cadastrado. Clique em "+ Novo objetivo" para adicionar.' : 'Nenhum objetivo definido ainda. Seu consultor vai cadastrar seus objetivos aqui.') + '</div></div>';
+    } else {
+      items.forEach(function(obj) {
+        var prCor = obj.prioridade === 'Alta' ? 'var(--neg)' : (obj.prioridade === 'Média' ? 'var(--caution)' : 'var(--ok)');
+        html += '<div class="card" style="padding:16px;margin-bottom:10px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+          + '<div style="flex:1">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          + '<span style="font-size:14px;font-weight:600;color:var(--white)">' + (obj.nome || obj.tipo || 'Objetivo') + '</span>'
+          + '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,' + prCor + ' 15%,transparent);color:' + prCor + ';font-weight:600">' + (obj.prioridade || 'Média') + '</span>'
+          + '</div>'
+          + '<div style="display:flex;gap:20px;flex-wrap:wrap">'
+          + '<div><span style="font-size:11px;color:var(--text3)">Valor alvo</span><div style="font-size:14px;font-weight:600;color:var(--pos)">' + wpFmtMoeda(obj.valorAlvo) + '</div></div>'
+          + '<div><span style="font-size:11px;color:var(--text3)">Prazo</span><div style="font-size:14px;font-weight:600;color:var(--white)">' + (obj.prazo || 'Não definido') + '</div></div>'
+          + (obj.descricao ? '<div style="flex-basis:100%;font-size:12px;color:var(--text2);margin-top:4px">' + obj.descricao + '</div>' : '')
+          + '</div></div>';
+        if (isAdmin) {
+          html += '<button onclick="wpDeleteObjetivo(\'' + clienteId + '\',\'' + obj.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5" title="Remover">x</button>';
+        }
+        html += '</div></div>';
+      });
+    }
+    container.innerHTML = html;
+  });
+}
+
+function wpAddObjetivo(clienteId) {
+  var html = '<div class="card" style="padding:20px">'
+    + '<div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:14px">Novo Objetivo</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    + '<div class="form-group"><label>Tipo</label><select class="form-input" id="wp-obj-tipo">' + WP_OBJ_TIPOS.map(function(t) { return '<option>' + t + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Nome personalizado</label><input class="form-input" id="wp-obj-nome" placeholder="Ex: Apartamento na praia"></div>'
+    + '<div class="form-group"><label>Valor alvo (R$)</label><input class="form-input" id="wp-obj-valor" type="number" placeholder="0" step="1000"></div>'
+    + '<div class="form-group"><label>Prazo</label><input class="form-input" id="wp-obj-prazo" placeholder="Ex: 2030, 5 anos, etc"></div>'
+    + '<div class="form-group"><label>Prioridade</label><select class="form-input" id="wp-obj-prio">' + WP_OBJ_PRIORIDADES.map(function(p) { return '<option>' + p + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group form-full"><label>Descrição (opcional)</label><input class="form-input" id="wp-obj-desc" placeholder="Detalhes adicionais..."></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
+    + '<button class="btn-secondary" onclick="wpShowTab(\'objetivos\',\'' + clienteId + '\',true)">Cancelar</button>'
+    + '<button class="btn-primary" onclick="wpSaveObjetivo(\'' + clienteId + '\')">Salvar</button>'
     + '</div></div>';
+  var container = document.getElementById('wp-modules-content');
+  if (container) container.innerHTML = html;
+}
+
+function wpSaveObjetivo(clienteId) {
+  var tipo = document.getElementById('wp-obj-tipo').value;
+  var nome = document.getElementById('wp-obj-nome').value.trim() || tipo;
+  var data = {
+    tipo: tipo,
+    nome: nome,
+    valorAlvo: Number(document.getElementById('wp-obj-valor').value) || 0,
+    prazo: document.getElementById('wp-obj-prazo').value.trim(),
+    prioridade: document.getElementById('wp-obj-prio').value,
+    descricao: document.getElementById('wp-obj-desc').value.trim(),
+    criadoEm: new Date().toISOString()
+  };
+  db.collection('clientes').doc(clienteId).collection('wp_objetivos').add(data).then(function() {
+    wpAuditLog(clienteId, 'create', 'wp_objetivos', '', 'nome', '', nome);
+    wpShowTab('objetivos', clienteId, true);
+  });
+}
+
+function wpDeleteObjetivo(clienteId, docId) {
+  if (!confirm('Remover este objetivo?')) return;
+  db.collection('clientes').doc(clienteId).collection('wp_objetivos').doc(docId).delete().then(function() {
+    wpAuditLog(clienteId, 'delete', 'wp_objetivos', docId, '', '', '');
+    wpShowTab('objetivos', clienteId, true);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: SEGUROS
+// ═══════════════════════════════════════════════════════════
+var WP_SEGURO_TIPOS = ['Vida','Saúde','Patrimonial','Auto','Responsabilidade Civil','Previdência Privada','Outro'];
+
+function wpRenderSeguros(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando seguros...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_seguros').orderBy('criadoEm','desc').get().then(function(snap) {
+    var items = [];
+    snap.forEach(function(d) { items.push(Object.assign({ id: d.id }, d.data())); });
+    var html = '';
+    if (isAdmin) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+        + '<div style="font-size:15px;font-weight:700;color:var(--white)">Seguros e Proteções</div>'
+        + '<button class="btn-primary" onclick="wpAddSeguro(\'' + clienteId + '\')" style="padding:6px 14px;font-size:12px">+ Nova apólice</button>'
+        + '</div>';
+    }
+    if (items.length === 0) {
+      html += '<div class="card" style="padding:40px;text-align:center">'
+        + '<div style="color:var(--text3);font-size:13px">' + (isAdmin ? 'Nenhum seguro cadastrado.' : 'Nenhum seguro registrado ainda.') + '</div></div>';
+    } else {
+      var totalPremio = 0;
+      items.forEach(function(seg) {
+        totalPremio += seg.premioMensal || 0;
+        html += '<div class="card" style="padding:16px;margin-bottom:10px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+          + '<div style="flex:1">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          + '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,#a78bfa 15%,transparent);color:#a78bfa;font-weight:600">' + (seg.tipo || 'Seguro') + '</span>'
+          + '<span style="font-size:14px;font-weight:600;color:var(--white)">' + (seg.seguradora || '') + '</span>'
+          + '</div>'
+          + '<div style="display:flex;gap:20px;flex-wrap:wrap">'
+          + '<div><span style="font-size:11px;color:var(--text3)">Cobertura</span><div style="font-size:14px;font-weight:600;color:var(--pos)">' + wpFmtMoeda(seg.cobertura) + '</div></div>'
+          + '<div><span style="font-size:11px;color:var(--text3)">Prêmio mensal</span><div style="font-size:14px;font-weight:600;color:var(--neg)">' + wpFmtMoeda(seg.premioMensal) + '</div></div>'
+          + '<div><span style="font-size:11px;color:var(--text3)">Vencimento</span><div style="font-size:14px;font-weight:600;color:var(--white)">' + (seg.vencimento || 'N/A') + '</div></div>'
+          + (seg.observacoes ? '<div style="flex-basis:100%;font-size:12px;color:var(--text2);margin-top:4px">' + seg.observacoes + '</div>' : '')
+          + '</div></div>';
+        if (isAdmin) {
+          html += '<button onclick="wpDeleteSeguro(\'' + clienteId + '\',\'' + seg.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5" title="Remover">x</button>';
+        }
+        html += '</div></div>';
+      });
+      html += '<div class="card" style="padding:14px;background:color-mix(in srgb,#a78bfa 5%,transparent);border-color:color-mix(in srgb,#a78bfa 20%,transparent)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<span style="font-size:13px;font-weight:600;color:#a78bfa">Total em prêmios mensais</span>'
+        + '<span style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:#a78bfa">' + wpFmtMoeda(totalPremio) + '/mês</span>'
+        + '</div></div>';
+    }
+    container.innerHTML = html;
+  });
+}
+
+function wpAddSeguro(clienteId) {
+  var html = '<div class="card" style="padding:20px">'
+    + '<div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:14px">Nova Apólice de Seguro</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    + '<div class="form-group"><label>Tipo</label><select class="form-input" id="wp-seg-tipo">' + WP_SEGURO_TIPOS.map(function(t) { return '<option>' + t + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Seguradora</label><input class="form-input" id="wp-seg-seguradora" placeholder="Ex: Porto Seguro, SulAmérica..."></div>'
+    + '<div class="form-group"><label>Cobertura (R$)</label><input class="form-input" id="wp-seg-cobertura" type="number" placeholder="0" step="1000"></div>'
+    + '<div class="form-group"><label>Prêmio mensal (R$)</label><input class="form-input" id="wp-seg-premio" type="number" placeholder="0" step="10"></div>'
+    + '<div class="form-group"><label>Vencimento</label><input class="form-input" id="wp-seg-venc" placeholder="MM/AAAA ou vigência"></div>'
+    + '<div class="form-group"><label>Número da apólice</label><input class="form-input" id="wp-seg-apolice" placeholder="Opcional"></div>'
+    + '<div class="form-group form-full"><label>Observações</label><input class="form-input" id="wp-seg-obs" placeholder="Detalhes adicionais..."></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
+    + '<button class="btn-secondary" onclick="wpShowTab(\'seguros\',\'' + clienteId + '\',true)">Cancelar</button>'
+    + '<button class="btn-primary" onclick="wpSaveSeguro(\'' + clienteId + '\')">Salvar</button>'
+    + '</div></div>';
+  var container = document.getElementById('wp-modules-content');
+  if (container) container.innerHTML = html;
+}
+
+function wpSaveSeguro(clienteId) {
+  var data = {
+    tipo: document.getElementById('wp-seg-tipo').value,
+    seguradora: document.getElementById('wp-seg-seguradora').value.trim(),
+    cobertura: Number(document.getElementById('wp-seg-cobertura').value) || 0,
+    premioMensal: Number(document.getElementById('wp-seg-premio').value) || 0,
+    vencimento: document.getElementById('wp-seg-venc').value.trim(),
+    numeroApolice: document.getElementById('wp-seg-apolice').value.trim(),
+    observacoes: document.getElementById('wp-seg-obs').value.trim(),
+    criadoEm: new Date().toISOString()
+  };
+  db.collection('clientes').doc(clienteId).collection('wp_seguros').add(data).then(function() {
+    wpAuditLog(clienteId, 'create', 'wp_seguros', '', 'tipo', '', data.tipo);
+    wpShowTab('seguros', clienteId, true);
+  });
+}
+
+function wpDeleteSeguro(clienteId, docId) {
+  if (!confirm('Remover esta apólice?')) return;
+  db.collection('clientes').doc(clienteId).collection('wp_seguros').doc(docId).delete().then(function() {
+    wpAuditLog(clienteId, 'delete', 'wp_seguros', docId, '', '', '');
+    wpShowTab('seguros', clienteId, true);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: GRUPO FAMILIAR
+// ═══════════════════════════════════════════════════════════
+var WP_RELACOES = ['Cônjuge','Filho(a)','Pai','Mãe','Irmão(ã)','Avô(ó)','Neto(a)','Outro'];
+
+function wpRenderFamilia(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando grupo familiar...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_familia').orderBy('criadoEm','desc').get().then(function(snap) {
+    var items = [];
+    snap.forEach(function(d) { items.push(Object.assign({ id: d.id }, d.data())); });
+    var html = '';
+    if (isAdmin) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+        + '<div style="font-size:15px;font-weight:700;color:var(--white)">Grupo Familiar</div>'
+        + '<button class="btn-primary" onclick="wpAddFamiliar(\'' + clienteId + '\')" style="padding:6px 14px;font-size:12px">+ Novo membro</button>'
+        + '</div>';
+    }
+    if (items.length === 0) {
+      html += '<div class="card" style="padding:40px;text-align:center">'
+        + '<div style="color:var(--text3);font-size:13px">' + (isAdmin ? 'Nenhum membro familiar cadastrado.' : 'Nenhum membro familiar registrado ainda.') + '</div></div>';
+    } else {
+      items.forEach(function(m) {
+        var idade = m.dataNasc ? calcIdade(m.dataNasc) : (m.idade || '');
+        html += '<div class="card" style="padding:16px;margin-bottom:10px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center">'
+          + '<div style="display:flex;align-items:center;gap:14px">'
+          + '<div style="width:40px;height:40px;border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,transparent);display:flex;align-items:center;justify-content:center">'
+          + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>'
+          + '<div>'
+          + '<div style="font-size:14px;font-weight:600;color:var(--white)">' + (m.nome || 'Sem nome') + '</div>'
+          + '<div style="font-size:12px;color:var(--text3)">' + (m.relacao || '') + (idade ? ' · ' + idade + ' anos' : '') + '</div>'
+          + (m.observacoes ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">' + m.observacoes + '</div>' : '')
+          + '</div></div>';
+        if (isAdmin) {
+          html += '<button onclick="wpDeleteFamiliar(\'' + clienteId + '\',\'' + m.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5" title="Remover">x</button>';
+        }
+        html += '</div></div>';
+      });
+    }
+    container.innerHTML = html;
+  });
+}
+
+function calcIdade(dataNasc) {
+  if (!dataNasc) return '';
+  var parts = dataNasc.split('/');
+  var d;
+  if (parts.length === 3) {
+    d = new Date(parts[2], parts[1] - 1, parts[0]);
+  } else {
+    d = new Date(dataNasc);
+  }
+  if (isNaN(d.getTime())) return '';
+  var hoje = new Date();
+  var age = hoje.getFullYear() - d.getFullYear();
+  var m = hoje.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < d.getDate())) age--;
+  return age;
+}
+
+function wpAddFamiliar(clienteId) {
+  var html = '<div class="card" style="padding:20px">'
+    + '<div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:14px">Novo Membro Familiar</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    + '<div class="form-group"><label>Nome</label><input class="form-input" id="wp-fam-nome" placeholder="Nome completo"></div>'
+    + '<div class="form-group"><label>Relação</label><select class="form-input" id="wp-fam-relacao">' + WP_RELACOES.map(function(r) { return '<option>' + r + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="wp-fam-nasc" placeholder="DD/MM/AAAA" maxlength="10"></div>'
+    + '<div class="form-group"><label>CPF</label><input class="form-input" id="wp-fam-cpf" placeholder="Opcional"></div>'
+    + '<div class="form-group form-full"><label>Observações</label><input class="form-input" id="wp-fam-obs" placeholder="Detalhes relevantes..."></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
+    + '<button class="btn-secondary" onclick="wpShowTab(\'familia\',\'' + clienteId + '\',true)">Cancelar</button>'
+    + '<button class="btn-primary" onclick="wpSaveFamiliar(\'' + clienteId + '\')">Salvar</button>'
+    + '</div></div>';
+  var container = document.getElementById('wp-modules-content');
+  if (container) container.innerHTML = html;
+}
+
+function wpSaveFamiliar(clienteId) {
+  var nome = document.getElementById('wp-fam-nome').value.trim();
+  if (!nome) { alert('Nome é obrigatório'); return; }
+  var data = {
+    nome: nome,
+    relacao: document.getElementById('wp-fam-relacao').value,
+    dataNasc: document.getElementById('wp-fam-nasc').value.trim(),
+    cpf: document.getElementById('wp-fam-cpf').value.trim(),
+    observacoes: document.getElementById('wp-fam-obs').value.trim(),
+    criadoEm: new Date().toISOString()
+  };
+  db.collection('clientes').doc(clienteId).collection('wp_familia').add(data).then(function() {
+    wpAuditLog(clienteId, 'create', 'wp_familia', '', 'nome', '', nome);
+    wpShowTab('familia', clienteId, true);
+  });
+}
+
+function wpDeleteFamiliar(clienteId, docId) {
+  if (!confirm('Remover este membro familiar?')) return;
+  db.collection('clientes').doc(clienteId).collection('wp_familia').doc(docId).delete().then(function() {
+    wpAuditLog(clienteId, 'delete', 'wp_familia', docId, '', '', '');
+    wpShowTab('familia', clienteId, true);
+  });
 }
 
 // ── Audit Trail helper ───────────────────────────────────

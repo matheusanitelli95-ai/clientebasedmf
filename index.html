@@ -1910,6 +1910,23 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
         </div>
         <div class="form-section">
+          <div class="form-section-title">Dados Financeiros</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Profissão</label><input class="form-input" id="fc-profissao" placeholder="Ex: Engenheiro, Médico..."></div>
+            <div class="form-group"><label>Renda Mensal (R$)</label><input class="form-input" id="fc-renda" type="number" placeholder="0,00" step="100"></div>
+            <div class="form-group"><label>Patrimônio Declarado (R$)</label><input class="form-input" id="fc-patrimonio-declarado" type="number" placeholder="0,00" step="1000"></div>
+            <div class="form-group"><label>Dívidas / Financiamentos (R$)</label><input class="form-input" id="fc-dividas" type="number" placeholder="0,00" step="100"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Dados Familiares</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Estado Civil</label><select class="form-input" id="fc-estado-civil"><option value="">Não informado</option><option>Solteiro(a)</option><option>Casado(a)</option><option>União Estável</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select></div>
+            <div class="form-group"><label>Regime de Bens</label><select class="form-input" id="fc-regime-bens"><option value="">Não informado</option><option>Comunhão Parcial</option><option>Comunhão Universal</option><option>Separação Total</option><option>Participação Final nos Aquestos</option></select></div>
+            <div class="form-group"><label>Quantidade de Dependentes</label><input class="form-input" id="fc-dependentes" type="number" min="0" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="form-section">
           <div class="form-section-title">Observações</div>
           <div class="form-group"><label>Notas internas</label><textarea class="form-input" id="fc-obs" placeholder="Informações relevantes sobre o cliente..."></textarea></div>
         </div>
@@ -3298,6 +3315,13 @@ function openModalCliente(id){
   document.getElementById('fc-seg').value=c?c.segmentação||'Varejo':'Varejo';
   document.getElementById('fc-obj').value=c?c.objetivo||'Acumulação':'Acumulação';
   document.getElementById('fc-obs').value=c?c.obs||'':'';
+  document.getElementById('fc-profissao').value=c?c.profissao||'':'';
+  document.getElementById('fc-renda').value=c?c.rendaMensal||'':'';
+  document.getElementById('fc-patrimonio-declarado').value=c?c.patrimonioDeclarado||'':'';
+  document.getElementById('fc-dividas').value=c?c.dividas||'':'';
+  document.getElementById('fc-estado-civil').value=c?c.estadoCivil||'':'';
+  document.getElementById('fc-regime-bens').value=c?c.regimeBens||'':'';
+  document.getElementById('fc-dependentes').value=c?c.dependentes||'':'';
   updateProfSelect(c?c.responsavelConsId:'', c?c.responsavelBlackId:'');
   toggleResp();
   openModal('modal-cliente');
@@ -3357,6 +3381,13 @@ function saveCliente(){
     perfil:document.getElementById('fc-perfil').value,
     segmentação:document.getElementById('fc-seg').value,
     objetivo:document.getElementById('fc-obj').value,
+    profissao:document.getElementById('fc-profissao').value,
+    rendaMensal:Number(document.getElementById('fc-renda').value)||0,
+    patrimonioDeclarado:Number(document.getElementById('fc-patrimonio-declarado').value)||0,
+    dividas:Number(document.getElementById('fc-dividas').value)||0,
+    estadoCivil:document.getElementById('fc-estado-civil').value,
+    regimeBens:document.getElementById('fc-regime-bens').value,
+    dependentes:Number(document.getElementById('fc-dependentes').value)||0,
     obs:document.getElementById('fc-obs').value
   };
 
