@@ -605,8 +605,6 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="nav-section">CRM</div>
       <button class="nav-item" onclick="showView('metas-kpis',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Metas e KPIs</span></button>
       <div class="nav-section">Ferramentas</div>
-      <button class="nav-item" onclick="showView('panorama',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Panorama</span></button>
-
       <button class="nav-item" onclick="showView('estrategias',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M6 20V10l6-6 6 6v10"/></svg></span><span>Estratégias</span></button>
       <button class="nav-item" onclick="showView('controle-opcoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span><span>Controle de Opções</span></button>
       <button class="nav-item" onclick="window.open('https://simulador.b3.com.br/','_blank')"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span>Simulador B3</span></button>
@@ -687,7 +685,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <input class="filter-input" id="search-cli" placeholder="Buscar nome ou CPF..." oninput="renderClientes()" style="min-width:200px">
           <select class="filter-input" id="filter-cli-status" onchange="renderClientes()"><option value="">Todos os status</option><option>Ativo</option><option>Inativo</option><option>Prospecto</option></select>
           <select class="filter-input" id="filter-cli-prof" onchange="renderClientes()"><option value="">Todos os profissionais</option></select>
-          <select class="filter-input" id="filter-cli-srv" onchange="renderClientes()"><option value="">Todos os serviços</option><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select>
+          <select class="filter-input" id="filter-cli-srv" onchange="renderClientes()"><option value="">Todos os serviços</option><option value="consultoria">Consultoria</option><option value="black">Black</option><option value="vitalicio">Vitalício</option><option value="socio">Sócio</option></select>
         </div>
         <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
           <span style="font-size:13px;font-weight:700;color:#000" id="bulk-count">0 selecionados</span>
@@ -1831,10 +1829,17 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="form-grid">
         <div class="form-group form-full"><label>Nome completo *</label><input class="form-input" id="fc-nome" placeholder="Nome do cliente"></div>
         <div class="form-group"><label>Banco / Corretora *</label><select class="form-input" id="fc-banco"><option value="">Selecione...</option><option>BTG Pactual</option><option>XP Investimentos</option><option>Itaú</option><option>Bradesco</option><option>Banco do Brasil</option><option>Santander</option><option>Nubank</option><option>Inter</option><option>Clear</option><option>Rico</option><option>Genial</option><option>Órama</option><option>Modal</option><option>Warren</option><option>Guide</option><option>Ágora</option><option>Sicoob</option><option>Sicredi</option><option>Outro</option></select></div>
-        <div class="form-group"><label>Serviço Contratado *</label><select class="form-input" id="fc-servico" onchange="toggleResp()"><option>DMF Consultoria</option><option>DMF Black</option><option>DMF Consultoria + Black</option></select></div>
         <div class="form-group"><label>Status</label><select class="form-input" id="fc-status"><option>Ativo</option><option>Inativo</option><option>Prospecto</option></select></div>
         <div class="form-group"><label>Patrimônio em Ativos (R$) *</label><input class="form-input" id="fc-patrimonio" type="number" placeholder="0" style="font-size:15px;font-weight:600"></div>
-        <div class="form-group"><label>Nível DMF Black</label><select class="form-input" id="fc-nivel"><option value="">N/A</option><option>Assinatura</option><option>Vitalício</option><option>Sócio</option></select></div>
+        <div class="form-group form-full">
+          <label>Tipo de Serviço</label>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isConsultoria" style="accent-color:var(--blue);width:16px;height:16px" onchange="toggleResp()"> Consultoria</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isBlack" style="accent-color:var(--blue);width:16px;height:16px" onchange="toggleResp()"> Black</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isVitalicio" style="accent-color:var(--blue);width:16px;height:16px"> Vitalício</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isSocio" style="accent-color:var(--blue);width:16px;height:16px"> Sócio</label>
+          </div>
+        </div>
         <!-- Responsável Consultoria -->
         <div class="form-group" id="fc-resp-cons-wrap">
           <label>Responsável — Consultoria</label>
@@ -1868,6 +1873,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="form-section">
           <div class="form-section-title">Endereço</div>
           <div class="form-grid">
+            <div class="form-group"><label>CEP</label><input class="form-input" id="fc-cep" placeholder="00000-000" maxlength="9" oninput="buscarCep(this.value)"><div id="fc-cep-status" style="font-size:10px;margin-top:2px;color:var(--text3)"></div></div>
             <div class="form-group form-full"><label>Endereço</label><input class="form-input" id="fc-end" placeholder="Rua, número, complemento"></div>
             <div class="form-group"><label>Cidade</label><input class="form-input" id="fc-cidade" placeholder="Cidade"></div>
             <div class="form-group"><label>Estado</label><select class="form-input" id="fc-estado"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div>
@@ -3042,14 +3048,24 @@ function renderDashboard(){
 function sortClientes(col){if(cliSortCol===col)cliSortAsc=!cliSortAsc;else{cliSortCol=col;cliSortAsc=true;}renderClientes();}
 
 function nivelBadge(c){
+  // Novo sistema de badges baseado em checkboxes
+  if(typeof c.isConsultoria !== 'undefined'){
+    var parts=[];
+    if(c.isConsultoria) parts.push('<span class="badge-consultoria" style="font-size:10px;padding:2px 8px;border-radius:12px">Consultoria</span>');
+    if(c.isBlack) parts.push('<span class="badge-black" style="font-size:10px;padding:2px 8px;border-radius:12px">Black</span>');
+    if(c.isVitalicio) parts.push('<span class="badge-vitalicio" style="font-size:10px;padding:2px 8px;border-radius:12px">Vitalício</span>');
+    if(c.isSocio) parts.push('<span class="badge-socio" style="font-size:10px;padding:2px 8px;border-radius:12px">Sócio</span>');
+    return parts.length?parts.join(' '):'<span style="font-size:10px;color:var(--text3)">—</span>';
+  }
+  // Fallback para clientes antigos sem os novos campos
   var srv=c.servico||'';
   var nivel=c.nivel||'';
-  if(srv==='DMF Consultoria+Black'||srv==='DMF Consultoria + Black')return'<span class="badge-vitalicio" style="font-size:10px;padding:2px 8px;border-radius:12px">Consultoria+Black</span>';
-  if(srv==='DMF Black'){
-    var cls=nivel==='Scale'?'badge-consultoria':nivel==='Sócio'?'badge-socio':nivel==='Vitalício'?'badge-vitalicio':'badge-black';
+  if(srv.indexOf('Consultoria')>=0&&srv.indexOf('Black')>=0)return'<span class="badge-vitalicio" style="font-size:10px;padding:2px 8px;border-radius:12px">Consultoria+Black</span>';
+  if(srv.indexOf('Black')>=0){
+    var cls=nivel==='Sócio'?'badge-socio':nivel==='Vitalício'?'badge-vitalicio':'badge-black';
     return'<span class="'+cls+'" style="font-size:10px;padding:2px 8px;border-radius:12px">Black'+(nivel?' · '+nivel:'')+'</span>';
   }
-  if(srv==='DMF Consultoria')return'<span class="badge-consultoria" style="font-size:10px;padding:2px 8px;border-radius:12px">Consultoria</span>';
+  if(srv.indexOf('Consultoria')>=0)return'<span class="badge-consultoria" style="font-size:10px;padding:2px 8px;border-radius:12px">Consultoria</span>';
   return'<span style="font-size:10px;color:var(--text3)">—</span>';
 }
 
@@ -3059,8 +3075,23 @@ function renderClientes(){
   var fp=document.getElementById('filter-cli-prof').value;
   var fsr=document.getElementById('filter-cli-srv').value;
   var f=clientes.filter(function(c){
+    var srvOk=true;
+    if(fsr){
+      if(typeof c.isConsultoria !== 'undefined'){
+        if(fsr==='consultoria') srvOk=!!c.isConsultoria;
+        else if(fsr==='black') srvOk=!!c.isBlack;
+        else if(fsr==='vitalicio') srvOk=!!c.isVitalicio;
+        else if(fsr==='socio') srvOk=!!c.isSocio;
+      } else {
+        // Fallback para clientes antigos
+        if(fsr==='consultoria') srvOk=(c.servico||'').indexOf('Consultoria')>=0;
+        else if(fsr==='black') srvOk=(c.servico||'').indexOf('Black')>=0;
+        else if(fsr==='vitalicio') srvOk=(c.nivel||'')==='Vitalício';
+        else if(fsr==='socio') srvOk=(c.nivel||'')==='Sócio';
+      }
+    }
     return(!s||(c.nome||'').toLowerCase().includes(s)||(c.cpf||'').includes(s))
-      &&(!fs||c.status===fs)&&(!fp||c.responsavel===fp)&&(!fsr||c.servico===fsr);
+      &&(!fs||c.status===fs)&&(!fp||c.responsavel===fp)&&srvOk;
   }).sort(function(a,b){
     var va=a[cliSortCol],vb=b[cliSortCol];
     return typeof va==='number'?(cliSortAsc?va-vb:vb-va):(cliSortAsc?String(va||'').localeCompare(String(vb||'')):String(vb||'').localeCompare(String(va||'')));
@@ -3070,7 +3101,7 @@ function renderClientes(){
   tb.innerHTML=f.map(function(c){
     var sc=STATUS_C[c.status]||'#424242';
     var pat=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
-    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+(c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#00c853;font-weight:500">'+fmtFull(pat)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
+    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+(c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:DM Mono,monospace;font-size:13px;color:#38bdf8;font-weight:500">'+fmtFull(pat)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
   }).join('');
 }
 
@@ -3110,8 +3141,17 @@ function renderDadosCliente(c){
   [['Nome',c.nome],['CPF/CNPJ',c.cpf],['Tipo',c.tipo],['Nascimento',fmtDate(c.nasc)],['Entrada',fmtDate(c.entrada)],['E-mail',c.email],['Telefone',c.telefone]].forEach(function(f){
     html+='<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">'+f[0]+'</span><span style="font-size:13px;color:var(--text)">'+(f[1]||'—')+'</span></div>';
   });
+  // Badges de serviço
+  var badges='';
+  if(c.isConsultoria) badges+='<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#38bdf822;color:#38bdf8;margin-right:4px">Consultoria</span>';
+  if(c.isBlack) badges+='<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#a78bfa22;color:#a78bfa;margin-right:4px">Black</span>';
+  if(c.isVitalicio) badges+='<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#ff8c0022;color:#ff8c00;margin-right:4px">Vitalício</span>';
+  if(c.isSocio) badges+='<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#22c55e22;color:#22c55e;margin-right:4px">Sócio</span>';
+  // Fallback para clientes antigos sem os novos campos
+  if(!badges && c.servico) badges='<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:#64748b22;color:#64748b">'+c.servico+'</span>';
+  html+='<div style="display:flex;gap:4px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3);margin-right:auto">Serviços</span>'+badges+'</div>';
   html+='</div><div class="card"><div class="section-title">Endereço & Perfil</div>';
-  [['Endereço',c.endereco],['Cidade',c.cidade],['Estado',c.estado],['Banco/Corretora',c.banco],['Segmentação',c.segmentação],['Serviço',c.servico],['Nível',c.nivel],['Status',c.status]].forEach(function(f){
+  [['CEP',c.cep],['Endereço',c.endereco],['Cidade',c.cidade],['Estado',c.estado],['Banco/Corretora',c.banco],['Segmentação',c.segmentação],['Status',c.status]].forEach(function(f){
     html+='<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text3)">'+f[0]+'</span><span style="font-size:13px;color:var(--text)">'+(f[1]||'—')+'</span></div>';
   });
   html+='</div></div>';
@@ -3204,10 +3244,30 @@ function openModalCliente(id){
   var c=id?clientes.find(function(x){return x.id===id;}):null;
   document.getElementById('fc-nome').value=c?c.nome||'':'';
   document.getElementById('fc-banco').value=c?c.banco||'':'';
-  document.getElementById('fc-servico').value=c?c.servico||'DMF Consultoria':'DMF Consultoria';
   document.getElementById('fc-status').value=c?c.status||'Ativo':'Ativo';
   document.getElementById('fc-patrimonio').value=c?c.patrimonio||'':'';
-  document.getElementById('fc-nivel').value=c?c.nivel||'':'';
+  // Checkboxes de tipo de serviço — retrocompatível com campo 'servico' antigo
+  var isConsEl=document.getElementById('fc-isConsultoria');
+  var isBlkEl=document.getElementById('fc-isBlack');
+  var isVitEl=document.getElementById('fc-isVitalicio');
+  var isSocEl=document.getElementById('fc-isSocio');
+  if(c){
+    // Se já tem os novos campos, usar; senão, inferir do campo 'servico' antigo
+    if(typeof c.isConsultoria !== 'undefined'){
+      isConsEl.checked=!!c.isConsultoria;
+      isBlkEl.checked=!!c.isBlack;
+      isVitEl.checked=!!c.isVitalicio;
+      isSocEl.checked=!!c.isSocio;
+    } else {
+      var sv=c.servico||'';
+      isConsEl.checked=sv.indexOf('Consultoria')>=0;
+      isBlkEl.checked=sv.indexOf('Black')>=0;
+      isVitEl.checked=(c.nivel||'')==='Vitalício';
+      isSocEl.checked=(c.nivel||'')==='Sócio';
+    }
+  } else {
+    isConsEl.checked=true; isBlkEl.checked=false; isVitEl.checked=false; isSocEl.checked=false;
+  }
   // Complementares
   document.getElementById('fc-tipo').value=c?c.tipo||'PF':'PF';
   document.getElementById('fc-cpf').value=c?c.cpf||'':'';
@@ -3215,6 +3275,8 @@ function openModalCliente(id){
   document.getElementById('fc-entrada').value=c?c.entrada||today():today();
   document.getElementById('fc-email').value=c?c.email||'':'';
   document.getElementById('fc-tel').value=c?c.telefone||'':'';
+  document.getElementById('fc-cep').value=c?c.cep||'':'';
+  document.getElementById('fc-cep-status').textContent='';
   document.getElementById('fc-end').value=c?c.endereco||'':'';
   document.getElementById('fc-cidade').value=c?c.cidade||'':'';
   document.getElementById('fc-estado').value=c?c.estado||'':'';
@@ -3238,15 +3300,30 @@ function saveCliente(){
   var blackNome=selBlack&&selBlack.selectedIndex>0?selBlack.options[selBlack.selectedIndex].text:'';
   var respPrincipal = consNome || blackNome;
   var respPrincipalId = selCons&&selCons.value?selCons.value:(selBlack?selBlack.value:'');
+  var isCons=document.getElementById('fc-isConsultoria').checked;
+  var isBlk=document.getElementById('fc-isBlack').checked;
+  var isVit=document.getElementById('fc-isVitalicio').checked;
+  var isSoc=document.getElementById('fc-isSocio').checked;
+  // Gerar campo 'servico' retrocompatível para não quebrar filtros existentes
+  var servicoParts=[];
+  if(isCons) servicoParts.push('DMF Consultoria');
+  if(isBlk) servicoParts.push('DMF Black');
+  var servicoStr=servicoParts.join(' + ')||'Nenhum';
+  // Gerar campo 'nivel' retrocompatível
+  var nivelStr=isSoc?'Sócio':(isVit?'Vitalício':(isBlk?'Assinatura':''));
   var data={
     nome:nome,
     banco:document.getElementById('fc-banco').value,
-    servico:document.getElementById('fc-servico').value,
+    servico:servicoStr,
+    isConsultoria:isCons,
+    isBlack:isBlk,
+    isVitalicio:isVit,
+    isSocio:isSoc,
     status:document.getElementById('fc-status').value,
     patrimonio:Number(document.getElementById('fc-patrimonio').value)||0,
     custodiaRF:Number(document.getElementById('fc-patrimonio').value)||0,
     custodiaRV:0,
-    nivel:document.getElementById('fc-nivel').value,
+    nivel:nivelStr,
     responsavelConsultoria:consNome,
     responsavelConsId:selCons?selCons.value:'',
     responsavelBlack:blackNome,
@@ -3259,6 +3336,7 @@ function saveCliente(){
     entrada:document.getElementById('fc-entrada').value,
     email:email,
     telefone:document.getElementById('fc-tel').value,
+    cep:document.getElementById('fc-cep').value,
     endereco:document.getElementById('fc-end').value,
     cidade:document.getElementById('fc-cidade').value,
     estado:document.getElementById('fc-estado').value,
@@ -3317,12 +3395,37 @@ function deleteCliente(id){
 
 // PROFISSIONAIS
 function toggleResp(){
-  var srv = document.getElementById('fc-servico').value;
+  var isCons = document.getElementById('fc-isConsultoria');
+  var isBlk = document.getElementById('fc-isBlack');
   var consWrap = document.getElementById('fc-resp-cons-wrap');
   var blackWrap = document.getElementById('fc-resp-black-wrap');
   if(!consWrap||!blackWrap) return;
-  consWrap.style.display = (srv==='DMF Black') ? 'none' : 'flex';
-  blackWrap.style.display = (srv==='DMF Consultoria') ? 'none' : 'flex';
+  consWrap.style.display = (isCons&&isCons.checked) ? 'flex' : 'none';
+  blackWrap.style.display = (isBlk&&isBlk.checked) ? 'flex' : 'none';
+}
+
+// ── Busca CEP via ViaCEP ─────────────────────────────────
+var _cepTimeout=null;
+function buscarCep(val){
+  val=val.replace(/\D/g,'');
+  var st=document.getElementById('fc-cep-status');
+  if(val.length<8){if(st)st.textContent='';return;}
+  if(_cepTimeout)clearTimeout(_cepTimeout);
+  _cepTimeout=setTimeout(function(){
+    if(st)st.textContent='Buscando...';
+    fetch('https://viacep.com.br/ws/'+val+'/json/')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.erro){if(st)st.textContent='CEP não encontrado';return;}
+        document.getElementById('fc-end').value=d.logradouro||'';
+        document.getElementById('fc-cidade').value=d.localidade||'';
+        document.getElementById('fc-estado').value=d.uf||'';
+        if(st)st.textContent='✓ Endereço preenchido';
+        if(st)st.style.color='var(--blue)';
+        setTimeout(function(){if(st){st.textContent='';st.style.color='var(--text3)';}},3000);
+      })
+      .catch(function(){if(st)st.textContent='Erro ao buscar CEP';});
+  },500);
 }
 
 function updateProfSelect(selConsId, selBlackId){
@@ -4856,10 +4959,8 @@ var editingComId = null, editingGloId = null;
 var _origShowViewComm = showView;
 showView = function(v,btn){
   _origShowViewComm(v,btn);
-  if(v==='comunicados'){ loadComunicados(); checkAlertasVencimento(); }
   if(v==='glossario') loadGlossario();
   if(v==='agendamento') loadReunioes();
-  if(v==='whatsapp') populateWaClientes();
 };
 
 // ── Alertas de Vencimento ─────────────────────────────────
@@ -5636,8 +5737,6 @@ var noticiaTemaAtual = 'mercado financeiro brasil';
 var _origShowViewNot = showView;
 showView = function(v,btn){
   _origShowViewNot(v,btn);
-  if(v==='noticias') loadNoticias();
-  if(v==='whatsapp') { populateWaClientes(); updateWaCount(); }
 };
 
 function setNoticiaTema(btn){
@@ -7529,9 +7628,9 @@ function _ensureClienteVinculado(callback){
 }
 
 var PERFIL_MENUS = {
-  adm: ['clientes','cliente-detalhe','financeiro','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','minha-carteira','minhas-operacoes','metas-kpis'],
-  gestor: ['clientes','cliente-detalhe','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','minha-carteira','minhas-operacoes','metas-kpis'],
-  cliente: ['minha-carteira','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
+  adm: ['clientes','cliente-detalhe','financeiro','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','configuracoes','minha-carteira','minhas-operacoes','metas-kpis'],
+  gestor: ['clientes','cliente-detalhe','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','minha-carteira','minhas-operacoes','metas-kpis'],
+  cliente: ['minha-carteira','minhas-operacoes','agendamento','glossario','estrategias','controle-opcoes','materiais-cliente','calc-aposentadoria']
 };
 
 var PERFIL_COR = {adm:'#ff8c00', gestor:'#00c853', cliente:'#c084fc'};
@@ -7717,7 +7816,6 @@ function showClientePortal(){
     clienteNav.appendChild(mkBtn('cnav-operacoes','minhas-operacoes','Operações',false));
     clienteNav.appendChild(mkBtn('cnav-agendamento','agendamento','Agendamento',false));
     clienteNav.appendChild(mkSec('Ferramentas'));
-    clienteNav.appendChild(mkBtn('cnav-panorama','panorama','Panorama',false));
     clienteNav.appendChild(mkBtn('cnav-estrategias','estrategias','Estratégias',false));
     clienteNav.appendChild(mkBtn('cnav-controle-opcoes','controle-opcoes','Controle de Opções',false));
     var b3Btn = document.createElement('button');
@@ -7739,7 +7837,6 @@ function showClientePortal(){
   if(!document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
   // Minha Conta is now embedded in the Dashboard "Dados" tab — no separate view needed
   if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
-  if(!document.getElementById('view-chamados')) buildChamadosView();
   if(!document.getElementById('view-materiais-cliente')) buildMateriaisClienteView();
   // Trilha do cliente desabilitada — descomentar para liberar:
   // if(!document.getElementById('view-academy-trilha-cliente')) buildAcademyTrilhaClienteView();
@@ -7762,16 +7859,11 @@ function showClienteView(viewId, btn){
   if(viewId==='minhas-operacoes') loadMinhasOperacoes();
   if(viewId==='minha-conta') loadMinhaConta();
   if(viewId==='minha-carteira') loadMinhaCarteira();
-  if(viewId==='comunicados') loadComunicados();
   if(viewId==='glossario') loadGlossario();
   if(viewId==='estrategias') setTimeout(renderEst, 50);
   if(viewId==='simulador') setTimeout(calcSimulador, 50);
-  if(viewId==='noticias') loadNoticias&&loadNoticias();
-  if(viewId==='grade-cotacoes') initGradeCotacoes();
   if(viewId==='opcoes-chain') initOpcoesChain();
-  if(viewId==='panorama') initPanorama();
   if(viewId==='calendario-economico') initCalendarioEconomico&&initCalendarioEconomico();
-  if(viewId==='chamados') loadChamados();
   if(viewId==='materiais-cliente') loadMateriais();
   if(viewId==='academy-trilha-cliente') renderAcademyTrilhaCliente();
   if(viewId==='controle-opcoes') initControleOpcoes();
@@ -7921,12 +8013,16 @@ function renderMcEvolucao(ops){
   var ctx=document.getElementById('mc-evolucao-chart');if(!ctx)return;
   if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
 
+  // Guardar referência do wrapper (div com height:220px) antes de mexer no innerHTML
+  var evolWrapper=ctx.parentElement;
+
   // Tentar carregar evolução real via API Mais Retorno
   if(currentClienteVinculado){
-    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Carregando evolução...</div>';
+    evolWrapper.innerHTML='<div id="mc-evol-loading" style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Carregando evolução...</div>';
     db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
       var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       if(!ativos.length){
+        _renderMcEvolRestore(evolWrapper);
         _renderMcEvolFallback(ops);
         return;
       }
@@ -7937,16 +8033,24 @@ function renderMcEvolucao(ops){
       var promises=allT.map(function(t){
         var id=t.toLowerCase();
         if(t==='CDI')id='cdi:idx';
-        else if(/^[A-Z]{2,5}$/.test(t)&&!/\d/.test(t))id=t.toLowerCase(); // intl
+        else if(/^[A-Z]{2,5}$/.test(t)&&!/\d/.test(t))id=t.toLowerCase();
         else id=t.toLowerCase()+':b3';
         return fetch('/api/maisretorno?action=stats&identifier='+encodeURIComponent(id)+'&details=true').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
       });
       Promise.all(promises).then(function(results){
         var statsMap={};
         results.forEach(function(r){if(r.data)statsMap[r.ticker]=r.data;});
+        // Restaurar canvas antes de desenhar
+        _renderMcEvolRestore(evolWrapper);
         _renderMcEvolFromStats(ativos,statsMap);
+      }).catch(function(e){
+        console.error('Evolução API error:',e);
+        _renderMcEvolRestore(evolWrapper);
+        _renderMcEvolFallback(ops);
       });
-    }).catch(function(){
+    }).catch(function(e){
+      console.error('Evolução Firestore error:',e);
+      _renderMcEvolRestore(evolWrapper);
       _renderMcEvolFallback(ops);
     });
     return;
@@ -7954,30 +8058,16 @@ function renderMcEvolucao(ops){
   _renderMcEvolFallback(ops);
 }
 
+// Restaura o canvas no wrapper após o loading
+function _renderMcEvolRestore(wrapper){
+  if(!wrapper) return;
+  wrapper.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';
+}
+
 function _renderMcEvolFromStats(ativos,statsMap){
   var ctx=document.getElementById('mc-evolucao-chart');
-  if(!ctx){
-    // Canvas may have been replaced, recreate it
-    var wrap=document.querySelector('#view-minha-carteira .card canvas');
-    if(!wrap){
-      var cards=document.querySelectorAll('#view-minha-carteira .card');
-      for(var i=0;i<cards.length;i++){
-        if(cards[i].textContent.indexOf('Evolução Patrimonial')>=0){
-          var cDiv=cards[i].querySelector('div[style*="height"]');
-          if(cDiv){cDiv.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';ctx=document.getElementById('mc-evolucao-chart');break;}
-        }
-      }
-    }
-  }
   if(!ctx) return;
   if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
-
-  // Rebuild canvas if parent was replaced with text
-  if(ctx.tagName!=='CANVAS'){
-    var p=ctx.parentElement;
-    p.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';
-    ctx=document.getElementById('mc-evolucao-chart');
-  }
 
   var totalI=0;
   ativos.forEach(function(a){totalI+=(a.quantidade||0)*(a.precoMedio||0);});
@@ -11572,12 +11662,10 @@ function salvarGrupoGrade(){
   }).catch(function(e){alert('Erro: '+e.message);});
 }
 
-// Hook showView para grade e panorama
+// Hook showView para pre-mercado
 var _origShowViewGrade = showView;
 showView = function(v, btn){
   _origShowViewGrade(v, btn);
-  if(v==='grade-cotacoes') initGradeCotacoes();
-  if(v==='panorama') initPanorama();
   if(v==='pre-mercado') initPreMercado();
 };
 
@@ -14529,5 +14617,6 @@ function caExportPDF(){
 <script src="panorama-v6.js"></script>
 <script src="carteira-analise.js"></script>
 <script src="consultorias.js"></script>
+<script src="wealth-planning.js"></script>
 </body>
 </html>
