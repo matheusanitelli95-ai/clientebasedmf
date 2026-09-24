@@ -7703,7 +7703,7 @@ function buildMinhaCarteiraView(){
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Valor Investido</div><div class="kpi-val" id="mc-investido" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Ganho / Perda</div><div class="kpi-val" id="mc-ganho" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#a78bfa,#a78bfa44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">Acumulado Black</div><div class="kpi-val" id="mc-acumulado" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums"><span class="mc-skel" style="display:inline-block;width:90px;height:20px;background:var(--border);border-radius:6px;animation:mcPulse 1.2s ease-in-out infinite"></span></div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#64748b,#64748b44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
-    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">P&L Opções</div><div class="kpi-val" id="mc-pnl-opcoes" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$ 0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#22c55e,#22c55e44);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative"><div style="font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:500">P&L Opções</div><div class="kpi-val" id="mc-pnl-opcoes" style="font-size:22px;font-weight:700;color:var(--white);font-variant-numeric:tabular-nums">R$ 0</div><div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#38bdf8,#38bdf844);border-radius:var(--radius) var(--radius) 0 0"></div></div>'
     +'</div>'
     +'<div id="mc-cotacao-status" style="font-size:11px;color:var(--text3);margin-bottom:12px;display:none"></div>'
     +'<div class="card" style="margin-bottom:16px;padding:20px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Evolução Patrimonial</div><div style="font-size:11px;color:var(--text3);margin-bottom:14px">Histórico mensal do patrimônio</div><div style="position:relative;height:220px"><canvas id="mc-evolucao-chart"></canvas></div></div>'
@@ -7819,6 +7819,148 @@ function renderExtChart(labels,dataMensal,dataAcum){
 }
 
 function renderMcEvolucao(ops){
+  var ctx=document.getElementById('mc-evolucao-chart');if(!ctx)return;
+  if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
+
+  // Tentar carregar evolução real via API Mais Retorno
+  if(currentClienteVinculado){
+    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Carregando evolução...</div>';
+    db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
+      var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      if(!ativos.length){
+        _renderMcEvolFallback(ops);
+        return;
+      }
+      var tickers=[];
+      ativos.forEach(function(a){var t=(a.nome||'').trim().toUpperCase();if(t&&tickers.indexOf(t)<0)tickers.push(t);});
+      // Fetch stats de cada ativo + CDI
+      var allT=tickers.concat(['CDI']);
+      var promises=allT.map(function(t){
+        var id=t.toLowerCase();
+        if(t==='CDI')id='cdi:idx';
+        else if(/^[A-Z]{2,5}$/.test(t)&&!/\d/.test(t))id=t.toLowerCase(); // intl
+        else id=t.toLowerCase()+':b3';
+        return fetch('/api/maisretorno?action=stats&identifier='+encodeURIComponent(id)+'&details=true').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
+      });
+      Promise.all(promises).then(function(results){
+        var statsMap={};
+        results.forEach(function(r){if(r.data)statsMap[r.ticker]=r.data;});
+        _renderMcEvolFromStats(ativos,statsMap);
+      });
+    }).catch(function(){
+      _renderMcEvolFallback(ops);
+    });
+    return;
+  }
+  _renderMcEvolFallback(ops);
+}
+
+function _renderMcEvolFromStats(ativos,statsMap){
+  var ctx=document.getElementById('mc-evolucao-chart');
+  if(!ctx){
+    // Canvas may have been replaced, recreate it
+    var wrap=document.querySelector('#view-minha-carteira .card canvas');
+    if(!wrap){
+      var cards=document.querySelectorAll('#view-minha-carteira .card');
+      for(var i=0;i<cards.length;i++){
+        if(cards[i].textContent.indexOf('Evolução Patrimonial')>=0){
+          var cDiv=cards[i].querySelector('div[style*="height"]');
+          if(cDiv){cDiv.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';ctx=document.getElementById('mc-evolucao-chart');break;}
+        }
+      }
+    }
+  }
+  if(!ctx) return;
+  if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
+
+  // Rebuild canvas if parent was replaced with text
+  if(ctx.tagName!=='CANVAS'){
+    var p=ctx.parentElement;
+    p.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';
+    ctx=document.getElementById('mc-evolucao-chart');
+  }
+
+  var totalI=0;
+  ativos.forEach(function(a){totalI+=(a.quantidade||0)*(a.precoMedio||0);});
+  if(totalI<=0){
+    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Sem dados de evolução</div>';
+    return;
+  }
+
+  // Coletar todos os anos disponíveis
+  var todosAnos={};
+  ativos.forEach(function(a){
+    var t=(a.nome||'').trim().toUpperCase();
+    if(statsMap[t]&&statsMap[t].years) Object.keys(statsMap[t].years).forEach(function(y){todosAnos[y]=true;});
+  });
+  if(statsMap['CDI']&&statsMap['CDI'].years) Object.keys(statsMap['CDI'].years).forEach(function(y){todosAnos[y]=true;});
+  var anos=Object.keys(todosAnos).sort();
+  // Limitar a últimos 5 anos
+  var anoAt=new Date().getFullYear();
+  anos=anos.filter(function(y){return parseInt(y)>=anoAt-4;});
+
+  if(!anos.length){
+    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Sem dados históricos via API</div>';
+    return;
+  }
+
+  var now=new Date(),mesAt=now.getMonth()+1;
+  var labels=[],valsCart=[],valsCDI=[];
+  var acC=100,acD=100;
+
+  anos.forEach(function(y){
+    for(var m=1;m<=12;m++){
+      var yi=parseInt(y);
+      if(yi>anoAt||(yi===anoAt&&m>mesAt)) continue;
+      var rC=0;
+      ativos.forEach(function(a){
+        var t=(a.nome||'').trim().toUpperCase();
+        var inv=(a.quantidade||0)*(a.precoMedio||0);
+        if(statsMap[t]&&statsMap[t].years&&statsMap[t].years[y]&&statsMap[t].years[y][m]!==undefined){
+          var peso=totalI>0?inv/totalI:1/ativos.length;
+          rC+=statsMap[t].years[y][m]*peso;
+        }
+      });
+      acC*=(1+rC/100);
+      var rD=0;
+      if(statsMap['CDI']&&statsMap['CDI'].years&&statsMap['CDI'].years[y]&&statsMap['CDI'].years[y][m]!==undefined) rD=statsMap['CDI'].years[y][m];
+      acD*=(1+rD/100);
+      labels.push((m<10?'0':'')+m+'/'+String(y).slice(2));
+      valsCart.push(parseFloat(((acC-100)).toFixed(2)));
+      valsCDI.push(parseFloat(((acD-100)).toFixed(2)));
+    }
+  });
+
+  if(labels.length<2){
+    ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Dados insuficientes</div>';
+    return;
+  }
+
+  // Reconstruct canvas
+  var parent=ctx.parentElement;
+  parent.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';
+  ctx=document.getElementById('mc-evolucao-chart');
+
+  _mcEvolChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:labels,datasets:[
+      {label:'Carteira',data:valsCart,borderColor:'#ff8c00',borderWidth:2.5,pointRadius:0,tension:.35,fill:{target:'origin',above:'rgba(255,140,0,0.08)',below:'rgba(255,140,0,0.04)'}},
+      {label:'CDI',data:valsCDI,borderColor:'#6b7280',borderWidth:1.5,pointRadius:0,tension:.35,borderDash:[4,3],fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{color:'#71717a',font:{size:10},boxWidth:12,padding:8,usePointStyle:true}},tooltip:{backgroundColor:'#1a1a1e',titleColor:'#fff',bodyColor:'#ddd',borderColor:'#333',borderWidth:1,cornerRadius:8,padding:10,callbacks:{label:function(c){return c.dataset.label+': '+(c.raw>=0?'+':'')+c.raw.toFixed(2)+'%';}}}},scales:{x:{ticks:{color:'#71717a',font:{size:10},maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#71717a',font:{size:10},callback:function(v){return(v>=0?'+':'')+v.toFixed(0)+'%';}},grid:{color:'rgba(255,255,255,.06)'}}}}
+  });
+
+  // Atualizar subtítulo
+  var lastCart=valsCart[valsCart.length-1];
+  var lastCDI=valsCDI[valsCDI.length-1];
+  var evolCard=ctx.closest('.card');
+  if(evolCard){
+    var sub=evolCard.querySelector('div[style*="color:var(--text3)"]');
+    if(sub) sub.innerHTML='Rentabilidade acumulada · <span style="color:#ff8c00">Carteira '+(lastCart>=0?'+':'')+lastCart.toFixed(1)+'%</span> vs <span style="color:#6b7280">CDI '+(lastCDI>=0?'+':'')+lastCDI.toFixed(1)+'%</span>';
+  }
+}
+
+function _renderMcEvolFallback(ops){
   var ctx=document.getElementById('mc-evolucao-chart');if(!ctx)return;
   if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
   if(!ops||!ops.length){
