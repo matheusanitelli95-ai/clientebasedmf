@@ -840,25 +840,94 @@ function orcRenderDashboard() {
     + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Saldo</div><div style="font-family:DM Mono,monospace;font-size:18px;font-weight:700;color:' + saldoColor + '">' + orcFmt(saldo) + '</div></div>'
     + '</div>';
 
-  // Barra de composição de despesas
+  // Gráfico donut + legenda por categoria
   if (totalDesp > 0) {
-    html += '<div class="card" style="padding:16px;margin-bottom:16px">'
-      + '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:10px">Composição das Despesas</div>'
-      + '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px">';
     var catKeys = Object.keys(catTotals).sort(function(a, b) { return catTotals[b] - catTotals[a]; });
+    // SVG donut chart
+    var donutR = 60, donutStroke = 20, donutCirc = 2 * Math.PI * donutR;
+    var donutOffset = 0;
+    var donutPaths = '';
+    catKeys.forEach(function(catId) {
+      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#64748b', nome: catId };
+      var pct = catTotals[catId] / totalDesp;
+      var dashLen = pct * donutCirc;
+      var dashGap = donutCirc - dashLen;
+      donutPaths += '<circle cx="80" cy="80" r="' + donutR + '" fill="none" stroke="' + cat.cor + '" stroke-width="' + donutStroke + '" stroke-dasharray="' + dashLen.toFixed(2) + ' ' + dashGap.toFixed(2) + '" stroke-dashoffset="-' + donutOffset.toFixed(2) + '" style="transition:stroke-dasharray .4s"/>';
+      donutOffset += dashLen;
+    });
+
+    html += '<div class="card" style="padding:20px;margin-bottom:16px">'
+      + '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:14px">Composição das Despesas</div>'
+      + '<div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">'
+      // Donut SVG
+      + '<div style="flex-shrink:0;position:relative;width:160px;height:160px">'
+      + '<svg viewBox="0 0 160 160" style="transform:rotate(-90deg);width:160px;height:160px">'
+      + donutPaths
+      + '</svg>'
+      + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+      + '<div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalDesp) + '</div>'
+      + '<div style="font-size:9px;color:var(--text3)">Total Despesas</div>'
+      + '</div></div>'
+      // Legenda
+      + '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px">';
     catKeys.forEach(function(catId) {
       var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#64748b', nome: catId };
       var pct = (catTotals[catId] / totalDesp * 100);
-      html += '<div style="width:' + pct + '%;background:' + cat.cor + '" title="' + cat.nome + ': ' + orcFmt(catTotals[catId]) + ' (' + pct.toFixed(1) + '%)"></div>';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        + '<div style="display:flex;align-items:center;gap:6px">'
+        + '<span style="width:10px;height:10px;border-radius:3px;background:' + cat.cor + ';flex-shrink:0"></span>'
+        + '<span style="font-size:11px;color:var(--text2)">' + cat.nome + '</span></div>'
+        + '<div style="display:flex;align-items:center;gap:8px">'
+        + '<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--white)">' + orcFmt(catTotals[catId]) + '</span>'
+        + '<span style="font-size:10px;color:var(--text3);min-width:32px;text-align:right">' + pct.toFixed(0) + '%</span>'
+        + '</div></div>';
     });
-    html += '</div>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">';
-    catKeys.forEach(function(catId) {
-      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#64748b', nome: catId };
-      var pct = (catTotals[catId] / totalDesp * 100);
-      html += '<span style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:' + cat.cor + '"></span>' + cat.nome + ' ' + pct.toFixed(0) + '%</span>';
+    html += '</div></div></div>';
+  }
+
+  // Gráfico donut receitas (se houver mais de 1 categoria)
+  var recTotals = {};
+  orcLancamentos.forEach(function(l) {
+    if (l.tipo !== 'receita') return;
+    if (!recTotals[l.categoria]) recTotals[l.categoria] = 0;
+    recTotals[l.categoria] += l.valor;
+  });
+  var recKeys = Object.keys(recTotals);
+  if (totalRec > 0 && recKeys.length > 1) {
+    recKeys.sort(function(a, b) { return recTotals[b] - recTotals[a]; });
+    var donutR2 = 60, donutStroke2 = 20, donutCirc2 = 2 * Math.PI * donutR2;
+    var donutOffset2 = 0;
+    var donutPaths2 = '';
+    recKeys.forEach(function(catId) {
+      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#38bdf8', nome: catId };
+      var pct = recTotals[catId] / totalRec;
+      var dashLen = pct * donutCirc2;
+      var dashGap = donutCirc2 - dashLen;
+      donutPaths2 += '<circle cx="80" cy="80" r="' + donutR2 + '" fill="none" stroke="' + cat.cor + '" stroke-width="' + donutStroke2 + '" stroke-dasharray="' + dashLen.toFixed(2) + ' ' + dashGap.toFixed(2) + '" stroke-dashoffset="-' + donutOffset2.toFixed(2) + '"/>';
+      donutOffset2 += dashLen;
     });
-    html += '</div></div>';
+    html += '<div class="card" style="padding:20px;margin-bottom:16px">'
+      + '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:14px">Composição das Receitas</div>'
+      + '<div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">'
+      + '<div style="flex-shrink:0;position:relative;width:160px;height:160px">'
+      + '<svg viewBox="0 0 160 160" style="transform:rotate(-90deg);width:160px;height:160px">' + donutPaths2 + '</svg>'
+      + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
+      + '<div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalRec) + '</div>'
+      + '<div style="font-size:9px;color:var(--text3)">Total Receitas</div>'
+      + '</div></div>'
+      + '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px">';
+    recKeys.forEach(function(catId) {
+      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#38bdf8', nome: catId };
+      var pct = (recTotals[catId] / totalRec * 100);
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:' + cat.cor + ';flex-shrink:0"></span>'
+        + '<span style="font-size:11px;color:var(--text2)">' + cat.nome + '</span></div>'
+        + '<div style="display:flex;align-items:center;gap:8px">'
+        + '<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--white)">' + orcFmt(recTotals[catId]) + '</span>'
+        + '<span style="font-size:10px;color:var(--text3);min-width:32px;text-align:right">' + pct.toFixed(0) + '%</span>'
+        + '</div></div>';
+    });
+    html += '</div></div></div>';
   }
 
   // Botão adicionar lançamento
@@ -892,28 +961,33 @@ function orcRenderDashboard() {
 
 // ── Tabela de lançamentos ────────────────────────────────
 function orcTabelaLancamentos(items) {
+  var isReceita = items.length > 0 && items[0].tipo === 'receita';
+  var colBancoLabel = isReceita ? 'Banco/Origem' : 'Banco/Cartão';
+  var thStyle = 'padding:10px 14px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:.05em';
+
   var html = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:8px"><table style="width:100%;border-collapse:collapse">'
     + '<thead><tr style="border-bottom:1px solid var(--border)">'
-    + '<th style="padding:10px 14px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Data</th>'
-    + '<th style="padding:10px 14px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Descrição</th>'
-    + '<th style="padding:10px 14px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Categoria</th>'
-    + '<th style="padding:10px 14px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Banco/Cartão</th>'
-    + '<th style="padding:10px 14px;font-size:10px;color:var(--text3);text-align:right;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Valor</th>'
+    + '<th style="' + thStyle + '">Data</th>'
+    + '<th style="' + thStyle + '">Descrição</th>'
+    + '<th style="' + thStyle + '">Categoria</th>'
+    + '<th style="' + thStyle + '">' + colBancoLabel + '</th>'
+    + '<th style="' + thStyle + ';text-align:right">Valor</th>'
     + '<th style="padding:10px 14px;width:60px"></th>'
     + '</tr></thead><tbody>';
 
   items.forEach(function(l) {
     var cat = orcCategorias.find(function(c) { return c.id === l.categoria; }) || { nome: l.categoria, cor: '#64748b' };
-    var dataFmt = l.data ? l.data.split('-').reverse().slice(0, 2).join('/') : '--';
+    var dataFmt = l.data ? l.data.split('-')[2] + '/' + l.data.split('-')[1] : '--';
     var parcInfo = l.parcelado ? ' <span style="font-size:9px;color:var(--text3)">(' + l.parcela + '/' + l.totalParcelas + ')</span>' : '';
     var recIcon = l.recorrente ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="vertical-align:-1px;margin-left:4px"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/></svg>' : '';
-    var bancoCartao = l.cartao || l.banco || '—';
+    // Receita: só banco/origem; Despesa: banco + cartão
+    var bancoCol = l.tipo === 'receita' ? (l.banco || '—') : (l.cartao ? l.cartao + (l.banco ? ' (' + l.banco + ')' : '') : (l.banco || '—'));
 
     html += '<tr style="border-bottom:1px solid var(--border)">'
       + '<td style="padding:8px 14px;font-size:12px;color:var(--text2)">' + dataFmt + '</td>'
       + '<td style="padding:8px 14px;font-size:12px;color:var(--white)">' + (l.descricao || '') + parcInfo + recIcon + '</td>'
       + '<td style="padding:8px 14px"><span style="font-size:10px;background:' + cat.cor + '22;color:' + cat.cor + ';padding:2px 8px;border-radius:10px">' + cat.nome + '</span></td>'
-      + '<td style="padding:8px 14px;font-size:12px;color:var(--text2)">' + bancoCartao + '</td>'
+      + '<td style="padding:8px 14px;font-size:12px;color:var(--text2)">' + bancoCol + '</td>'
       + '<td style="padding:8px 14px;font-family:DM Mono,monospace;font-size:12px;color:var(--white);text-align:right">' + orcFmt(l.valor) + '</td>'
       + '<td style="padding:8px 14px;text-align:right">'
       + '<button onclick="orcAbrirModal(\'' + l.id + '\')" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--text3)" title="Editar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
@@ -1062,15 +1136,16 @@ function orcAbrirModal(lancId) {
     + '<optgroup label="Receitas" id="orc-cat-rec">' + catOptionsRec + '</optgroup>'
     + '<optgroup label="Despesas" id="orc-cat-desp">' + catOptionsDesp + '</optgroup>'
     + '</select></div>'
-    // Banco / Cartão
-    + '<div style="display:flex;gap:12px;margin-bottom:12px">'
-    + '<div class="form-group" style="flex:1"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Banco</label>'
-    + '<input class="form-input" id="orc-banco" value="' + (existing ? (existing.banco || '') : '') + '" placeholder="Ex: Nubank, Itaú..." style="width:100%"></div>'
-    + '<div class="form-group" style="flex:1"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Cartão</label>'
+    // Banco / Origem (sempre visível)
+    + '<div id="orc-banco-wrap" style="display:flex;gap:12px;margin-bottom:12px">'
+    + '<div class="form-group" style="flex:1"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px" id="orc-banco-label">' + (tipoVal === 'receita' ? 'Banco / Origem' : 'Banco') + '</label>'
+    + '<input class="form-input" id="orc-banco" value="' + (existing ? (existing.banco || '') : '') + '" placeholder="' + (tipoVal === 'receita' ? 'Ex: Empresa, Investimentos...' : 'Ex: Nubank, Itaú...') + '" style="width:100%"></div>'
+    // Cartão (só despesa)
+    + '<div class="form-group" id="orc-cartao-wrap" style="flex:1;display:' + (tipoVal === 'receita' ? 'none' : 'block') + '"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Cartão</label>'
     + '<input class="form-input" id="orc-cartao" value="' + (existing ? (existing.cartao || '') : '') + '" placeholder="Ex: Nubank Visa..." style="width:100%"></div>'
     + '</div>'
-    // Parcelado
-    + '<div style="display:flex;gap:12px;align-items:end;margin-bottom:16px">'
+    // Parcelado (só despesa)
+    + '<div id="orc-parcelado-wrap" style="display:' + (tipoVal === 'receita' ? 'none' : 'flex') + ';gap:12px;align-items:end;margin-bottom:16px">'
     + '<label style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px"><input type="checkbox" id="orc-parcelado" ' + (existing && existing.parcelado ? 'checked' : '') + ' onchange="document.getElementById(\'orc-parcelas-wrap\').style.display=this.checked?\'flex\':\'none\'"> Parcelado</label>'
     + '<div id="orc-parcelas-wrap" style="display:' + (existing && existing.parcelado ? 'flex' : 'none') + ';gap:8px;align-items:center">'
     + '<input class="form-input" id="orc-parcela" type="number" min="1" value="' + (existing && existing.parcela ? existing.parcela : '1') + '" style="width:50px;text-align:center" placeholder="1">'
@@ -1090,12 +1165,36 @@ function orcToggleTipo(tipo) {
   document.getElementById('orc-tipo').value = tipo;
   var btnRec = document.getElementById('orc-tipo-rec');
   var btnDesp = document.getElementById('orc-tipo-desp');
+  var cartaoWrap = document.getElementById('orc-cartao-wrap');
+  var parceladoWrap = document.getElementById('orc-parcelado-wrap');
+  var bancoLabel = document.getElementById('orc-banco-label');
+  var bancoInput = document.getElementById('orc-banco');
   if (tipo === 'receita') {
     btnRec.className = 'btn-primary';
     btnDesp.className = 'btn-ghost';
+    if (cartaoWrap) cartaoWrap.style.display = 'none';
+    if (parceladoWrap) parceladoWrap.style.display = 'none';
+    if (bancoLabel) bancoLabel.textContent = 'Banco / Origem';
+    if (bancoInput) bancoInput.placeholder = 'Ex: Empresa, Investimentos...';
   } else {
     btnRec.className = 'btn-ghost';
     btnDesp.className = 'btn-primary';
+    if (cartaoWrap) cartaoWrap.style.display = 'block';
+    if (parceladoWrap) parceladoWrap.style.display = 'flex';
+    if (bancoLabel) bancoLabel.textContent = 'Banco';
+    if (bancoInput) bancoInput.placeholder = 'Ex: Nubank, Itaú...';
+  }
+  // Atualizar select de categorias — mostrar só categorias do tipo selecionado
+  var catRec = document.getElementById('orc-cat-rec');
+  var catDesp = document.getElementById('orc-cat-desp');
+  if (catRec) catRec.style.display = tipo === 'receita' ? '' : 'none';
+  if (catDesp) catDesp.style.display = tipo === 'despesa' ? '' : 'none';
+  // Selecionar primeira opção do tipo ativo
+  var sel = document.getElementById('orc-categoria');
+  if (sel) {
+    var opts = sel.querySelectorAll('optgroup[style*="display"] option, optgroup:not([style]) option');
+    var visGroup = tipo === 'receita' ? catRec : catDesp;
+    if (visGroup && visGroup.querySelector('option')) sel.value = visGroup.querySelector('option').value;
   }
 }
 
@@ -1124,10 +1223,10 @@ function orcSalvarLancamento(lancId) {
     categoria: categoria,
     tipo: tipo,
     banco: banco,
-    cartao: cartao,
-    parcelado: parcelado,
-    parcela: parcela,
-    totalParcelas: totalParcelas,
+    cartao: tipo === 'receita' ? '' : cartao,
+    parcelado: tipo === 'receita' ? false : parcelado,
+    parcela: tipo === 'receita' ? null : parcela,
+    totalParcelas: tipo === 'receita' ? null : totalParcelas,
     data: data,
     recorrente: false
   };
