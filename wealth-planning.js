@@ -206,38 +206,60 @@ function buildWealthPlanningView() {
   });
 }
 
+// ── Cache de clientes para o WP (carregado do Firestore) ─
+var wpClientesCache = [];
+var wpClientesCacheLoaded = false;
+
+function wpLoadClientesCache(callback) {
+  if (wpClientesCacheLoaded && wpClientesCache.length > 0) {
+    if (callback) callback();
+    return;
+  }
+  db.collection('clientes').orderBy('nome').get().then(function(snap) {
+    wpClientesCache = [];
+    snap.forEach(function(doc) {
+      wpClientesCache.push(Object.assign({ id: doc.id }, doc.data()));
+    });
+    wpClientesCacheLoaded = true;
+    if (callback) callback();
+  });
+}
+
 // ── Filtrar clientes no seletor do WP ────────────────────
 function wpFilterClientes() {
   var input = document.getElementById('wp-search-cliente');
   var resultsDiv = document.getElementById('wp-search-results');
   if (!input || !resultsDiv) return;
 
-  var query = (input.value || '').toLowerCase().trim();
-  // Usar a variável global 'clientes' do sistema
-  var list = typeof clientes !== 'undefined' ? clientes : [];
+  // Carregar cache do Firestore se ainda não tiver
+  if (!wpClientesCacheLoaded) {
+    resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">Carregando clientes...</div>';
+    resultsDiv.style.display = 'block';
+    wpLoadClientesCache(function() { wpFilterClientes(); });
+    return;
+  }
 
-  // Filtrar só clientes com consultoria (mas mostrar todos com indicador)
-  var filtered = list.filter(function(c) {
+  var query = (input.value || '').toLowerCase().trim();
+
+  // Filtrar apenas clientes com consultoria ticada
+  var filtered = wpClientesCache.filter(function(c) {
+    if (!clienteTemConsultoria(c)) return false;
     if (!query) return true;
     return (c.nome || '').toLowerCase().indexOf(query) >= 0
       || (c.cpf || '').replace(/\D/g,'').indexOf(query.replace(/\D/g,'')) >= 0;
-  }).slice(0, 15);
+  }).slice(0, 20);
 
   if (filtered.length === 0) {
-    resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">Nenhum cliente encontrado</div>';
+    resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">' + (query ? 'Nenhum cliente com consultoria encontrado' : 'Nenhum cliente com consultoria ativa') + '</div>';
     resultsDiv.style.display = 'block';
     return;
   }
 
   var html = '';
   filtered.forEach(function(c) {
-    var temWP = clienteTemConsultoria(c);
-    var badge = temWP
-      ? '<span style="font-size:9px;background:var(--pos);color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
-      : '<span style="font-size:9px;background:var(--border);color:var(--text3);padding:1px 6px;border-radius:10px">Sem WP</span>';
     html += '<div onclick="wpSelectCliente(\'' + c.id + '\')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
       + '<div style="font-size:13px;color:var(--white)">' + (c.nome || 'Sem nome') + '</div>'
-      + badge
+      + '<span style="font-size:9px;background:var(--pos);color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
       + '</div>';
   });
   resultsDiv.innerHTML = html;
