@@ -594,11 +594,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="nav-item active" onclick="showView('clientes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></button>
       <div class="nav-section">Empresa</div>
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Financeiro</span></button>
-      <button class="nav-item" onclick="showView('dre',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>DRE</span></button>
-      <button class="nav-item" onclick="showView('balanco',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span><span>Balanço</span></button>
-      <button class="nav-item" onclick="showView('tarefas-equipe',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Tarefas</span></button>
-      <button class="nav-item" onclick="showView('organograma',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><rect x="1" y="14" width="6" height="4" rx="1"/><rect x="9" y="14" width="6" height="4" rx="1"/><rect x="17" y="14" width="6" height="4" rx="1"/><path d="M4 14V9h16v5M12 6v3"/></svg></span><span>Organograma</span></button>
-      <button class="nav-item" onclick="showView('whatsapp',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp</span></button>
+      <button class="nav-item" onclick="showView('profissionais',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></span><span>Profissionais</span></button>
       <div class="nav-section">DMF Black</div>
       <button class="nav-item" onclick="showView('black-dashboard',this)"><span class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span><span>Dashboard Black</span></button>
       <button class="nav-item" onclick="showView('black-operacoes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span>Operações</span></button>
@@ -1717,6 +1713,17 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div id="organograma-content"></div>
+      </div>
+    </div>
+
+    <!-- PROFISSIONAIS -->
+    <div class="view" id="view-profissionais">
+      <div class="page-header">
+        <div><div class="page-title">Profissionais</div><div class="page-sub">Gestão de acessos à plataforma</div></div>
+        <button class="btn-primary" onclick="openModalProfissional(null)">+ Adicionar Profissional</button>
+      </div>
+      <div class="page-content">
+        <div id="profissionais-content"></div>
       </div>
     </div>
 
@@ -6492,6 +6499,98 @@ function openModalTarefaEdit(id){ openModalTarefaEquipeEdit(id); }
 function saveTarefa(overlay){ saveTarefaEquipe(overlay); }
 
 // ═══════════════════════════════════════════════════════════
+// PROFISSIONAIS — Gestão de acessos à plataforma
+// ═══════════════════════════════════════════════════════════
+var _profissionais = [], _profEditId = null, _profUnsubscribe = null;
+
+var _origShowViewProf = showView;
+showView = function(v,btn){
+  _origShowViewProf(v,btn);
+  if(v==='profissionais') loadProfissionais();
+};
+
+function loadProfissionais(){
+  if(_profUnsubscribe) return; // já ouvindo
+  _profUnsubscribe = db.collection('profissionais').orderBy('nome').onSnapshot(function(snap){
+    _profissionais = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    renderProfissionais();
+  });
+}
+
+var PERFIL_LABELS = {adm:'Administrador', gestor:'Gestor', cliente:'Cliente'};
+var PERFIL_CORES = {adm:'#ff8c00', gestor:'#38bdf8', cliente:'#c084fc'};
+
+function renderProfissionais(){
+  var el = document.getElementById('profissionais-content');
+  if(!el) return;
+  if(!_profissionais.length){
+    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted)"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 16px;display:block;opacity:.4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><div style="font-size:15px;font-weight:600;margin-bottom:4px">Nenhum profissional cadastrado</div><div style="font-size:13px">Adicione profissionais que terão acesso à plataforma</div></div>';
+    return;
+  }
+  var h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">';
+  _profissionais.forEach(function(p){
+    var cor = PERFIL_CORES[p.perfil] || '#64748b';
+    var label = PERFIL_LABELS[p.perfil] || p.perfil;
+    var status = p.ativo !== false ? 'Ativo' : 'Inativo';
+    var statusCor = p.ativo !== false ? '#38bdf8' : '#64748b';
+    h += '<div style="background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid var(--border)">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
+    h += '<div><div style="font-size:15px;font-weight:600;color:var(--text)">' + (p.nome||'—') + '</div>';
+    h += '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + (p.email||'—') + '</div></div>';
+    h += '<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:4px;background:' + cor + '22;color:' + cor + '">' + label + '</span></div>';
+    h += '<div style="display:flex;gap:12px;margin-bottom:14px">';
+    if(p.cargo) h += '<div style="font-size:12px;color:var(--muted)"><span style="font-weight:600;color:var(--text)">Cargo:</span> ' + p.cargo + '</div>';
+    h += '<div style="font-size:12px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + statusCor + ';margin-right:4px;vertical-align:middle"></span><span style="color:' + statusCor + '">' + status + '</span></div></div>';
+    if(p.telefone) h += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Tel: ' + p.telefone + '</div>';
+    h += '<div style="display:flex;gap:8px;justify-content:flex-end">';
+    h += '<button class="btn-ghost" onclick="openModalProfissional(\'' + p.id + '\')" style="font-size:11px;padding:4px 10px">Editar</button>';
+    h += '<button class="btn-ghost" onclick="confirmDelete(function(){db.collection(\'profissionais\').doc(\'' + p.id + '\').delete();})" style="font-size:11px;padding:4px 10px;color:#ff8c00">Remover</button>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+function openModalProfissional(id){
+  _profEditId = id;
+  var p = id ? _profissionais.find(function(x){return x.id===id;}) : {};
+  var ov = document.createElement('div');
+  ov.className = 'modal-overlay active';
+  ov.innerHTML = '<div class="modal" style="max-width:440px">' +
+    '<div class="modal-header"><span>' + (id ? 'Editar' : 'Adicionar') + ' Profissional</span><button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button></div>' +
+    '<div class="modal-body">' +
+    '<label class="form-label">Nome</label><input class="form-input" id="prof-nome" value="' + (p.nome||'') + '">' +
+    '<label class="form-label">Email</label><input class="form-input" id="prof-email" type="email" value="' + (p.email||'') + '">' +
+    '<label class="form-label">Cargo</label><input class="form-input" id="prof-cargo" value="' + (p.cargo||'') + '">' +
+    '<label class="form-label">Telefone</label><input class="form-input" id="prof-telefone" value="' + (p.telefone||'') + '">' +
+    '<label class="form-label">Perfil de Acesso</label><select class="form-input" id="prof-perfil"><option value="adm"' + (p.perfil==='adm'?' selected':'') + '>Administrador</option><option value="gestor"' + (p.perfil==='gestor'?' selected':'') + '>Gestor</option><option value="cliente"' + (p.perfil==='cliente'?' selected':'') + '>Cliente</option></select>' +
+    '<label class="form-label">Status</label><select class="form-input" id="prof-ativo"><option value="true"' + (p.ativo!==false?' selected':'') + '>Ativo</option><option value="false"' + (p.ativo===false?' selected':'') + '>Inativo</option></select>' +
+    '</div>' +
+    '<div class="modal-footer"><button class="btn-primary" onclick="saveProfissional(this.closest(\'.modal-overlay\'))">Salvar</button></div></div>';
+  document.body.appendChild(ov);
+}
+
+function saveProfissional(overlay){
+  var data = {
+    nome: document.getElementById('prof-nome').value.trim(),
+    email: document.getElementById('prof-email').value.trim(),
+    cargo: document.getElementById('prof-cargo').value.trim(),
+    telefone: document.getElementById('prof-telefone').value.trim(),
+    perfil: document.getElementById('prof-perfil').value,
+    ativo: document.getElementById('prof-ativo').value === 'true',
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(!data.nome){ showToast('Preencha o nome','error'); return; }
+  if(_profEditId){
+    db.collection('profissionais').doc(_profEditId).update(data).then(function(){ showToast('Profissional atualizado'); });
+  } else {
+    data.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+    db.collection('profissionais').add(data).then(function(){ showToast('Profissional adicionado'); });
+  }
+  overlay.remove();
+}
+
+// ═══════════════════════════════════════════════════════════
 // ORGANOGRAMA
 // ═══════════════════════════════════════════════════════════
 var cargos = [], editingCargoId = null;
@@ -7430,8 +7529,8 @@ function _ensureClienteVinculado(callback){
 }
 
 var PERFIL_MENUS = {
-  adm: ['clientes','cliente-detalhe','financeiro','dre','balanco','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
-  gestor: ['clientes','cliente-detalhe','tarefas-equipe','organograma','whatsapp','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','consultorias','minha-carteira','minhas-operacoes','metas-kpis'],
+  adm: ['clientes','cliente-detalhe','financeiro','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','configuracoes','minha-carteira','minhas-operacoes','metas-kpis'],
+  gestor: ['clientes','cliente-detalhe','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','panorama','controle-opcoes','minha-carteira','minhas-operacoes','metas-kpis'],
   cliente: ['minha-carteira','minhas-operacoes','agendamento','comunicados','noticias','panorama','grade-cotacoes','glossario','estrategias','controle-opcoes','materiais-cliente','chamados','calc-aposentadoria']
 };
 
