@@ -530,8 +530,8 @@ function patchPerfilMenus(){
 
 // Hook no showView para carregar dados quando abrir
 var _origShowView = window.showView;
-window.showView = function(viewId){
-  if(typeof _origShowView === 'function') _origShowView(viewId);
+window.showView = function(viewId, btn){
+  if(typeof _origShowView === 'function') _origShowView(viewId, btn);
   if(viewId === 'consultorias') loadConsultorias();
 };
 

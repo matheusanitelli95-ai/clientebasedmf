@@ -2977,28 +2977,20 @@ function showView(v,btn){
   if(allowedMenus && allowedMenus.indexOf(v) < 0) return;
   document.querySelectorAll('.view').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});
+  // Build dynamic views BEFORE trying to activate them
+  if(v==='minha-carteira' && !document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
+  if(v==='minhas-operacoes' && !document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
+  if(v==='metas-kpis' && !document.getElementById('view-metas-kpis')) buildMetasKPIsView();
+  if(v==='calc-aposentadoria' && !document.getElementById('view-calc-aposentadoria')) buildCalcAposentadoriaView();
   var viewEl = document.getElementById('view-'+v);
   if(viewEl) viewEl.classList.add('active');
   if(btn)btn.classList.add('active');
   if(v==='dashboard') renderDashboard();
   if(v==='controle-opcoes') initControleOpcoes();
-  // Minha Carteira / Minhas Operações para admin/gestor
-  if(v==='minha-carteira'){
-    if(!document.getElementById('view-minha-carteira')) buildMinhaCarteiraView();
-    _ensureClienteVinculado(function(){ loadMinhaCarteira(); });
-  }
-  if(v==='minhas-operacoes'){
-    if(!document.getElementById('view-minhas-operacoes')) buildMinhasOperacoesView();
-    _ensureClienteVinculado(function(){ loadMinhasOperacoes(); });
-  }
-  if(v==='metas-kpis'){
-    if(!document.getElementById('view-metas-kpis')) buildMetasKPIsView();
-    loadMetasKPIs();
-  }
-  if(v==='calc-aposentadoria'){
-    if(!document.getElementById('view-calc-aposentadoria')) buildCalcAposentadoriaView();
-    setTimeout(function(){if(typeof _calcApoInit==='function')_calcApoInit();},100);
-  }
+  if(v==='minha-carteira') _ensureClienteVinculado(function(){ loadMinhaCarteira(); });
+  if(v==='minhas-operacoes') _ensureClienteVinculado(function(){ loadMinhasOperacoes(); });
+  if(v==='metas-kpis') loadMetasKPIs();
+  if(v==='calc-aposentadoria') setTimeout(function(){if(typeof _calcApoInit==='function')_calcApoInit();},100);
 }
 
 function showTab(t,btn){

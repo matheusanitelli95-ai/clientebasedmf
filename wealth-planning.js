@@ -31,6 +31,10 @@ function clienteTemConsultoria(clienteDoc) {
 // ── Encadeamento do showView ─────────────────────────────
 var _origShowViewWP = showView;
 showView = function(v, btn) {
+  // Build the view BEFORE calling original showView so it can activate it
+  if (v === 'wealth-planning' && !document.getElementById('view-wealth-planning')) {
+    buildWealthPlanningView();
+  }
   _origShowViewWP(v, btn);
   if (v === 'wealth-planning') loadWealthPlanning();
 };
@@ -136,6 +140,10 @@ var _origBuildPortalWP = typeof loadClienteData === 'function' ? loadClienteData
   var _origShowClienteViewWP = typeof showClienteView === 'function' ? showClienteView : null;
   if (_origShowClienteViewWP) {
     showClienteView = function(viewId, btn) {
+      // Build the view BEFORE calling original so it can activate it
+      if (viewId === 'wealth-planning' && !document.getElementById('view-wealth-planning')) {
+        loadWealthPlanningCliente();
+      }
       _origShowClienteViewWP(viewId, btn);
       if (viewId === 'wealth-planning') loadWealthPlanningCliente();
     };
@@ -470,6 +478,10 @@ var orcVisao = 'mensal'; // 'mensal' ou 'anual'
 // ── Encadeamento do showView para Orçamento ──────────────
 var _origShowViewOrc = showView;
 showView = function(v, btn) {
+  // Build the view BEFORE calling original so it can activate it
+  if (v === 'wp-orcamento' && !document.getElementById('view-wp-orcamento')) {
+    buildOrcamentoView();
+  }
   _origShowViewOrc(v, btn);
   if (v === 'wp-orcamento') loadOrcamento();
 };
@@ -520,6 +532,10 @@ if (typeof PERFIL_MENUS !== 'undefined') {
   var _origShowClienteViewOrc = typeof showClienteView === 'function' ? showClienteView : null;
   if (_origShowClienteViewOrc) {
     showClienteView = function(viewId, btn) {
+      // Build the view BEFORE calling original so it can activate it
+      if (viewId === 'wp-orcamento' && !document.getElementById('view-wp-orcamento')) {
+        loadOrcamentoCliente();
+      }
       _origShowClienteViewOrc(viewId, btn);
       if (viewId === 'wp-orcamento') loadOrcamentoCliente();
     };
