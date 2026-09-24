@@ -300,7 +300,7 @@ body.light-mode .mc-tab.active{box-shadow:var(--shadow)}
 
 /* ─── BADGE LEVELS ─────────────────────────── */
 .badge-consultoria{background:color-mix(in srgb,var(--neg) 13%,transparent);color:var(--neg);border:1px solid color-mix(in srgb,var(--neg) 20%,transparent);padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
-.badge-black{background:#1a1a1a;color:#999999;border:1px solid #333;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.badge-black{background:rgba(100,116,139,.12);color:#64748b;border:1px solid rgba(100,116,139,.25);padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
 .badge-vitalicio{background:#c084fc22;color:#c084fc;border:1px solid #c084fc33;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
 .badge-socio{background:#fbbf2422;color:#fbbf24;border:1px solid #fbbf2433;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em}
 
@@ -1694,17 +1694,17 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div id="payoff-pernas" style="margin-bottom:14px"></div>
           <!-- Stats -->
           <div id="payoff-stats" style="display:none;margin-bottom:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-            <div style="background:color-mix(in srgb,var(--pos) 7%,transparent);border:1px solid color-mix(in srgb,var(--pos) 20%,transparent);border-radius:10px;padding:14px;text-align:center">
-              <div style="font-size:13px;color:var(--text3);margin-bottom:6px;font-weight:400">Lucro Maximo</div>
-              <div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--pos)" id="payoff-max-lucro">--</div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:500;letter-spacing:0.3px">Lucro Maximo</div>
+              <div style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:var(--pos)" id="payoff-max-lucro">--</div>
             </div>
-            <div style="background:color-mix(in srgb,var(--neg) 7%,transparent);border:1px solid color-mix(in srgb,var(--neg) 20%,transparent);border-radius:10px;padding:14px;text-align:center">
-              <div style="font-size:13px;color:var(--text3);margin-bottom:6px;font-weight:400">Prejuizo Maximo</div>
-              <div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--neg)" id="payoff-max-perda">--</div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:500;letter-spacing:0.3px">Prejuizo Maximo</div>
+              <div style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:var(--neg)" id="payoff-max-perda">--</div>
             </div>
-            <div style="background:color-mix(in srgb,var(--blue) 7%,transparent);border:1px solid color-mix(in srgb,var(--blue) 20%,transparent);border-radius:10px;padding:14px;text-align:center">
-              <div style="font-size:13px;color:var(--text3);margin-bottom:6px;font-weight:400">Break-even</div>
-              <div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--blue)" id="payoff-breakeven">--</div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:500;letter-spacing:0.3px">Break-even</div>
+              <div style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:var(--white)" id="payoff-breakeven">--</div>
             </div>
           </div>
           <!-- Chart -->
@@ -3058,14 +3058,15 @@ function renderDashboard(){
   clientes.forEach(function(c){var o=normObjetivo(c.objetivo)||'Não definido';om[o]=(om[o]||0)+(c.custodiaTotal||0);});
   if(pieChart)pieChart.destroy();
   var ctxP=document.getElementById('chart-pie');
-  if(ctxP)pieChart=new Chart(ctxP.getContext('2d'),{type:'doughnut',data:{labels:Object.keys(om),datasets:[{data:Object.values(om),backgroundColor:COLORS,borderWidth:2,borderColor:'#0f0f0f'}]},options:{plugins:{legend:{labels:{color:'#999999',font:{size:11},boxWidth:10}}},cutout:'65%'}});
+  var _dbLight = _isLightMode();
+  if(ctxP)pieChart=new Chart(ctxP.getContext('2d'),{type:'doughnut',data:{labels:Object.keys(om),datasets:[{data:Object.values(om),backgroundColor:COLORS,borderWidth:2,borderColor:_dbLight?'#fff':'#0f0f0f'}]},options:{plugins:{legend:{labels:{color:_dbLight?'#64748b':'#94a3b8',font:{size:11},boxWidth:10}}},cutout:'65%'}});
 
   // Bar
   var pm={};
   clientes.forEach(function(c){pm[c.responsavel||'N/A']=(pm[c.responsavel||'N/A']||0)+(c.custodiaTotal||0);});
   if(barChart)barChart.destroy();
   var ctxB=document.getElementById('chart-bar');
-  if(ctxB)barChart=new Chart(ctxB.getContext('2d'),{type:'bar',data:{labels:Object.keys(pm),datasets:[{data:Object.values(pm),backgroundColor:'var(--neg)',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#555555',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#555555',font:{size:10},callback:function(v){return fmt(v);}},grid:{color:'#222222'}}}}});
+  if(ctxB)barChart=new Chart(ctxB.getContext('2d'),{type:'bar',data:{labels:Object.keys(pm),datasets:[{data:Object.values(pm),backgroundColor:'#1a3a5c',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:_dbLight?'#64748b':'#94a3b8',font:{size:11}},grid:{display:false}},y:{ticks:{color:_dbLight?'#64748b':'#94a3b8',font:{size:10},callback:function(v){return fmt(v);}},grid:{color:_dbLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)'}}}}});
 
   // Ranking
   var rm={};
@@ -5999,18 +6000,19 @@ var estSortKey = 'n', estSortAsc = true;
 
 function fcEst(f){return f==='Débito'?'badge-consultoria':f==='Crédito'?'badge-black':'badge-vitalicio';}
 function vcEst(v){
-  if(v.includes('Alta')&&v.includes('Baixa')) return 'var(--caution)';
-  if(v.includes('Alta')) return 'var(--neg)';
-  if(v.includes('Baixa')) return 'var(--neg)';
-  return 'var(--pos)';
+  if(v.includes('Alta')&&v.includes('Baixa')) return '#b45309';
+  if(v.includes('Alta')) return '#16a34a';
+  if(v.includes('Baixa')) return '#dc2626';
+  if(v.includes('Lateralidade')) return '#2563eb';
+  return '#64748b';
 }
 function rcEst(r){
-  if(r.includes('CALL')&&r.includes('PUT')) return 'var(--caution)';
-  if(r.includes('CALL')) return '#c084fc';
-  if(r.includes('PUT')) return 'var(--neg)';
-  if(r.includes('delta')) return 'var(--caution)';
-  if(r.includes('forte')||r.includes('Queda')) return 'var(--neg)';
-  return '#555555';
+  if(r.includes('CALL')&&r.includes('PUT')) return '#b45309';
+  if(r.includes('CALL')) return '#7c3aed';
+  if(r.includes('PUT')) return '#7c3aed';
+  if(r.includes('delta')) return '#b45309';
+  if(r.includes('forte')||r.includes('Queda')) return '#dc2626';
+  return '#64748b';
 }
 
 function renderEst(){
@@ -10392,11 +10394,16 @@ function calcPayoff(){
   if(emptyEl) emptyEl.style.display='none';
   if(canvas) canvas.style.display='block';
   if(payoffChart){payoffChart.destroy();}
+  var _pfLight = _isLightMode();
+  var _pfTickColor = _pfLight ? '#64748b' : '#94a3b8';
+  var _pfGridColor = _pfLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
+  var _pfZeroLine = _pfLight ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
+  var _pfSpotColor = '#b45309';
   payoffChart=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{labels:labels,datasets:[{
       label:'P&L (R$)',data:data,
-      segment:{borderColor:function(ctx){return ctx.p1.parsed.y>=0?'var(--pos)':'var(--neg)';}},
+      segment:{borderColor:function(ctx){return ctx.p1.parsed.y>=0?'#22c55e':'#b45309';}},
       backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,tension:0
     }]},
     options:{
@@ -10413,15 +10420,15 @@ function calcPayoff(){
               type:'line',
               xMin: spot.toFixed(2),
               xMax: spot.toFixed(2),
-              borderColor:'var(--caution)',
+              borderColor:_pfSpotColor,
               borderWidth:2,
               borderDash:[6,3],
               label:{
                 content:'R$'+spot.toFixed(2),
                 enabled:true,
                 position:'start',
-                backgroundColor:'var(--caution)',
-                color:'#000',
+                backgroundColor:_pfSpotColor,
+                color:'#fff',
                 font:{size:10,weight:'bold'},
                 padding:{x:6,y:3}
               }
@@ -10430,8 +10437,8 @@ function calcPayoff(){
         }
       },
       scales:{
-        x:{ticks:{color:'#555555',font:{size:10},maxTicksLimit:8,callback:function(v){return 'R$'+this.getLabelForValue(v);}},grid:{color:'#222222'}},
-        y:{ticks:{color:'#555555',font:{size:10},callback:function(v){return fmtFull(v);}},grid:{color:function(ctx){return ctx.tick.value===0?'#ffffff44':'#222222';},lineWidth:function(ctx){return ctx.tick.value===0?2:1;}}}
+        x:{ticks:{color:_pfTickColor,font:{size:10},maxTicksLimit:8,callback:function(v){return 'R$'+this.getLabelForValue(v);}},grid:{color:_pfGridColor}},
+        y:{ticks:{color:_pfTickColor,font:{size:10},callback:function(v){return fmtFull(v);}},grid:{color:function(ctx){return ctx.tick.value===0?_pfZeroLine:_pfGridColor;},lineWidth:function(ctx){return ctx.tick.value===0?2:1;}}}
       }
     }
   });
@@ -13866,21 +13873,21 @@ var _opcFmtPct = function(v){ return (v*100).toLocaleString('pt-BR',{minimumFrac
 var _opcFmtDate = function(s){ if(!s) return '-'; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; };
 
 function _opcMoneynessTag(m){
-  if(m==='ITM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,197,94,.15);color:#22c55e">Dentro (ITM)</span>';
-  if(m==='ATM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,158,11,.15);color:var(--caution)">No dinheiro</span>';
-  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(26,58,92,.15);color:var(--neg)">Fora (OTM)</span>';
+  if(m==='ITM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,197,94,.18);color:#16a34a">Dentro (ITM)</span>';
+  if(m==='ATM') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(180,83,9,.15);color:#b45309">No dinheiro</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(26,58,92,.15);color:#64748b">Fora (OTM)</span>';
 }
 function _opcTipoTag(t){
-  if(t==='CALL') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(59,130,246,.15);color:#3b82f6">CALL</span>';
-  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(236,72,153,.15);color:#ec4899">PUT</span>';
+  if(t==='CALL') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(59,130,246,.18);color:#2563eb">CALL</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(168,85,247,.18);color:#7c3aed">PUT</span>';
 }
 function _opcDirecaoTag(d){
-  if(d==='Compra') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,211,238,.15);color:#22d3ee">Compra</span>';
-  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(245,158,11,.15);color:var(--caution)">Venda</span>';
+  if(d==='Compra') return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(34,197,94,.18);color:#16a34a">Compra</span>';
+  return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(180,83,9,.15);color:#b45309">Venda</span>';
 }
 function _opcEquivCell(p,c){
-  var tagColor = c.eqDirecao==='long' ? 'var(--ok)' : 'var(--caution)';
-  var tagBg = c.eqDirecao==='long' ? 'rgba(34,197,94,.15)' : 'rgba(245,158,11,.15)';
+  var tagColor = c.eqDirecao==='long' ? '#16a34a' : '#b45309';
+  var tagBg = c.eqDirecao==='long' ? 'rgba(34,197,94,.15)' : 'rgba(180,83,9,.15)';
   var label = c.eqDirecao==='long' ? '≈ Comprado no ativo' : '≈ Vendido no ativo';
   var detail = p.qtd.toLocaleString('pt-BR')+' '+p.ativo+' a '+_opcFmtMoney2(p.strike);
   return '<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:'+tagBg+';color:'+tagColor+'">'+label+'</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">'+detail+'</div>';
@@ -14057,11 +14064,20 @@ function opcRender(){
   opcRenderCharts();
 }
 
+// Helper: resolve CSS variable to computed hex for Chart.js canvas
+function _cssColor(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#888';
+}
+function _isLightMode() {
+  return document.body.classList.contains('light-mode');
+}
+
 function opcRenderCharts(){
   var calcs = _opcPosicoes.map(_opcCalc);
   var labels = _opcPosicoes.map(function(p){ return p.ativo+' '+p.tipo+' '+p.strike; });
-  var gridColor = 'rgba(255,255,255,0.06)';
-  var tickColor = '#8a93a6';
+  var light = _isLightMode();
+  var gridColor = light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+  var tickColor = light ? '#64748b' : '#94a3b8';
   var totalNot = calcs.reduce(function(s,c){ return s+c.notional; },0);
   var totalEst = calcs.reduce(function(s,c){ return s+c.valorEstrutura; },0);
   var resto = Math.max(totalNot - totalEst, 0);
@@ -14069,8 +14085,8 @@ function opcRenderCharts(){
   var ctx1 = document.getElementById('opc-chartEstrutura');
   if(ctx1) _opcChartEst = new Chart(ctx1, {
     type:'pie',
-    data:{labels:['Valor da Estrutura (Prêmio)','Notional restante'],datasets:[{data:[totalEst,resto],backgroundColor:['#7c3aed','#3b82f6'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:11}}},title:{display:false}}}
+    data:{labels:['Valor da Estrutura (Prêmio)','Notional restante'],datasets:[{data:[totalEst,resto],backgroundColor:['#7c3aed','#3b82f6'],borderWidth:light?2:0,borderColor:light?'#fff':'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:12}}},title:{display:false}}}
   });
   var sumIntr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].intrinsico*p.qtd; },0);
   var sumExtr = _opcPosicoes.reduce(function(s,p,i){ return s + calcs[i].extrinsico*p.qtd; },0);
@@ -14078,14 +14094,14 @@ function opcRenderCharts(){
   var ctx2 = document.getElementById('opc-chartIntrinsExtr');
   if(ctx2) _opcChartIntr = new Chart(ctx2, {
     type:'doughnut',
-    data:{labels:['Valor Intrínseco','Valor Extrínseco'],datasets:[{data:[sumIntr,sumExtr],backgroundColor:['var(--ok)','var(--caution)'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:11}}},title:{display:false}}}
+    data:{labels:['Valor Intrínseco','Valor Extrínseco'],datasets:[{data:[sumIntr,sumExtr],backgroundColor:['#22c55e','#3b82f6'],borderWidth:light?2:0,borderColor:light?'#fff':'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tickColor,padding:14,font:{size:12}}},title:{display:false}}}
   });
   if(_opcChartPnl) _opcChartPnl.destroy();
   var ctx3 = document.getElementById('opc-chartPnl');
   if(ctx3 && labels.length) _opcChartPnl = new Chart(ctx3, {
     type:'bar',
-    data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'var(--ok)':'#3b82f6';}),borderRadius:4}]},
+    data:{labels:labels,datasets:[{label:'P&L',data:calcs.map(function(c){return c.pnl;}),backgroundColor:calcs.map(function(c){return c.pnl>=0?'#22c55e':'#b45309';}),borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},title:{display:false}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}}}}
   });
 }
