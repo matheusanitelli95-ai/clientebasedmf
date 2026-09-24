@@ -208,40 +208,45 @@ function buildWealthPlanningView() {
 
 // ── Cache de clientes para o WP (carregado do Firestore) ─
 var wpClientesCache = [];
-var wpClientesCacheLoaded = false;
+var wpClientesCacheReady = false;
 
-function wpLoadClientesCache(callback) {
-  if (wpClientesCacheLoaded && wpClientesCache.length > 0) {
-    if (callback) callback();
-    return;
-  }
+// Carrega todos os clientes do Firestore para o cache.
+// Chamado automaticamente quando o WP abre (loadWealthPlanning).
+function wpLoadClientesCache() {
+  if (wpClientesCacheReady) return; // já carregado
   db.collection('clientes').orderBy('nome').get().then(function(snap) {
     wpClientesCache = [];
-    snap.forEach(function(doc) {
-      wpClientesCache.push(Object.assign({ id: doc.id }, doc.data()));
+    snap.forEach(function(d) {
+      wpClientesCache.push(Object.assign({ id: d.id }, d.data()));
     });
-    wpClientesCacheLoaded = true;
-    if (callback) callback();
+    wpClientesCacheReady = true;
+    // Se o usuário já clicou no campo, renderizar agora
+    var input = document.getElementById('wp-search-cliente');
+    var resultsDiv = document.getElementById('wp-search-results');
+    if (input && resultsDiv && resultsDiv.style.display === 'block') {
+      wpRenderFilteredResults(input.value, resultsDiv);
+    }
   });
 }
 
-// ── Filtrar clientes no seletor do WP ────────────────────
+// Filtra clientes — 100% síncrono (cache já carregado).
 function wpFilterClientes() {
   var input = document.getElementById('wp-search-cliente');
   var resultsDiv = document.getElementById('wp-search-results');
   if (!input || !resultsDiv) return;
 
-  // Carregar cache do Firestore se ainda não tiver
-  if (!wpClientesCacheLoaded) {
+  if (!wpClientesCacheReady) {
     resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">Carregando clientes...</div>';
     resultsDiv.style.display = 'block';
-    wpLoadClientesCache(function() { wpFilterClientes(); });
     return;
   }
 
-  var query = (input.value || '').toLowerCase().trim();
+  wpRenderFilteredResults(input.value, resultsDiv);
+}
 
-  // Filtrar apenas clientes com consultoria ticada
+function wpRenderFilteredResults(rawQuery, resultsDiv) {
+  var query = (rawQuery || '').toLowerCase().trim();
+
   var filtered = wpClientesCache.filter(function(c) {
     if (!clienteTemConsultoria(c)) return false;
     if (!query) return true;
@@ -250,7 +255,7 @@ function wpFilterClientes() {
   }).slice(0, 20);
 
   if (filtered.length === 0) {
-    resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">' + (query ? 'Nenhum cliente com consultoria encontrado' : 'Nenhum cliente com consultoria ativa') + '</div>';
+    resultsDiv.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text3)">' + (query ? 'Nenhum cliente encontrado para "' + query + '"' : 'Nenhum cliente com consultoria ativa') + '</div>';
     resultsDiv.style.display = 'block';
     return;
   }
@@ -340,6 +345,8 @@ function loadWealthPlanning() {
   if (!document.getElementById('view-wealth-planning')) {
     buildWealthPlanningView();
   }
+  // Pré-carregar cache de clientes assim que o WP abre
+  wpLoadClientesCache();
   // Se já tinha um cliente selecionado, recarregar
   if (wpSelectedClienteId) {
     wpSelectCliente(wpSelectedClienteId);
