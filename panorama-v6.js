@@ -1114,7 +1114,7 @@ window.gerarPreMercado = function() {
       sub.textContent = 'Gerado em ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' — ' + agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
   }).catch(function(e) {
-    if (body) body.innerHTML = '<div class="empty" style="padding:40px"><div class="empty-title" style="color:#ff1744">Erro ao buscar dados: ' + e.message + '</div></div>';
+    if (body) body.innerHTML = '<div class="empty" style="padding:40px"><div class="empty-title" style="color:var(--neg)">Erro ao buscar dados: ' + e.message + '</div></div>';
     if (btn) { btn.textContent = 'Gerar Relatório'; btn.disabled = false; }
   });
 };

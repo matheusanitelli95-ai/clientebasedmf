@@ -5,10 +5,10 @@
 
 // ── Constantes ───────────────────────────────────────────
 var WP_FASES_ICONS = {
-  fundacao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V10l7-6 7 6v10"/><path d="M9 20v-6h6v6"/></svg>',
-  acumulacao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  fundacao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="stroke:var(--neg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V10l7-6 7 6v10"/><path d="M9 20v-6h6v6"/></svg>',
+  acumulacao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
   distribuicao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-  sucessao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+  sucessao: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
 };
 var WP_FASES = [
   { id: 'fundacao', label: 'Fundação', icon: WP_FASES_ICONS.fundacao, desc: 'Organização financeira, fluxo de caixa, reserva e proteções' },
@@ -225,7 +225,7 @@ function wpFilterClientes() {
   filtered.forEach(function(c) {
     var temWP = clienteTemConsultoria(c);
     var badge = temWP
-      ? '<span style="font-size:9px;background:#38bdf8;color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
+      ? '<span style="font-size:9px;background:var(--pos);color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
       : '<span style="font-size:9px;background:var(--border);color:var(--text3);padding:1px 6px;border-radius:10px">Sem WP</span>';
     html += '<div onclick="wpSelectCliente(\'' + c.id + '\')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
       + '<div style="font-size:13px;color:var(--white)">' + (c.nome || 'Sem nome') + '</div>'
@@ -256,7 +256,7 @@ function wpSelectCliente(clienteId) {
     }
     if (badge) {
       var temWP = clienteTemConsultoria(c);
-      var statusColor = temWP ? '#38bdf8' : '#ff8c00';
+      var statusColor = temWP ? 'var(--pos)' : 'var(--neg)';
       var statusText = temWP ? 'Consultoria ativa' : 'Sem consultoria';
       badge.style.display = 'flex';
       badge.innerHTML = '<span style="font-weight:600">' + (c.nome || '') + '</span>'
@@ -273,14 +273,14 @@ function wpSelectCliente(clienteId) {
       wpContent.innerHTML = wpBloqueioHTML()
         + '<div style="text-align:center;padding:0 20px 40px">'
         + '<div style="font-size:12px;color:var(--text3);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:inline-block;max-width:420px">'
-        + '<strong style="color:#ff8c00">Visão admin:</strong> Este cliente não tem Consultoria ativa. '
+        + '<strong style="color:var(--neg)">Visão admin:</strong> Este cliente não tem Consultoria ativa. '
         + 'Ele veria esta tela de bloqueio ao acessar o Wealth Planning. '
         + 'Para liberar o acesso, ative o checkbox "Consultoria" no cadastro do cliente.'
         + '</div></div>';
     } else {
       // Renderizar exatamente o que o cliente veria
       wpContent.innerHTML = '<div style="margin-bottom:12px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px">'
-        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
         + '<span>Você está visualizando o Wealth Planning como o cliente <strong style="color:var(--white)">' + (c.nome || '') + '</strong> veria.</span>'
         + '</div>'
         + wpClienteDashboardHTML(c);
@@ -365,9 +365,9 @@ function wpBloqueioHTML() {
     + '<div class="page-content">'
     + '<div style="text-align:center;padding:80px 20px">'
     + '<div style="width:80px;height:80px;border-radius:20px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 24px">'
-    + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+    + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="stroke:var(--neg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
     + '</div>'
-    + '<div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Acesso exclusivo para clientes de Consultoria</div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px">Acesso exclusivo para clientes de Consultoria</div>'
     + '<div style="font-size:13px;color:var(--text3);max-width:420px;margin:0 auto;line-height:1.6">O Wealth Planning é um serviço exclusivo para clientes com contrato de consultoria ativa na DMF Gestão Patrimonial. Entre em contato com seu consultor para saber mais.</div>'
     + '</div></div>';
 }
@@ -396,8 +396,8 @@ function wpClienteDashboardHTML(clienteData) {
     + '<div style="display:flex;align-items:center;gap:16px">'
     + '<div style="width:48px;height:48px;border-radius:12px;background:var(--border);display:flex;align-items:center;justify-content:center">' + faseInfo.icon + '</div>'
     + '<div style="flex:1">'
-    + '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Fase Atual da Jornada</div>'
-    + '<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--white)">' + faseInfo.label + '</div>'
+    + '<div style="font-size:10px;color:var(--text3);text-transform:none;letter-spacing:-.01em;font-weight:600;margin-bottom:2px">Fase Atual da Jornada</div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">' + faseInfo.label + '</div>'
     + '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + faseInfo.desc + '</div>'
     + '</div></div>'
     // Barra de fases
@@ -409,10 +409,10 @@ function wpClienteDashboardHTML(clienteData) {
     + '</div></div>'
     // Placeholder para módulos futuros
     + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">'
-    + wpModuleCard('Objetivos', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', 'Em breve')
-    + wpModuleCard('Orçamento', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', 'Em breve')
+    + wpModuleCard('Objetivos', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', 'Em breve')
+    + wpModuleCard('Orçamento', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--neg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', 'Em breve')
     + wpModuleCard('Seguros', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', 'Em breve')
-    + wpModuleCard('Grupo Familiar', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 'Em breve')
+    + wpModuleCard('Grupo Familiar', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 'Em breve')
     + '</div></div>';
 }
 
@@ -441,16 +441,16 @@ function wpAuditLog(clienteId, action, collection, docId, field, oldValue, newVa
 
 // ── Categorias padrão ────────────────────────────────────
 var ORC_CATEGORIAS_PADRAO = [
-  { id: 'salario', nome: 'Salário', tipo: 'receita', cor: '#38bdf8' },
-  { id: 'rendimentos', nome: 'Rendimentos', tipo: 'receita', cor: '#22c55e' },
+  { id: 'salario', nome: 'Salário', tipo: 'receita', cor: 'var(--pos)' },
+  { id: 'rendimentos', nome: 'Rendimentos', tipo: 'receita', cor: 'var(--ok)' },
   { id: 'outros-rec', nome: 'Outras Receitas', tipo: 'receita', cor: '#a78bfa' },
-  { id: 'moradia', nome: 'Moradia', tipo: 'despesa', cor: '#ff8c00' },
+  { id: 'moradia', nome: 'Moradia', tipo: 'despesa', cor: 'var(--neg)' },
   { id: 'alimentacao', nome: 'Alimentação', tipo: 'despesa', cor: '#f87171' },
   { id: 'transporte', nome: 'Transporte', tipo: 'despesa', cor: '#64748b' },
-  { id: 'saude', nome: 'Saúde', tipo: 'despesa', cor: '#38bdf8' },
+  { id: 'saude', nome: 'Saúde', tipo: 'despesa', cor: 'var(--pos)' },
   { id: 'educacao', nome: 'Educação', tipo: 'despesa', cor: '#a78bfa' },
-  { id: 'lazer', nome: 'Lazer', tipo: 'despesa', cor: '#22c55e' },
-  { id: 'vestuario', nome: 'Vestuário', tipo: 'despesa', cor: '#ff8c00' },
+  { id: 'lazer', nome: 'Lazer', tipo: 'despesa', cor: 'var(--ok)' },
+  { id: 'vestuario', nome: 'Vestuário', tipo: 'despesa', cor: 'var(--neg)' },
   { id: 'seguros-prev', nome: 'Seguros/Previdência', tipo: 'despesa', cor: '#64748b' },
   { id: 'servicos', nome: 'Serviços/Assinaturas', tipo: 'despesa', cor: '#a855f7' },
   { id: 'impostos', nome: 'Impostos/Taxas', tipo: 'despesa', cor: '#f87171' },
@@ -646,7 +646,7 @@ function orcFilterClientes() {
   filtered.forEach(function(c) {
     var temWP = clienteTemConsultoria(c);
     var badge = temWP
-      ? '<span style="font-size:9px;background:#38bdf8;color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
+      ? '<span style="font-size:9px;background:var(--pos);color:#000;padding:1px 6px;border-radius:10px;font-weight:600">Consultoria</span>'
       : '';
     html += '<div onclick="orcSelectCliente(\'' + c.id + '\')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
       + '<div style="font-size:13px;color:var(--white)">' + (c.nome || 'Sem nome') + '</div>'
@@ -804,7 +804,7 @@ function orcRenderDashboard() {
     else totalDesp += l.valor;
   });
   var saldo = totalRec - totalDesp;
-  var saldoColor = saldo >= 0 ? '#38bdf8' : '#ff8c00';
+  var saldoColor = saldo >= 0 ? 'var(--pos)' : 'var(--neg)';
 
   // Totais por categoria (despesas)
   var catTotals = {};
@@ -820,7 +820,7 @@ function orcRenderDashboard() {
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">'
     + '<div style="display:flex;align-items:center;gap:8px">'
     + '<button class="btn-ghost" onclick="orcNavMes(-1)" style="padding:4px 8px" title="Mês anterior"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>'
-    + '<span style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:var(--white);min-width:120px;text-align:center">' + orcMesLabel(orcMesAtual) + '</span>'
+    + '<span style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;color:var(--white);min-width:120px;text-align:center">' + orcMesLabel(orcMesAtual) + '</span>'
     + '<button class="btn-ghost" onclick="orcNavMes(1)" style="padding:4px 8px" title="Próximo mês"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>'
     + '</div>'
     + '<div style="display:flex;gap:4px">'
@@ -835,9 +835,9 @@ function orcRenderDashboard() {
 
   // KPIs
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">'
-    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Receitas</div><div style="font-family:DM Mono,monospace;font-size:18px;font-weight:700;color:#38bdf8">' + orcFmt(totalRec) + '</div></div>'
-    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Despesas</div><div style="font-family:DM Mono,monospace;font-size:18px;font-weight:700;color:#ff8c00">' + orcFmt(totalDesp) + '</div></div>'
-    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Saldo</div><div style="font-family:DM Mono,monospace;font-size:18px;font-weight:700;color:' + saldoColor + '">' + orcFmt(saldo) + '</div></div>'
+    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:none;letter-spacing:-.01em;font-weight:600;margin-bottom:4px">Receitas</div><div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--pos)">' + orcFmt(totalRec) + '</div></div>'
+    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:none;letter-spacing:-.01em;font-weight:600;margin-bottom:4px">Despesas</div><div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--neg)">' + orcFmt(totalDesp) + '</div></div>'
+    + '<div class="card" style="padding:16px"><div style="font-size:10px;color:var(--text3);text-transform:none;letter-spacing:-.01em;font-weight:600;margin-bottom:4px">Saldo</div><div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:' + saldoColor + '">' + orcFmt(saldo) + '</div></div>'
     + '</div>';
 
   // Gráfico donut + legenda por categoria
@@ -865,7 +865,7 @@ function orcRenderDashboard() {
       + donutPaths
       + '</svg>'
       + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
-      + '<div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalDesp) + '</div>'
+      + '<div style="font-family:Inter,sans-serif;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalDesp) + '</div>'
       + '<div style="font-size:9px;color:var(--text3)">Total Despesas</div>'
       + '</div></div>'
       // Legenda
@@ -878,7 +878,7 @@ function orcRenderDashboard() {
         + '<span style="width:10px;height:10px;border-radius:3px;background:' + cat.cor + ';flex-shrink:0"></span>'
         + '<span style="font-size:11px;color:var(--text2)">' + cat.nome + '</span></div>'
         + '<div style="display:flex;align-items:center;gap:8px">'
-        + '<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--white)">' + orcFmt(catTotals[catId]) + '</span>'
+        + '<span style="font-family:Inter,sans-serif;font-size:11px;color:var(--white)">' + orcFmt(catTotals[catId]) + '</span>'
         + '<span style="font-size:10px;color:var(--text3);min-width:32px;text-align:right">' + pct.toFixed(0) + '%</span>'
         + '</div></div>';
     });
@@ -899,7 +899,7 @@ function orcRenderDashboard() {
     var donutOffset2 = 0;
     var donutPaths2 = '';
     recKeys.forEach(function(catId) {
-      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#38bdf8', nome: catId };
+      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: 'var(--pos)', nome: catId };
       var pct = recTotals[catId] / totalRec;
       var dashLen = pct * donutCirc2;
       var dashGap = donutCirc2 - dashLen;
@@ -912,18 +912,18 @@ function orcRenderDashboard() {
       + '<div style="flex-shrink:0;position:relative;width:160px;height:160px">'
       + '<svg viewBox="0 0 160 160" style="transform:rotate(-90deg);width:160px;height:160px">' + donutPaths2 + '</svg>'
       + '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">'
-      + '<div style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalRec) + '</div>'
+      + '<div style="font-family:Inter,sans-serif;font-size:14px;font-weight:700;color:var(--white)">' + orcFmt(totalRec) + '</div>'
       + '<div style="font-size:9px;color:var(--text3)">Total Receitas</div>'
       + '</div></div>'
       + '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px">';
     recKeys.forEach(function(catId) {
-      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: '#38bdf8', nome: catId };
+      var cat = orcCategorias.find(function(c) { return c.id === catId; }) || { cor: 'var(--pos)', nome: catId };
       var pct = (recTotals[catId] / totalRec * 100);
       html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
         + '<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:' + cat.cor + ';flex-shrink:0"></span>'
         + '<span style="font-size:11px;color:var(--text2)">' + cat.nome + '</span></div>'
         + '<div style="display:flex;align-items:center;gap:8px">'
-        + '<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--white)">' + orcFmt(recTotals[catId]) + '</span>'
+        + '<span style="font-family:Inter,sans-serif;font-size:11px;color:var(--white)">' + orcFmt(recTotals[catId]) + '</span>'
         + '<span style="font-size:10px;color:var(--text3);min-width:32px;text-align:right">' + pct.toFixed(0) + '%</span>'
         + '</div></div>';
     });
@@ -947,11 +947,11 @@ function orcRenderDashboard() {
     var despesas = orcLancamentos.filter(function(l) { return l.tipo === 'despesa'; });
 
     if (receitas.length > 0) {
-      html += '<div style="font-size:11px;color:#38bdf8;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Receitas</div>';
+      html += '<div style="font-size:11px;color:var(--pos);font-weight:600;margin-bottom:6px;text-transform:none;letter-spacing:-.01em;font-weight:600">Receitas</div>';
       html += orcTabelaLancamentos(receitas);
     }
     if (despesas.length > 0) {
-      html += '<div style="font-size:11px;color:#ff8c00;font-weight:600;margin:12px 0 6px;text-transform:uppercase;letter-spacing:.08em">Despesas</div>';
+      html += '<div style="font-size:11px;color:var(--neg);font-weight:600;margin:12px 0 6px;text-transform:none;letter-spacing:-.01em;font-weight:600">Despesas</div>';
       html += orcTabelaLancamentos(despesas);
     }
   }
@@ -988,7 +988,7 @@ function orcTabelaLancamentos(items) {
       + '<td style="padding:8px 14px;font-size:12px;color:var(--white)">' + (l.descricao || '') + parcInfo + recIcon + '</td>'
       + '<td style="padding:8px 14px"><span style="font-size:10px;background:' + cat.cor + '22;color:' + cat.cor + ';padding:2px 8px;border-radius:10px">' + cat.nome + '</span></td>'
       + '<td style="padding:8px 14px;font-size:12px;color:var(--text2)">' + bancoCol + '</td>'
-      + '<td style="padding:8px 14px;font-family:DM Mono,monospace;font-size:12px;color:var(--white);text-align:right">' + orcFmt(l.valor) + '</td>'
+      + '<td style="padding:8px 14px;font-family:Inter,sans-serif;font-size:12px;color:var(--white);text-align:right">' + orcFmt(l.valor) + '</td>'
       + '<td style="padding:8px 14px;text-align:right">'
       + '<button onclick="orcAbrirModal(\'' + l.id + '\')" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--text3)" title="Editar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
       + '<button onclick="orcRemover(\'' + l.id + '\')" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--text3);margin-left:4px" title="Excluir"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
@@ -1021,7 +1021,7 @@ function orcRenderAnual(content) {
   content.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
     + '<div style="display:flex;align-items:center;gap:8px">'
     + '<button class="btn-ghost" onclick="orcNavAno(-1)" style="padding:4px 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>'
-    + '<span style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:var(--white);min-width:60px;text-align:center">' + ano + '</span>'
+    + '<span style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;color:var(--white);min-width:60px;text-align:center">' + ano + '</span>'
     + '<button class="btn-ghost" onclick="orcNavAno(1)" style="padding:4px 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>'
     + '</div>'
     + '<div style="display:flex;gap:4px">'
@@ -1031,8 +1031,8 @@ function orcRenderAnual(content) {
     + '<div class="card" style="padding:0;overflow:auto"><table style="width:100%;border-collapse:collapse;min-width:800px">'
     + '<thead><tr style="border-bottom:1px solid var(--border)">'
     + '<th style="padding:10px 12px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;text-transform:uppercase;position:sticky;left:0;background:var(--card)">Mês</th>'
-    + '<th style="padding:10px 12px;font-size:10px;color:#38bdf8;text-align:right;font-weight:600;text-transform:uppercase">Receitas</th>'
-    + '<th style="padding:10px 12px;font-size:10px;color:#ff8c00;text-align:right;font-weight:600;text-transform:uppercase">Despesas</th>'
+    + '<th style="padding:10px 12px;font-size:10px;color:var(--pos);text-align:right;font-weight:600;text-transform:uppercase">Receitas</th>'
+    + '<th style="padding:10px 12px;font-size:10px;color:var(--neg);text-align:right;font-weight:600;text-transform:uppercase">Despesas</th>'
     + '<th style="padding:10px 12px;font-size:10px;color:var(--text3);text-align:right;font-weight:600;text-transform:uppercase">Saldo</th>'
     + '</tr></thead><tbody id="orc-anual-body">'
     + '<tr><td colspan="4" style="padding:20px;text-align:center;font-size:12px;color:var(--text3)">Carregando...</td></tr>'
@@ -1061,23 +1061,23 @@ function orcRenderAnual(content) {
       totRec += rec;
       totDesp += desp;
       var saldo = rec - desp;
-      var saldoC = saldo >= 0 ? '#38bdf8' : '#ff8c00';
+      var saldoC = saldo >= 0 ? 'var(--pos)' : 'var(--neg)';
       var isCurrentMonth = mesKey === orcMesStr();
       var rowBg = isCurrentMonth ? 'var(--border)' : 'transparent';
       html += '<tr style="border-bottom:1px solid var(--border);background:' + rowBg + ';cursor:pointer" onclick="orcMesAtual=\'' + mesKey + '\';orcSetVisao(\'mensal\');orcLoadMes(orcClienteId,\'' + mesKey + '\')">'
         + '<td style="padding:8px 12px;font-size:12px;color:var(--white);font-weight:' + (isCurrentMonth ? '700' : '400') + ';position:sticky;left:0;background:' + (isCurrentMonth ? 'var(--border)' : 'var(--card)') + '">' + ORC_MESES[idx] + '</td>'
-        + '<td style="padding:8px 12px;font-family:DM Mono,monospace;font-size:12px;color:#38bdf8;text-align:right">' + (rec ? orcFmt(rec) : '—') + '</td>'
-        + '<td style="padding:8px 12px;font-family:DM Mono,monospace;font-size:12px;color:#ff8c00;text-align:right">' + (desp ? orcFmt(desp) : '—') + '</td>'
-        + '<td style="padding:8px 12px;font-family:DM Mono,monospace;font-size:12px;color:' + saldoC + ';text-align:right;font-weight:600">' + (rec || desp ? orcFmt(saldo) : '—') + '</td>'
+        + '<td style="padding:8px 12px;font-family:Inter,sans-serif;font-size:12px;color:var(--pos);text-align:right">' + (rec ? orcFmt(rec) : '—') + '</td>'
+        + '<td style="padding:8px 12px;font-family:Inter,sans-serif;font-size:12px;color:var(--neg);text-align:right">' + (desp ? orcFmt(desp) : '—') + '</td>'
+        + '<td style="padding:8px 12px;font-family:Inter,sans-serif;font-size:12px;color:' + saldoC + ';text-align:right;font-weight:600">' + (rec || desp ? orcFmt(saldo) : '—') + '</td>'
         + '</tr>';
     });
     // Linha total
     var totSaldo = totRec - totDesp;
     html += '<tr style="background:var(--border)">'
       + '<td style="padding:10px 12px;font-size:12px;color:var(--white);font-weight:700;position:sticky;left:0;background:var(--border)">TOTAL</td>'
-      + '<td style="padding:10px 12px;font-family:DM Mono,monospace;font-size:13px;color:#38bdf8;text-align:right;font-weight:700">' + orcFmt(totRec) + '</td>'
-      + '<td style="padding:10px 12px;font-family:DM Mono,monospace;font-size:13px;color:#ff8c00;text-align:right;font-weight:700">' + orcFmt(totDesp) + '</td>'
-      + '<td style="padding:10px 12px;font-family:DM Mono,monospace;font-size:13px;color:' + (totSaldo >= 0 ? '#38bdf8' : '#ff8c00') + ';text-align:right;font-weight:700">' + orcFmt(totSaldo) + '</td>'
+      + '<td style="padding:10px 12px;font-family:Inter,sans-serif;font-size:13px;color:var(--pos);text-align:right;font-weight:700">' + orcFmt(totRec) + '</td>'
+      + '<td style="padding:10px 12px;font-family:Inter,sans-serif;font-size:13px;color:var(--neg);text-align:right;font-weight:700">' + orcFmt(totDesp) + '</td>'
+      + '<td style="padding:10px 12px;font-family:Inter,sans-serif;font-size:13px;color:' + (totSaldo >= 0 ? 'var(--pos)' : 'var(--neg)') + ';text-align:right;font-weight:700">' + orcFmt(totSaldo) + '</td>'
       + '</tr>';
     tbody.innerHTML = html;
   });
@@ -1111,7 +1111,7 @@ function orcAbrirModal(lancId) {
 
   overlay.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
-    + '<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--white)">' + (existing ? 'Editar Lançamento' : 'Novo Lançamento') + '</div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">' + (existing ? 'Editar Lançamento' : 'Novo Lançamento') + '</div>'
     + '<button onclick="document.getElementById(\'orc-modal-overlay\').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">&times;</button>'
     + '</div>'
     // Tipo
@@ -1273,7 +1273,7 @@ function orcAbrirRecorrencias() {
         + '<div><div style="font-size:12px;color:var(--white)">' + r.descricao + '</div>'
         + '<div style="font-size:10px;color:var(--text3)">' + cat.nome + ' · ' + (r.banco || r.cartao || '—') + '</div></div>'
         + '<div style="display:flex;align-items:center;gap:8px">'
-        + '<span style="font-family:DM Mono,monospace;font-size:12px;color:' + (r.tipo === 'receita' ? '#38bdf8' : '#ff8c00') + '">' + orcFmt(r.valor) + '</span>'
+        + '<span style="font-family:Inter,sans-serif;font-size:12px;color:' + (r.tipo === 'receita' ? 'var(--pos)' : 'var(--neg)') + '">' + orcFmt(r.valor) + '</span>'
         + '<button onclick="orcRemoverRecorrencia(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--text3)" title="Remover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
         + '</div></div>';
     });
@@ -1281,7 +1281,7 @@ function orcAbrirRecorrencias() {
 
   overlay.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:24px">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
-    + '<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--white)">Recorrências</div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">Recorrências</div>'
     + '<button onclick="document.getElementById(\'orc-rec-overlay\').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">&times;</button>'
     + '</div>'
     + '<div style="font-size:11px;color:var(--text3);margin-bottom:16px">Lançamentos que se repetem todo mês (salário, aluguel, assinaturas). São preenchidos automaticamente ao abrir um novo mês.</div>'
