@@ -449,6 +449,7 @@ function wpShowTab(tab, clienteId, isAdmin) {
   if (tab === 'objetivos') wpRenderObjetivos(container, clienteId, isAdmin);
   if (tab === 'seguros') wpRenderSeguros(container, clienteId, isAdmin);
   if (tab === 'familia') wpRenderFamilia(container, clienteId, isAdmin);
+  if (tab === 'diagnostico' && isAdmin) wpRenderDiagnostico(container, clienteId);
 }
 
 // ── HTML do dashboard WP (admin e cliente) ───────────────
@@ -495,6 +496,7 @@ function wpClienteDashboardHTML(clienteData, isAdmin) {
     + wpTabBtn('objetivos', 'Objetivos', false)
     + wpTabBtn('seguros', 'Seguros', false)
     + wpTabBtn('familia', 'Grupo Familiar', false)
+    + (isAdmin ? wpTabBtn('diagnostico', 'Diagnóstico', false) : '')
     + '</div></div>'
     + '<div id="wp-modules-content"></div>'
     // Layer: PLANEJAMENTO (placeholder)
@@ -1029,6 +1031,492 @@ function wpAuditLog(clienteId, action, collection, docId, field, oldValue, newVa
   }).catch(function(err) {
     console.warn('Audit log error:', err.message);
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DIAGNÓSTICO — Roteiro de Reunião Digital
+// ═══════════════════════════════════════════════════════════
+
+// -- Helpers de campo --
+function wpDiagFld(key, label, type, val, opts) {
+  var v = (val !== undefined && val !== null) ? String(val) : '';
+  var ph = (opts && opts.placeholder) || '';
+  var s = 'width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;';
+  var wrap = '<div style="margin-bottom:10px;">'
+    + (label ? '<label style="font-size:12px;color:var(--text2);display:block;margin-bottom:3px;">' + label + '</label>' : '');
+  if (type === 'textarea') {
+    return wrap + '<textarea data-diag="' + key + '" rows="' + ((opts && opts.rows) || 3) + '" placeholder="' + ph + '" style="' + s + 'resize:vertical;">' + v + '</textarea></div>';
+  }
+  if (type === 'select') {
+    var sh = '<select data-diag="' + key + '" style="' + s + '"><option value="">Selecionar...</option>';
+    ((opts && opts.options) || []).forEach(function(o) { sh += '<option value="' + o + '"' + (v === o ? ' selected' : '') + '>' + o + '</option>'; });
+    return wrap + sh + '</select></div>';
+  }
+  var it = type === 'currency' ? 'number' : (type || 'text');
+  var extra = type === 'currency' ? ' step="0.01" placeholder="R$ 0"' : '';
+  return wrap + '<input data-diag="' + key + '" type="' + it + '"' + extra + ' value="' + v.replace(/"/g, '&quot;') + '"' + (ph && !extra ? ' placeholder="' + ph + '"' : '') + ' style="' + s + '"/></div>';
+}
+
+function wpDiagChks(prefix, items, data) {
+  var d = data || {};
+  var h = '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;">';
+  items.forEach(function(it) {
+    var k = prefix + '_' + it.k;
+    h += '<label style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text);cursor:pointer;">'
+      + '<input type="checkbox" data-diag-check="' + k + '"' + (d[k] ? ' checked' : '') + ' style="accent-color:var(--blue);"/> ' + it.l + '</label>';
+  });
+  return h + '</div>';
+}
+
+function wpDiagRadios(key, items, val) {
+  var h = '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;">';
+  items.forEach(function(it) {
+    h += '<label style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text);cursor:pointer;">'
+      + '<input type="radio" name="diag_' + key + '" data-diag-radio="' + key + '" value="' + it.v + '"' + (val === it.v ? ' checked' : '') + ' style="accent-color:var(--blue);"/> ' + it.l + '</label>';
+  });
+  return h + '</div>';
+}
+
+function wpDiagQ(text) {
+  return '<p style="font-size:13px;font-weight:600;color:var(--blue);margin:12px 0 6px;">' + text + '</p>';
+}
+
+function wpDiagSub(text) {
+  return '<div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border);">' + text + '</div>';
+}
+
+function wpDiagG2() { return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'; }
+
+// -- Section 1: Contexto e Família --
+function wpDiagBuildS1(d) {
+  var h = '';
+  h += wpDiagChks('s1', [
+    {k:'conjuge',l:'Cônjuge/companheiro'}, {k:'filhos',l:'Filhos'}, {k:'dependentes',l:'Dependentes'},
+    {k:'paisDep',l:'Pais dependentes'}, {k:'profissao',l:'Profissão'}, {k:'empresa',l:'Empresa/sociedade'},
+    {k:'regimeBens',l:'Regime de bens'}, {k:'mudanca',l:'Mudança recente/prevista'}
+  ], d);
+  h += wpDiagQ('Quem faz parte da estrutura financeira da família hoje?');
+  h += wpDiagFld('s1_estrutura', '', 'textarea', d.s1_estrutura, {rows:3, placeholder:'Descreva a composição familiar e financeira...'});
+  h += wpDiagQ('O que mudou recentemente na sua vida ou deve mudar nos próximos anos?');
+  h += wpDiagFld('s1_mudancas', '', 'textarea', d.s1_mudancas, {rows:3, placeholder:'Mudanças recentes ou previstas...'});
+  h += wpDiagFld('s1_notas', 'Anotações do consultor', 'textarea', d.s1_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 2: Objetivos --
+function wpDiagBuildS2(d) {
+  var h = '';
+  h += wpDiagQ('O que você quer que seu dinheiro permita fazer?');
+  h += wpDiagFld('s2_oQueQuer', '', 'textarea', d.s2_oQueQuer, {rows:3, placeholder:'Sonhos, metas, desejos...'});
+  h += wpDiagSub('Objetivos Mapeados');
+  var ts = 'padding:6px 8px;text-align:left;border:1px solid var(--border);';
+  h += '<div style="overflow-x:auto;margin-bottom:10px;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  h += '<tr style="background:var(--card2);"><th style="' + ts + '">Objetivo</th><th style="' + ts + 'width:90px;">Quando?</th><th style="' + ts + 'width:110px;">Valor de hoje</th><th style="' + ts + 'width:90px;">Prioridade</th><th style="' + ts + 'width:60px;">Flex?</th></tr>';
+  var cs = 'width:100%;border:none;background:transparent;color:var(--text);font-size:13px;padding:4px;';
+  for (var i = 0; i < 3; i++) {
+    var p = 's2_obj' + i;
+    h += '<tr>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_nome" value="' + (d[p+'_nome']||'').replace(/"/g,'&quot;') + '" style="' + cs + '"/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_quando" value="' + (d[p+'_quando']||'') + '" style="' + cs + '" placeholder="Ex: 2030"/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_valor" type="number" value="' + (d[p+'_valor']||'') + '" style="' + cs + '" placeholder="R$"/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><select data-diag="' + p + '_pri" style="' + cs + '">'
+      + '<option value="">-</option><option value="Alta"' + (d[p+'_pri']==='Alta'?' selected':'') + '>Alta</option>'
+      + '<option value="Media"' + (d[p+'_pri']==='Media'?' selected':'') + '>Média</option>'
+      + '<option value="Baixa"' + (d[p+'_pri']==='Baixa'?' selected':'') + '>Baixa</option></select></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><select data-diag="' + p + '_flex" style="' + cs + '">'
+      + '<option value="">-</option><option value="S"' + (d[p+'_flex']==='S'?' selected':'') + '>S</option>'
+      + '<option value="N"' + (d[p+'_flex']==='N'?' selected':'') + '>N</option></select></td>';
+    h += '</tr>';
+  }
+  h += '</table></div>';
+  h += wpDiagQ('Se não der para fazer tudo simultaneamente, o que vem primeiro?');
+  h += wpDiagFld('s2_prioridade', '', 'textarea', d.s2_prioridade, {rows:2});
+  h += wpDiagQ('Daqui a 10-15 anos, o que precisaria ter acontecido para você dizer: "deu certo"?');
+  h += wpDiagFld('s2_visao', '', 'textarea', d.s2_visao, {rows:2});
+  h += wpDiagFld('s2_notas', 'Anotações do consultor', 'textarea', d.s2_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 3: Renda e Fluxo Financeiro --
+function wpDiagBuildS3(d) {
+  var h = '';
+  h += wpDiagG2();
+  h += wpDiagFld('s3_rendaLiquida', 'Renda líquida familiar', 'currency', d.s3_rendaLiquida);
+  h += wpDiagFld('s3_custoVida', 'Custo de vida total', 'currency', d.s3_custoVida);
+  h += '</div>' + wpDiagG2();
+  h += wpDiagFld('s3_despEssenciais', 'Despesas essenciais', 'currency', d.s3_despEssenciais);
+  h += wpDiagFld('s3_aporteEfetivo', 'Aporte efetivo', 'currency', d.s3_aporteEfetivo);
+  h += '</div>' + wpDiagG2();
+  h += wpDiagFld('s3_superavitTeorico', 'Superávit teórico', 'currency', d.s3_superavitTeorico);
+  h += wpDiagFld('s3_superavitReal', 'Superávit real', 'currency', d.s3_superavitReal);
+  h += '</div>';
+  h += wpDiagSub('Fontes de receita');
+  h += wpDiagChks('s3', [
+    {k:'salario',l:'Salário'}, {k:'proLabore',l:'Pró-labore'}, {k:'lucros',l:'Lucros'},
+    {k:'bonus',l:'Bônus'}, {k:'alugueis',l:'Aluguéis'}, {k:'outrasReceitas',l:'Outras receitas'},
+    {k:'rendaVariavel',l:'Renda variável'}, {k:'despExtraord',l:'Despesas extraordinárias'},
+    {k:'financiamentos',l:'Financiamentos/dívidas'}
+  ], d);
+  h += wpDiagQ('Pela conta deveria sobrar aproximadamente R$___. Isso realmente sobra e é investido?');
+  h += wpDiagG2();
+  h += wpDiagFld('s3_deveriaSobrar', 'Deveria sobrar (R$)', 'currency', d.s3_deveriaSobrar);
+  h += '<div style="padding-top:20px;">' + wpDiagRadios('s3_realmenteSobra', [
+    {v:'sim',l:'Sim'}, {v:'parcialmente',l:'Parcialmente'}, {v:'nao',l:'Não'}
+  ], d.s3_realmenteSobra) + '</div>';
+  h += '</div>';
+  h += wpDiagFld('s3_notas', 'Anotações do consultor', 'textarea', d.s3_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 4: Reserva e Liquidez --
+function wpDiagBuildS4(d) {
+  var h = '';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">';
+  h += wpDiagFld('s4_reservaAtual', 'Reserva atual (R$)', 'currency', d.s4_reservaAtual);
+  h += wpDiagFld('s4_custoEssencial', 'Custo essencial (R$)', 'currency', d.s4_custoEssencial);
+  h += wpDiagFld('s4_coberturaMeses', 'Cobertura (meses)', 'number', d.s4_coberturaMeses);
+  h += '</div>';
+  h += wpDiagSub('Meta de reserva');
+  h += wpDiagChks('s4', [
+    {k:'meta3m',l:'3 meses'}, {k:'meta6m',l:'6 meses'}, {k:'meta9m',l:'9 meses'},
+    {k:'meta12m',l:'12 meses'}, {k:'metaPersonalizada',l:'Personalizada'}
+  ], d);
+  h += wpDiagQ('Se amanhã sua renda parasse completamente, por quanto tempo conseguiria manter a família sem vender patrimônio de longo prazo?');
+  h += wpDiagFld('s4_rendaParasse', '', 'textarea', d.s4_rendaParasse, {rows:2});
+  h += wpDiagSub('Avaliação');
+  h += wpDiagRadios('s4_avaliacao', [
+    {v:'adequada',l:'Adequada'}, {v:'analisar',l:'Analisar'}, {v:'insuficiente',l:'Possível insuficiência'}
+  ], d.s4_avaliacao);
+  h += wpDiagFld('s4_notas', 'Anotações do consultor', 'textarea', d.s4_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 5: Patrimônio e Passivos --
+function wpDiagBuildS5(d) {
+  var h = '';
+  h += wpDiagG2();
+  h += wpDiagFld('s5_investimentos', 'Investimentos (R$)', 'currency', d.s5_investimentos);
+  h += wpDiagFld('s5_imoveis', 'Imóveis (R$)', 'currency', d.s5_imoveis);
+  h += '</div>' + wpDiagG2();
+  h += wpDiagFld('s5_empresas', 'Empresas (R$)', 'currency', d.s5_empresas);
+  h += wpDiagFld('s5_previdencia', 'Previdência (R$)', 'currency', d.s5_previdencia);
+  h += '</div>' + wpDiagG2();
+  h += wpDiagFld('s5_veiculos', 'Veículos/outros (R$)', 'currency', d.s5_veiculos);
+  h += wpDiagFld('s5_dividas', 'Dívidas (R$)', 'currency', d.s5_dividas);
+  h += '</div>' + wpDiagG2();
+  h += wpDiagFld('s5_ativosTotais', 'Ativos totais (R$)', 'currency', d.s5_ativosTotais);
+  h += wpDiagFld('s5_patrimonioLiquido', 'Patrimônio líquido (R$)', 'currency', d.s5_patrimonioLiquido);
+  h += '</div>';
+  h += wpDiagSub('Alertas patrimoniais');
+  h += wpDiagChks('s5', [
+    {k:'concentracao',l:'Concentração patrimonial'}, {k:'baixaLiquidez',l:'Baixa liquidez'},
+    {k:'exposicaoEmpresarial',l:'Exposição empresarial'}, {k:'passivoRelevante',l:'Passivo relevante'},
+    {k:'aprofundar',l:'Aprofundar'}
+  ], d);
+  h += wpDiagFld('s5_notas', 'Anotações do consultor', 'textarea', d.s5_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 6: Investimentos --
+function wpDiagBuildS6(d) {
+  var h = '';
+  h += wpDiagChks('s6', [
+    {k:'carteiraDMF',l:'Carteira DMF'}, {k:'outrasInst',l:'Outras instituições'},
+    {k:'exterior',l:'Exterior'}, {k:'previdencia',l:'Previdência'}, {k:'outros',l:'Outros'}
+  ], d);
+  h += wpDiagFld('s6_patrimonioInvestivel', 'Patrimônio investível aproximado (R$)', 'currency', d.s6_patrimonioInvestivel);
+  h += wpDiagQ('Alguma parte desse patrimônio já tem destino definido?');
+  h += wpDiagFld('s6_destinoPatrimonio', '', 'textarea', d.s6_destinoPatrimonio, {rows:2});
+  h += wpDiagChks('s6d', [
+    {k:'reserva',l:'Reserva'}, {k:'imovel',l:'Imóvel'}, {k:'aposentadoria',l:'Aposentadoria'},
+    {k:'educacao',l:'Educação'}, {k:'empresa',l:'Empresa'}, {k:'outro',l:'Outro'}
+  ], d);
+  h += wpDiagQ('Existe algum ativo que você não pretende vender independentemente da análise?');
+  h += wpDiagFld('s6_ativoNaoVende', '', 'textarea', d.s6_ativoNaoVende, {rows:2});
+  h += wpDiagSub('Perfil do investidor');
+  h += wpDiagChks('s6p', [
+    {k:'perfilRisco',l:'Perfil de risco levantado'}, {k:'experiencia',l:'Experiência'},
+    {k:'liquidez',l:'Liquidez'}, {k:'restricoes',l:'Restrições/preferências'}
+  ], d);
+  h += wpDiagFld('s6_notas', 'Anotações do consultor', 'textarea', d.s6_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 7: Proteção e Gestão de Riscos --
+function wpDiagBuildS7(d) {
+  var h = '';
+  h += wpDiagChks('s7', [
+    {k:'seguroVida',l:'Seguro de vida'}, {k:'invalidez',l:'Invalidez/incapacidade'},
+    {k:'saude',l:'Saúde'}, {k:'patrimonial',l:'Patrimonial'},
+    {k:'empresarial',l:'Empresarial'}, {k:'previdencia',l:'Previdência'}
+  ], d);
+  h += wpDiagQ('Se você ficasse impossibilitado de trabalhar por dois anos, o que aconteceria financeiramente?');
+  h += wpDiagFld('s7_impossibilitado', '', 'textarea', d.s7_impossibilitado, {rows:3});
+  h += wpDiagQ('Se você falecesse hoje, sua família teria liquidez suficiente para reorganizar a vida financeira?');
+  h += wpDiagFld('s7_falecimento', '', 'textarea', d.s7_falecimento, {rows:3});
+  h += wpDiagFld('s7_gaps', 'Possíveis gaps para análise', 'textarea', d.s7_gaps, {rows:2});
+  h += wpDiagFld('s7_notas', 'Anotações do consultor', 'textarea', d.s7_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 8: Independência Financeira / Aposentadoria --
+function wpDiagBuildS8(d) {
+  var h = '';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">';
+  h += wpDiagFld('s8_idadeAtual', 'Idade atual', 'number', d.s8_idadeAtual);
+  h += wpDiagFld('s8_idadeDesejada', 'Idade desejada (aposentadoria)', 'number', d.s8_idadeDesejada);
+  h += wpDiagFld('s8_rendaDesejada', 'Renda desejada (R$/mês)', 'currency', d.s8_rendaDesejada);
+  h += '</div>';
+  h += wpDiagSub('Padrão de vida');
+  h += wpDiagRadios('s8_padrao', [
+    {v:'manter',l:'Manter padrão'}, {v:'reduzir',l:'Reduzir padrão'}, {v:'aumentar',l:'Aumentar padrão'}
+  ], d.s8_padrao);
+  h += wpDiagQ('Quando chegar nessa fase, você quer preservar o patrimônio, continuar aumentando-o ou aceita consumir parte dele?');
+  h += wpDiagChks('s8', [
+    {k:'preservarCompra',l:'Preservar poder de compra'}, {k:'crescimentoReal',l:'Crescimento real'},
+    {k:'desacumulacao',l:'Desacumulação planejada'}, {k:'aindaNaoSabe',l:'Ainda não sabe'}
+  ], d);
+  h += wpDiagSub('Fontes de renda futuras');
+  h += wpDiagChks('s8f', [
+    {k:'inss',l:'INSS'}, {k:'previdencia',l:'Previdência'}, {k:'alugueis',l:'Aluguéis'},
+    {k:'empresa',l:'Empresa'}, {k:'outrasRendas',l:'Outras rendas futuras'}
+  ], d);
+  h += wpDiagFld('s8_notas', 'Anotações do consultor', 'textarea', d.s8_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 9: Tributário --
+function wpDiagBuildS9(d) {
+  var h = '';
+  h += wpDiagSub('Tipos de renda / tributação');
+  h += wpDiagChks('s9', [
+    {k:'irpf',l:'IRPF'}, {k:'assalariado',l:'Assalariado'}, {k:'socioEmpresario',l:'Sócio/empresário'},
+    {k:'proLabore',l:'Pró-labore'}, {k:'distLucros',l:'Distribuição de lucros'},
+    {k:'imoveisAlugueis',l:'Imóveis/aluguéis'}, {k:'exterior',l:'Exterior'},
+    {k:'ganhoCapital',l:'Ganho de capital'}, {k:'previdencia',l:'Previdência'},
+    {k:'herancaDoacao',l:'Herança/doação'}
+  ], d);
+  h += wpDiagQ('Existe alguma preocupação tributária ou estrutura já montada por contador/advogado?');
+  h += wpDiagFld('s9_preocupacao', '', 'textarea', d.s9_preocupacao, {rows:2});
+  h += wpDiagG2();
+  h += wpDiagFld('s9_contador', 'Contador', 'text', d.s9_contador);
+  h += '<div style="padding-top:20px;">' + wpDiagChks('s9', [{k:'analiseEspecializada',l:'Necessidade de análise especializada'}], d) + '</div>';
+  h += '</div>';
+  h += wpDiagFld('s9_notas', 'Anotações do consultor', 'textarea', d.s9_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 10: Sucessão e Legado --
+function wpDiagBuildS10(d) {
+  var h = '';
+  h += wpDiagQ('A intenção é aproveitar praticamente tudo em vida ou existe patrimônio que fazem questão de deixar?');
+  h += wpDiagRadios('s10_intencao', [
+    {v:'consumir',l:'Consumir em vida'}, {v:'legado',l:'Legado'}, {v:'naoDefinido',l:'Ainda não definido'}
+  ], d.s10_intencao);
+  h += wpDiagSub('Instrumentos existentes');
+  h += wpDiagChks('s10', [
+    {k:'testamento',l:'Testamento'}, {k:'holding',l:'Holding'}, {k:'previdencia',l:'Previdência'},
+    {k:'seguro',l:'Seguro'}, {k:'doacoes',l:'Doações'}, {k:'acordoSocietario',l:'Acordo societário'},
+    {k:'nenhuma',l:'Nenhuma'}
+  ], d);
+  h += wpDiagQ('Se algo acontecesse hoje, você sabe como o patrimônio seria transferido e se a família teria liquidez?');
+  h += wpDiagFld('s10_algoAcontecesse', '', 'textarea', d.s10_algoAcontecesse, {rows:2});
+  h += wpDiagRadios('s10_familiaLiquidez', [
+    {v:'sim',l:'Sim'}, {v:'parcialmente',l:'Parcialmente'}, {v:'nao',l:'Não'}
+  ], d.s10_familiaLiquidez);
+  h += wpDiagSub('Ações sugeridas');
+  h += wpDiagChks('s10a', [
+    {k:'revisarBeneficiarios',l:'Revisar beneficiários'}, {k:'analiseSucessoria',l:'Análise sucessória'},
+    {k:'advogado',l:'Advogado'}, {k:'contador',l:'Contador'}
+  ], d);
+  h += wpDiagFld('s10_notas', 'Anotações do consultor', 'textarea', d.s10_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 11: Comportamento Financeiro --
+function wpDiagBuildS11(d) {
+  var h = '';
+  h += wpDiagQ('Qual é sua maior preocupação financeira hoje?');
+  h += wpDiagFld('s11_maiorPreocupacao', '', 'textarea', d.s11_maiorPreocupacao, {rows:3});
+  h += wpDiagQ('Qual foi sua melhor e sua pior experiência com dinheiro ou investimentos?');
+  h += wpDiagFld('s11_melhorPior', '', 'textarea', d.s11_melhorPior, {rows:3});
+  h += wpDiagQ('Quando seus investimentos caem bastante, qual costuma ser sua reação?');
+  h += wpDiagFld('s11_reacaoQueda', '', 'textarea', d.s11_reacaoQueda, {rows:2});
+  h += wpDiagRadios('s11_perfil', [
+    {v:'forteAversao',l:'Forte aversão a perda'}, {v:'volatilidade',l:'Volatilidade incomoda'},
+    {v:'altaPrev',l:'Alta previsibilidade'}, {v:'impulsivas',l:'Decisões impulsivas'}
+  ], d.s11_perfil);
+  h += wpDiagSub('Conhecimento financeiro');
+  h += wpDiagRadios('s11_conhecimento', [
+    {v:'baixo',l:'Baixo'}, {v:'medio',l:'Médio'}, {v:'alto',l:'Alto'}
+  ], d.s11_conhecimento);
+  h += wpDiagFld('s11_notas', 'Anotações do consultor', 'textarea', d.s11_notas, {rows:2, placeholder:'FATO / DIAGNÓSTICO / AÇÃO'});
+  return h;
+}
+
+// -- Section 12: Check Final da Reunião --
+function wpDiagBuildS12(d) {
+  var h = '';
+  h += wpDiagSub('Temas abordados na reunião');
+  h += wpDiagChks('s12t', [
+    {k:'familia',l:'Família'}, {k:'objetivos',l:'Objetivos'}, {k:'fluxo',l:'Fluxo'},
+    {k:'reserva',l:'Reserva'}, {k:'patrimonio',l:'Patrimônio'}, {k:'investimentos',l:'Investimentos'},
+    {k:'protecao',l:'Proteção'}, {k:'aposentadoria',l:'Aposentadoria'},
+    {k:'tributario',l:'Tributário'}, {k:'sucessao',l:'Sucessão'}, {k:'comportamento',l:'Comportamento'}
+  ], d);
+  h += wpDiagSub('Pendências documentais / informações');
+  h += wpDiagChks('s12d', [
+    {k:'irpf',l:'IRPF'}, {k:'extratos',l:'Extratos/posições'}, {k:'previdencia',l:'Previdência'},
+    {k:'apolices',l:'Apólices'}, {k:'financiamentos',l:'Financiamentos'},
+    {k:'docsSocietarios',l:'Docs societários'}, {k:'docsSucessorios',l:'Docs sucessórios'},
+    {k:'outros',l:'Outros'}
+  ], d);
+  h += wpDiagFld('s12_pendenciasOutras', 'Outras pendências', 'textarea', d.s12_pendenciasOutras, {rows:2});
+  h += wpDiagSub('Principais pontos para análise');
+  for (var i = 1; i <= 4; i++) {
+    h += wpDiagFld('s12_ponto' + i, i + '.', 'text', d['s12_ponto' + i], {placeholder:'Ponto para análise...'});
+  }
+  h += wpDiagSub('Próximas ações');
+  var ts = 'padding:6px 8px;text-align:left;border:1px solid var(--border);';
+  var cs = 'width:100%;border:none;background:transparent;color:var(--text);font-size:13px;padding:4px;';
+  h += '<div style="overflow-x:auto;margin-bottom:10px;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  h += '<tr style="background:var(--card2);"><th style="' + ts + '">Ação</th><th style="' + ts + 'width:130px;">Responsável</th><th style="' + ts + 'width:110px;">Prazo</th><th style="' + ts + 'width:100px;">Status</th></tr>';
+  for (var j = 0; j < 4; j++) {
+    var p = 's12_acao' + j;
+    h += '<tr>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_desc" value="' + (d[p+'_desc']||'').replace(/"/g,'&quot;') + '" style="' + cs + '" placeholder="Descrição da ação..."/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_resp" value="' + (d[p+'_resp']||'').replace(/"/g,'&quot;') + '" style="' + cs + '"/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><input data-diag="' + p + '_prazo" type="date" value="' + (d[p+'_prazo']||'') + '" style="' + cs + '"/></td>';
+    h += '<td style="border:1px solid var(--border);padding:4px;"><select data-diag="' + p + '_status" style="' + cs + '">'
+      + '<option value="Pendente"' + (d[p+'_status']!=='Concluido'?' selected':'') + '>Pendente</option>'
+      + '<option value="Concluido"' + (d[p+'_status']==='Concluido'?' selected':'') + '>Concluído</option></select></td>';
+    h += '</tr>';
+  }
+  h += '</table></div>';
+  h += wpDiagFld('s12_notas', 'Anotações finais', 'textarea', d.s12_notas, {rows:2, placeholder:'Observações gerais...'});
+  return h;
+}
+
+// -- Toggle accordion --
+function wpDiagToggle(sid) {
+  var body = document.getElementById('wpDiagBody_' + sid);
+  var arrow = document.getElementById('wpDiagArrow_' + sid);
+  if (!body) return;
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  } else {
+    body.style.display = 'none';
+    if (arrow) arrow.style.transform = 'rotate(-90deg)';
+  }
+}
+
+// -- Main render --
+function wpRenderDiagnostico(container, clienteId) {
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);">Carregando diagnóstico...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_diagnostico').doc('atual').get()
+    .then(function(snap) {
+      var d = snap.exists ? snap.data() : {};
+      var h = '';
+
+      // Header
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">';
+      h += '<div><div style="font-size:16px;font-weight:700;color:var(--text);">Roteiro de Reunião — Diagnóstico</div>'
+        + '<div style="font-size:12px;color:var(--text2);">Material de apoio para reunião com cliente</div></div>';
+      h += '<div style="display:flex;gap:8px;align-items:center;">';
+      h += '<select data-diag="etapa" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;">'
+        + '<option value="inicial"' + (d.etapa !== 'revisao' ? ' selected' : '') + '>Inicial</option>'
+        + '<option value="revisao"' + (d.etapa === 'revisao' ? ' selected' : '') + '>Revisão</option></select>';
+      h += '<input data-diag="dataReuniao" type="date" value="' + (d.dataReuniao || '') + '" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;"/>';
+      h += '<button onclick="wpSaveDiagnostico(\'' + clienteId + '\')" style="padding:6px 16px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>'
+        + 'Salvar</button>';
+      h += '</div></div>';
+
+      // Sections
+      var sections = [
+        {id:'s1', t:'1. Contexto e Família', c: wpDiagBuildS1(d)},
+        {id:'s2', t:'2. Objetivos', c: wpDiagBuildS2(d)},
+        {id:'s3', t:'3. Renda e Fluxo Financeiro', c: wpDiagBuildS3(d)},
+        {id:'s4', t:'4. Reserva e Liquidez', c: wpDiagBuildS4(d)},
+        {id:'s5', t:'5. Patrimônio e Passivos', c: wpDiagBuildS5(d)},
+        {id:'s6', t:'6. Investimentos', c: wpDiagBuildS6(d)},
+        {id:'s7', t:'7. Proteção e Gestão de Riscos', c: wpDiagBuildS7(d)},
+        {id:'s8', t:'8. Independência Financeira / Aposentadoria', c: wpDiagBuildS8(d)},
+        {id:'s9', t:'9. Tributário', c: wpDiagBuildS9(d)},
+        {id:'s10', t:'10. Sucessão e Legado', c: wpDiagBuildS10(d)},
+        {id:'s11', t:'11. Comportamento Financeiro', c: wpDiagBuildS11(d)},
+        {id:'s12', t:'12. Check Final da Reunião', c: wpDiagBuildS12(d)}
+      ];
+
+      sections.forEach(function(s) {
+        h += '<div style="margin-bottom:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">';
+        h += '<div onclick="wpDiagToggle(\'' + s.id + '\')" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--blue);color:#fff;cursor:pointer;font-size:14px;font-weight:600;user-select:none;">';
+        h += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" id="wpDiagArrow_' + s.id + '" style="transition:transform 0.2s;transform:rotate(-90deg);flex-shrink:0;"><path d="M6 9l6 6 6-6"/></svg>';
+        h += s.t + '</div>';
+        h += '<div id="wpDiagBody_' + s.id + '" style="display:none;padding:14px;">' + s.c + '</div>';
+        h += '</div>';
+      });
+
+      // Bottom save
+      h += '<div style="text-align:center;margin-top:16px;">';
+      h += '<button onclick="wpSaveDiagnostico(\'' + clienteId + '\')" style="padding:10px 32px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">'
+        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>'
+        + 'Salvar Diagnóstico</button>';
+      h += '</div>';
+
+      // Legend
+      h += '<div style="margin-top:16px;padding:12px;background:var(--card2);border-radius:8px;display:flex;gap:20px;flex-wrap:wrap;">';
+      h += '<div style="font-size:11px;color:var(--text2);"><strong style="color:var(--blue);">FATO</strong> — Informação observada</div>';
+      h += '<div style="font-size:11px;color:var(--text2);"><strong style="color:#16a34a;">DIAGNÓSTICO</strong> — Conclusão técnica</div>';
+      h += '<div style="font-size:11px;color:var(--text2);"><strong style="color:#d4a017;">AÇÃO</strong> — Próximo passo</div>';
+      h += '</div>';
+
+      container.innerHTML = h;
+    })
+    .catch(function(err) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);">Erro ao carregar diagnóstico: ' + err.message + '</div>';
+    });
+}
+
+// -- Save diagnostico --
+function wpSaveDiagnostico(clienteId) {
+  var data = {};
+  // Collect text/number/date/select inputs
+  document.querySelectorAll('[data-diag]').forEach(function(el) {
+    var key = el.getAttribute('data-diag');
+    var val = el.value;
+    if (el.type === 'number' && val) val = parseFloat(val);
+    data[key] = val || '';
+  });
+  // Collect checkboxes
+  document.querySelectorAll('[data-diag-check]').forEach(function(el) {
+    data[el.getAttribute('data-diag-check')] = el.checked;
+  });
+  // Collect radio buttons (only checked ones)
+  document.querySelectorAll('[data-diag-radio]:checked').forEach(function(el) {
+    data[el.getAttribute('data-diag-radio')] = el.value;
+  });
+  // Metadata
+  var user = typeof currentUser !== 'undefined' ? currentUser : null;
+  data.updatedAt = new Date().toISOString();
+  data.updatedBy = user ? user.email : '';
+
+  var btn = event && event.target ? event.target : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+
+  db.collection('clientes').doc(clienteId).collection('wp_diagnostico').doc('atual').set(data, {merge: true})
+    .then(function() {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M20 6L9 17l-5-5"/></svg>Salvo!'; }
+      setTimeout(function() {
+        if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar';
+      }, 2000);
+      wpAuditLog(clienteId, 'update', 'wp_diagnostico', 'atual', '', '', JSON.stringify({keys: Object.keys(data).length}));
+    })
+    .catch(function(err) {
+      alert('Erro ao salvar: ' + err.message);
+      if (btn) { btn.disabled = false; btn.textContent = 'Salvar'; }
+    });
 }
 
 // ═══════════════════════════════════════════════════════════
