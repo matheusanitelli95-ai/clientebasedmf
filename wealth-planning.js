@@ -479,14 +479,37 @@ function wpClienteDashboardHTML(clienteData, isAdmin) {
     + wpKpiCard('Dívidas', wpFmtMoeda(clienteData.dividas), 'var(--neg)')
     + wpKpiCard('Dependentes', (clienteData.dependentes || 0) + ' pessoa' + ((clienteData.dependentes || 0) !== 1 ? 's' : ''), 'var(--ok)')
     + '</div>'
-    // Tab bar
+    // Layer: MAPEAMENTO
+    + '<div style="margin-bottom:6px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke:var(--blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
+    + '<span style="font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.3px">MAPEAMENTO</span>'
+    + '<span style="font-size:11px;color:var(--text3);margin-left:4px">Coleta de dados</span></div>'
     + '<div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0">'
     + wpTabBtn('resumo', 'Resumo', true)
     + wpTabBtn('objetivos', 'Objetivos', false)
     + wpTabBtn('seguros', 'Seguros', false)
     + wpTabBtn('familia', 'Grupo Familiar', false)
-    + '</div>'
+    + '</div></div>'
     + '<div id="wp-modules-content"></div>'
+    // Layer: PLANEJAMENTO (placeholder)
+    + '<div style="margin-top:24px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'
+    + '<span style="font-size:13px;font-weight:600;color:var(--pos);letter-spacing:.3px">PLANEJAMENTO</span>'
+    + '<span style="font-size:11px;color:var(--text3);margin-left:4px">Diagnóstico e projeções</span></div>'
+    + '<div class="card" style="padding:24px;text-align:center;opacity:.6">'
+    + '<div style="font-size:13px;color:var(--text3)">Simulações, projeções patrimoniais e diagnóstico de gaps serão adicionados aqui.</div>'
+    + '</div></div>'
+    // Layer: ACOMPANHAMENTO (placeholder)
+    + '<div style="margin-top:24px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke:#a78bfa" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'
+    + '<span style="font-size:13px;font-weight:600;color:#a78bfa;letter-spacing:.3px">ACOMPANHAMENTO</span>'
+    + '<span style="font-size:11px;color:var(--text3);margin-left:4px">Monitoramento contínuo</span></div>'
+    + '<div class="card" style="padding:24px;text-align:center;opacity:.6">'
+    + '<div style="font-size:13px;color:var(--text3)">Alertas, revisões periódicas e indicadores de acompanhamento serão adicionados aqui.</div>'
+    + '</div></div>'
     + '</div>'
     + '<script>'
     + 'wpIsAdminView=' + (isAdmin ? 'true' : 'false') + ';'
@@ -521,18 +544,93 @@ function wpGetCurrentClienteId() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// WP MODULE: COMPLETUDE DO MAPEAMENTO
+// ═══════════════════════════════════════════════════════════
+function wpCalcularCompletude(clienteData, objetivos, seguros, familia) {
+  var checks = [];
+  // Dados pessoais (30 pts)
+  checks.push({ area: 'Dados pessoais', item: 'Renda mensal', ok: !!(clienteData.rendaMensal && clienteData.rendaMensal > 0), pts: 5 });
+  checks.push({ area: 'Dados pessoais', item: 'Patrimônio declarado', ok: !!(clienteData.patrimonioDeclarado || clienteData.patrimonio), pts: 5 });
+  checks.push({ area: 'Dados pessoais', item: 'Profissão', ok: !!(clienteData.profissao && clienteData.profissao.trim()), pts: 4 });
+  checks.push({ area: 'Dados pessoais', item: 'Estado civil', ok: !!(clienteData.estadoCivil && clienteData.estadoCivil.trim()), pts: 4 });
+  checks.push({ area: 'Dados pessoais', item: 'Regime de bens', ok: !!(clienteData.regimeBens && clienteData.regimeBens.trim()), pts: 3 });
+  checks.push({ area: 'Dados pessoais', item: 'Objetivo financeiro', ok: !!(clienteData.objetivo && clienteData.objetivo.trim()), pts: 4 });
+  checks.push({ area: 'Dados pessoais', item: 'Perfil de risco', ok: !!(clienteData.perfil && clienteData.perfil.trim()), pts: 3 });
+  checks.push({ area: 'Dados pessoais', item: 'Dependentes informados', ok: (clienteData.dependentes !== undefined && clienteData.dependentes !== null && clienteData.dependentes !== ''), pts: 2 });
+  // Objetivos (25 pts)
+  checks.push({ area: 'Objetivos', item: 'Ao menos 1 objetivo', ok: objetivos.length >= 1, pts: 10 });
+  checks.push({ area: 'Objetivos', item: '3 ou mais objetivos', ok: objetivos.length >= 3, pts: 8 });
+  checks.push({ area: 'Objetivos', item: 'Objetivos com prazo definido', ok: objetivos.some(function(o) { return o.prazo && o.prazo.trim(); }), pts: 7 });
+  // Seguros (25 pts)
+  checks.push({ area: 'Seguros', item: 'Ao menos 1 apólice', ok: seguros.length >= 1, pts: 10 });
+  checks.push({ area: 'Seguros', item: 'Seguro de vida cadastrado', ok: seguros.some(function(s) { return s.tipo === 'Vida'; }), pts: 8 });
+  checks.push({ area: 'Seguros', item: 'Beneficiários definidos', ok: seguros.some(function(s) { return s.beneficiarios && s.beneficiarios.trim(); }), pts: 7 });
+  // Grupo familiar (20 pts)
+  checks.push({ area: 'Família', item: 'Ao menos 1 membro', ok: familia.length >= 1, pts: 10 });
+  checks.push({ area: 'Família', item: 'Dados financeiros do familiar', ok: familia.some(function(f) { return f.rendaIndividual > 0 || f.patrimonioIndividual > 0; }), pts: 10 });
+
+  var totalPts = 0, earnedPts = 0;
+  checks.forEach(function(c) { totalPts += c.pts; if (c.ok) earnedPts += c.pts; });
+  var pct = totalPts > 0 ? Math.round((earnedPts / totalPts) * 100) : 0;
+  return { pct: pct, checks: checks, earned: earnedPts, total: totalPts };
+}
+
+function wpRenderCompletude(completude) {
+  var pct = completude.pct;
+  var cor = pct >= 80 ? 'var(--pos)' : (pct >= 50 ? 'var(--blue)' : 'var(--caution,#d4a017)');
+  var html = '<div class="card" style="padding:20px;margin-bottom:16px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    + '<div style="display:flex;align-items:center;gap:10px">'
+    + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:' + cor + '" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+    + '<span style="font-size:14px;font-weight:600;color:var(--white)">Completude do Mapeamento</span></div>'
+    + '<span style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:' + cor + '">' + pct + '%</span>'
+    + '</div>'
+    + '<div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin-bottom:14px">'
+    + '<div style="height:100%;width:' + pct + '%;border-radius:4px;background:' + cor + ';transition:width .5s"></div></div>';
+  // Grouped checklist
+  var areas = {};
+  completude.checks.forEach(function(c) {
+    if (!areas[c.area]) areas[c.area] = [];
+    areas[c.area].push(c);
+  });
+  html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">';
+  Object.keys(areas).forEach(function(area) {
+    var items = areas[area];
+    var areaOk = items.filter(function(i) { return i.ok; }).length;
+    html += '<div style="padding:10px;border-radius:8px;background:var(--card2)">'
+      + '<div style="font-size:12px;font-weight:600;color:var(--white);margin-bottom:6px">' + area + ' <span style="font-weight:400;color:var(--text3)">(' + areaOk + '/' + items.length + ')</span></div>';
+    items.forEach(function(c) {
+      html += '<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:' + (c.ok ? 'var(--pos)' : 'var(--text3)') + ';margin-bottom:3px">'
+        + (c.ok ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'
+                : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="stroke:var(--text3)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>')
+        + c.item + '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════
 // WP MODULE: RESUMO
 // ═══════════════════════════════════════════════════════════
 function wpRenderResumo(container, clienteId, isAdmin) {
   if (!clienteId) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Selecione um cliente</div>'; return; }
   container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando...</div>';
   var html = '';
-  // Load all subcollections in parallel
-  var pending = 3;
-  var objetivos = [], seguros = [], familia = [];
+  // Load all subcollections + client doc in parallel
+  var pending = 4;
+  var objetivos = [], seguros = [], familia = [], clienteDoc = {};
   function checkDone() {
     pending--;
     if (pending > 0) return;
+    // Completude score
+    var completude = wpCalcularCompletude(clienteDoc, objetivos, seguros, familia);
+    html += wpRenderCompletude(completude);
+    // Save score on client doc (non-blocking)
+    if (clienteId && db) {
+      db.collection('clientes').doc(clienteId).update({ wpCompletude: completude.pct }).catch(function() {});
+    }
     // Build summary
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">';
     // Objetivos summary
@@ -563,6 +661,10 @@ function wpRenderResumo(container, clienteId, isAdmin) {
     html += '</div>';
     container.innerHTML = html;
   }
+  db.collection('clientes').doc(clienteId).get().then(function(doc) {
+    if (doc.exists) clienteDoc = doc.data();
+    checkDone();
+  }).catch(function() { checkDone(); });
   db.collection('clientes').doc(clienteId).collection('wp_objetivos').orderBy('criadoEm','desc').get().then(function(snap) {
     snap.forEach(function(d) { objetivos.push(Object.assign({ id: d.id }, d.data())); });
     checkDone();
@@ -582,6 +684,7 @@ function wpRenderResumo(container, clienteId, isAdmin) {
 // ═══════════════════════════════════════════════════════════
 var WP_OBJ_TIPOS = ['Aposentadoria','Casa própria','Educação dos filhos','Viagem','Reserva de emergência','Carro','Independência financeira','Outro'];
 var WP_OBJ_PRIORIDADES = ['Alta','Média','Baixa'];
+var WP_OBJ_CATEGORIAS = ['Aposentadoria','Educação','Patrimônio','Proteção','Lifestyle','Outro'];
 
 function wpRenderObjetivos(container, clienteId, isAdmin) {
   if (!clienteId) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Selecione um cliente</div>'; return; }
@@ -609,10 +712,14 @@ function wpRenderObjetivos(container, clienteId, isAdmin) {
           + '<span style="font-size:14px;font-weight:600;color:var(--white)">' + (obj.nome || obj.tipo || 'Objetivo') + '</span>'
           + '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,' + prCor + ' 15%,transparent);color:' + prCor + ';font-weight:600">' + (obj.prioridade || 'Média') + '</span>'
           + '</div>'
+          + (obj.categoria ? '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue);font-weight:600">' + obj.categoria + '</span>' : '')
           + '<div style="display:flex;gap:20px;flex-wrap:wrap">'
           + '<div><span style="font-size:11px;color:var(--text3)">Valor alvo</span><div style="font-size:14px;font-weight:600;color:var(--pos)">' + wpFmtMoeda(obj.valorAlvo) + '</div></div>'
           + '<div><span style="font-size:11px;color:var(--text3)">Prazo</span><div style="font-size:14px;font-weight:600;color:var(--white)">' + (obj.prazo || 'Não definido') + '</div></div>'
-          + (obj.descricao ? '<div style="flex-basis:100%;font-size:12px;color:var(--text2);margin-top:4px">' + obj.descricao + '</div>' : '')
+          + '</div>'
+          + (function() { var p = obj.progressoAtual || 0; return '<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:11px;color:var(--text3)">Progresso</span><span style="font-size:11px;font-weight:600;color:var(--white)">' + p + '%</span></div><div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden"><div style="height:100%;width:' + Math.min(p, 100) + '%;border-radius:3px;background:' + (p >= 100 ? 'var(--pos)' : 'var(--blue)') + ';transition:width .3s"></div></div></div>'; })()
+          + (obj.marcos ? '<div style="font-size:11px;color:var(--text2);margin-top:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="stroke:var(--text3);vertical-align:middle;margin-right:4px" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>' + obj.marcos + '</div>' : '')
+          + (obj.descricao ? '<div style="font-size:12px;color:var(--text2);margin-top:4px">' + obj.descricao + '</div>' : '')
           + '</div></div>';
         if (isAdmin) {
           html += '<button onclick="wpDeleteObjetivo(\'' + clienteId + '\',\'' + obj.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5" title="Remover">x</button>';
@@ -633,6 +740,9 @@ function wpAddObjetivo(clienteId) {
     + '<div class="form-group"><label>Valor alvo (R$)</label><input class="form-input" id="wp-obj-valor" type="number" placeholder="0" step="1000"></div>'
     + '<div class="form-group"><label>Prazo</label><input class="form-input" id="wp-obj-prazo" placeholder="Ex: 2030, 5 anos, etc"></div>'
     + '<div class="form-group"><label>Prioridade</label><select class="form-input" id="wp-obj-prio">' + WP_OBJ_PRIORIDADES.map(function(p) { return '<option>' + p + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Categoria</label><select class="form-input" id="wp-obj-cat">' + WP_OBJ_CATEGORIAS.map(function(c) { return '<option>' + c + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Progresso atual (%)</label><input class="form-input" id="wp-obj-progresso" type="number" min="0" max="100" placeholder="0" step="1"></div>'
+    + '<div class="form-group form-full"><label>Marcos intermediários</label><input class="form-input" id="wp-obj-marcos" placeholder="Ex: 25% em 2025, 50% em 2027..."></div>'
     + '<div class="form-group form-full"><label>Descrição (opcional)</label><input class="form-input" id="wp-obj-desc" placeholder="Detalhes adicionais..."></div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
@@ -652,6 +762,9 @@ function wpSaveObjetivo(clienteId) {
     valorAlvo: Number(document.getElementById('wp-obj-valor').value) || 0,
     prazo: document.getElementById('wp-obj-prazo').value.trim(),
     prioridade: document.getElementById('wp-obj-prio').value,
+    categoria: document.getElementById('wp-obj-cat').value,
+    progressoAtual: Number(document.getElementById('wp-obj-progresso').value) || 0,
+    marcos: document.getElementById('wp-obj-marcos').value.trim(),
     descricao: document.getElementById('wp-obj-desc').value.trim(),
     criadoEm: new Date().toISOString()
   };
@@ -673,6 +786,7 @@ function wpDeleteObjetivo(clienteId, docId) {
 // WP MODULE: SEGUROS
 // ═══════════════════════════════════════════════════════════
 var WP_SEGURO_TIPOS = ['Vida','Saúde','Patrimonial','Auto','Responsabilidade Civil','Previdência Privada','Outro'];
+var WP_SEGURO_PERIODICIDADE = ['Mensal','Trimestral','Semestral','Anual'];
 
 function wpRenderSeguros(container, clienteId, isAdmin) {
   if (!clienteId) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Selecione um cliente</div>'; return; }
@@ -703,8 +817,11 @@ function wpRenderSeguros(container, clienteId, isAdmin) {
           + '</div>'
           + '<div style="display:flex;gap:20px;flex-wrap:wrap">'
           + '<div><span style="font-size:11px;color:var(--text3)">Cobertura</span><div style="font-size:14px;font-weight:600;color:var(--pos)">' + wpFmtMoeda(seg.cobertura) + '</div></div>'
+          + (seg.coberturaIdeal ? '<div><span style="font-size:11px;color:var(--text3)">Cobertura ideal</span><div style="font-size:14px;font-weight:600;color:' + (seg.cobertura >= seg.coberturaIdeal ? 'var(--pos)' : 'var(--caution,#d4a017)') + '">' + wpFmtMoeda(seg.coberturaIdeal) + '</div></div>' : '')
           + '<div><span style="font-size:11px;color:var(--text3)">Prêmio mensal</span><div style="font-size:14px;font-weight:600;color:var(--neg)">' + wpFmtMoeda(seg.premioMensal) + '</div></div>'
           + '<div><span style="font-size:11px;color:var(--text3)">Vencimento</span><div style="font-size:14px;font-weight:600;color:var(--white)">' + (seg.vencimento || 'N/A') + '</div></div>'
+          + (seg.beneficiarios ? '<div style="flex-basis:100%;font-size:12px;color:var(--text2);margin-top:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="stroke:var(--text3);vertical-align:middle;margin-right:4px" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Beneficiários: ' + seg.beneficiarios + '</div>' : '')
+          + (seg.periodicidadeRevisao || seg.proximaRevisao ? '<div style="flex-basis:100%;font-size:11px;color:var(--text2);margin-top:4px">' + (seg.periodicidadeRevisao ? 'Revisão: ' + seg.periodicidadeRevisao : '') + (seg.proximaRevisao ? ' · Próxima: ' + seg.proximaRevisao : '') + '</div>' : '')
           + (seg.observacoes ? '<div style="flex-basis:100%;font-size:12px;color:var(--text2);margin-top:4px">' + seg.observacoes + '</div>' : '')
           + '</div></div>';
         if (isAdmin) {
@@ -732,6 +849,10 @@ function wpAddSeguro(clienteId) {
     + '<div class="form-group"><label>Prêmio mensal (R$)</label><input class="form-input" id="wp-seg-premio" type="number" placeholder="0" step="10"></div>'
     + '<div class="form-group"><label>Vencimento</label><input class="form-input" id="wp-seg-venc" placeholder="MM/AAAA ou vigência"></div>'
     + '<div class="form-group"><label>Número da apólice</label><input class="form-input" id="wp-seg-apolice" placeholder="Opcional"></div>'
+    + '<div class="form-group"><label>Cobertura ideal (R$)</label><input class="form-input" id="wp-seg-cobideal" type="number" placeholder="0" step="1000"></div>'
+    + '<div class="form-group"><label>Beneficiários</label><input class="form-input" id="wp-seg-benef" placeholder="Ex: Cônjuge 50%, Filhos 50%"></div>'
+    + '<div class="form-group"><label>Periodicidade de revisão</label><select class="form-input" id="wp-seg-periodo">' + WP_SEGURO_PERIODICIDADE.map(function(p) { return '<option>' + p + '</option>'; }).join('') + '</select></div>'
+    + '<div class="form-group"><label>Próxima revisão</label><input class="form-input" id="wp-seg-proxrev" placeholder="DD/MM/AAAA" maxlength="10"></div>'
     + '<div class="form-group form-full"><label>Observações</label><input class="form-input" id="wp-seg-obs" placeholder="Detalhes adicionais..."></div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
@@ -750,6 +871,10 @@ function wpSaveSeguro(clienteId) {
     premioMensal: Number(document.getElementById('wp-seg-premio').value) || 0,
     vencimento: document.getElementById('wp-seg-venc').value.trim(),
     numeroApolice: document.getElementById('wp-seg-apolice').value.trim(),
+    coberturaIdeal: Number(document.getElementById('wp-seg-cobideal').value) || 0,
+    beneficiarios: document.getElementById('wp-seg-benef').value.trim(),
+    periodicidadeRevisao: document.getElementById('wp-seg-periodo').value,
+    proximaRevisao: document.getElementById('wp-seg-proxrev').value.trim(),
     observacoes: document.getElementById('wp-seg-obs').value.trim(),
     criadoEm: new Date().toISOString()
   };
@@ -797,8 +922,11 @@ function wpRenderFamilia(container, clienteId, isAdmin) {
           + '<div style="width:40px;height:40px;border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,transparent);display:flex;align-items:center;justify-content:center">'
           + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:var(--ok)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>'
           + '<div>'
-          + '<div style="font-size:14px;font-weight:600;color:var(--white)">' + (m.nome || 'Sem nome') + '</div>'
+          + '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:var(--white)">' + (m.nome || 'Sem nome') + '</span>'
+          + (m.dependenteIR ? '<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue);font-weight:600">IR</span>' : '') + '</div>'
           + '<div style="font-size:12px;color:var(--text3)">' + (m.relacao || '') + (idade ? ' · ' + idade + ' anos' : '') + '</div>'
+          + ((m.rendaIndividual || m.patrimonioIndividual) ? '<div style="display:flex;gap:14px;margin-top:4px"><span style="font-size:11px;color:var(--text2)">' + (m.rendaIndividual ? 'Renda: ' + wpFmtMoeda(m.rendaIndividual) : '') + '</span>' + (m.patrimonioIndividual ? '<span style="font-size:11px;color:var(--text2)">Patrimônio: ' + wpFmtMoeda(m.patrimonioIndividual) + '</span>' : '') + '</div>' : '')
+          + (m.observacoesJuridicas ? '<div style="font-size:11px;color:var(--caution,#d4a017);margin-top:2px">' + m.observacoesJuridicas + '</div>' : '')
           + (m.observacoes ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">' + m.observacoes + '</div>' : '')
           + '</div></div>';
         if (isAdmin) {
@@ -836,7 +964,11 @@ function wpAddFamiliar(clienteId) {
     + '<div class="form-group"><label>Relação</label><select class="form-input" id="wp-fam-relacao">' + WP_RELACOES.map(function(r) { return '<option>' + r + '</option>'; }).join('') + '</select></div>'
     + '<div class="form-group"><label>Data de Nascimento</label><input class="form-input" id="wp-fam-nasc" placeholder="DD/MM/AAAA" maxlength="10"></div>'
     + '<div class="form-group"><label>CPF</label><input class="form-input" id="wp-fam-cpf" placeholder="Opcional"></div>'
-    + '<div class="form-group form-full"><label>Observações</label><input class="form-input" id="wp-fam-obs" placeholder="Detalhes relevantes..."></div>'
+    + '<div class="form-group"><label>Renda Individual (R$)</label><input class="form-input" id="wp-fam-renda" type="number" placeholder="0" step="100"></div>'
+    + '<div class="form-group"><label>Patrimônio Individual (R$)</label><input class="form-input" id="wp-fam-patrimonio" type="number" placeholder="0" step="1000"></div>'
+    + '<div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:22px"><input type="checkbox" id="wp-fam-depir" style="width:16px;height:16px;accent-color:var(--blue)"><label for="wp-fam-depir" style="margin:0;cursor:pointer">Dependente no IR</label></div>'
+    + '<div class="form-group"><label>Observações jurídicas</label><input class="form-input" id="wp-fam-obsjur" placeholder="Testamento, inventário, procuração..."></div>'
+    + '<div class="form-group form-full"><label>Observações gerais</label><input class="form-input" id="wp-fam-obs" placeholder="Detalhes relevantes..."></div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'
     + '<button class="btn-secondary" onclick="wpShowTab(\'familia\',\'' + clienteId + '\',true)">Cancelar</button>'
@@ -854,6 +986,10 @@ function wpSaveFamiliar(clienteId) {
     relacao: document.getElementById('wp-fam-relacao').value,
     dataNasc: document.getElementById('wp-fam-nasc').value.trim(),
     cpf: document.getElementById('wp-fam-cpf').value.trim(),
+    rendaIndividual: Number(document.getElementById('wp-fam-renda').value) || 0,
+    patrimonioIndividual: Number(document.getElementById('wp-fam-patrimonio').value) || 0,
+    dependenteIR: document.getElementById('wp-fam-depir').checked,
+    observacoesJuridicas: document.getElementById('wp-fam-obsjur').value.trim(),
     observacoes: document.getElementById('wp-fam-obs').value.trim(),
     criadoEm: new Date().toISOString()
   };
