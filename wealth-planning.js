@@ -318,12 +318,15 @@ function wpSelectCliente(clienteId) {
         + 'Para liberar o acesso, ative o checkbox "Consultoria" no cadastro do cliente.'
         + '</div></div>';
     } else {
-      // Renderizar exatamente o que o cliente veria
+      // Setar flag admin ANTES de inserir HTML (script tags em innerHTML não executam)
+      wpIsAdminView = true;
       wpContent.innerHTML = '<div style="margin-bottom:12px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px">'
         + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="stroke:var(--pos)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
         + '<span>Você está visualizando o Wealth Planning como o cliente <strong style="color:var(--white)">' + (c.nome || '') + '</strong> veria.</span>'
         + '</div>'
         + wpClienteDashboardHTML(Object.assign({id: wpSelectedClienteId}, c), true);
+      // Disparar tab inicial diretamente (setTimeout em script tag não executa via innerHTML)
+      setTimeout(function() { wpShowTab('resumo', wpSelectedClienteId, true); }, 100);
     }
   });
 }
@@ -393,7 +396,9 @@ function loadWealthPlanningCliente() {
 
     // Cliente tem consultoria — renderizar dashboard do WP
     clienteData.id = currentClienteVinculado;
+    wpIsAdminView = false;
     view.innerHTML = wpClienteDashboardHTML(clienteData, false);
+    setTimeout(function() { wpShowTab('resumo', currentClienteVinculado, false); }, 100);
   }).catch(function() {
     view.innerHTML = wpBloqueioHTML();
   });
