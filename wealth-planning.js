@@ -327,6 +327,7 @@ function wpSelectCliente(clienteId) {
         + wpClienteDashboardHTML(Object.assign({id: wpSelectedClienteId}, c), true);
       // Disparar tab inicial diretamente (setTimeout em script tag não executa via innerHTML)
       setTimeout(function() { wpShowTab('resumo', wpSelectedClienteId, true); }, 100);
+      wpFetchRendaOrcamento(wpSelectedClienteId);
     }
   });
 }
@@ -399,6 +400,7 @@ function loadWealthPlanningCliente() {
     wpIsAdminView = false;
     view.innerHTML = wpClienteDashboardHTML(clienteData, false);
     setTimeout(function() { wpShowTab('resumo', currentClienteVinculado, false); }, 100);
+    wpFetchRendaOrcamento(currentClienteVinculado);
   }).catch(function() {
     view.innerHTML = wpBloqueioHTML();
   });
@@ -449,6 +451,8 @@ function wpShowTab(tab, clienteId, isAdmin) {
   if (tab === 'objetivos') wpRenderObjetivos(container, clienteId, isAdmin);
   if (tab === 'seguros') wpRenderSeguros(container, clienteId, isAdmin);
   if (tab === 'familia') wpRenderFamilia(container, clienteId, isAdmin);
+  if (tab === 'bens') wpRenderBens(container, clienteId, isAdmin);
+  if (tab === 'previdencia') wpRenderPrevidencia(container, clienteId, isAdmin);
   if (tab === 'diagnostico' && isAdmin) wpRenderDiagnostico(container, clienteId);
 }
 
@@ -480,7 +484,7 @@ function wpClienteDashboardHTML(clienteData, isAdmin) {
     + '</div></div>'
     // Resumo financeiro do cadastro
     + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px">'
-    + wpKpiCard('Renda mensal', wpFmtMoeda(clienteData.rendaMensal), 'var(--pos)')
+    + wpKpiCard('Renda mensal', wpFmtMoeda(clienteData.rendaMensal), 'var(--pos)', 'wp-kpi-renda')
     + wpKpiCard('Patrimônio', wpFmtMoeda(clienteData.patrimonioDeclarado || clienteData.patrimonio), 'var(--blue)')
     + wpKpiCard('Dívidas', wpFmtMoeda(clienteData.dividas), 'var(--neg)')
     + wpKpiCard('Dependentes', (clienteData.dependentes || 0) + ' pessoa' + ((clienteData.dependentes || 0) !== 1 ? 's' : ''), 'var(--ok)')
@@ -495,6 +499,8 @@ function wpClienteDashboardHTML(clienteData, isAdmin) {
     + wpTabBtn('resumo', 'Resumo', true)
     + wpTabBtn('objetivos', 'Objetivos', false)
     + wpTabBtn('seguros', 'Seguros', false)
+    + wpTabBtn('bens', 'Bens e Patrimônio', false)
+    + wpTabBtn('previdencia', 'Previdência', false)
     + wpTabBtn('familia', 'Grupo Familiar', false)
     + (isAdmin ? wpTabBtn('diagnostico', 'Diagnóstico', false) : '')
     + '</div></div>'
@@ -524,10 +530,10 @@ function wpClienteDashboardHTML(clienteData, isAdmin) {
     + '</script>';
 }
 
-function wpKpiCard(label, value, color) {
+function wpKpiCard(label, value, color, id) {
   return '<div class="card" style="padding:16px">'
     + '<div style="font-size:13px;color:var(--text3);font-weight:400;margin-bottom:6px">' + label + '</div>'
-    + '<div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:' + color + '">' + value + '</div>'
+    + '<div' + (id ? ' id="' + id + '"' : '') + ' style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:' + color + '">' + value + '</div>'
     + '</div>';
 }
 
@@ -538,6 +544,26 @@ function wpTabBtn(tab, label, active) {
     + 'color:' + (active ? 'var(--blue)' : 'var(--text3)') + ';border-bottom:2px solid ' + (active ? 'var(--blue)' : 'transparent') + ';transition:all .15s"'
     + ' onmouseover="this.style.color=\'var(--blue)\'" onmouseout="if(!this.classList.contains(\'active\'))this.style.color=\'var(--text3)\'"'
     + '>' + label + '</button>';
+}
+
+// ── Puxar renda mensal do Orçamento para o KPI do WP ────
+function wpFetchRendaOrcamento(clienteId) {
+  if (!clienteId || typeof db === 'undefined') return;
+  var now = new Date();
+  var mesKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  db.collection('clientes').doc(clienteId).collection('orcamento').doc(mesKey).get().then(function(snap) {
+    if (!snap.exists) return;
+    var data = snap.data();
+    var receitas = data.receitas || [];
+    var totalReceitas = receitas.reduce(function(s, r) { return s + (Number(r.valor) || 0); }, 0);
+    if (totalReceitas > 0) {
+      var el = document.getElementById('wp-kpi-renda');
+      if (el) {
+        el.textContent = wpFmtMoeda(totalReceitas);
+        el.title = 'Valor puxado do Orçamento (' + mesKey + ')';
+      }
+    }
+  }).catch(function() {});
 }
 
 var wpIsAdminView = false;
@@ -1527,6 +1553,10 @@ function wpSaveDiagnostico(clienteId) {
 var ORC_CATEGORIAS_PADRAO = [
   { id: 'salario', nome: 'Salário', tipo: 'receita', cor: '#22c55e' },
   { id: 'rendimentos', nome: 'Rendimentos', tipo: 'receita', cor: '#0ea5e9' },
+  { id: 'prolabore', nome: 'Pró-labore', tipo: 'receita', cor: '#16a34a' },
+  { id: 'alugueis', nome: 'Aluguéis', tipo: 'receita', cor: '#2563eb' },
+  { id: 'dividendos', nome: 'Dividendos', tipo: 'receita', cor: '#059669' },
+  { id: 'freelance', nome: 'Freelance / Extras', tipo: 'receita', cor: '#7c3aed' },
   { id: 'outros-rec', nome: 'Outras Receitas', tipo: 'receita', cor: '#a78bfa' },
   { id: 'moradia', nome: 'Moradia', tipo: 'despesa', cor: '#1a3a5c' },
   { id: 'alimentacao', nome: 'Alimentação', tipo: 'despesa', cor: '#b45309' },
@@ -1538,6 +1568,12 @@ var ORC_CATEGORIAS_PADRAO = [
   { id: 'seguros-prev', nome: 'Seguros/Previdência', tipo: 'despesa', cor: '#64748b' },
   { id: 'servicos', nome: 'Serviços/Assinaturas', tipo: 'despesa', cor: '#a855f7' },
   { id: 'impostos', nome: 'Impostos/Taxas', tipo: 'despesa', cor: '#92400e' },
+  { id: 'cartao-credito', nome: 'Cartão de Crédito', tipo: 'despesa', cor: '#b45309' },
+  { id: 'emprestimos', nome: 'Empréstimos / Dívidas', tipo: 'despesa', cor: '#92400e' },
+  { id: 'pets', nome: 'Pets', tipo: 'despesa', cor: '#f59e0b' },
+  { id: 'presentes', nome: 'Presentes / Doações', tipo: 'despesa', cor: '#ec4899' },
+  { id: 'viagens', nome: 'Viagens', tipo: 'despesa', cor: '#06b6d4' },
+  { id: 'investimentos', nome: 'Investimentos / Aportes', tipo: 'despesa', cor: '#1a3a5c' },
   { id: 'outros-desp', nome: 'Outras Despesas', tipo: 'despesa', cor: '#64748b' }
 ];
 
@@ -2041,13 +2077,14 @@ function orcBuildSpreadsheet(tipo, tc) {
     + '<thead><tr style="border-bottom:1px solid var(--border);background:'+(tc.light?'#f8fafc':'var(--card2)')+'">'
     + '<th style="'+thS+'">Categoria</th>'
     + '<th style="'+thS+'">Descrição</th>'
-    + '<th style="'+thS+';text-align:right">Valor R$</th>';
-  if (isRec) {
-    html += '<th style="'+thS+';text-align:center;width:50px">Rec.</th>';
-  } else {
+    + '<th style="'+thS+'">Banco/Cartão</th>'
+    + '<th style="'+thS+';text-align:right">Valor R$</th>'
+    + '<th style="'+thS+';text-align:center;width:50px">Rec.</th>';
+  if (!isRec) {
     html += '<th style="'+thS+';text-align:center;width:40px">Fixo</th>';
     html += '<th style="'+thS+';text-align:center;width:40px">Pago</th>';
   }
+  html += '<th style="'+thS+';width:80px">Data</th>';
   html += '<th style="width:28px"></th></tr></thead><tbody>';
 
   // Rows
@@ -2062,14 +2099,18 @@ function orcBuildSpreadsheet(tipo, tc) {
       + catOpts + '</select></td>'
       // Descrição
       + '<td style="padding:4px 6px"><input value="'+((l.descricao||'').replace(/"/g,'&quot;'))+'" onchange="orcInlineEdit(\''+l.id+'\',\'descricao\',this.value)" style="font-size:11px;padding:3px 6px;border:1px solid '+tc.inputBdr+';border-radius:4px;background:'+tc.inputBg+';color:'+tc.text1+';width:100%;outline:none" placeholder="Descrição..."></td>'
+      // Banco/Cartão
+      + '<td style="padding:4px 6px"><input value="'+((l.banco||'').replace(/"/g,'&quot;'))+'" onchange="orcInlineEdit(\''+l.id+'\',\'banco\',this.value)" style="font-size:11px;padding:3px 6px;border:1px solid '+tc.inputBdr+';border-radius:4px;background:'+tc.inputBg+';color:'+tc.text1+';width:90px;outline:none" placeholder="Banco..."></td>'
       // Valor
-      + '<td style="padding:4px 6px"><input type="number" step="0.01" value="'+(l.valor||'')+'" onchange="orcInlineEdit(\''+l.id+'\',\'valor\',this.value)" style="font-size:11px;padding:3px 6px;border:1px solid '+tc.inputBdr+';border-radius:4px;background:'+tc.inputBg+';color:'+tc.text1+';width:90px;text-align:right;outline:none;font-family:Inter,sans-serif" placeholder="0,00"></td>';
-    if (isRec) {
-      html += '<td style="text-align:center;padding:4px"><input type="checkbox" '+(l.recorrente?'checked':'')+' onchange="orcInlineEdit(\''+l.id+'\',\'recorrente\',this.checked)" style="accent-color:'+tc.green+';cursor:pointer"></td>';
-    } else {
+      + '<td style="padding:4px 6px"><input type="number" step="0.01" value="'+(l.valor||'')+'" onchange="orcInlineEdit(\''+l.id+'\',\'valor\',this.value)" style="font-size:11px;padding:3px 6px;border:1px solid '+tc.inputBdr+';border-radius:4px;background:'+tc.inputBg+';color:'+tc.text1+';width:90px;text-align:right;outline:none;font-family:Inter,sans-serif" placeholder="0,00"></td>'
+      // Recorrente checkbox (for all types now)
+      + '<td style="text-align:center;padding:4px"><input type="checkbox" '+(l.recorrente?'checked':'')+' onchange="orcInlineEdit(\''+l.id+'\',\'recorrente\',this.checked)" style="accent-color:'+tc.green+';cursor:pointer"></td>';
+    if (!isRec) {
       html += '<td style="text-align:center;padding:4px"><input type="checkbox" '+(l.fixo?'checked':'')+' onchange="orcInlineEdit(\''+l.id+'\',\'fixo\',this.checked)" style="accent-color:'+tc.navy+';cursor:pointer"></td>';
       html += '<td style="text-align:center;padding:4px"><input type="checkbox" '+(l.pago?'checked':'')+' onchange="orcInlineEdit(\''+l.id+'\',\'pago\',this.checked)" style="accent-color:'+tc.green+';cursor:pointer"></td>';
     }
+    // Data
+    html += '<td style="padding:4px 6px"><input type="date" value="'+(l.data||'')+'" onchange="orcInlineEdit(\''+l.id+'\',\'data\',this.value)" style="font-size:10px;padding:2px 4px;border:1px solid '+tc.inputBdr+';border-radius:4px;background:'+tc.inputBg+';color:'+tc.text1+';outline:none;width:80px"></td>';
     // Delete button
     html += '<td style="padding:4px 6px;text-align:center"><button onclick="orcRemover(\''+l.id+'\')" style="background:none;border:none;cursor:pointer;color:'+tc.text3+';padding:2px" title="Excluir"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>';
     html += '</tr>';
@@ -2739,25 +2780,320 @@ function loadOrcamentoCliente() {
     return;
   }
 
-  // Verificar consultoria
-  db.collection('clientes').doc(currentClienteVinculado).get().then(function(doc) {
-    if (!doc.exists || !clienteTemConsultoria(doc.data())) {
-      view.innerHTML = wpBloqueioHTML();
-      return;
-    }
+  // Orçamento disponível para TODOS os clientes (sem check de consultoria)
+  orcClienteId = currentClienteVinculado;
+  orcMesAtual = orcMesStr();
 
-    // Montar interface do orçamento para o cliente
-    orcClienteId = currentClienteVinculado;
-    orcMesAtual = orcMesStr();
+  view.innerHTML = '<div class="page-header">'
+    + '<div><div class="page-title">Orçamento Doméstico</div>'
+    + '<div class="page-sub">Controle suas receitas e despesas</div></div>'
+    + '</div>'
+    + '<div class="page-content"><div id="orc-content"></div></div>';
 
-    view.innerHTML = '<div class="page-header">'
-      + '<div><div class="page-title">Orçamento Doméstico</div>'
-      + '<div class="page-sub">Controle suas receitas e despesas</div></div>'
-      + '</div>'
-      + '<div class="page-content"><div id="orc-content"></div></div>';
-
-    orcLoadConfig(currentClienteVinculado, function() {
-      orcLoadMes(currentClienteVinculado, orcMesAtual);
-    });
+  orcLoadConfig(currentClienteVinculado, function() {
+    orcLoadMes(currentClienteVinculado, orcMesAtual);
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: BENS E PATRIMÔNIO
+// ═══════════════════════════════════════════════════════════
+var WP_BENS_TIPOS = [
+  { id: 'imovel_casa', label: 'Casa', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
+  { id: 'imovel_apto', label: 'Apartamento', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8" y2="6"/><line x1="12" y1="6" x2="12" y2="6"/><line x1="16" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg>' },
+  { id: 'terreno', label: 'Terreno', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 4-4 5 5"/></svg>' },
+  { id: 'veiculo', label: 'Veículo', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0"/></svg>' },
+  { id: 'outro', label: 'Outro', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' }
+];
+
+function wpRenderBens(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando bens...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_bens').orderBy('criadoEm','desc').get().then(function(snap) {
+    var bens = [];
+    snap.forEach(function(d) { var b = d.data(); b.id = d.id; bens.push(b); });
+    var totalValor = bens.reduce(function(s, b) { return s + (Number(b.valorEstimado) || 0); }, 0);
+    var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+      + '<div><div style="font-size:15px;font-weight:600;color:var(--white)">Bens e Patrimônio</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + bens.length + ' ben' + (bens.length !== 1 ? 's' : '') + ' cadastrado' + (bens.length !== 1 ? 's' : '') + ' | Total: ' + wpFmtMoeda(totalValor) + '</div></div>'
+      + '<button class="btn-primary" onclick="wpModalBem(\'' + clienteId + '\')" style="padding:8px 16px;font-size:12px">+ Adicionar Bem</button>'
+      + '</div>';
+    if (bens.length === 0) {
+      html += '<div class="card" style="padding:40px;text-align:center"><div style="color:var(--text3);font-size:13px">Nenhum bem cadastrado. Adicione terrenos, imóveis, veículos e outros bens da família.</div></div>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">';
+      bens.forEach(function(b) {
+        var tipoInfo = WP_BENS_TIPOS.find(function(t) { return t.id === b.tipo; }) || WP_BENS_TIPOS[4];
+        html += '<div class="card" style="padding:18px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">'
+          + '<div style="display:flex;align-items:center;gap:10px">'
+          + '<div style="width:36px;height:36px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--blue)">' + tipoInfo.icon + '</div>'
+          + '<div><div style="font-size:14px;font-weight:600;color:var(--white)">' + (b.descricao || 'Sem descrição') + '</div>'
+          + '<div style="font-size:11px;color:var(--text3)">' + tipoInfo.label + (b.localizacao ? ' | ' + b.localizacao : '') + '</div></div></div>'
+          + '<div style="display:flex;gap:4px">'
+          + '<button onclick="wpModalBem(\'' + clienteId + '\',\'' + b.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
+          + '<button onclick="wpDeleteBem(\'' + clienteId + '\',\'' + b.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px" title="Excluir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
+          + '</div></div>'
+          + '<div style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:var(--pos);margin-bottom:8px">' + wpFmtMoeda(b.valorEstimado) + '</div>'
+          + '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        if (b.area) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)">' + b.area + ' m²</span>';
+        if (b.anoAquisicao) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)">Adquirido em ' + b.anoAquisicao + '</span>';
+        if (b.financiado) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--neg) 15%,transparent);color:var(--neg)">Financiado</span>';
+        if (b.alugado) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--pos) 15%,transparent);color:var(--pos)">Alugado</span>';
+        html += '</div>';
+        if (b.observacoes) html += '<div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.4">' + b.observacoes + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }).catch(function(e) {
+    container.innerHTML = '<div class="card" style="padding:24px;text-align:center;color:var(--neg)">Erro ao carregar bens: ' + e.message + '</div>';
+  });
+}
+
+function wpModalBem(clienteId, bemId) {
+  var isEdit = !!bemId;
+  var modal = document.createElement('div');
+  modal.id = 'wp-modal-bem';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55)';
+  modal.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:520px;max-height:85vh;overflow-y:auto;padding:24px;position:relative">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
+    + '<div style="font-size:16px;font-weight:600;color:var(--white)">' + (isEdit ? 'Editar Bem' : 'Adicionar Bem') + '</div>'
+    + '<button onclick="document.getElementById(\'wp-modal-bem\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px">&times;</button></div>'
+    + '<div class="form-grid" style="gap:12px">'
+    + '<div class="form-group"><label>Tipo de bem *</label><select class="form-input" id="wp-bem-tipo"><option value="">Selecione...</option>'
+    + WP_BENS_TIPOS.map(function(t) { return '<option value="' + t.id + '">' + t.label + '</option>'; }).join('')
+    + '</select></div>'
+    + '<div class="form-group"><label>Descrição *</label><input class="form-input" id="wp-bem-desc" placeholder="Ex: Casa de praia, Terreno em Alphaville..."></div>'
+    + '<div class="form-group"><label>Valor estimado (R$) *</label><input class="form-input" id="wp-bem-valor" type="number" step="1000" placeholder="0"></div>'
+    + '<div class="form-group"><label>Localização</label><input class="form-input" id="wp-bem-local" placeholder="Cidade, bairro..."></div>'
+    + '<div class="form-group"><label>Área (m²)</label><input class="form-input" id="wp-bem-area" placeholder="0"></div>'
+    + '<div class="form-group"><label>Ano de aquisição</label><input class="form-input" id="wp-bem-ano" type="number" placeholder="2020"></div>'
+    + '<div class="form-group"><label>Valor de aquisição (R$)</label><input class="form-input" id="wp-bem-valoraq" type="number" step="1000" placeholder="0"></div>'
+    + '<div class="form-group"><label>Registro / matrícula</label><input class="form-input" id="wp-bem-registro" placeholder="Número de matrícula"></div>'
+    + '<div class="form-group form-full" style="display:flex;gap:16px;align-items:center">'
+    + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="wp-bem-financiado"> Financiado</label>'
+    + '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text)"><input type="checkbox" id="wp-bem-alugado"> Alugado / Gera renda</label>'
+    + '</div>'
+    + '<div class="form-group form-full"><label>Saldo devedor (R$)</label><input class="form-input" id="wp-bem-saldo" type="number" step="1000" placeholder="0"></div>'
+    + '<div class="form-group form-full"><label>Renda mensal (R$)</label><input class="form-input" id="wp-bem-renda" type="number" step="100" placeholder="0"></div>'
+    + '<div class="form-group form-full"><label>Observações</label><textarea class="form-input" id="wp-bem-obs" rows="2" placeholder="Informações adicionais..."></textarea></div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">'
+    + '<button class="btn-secondary" onclick="document.getElementById(\'wp-modal-bem\').remove()">Cancelar</button>'
+    + '<button class="btn-primary" id="wp-bem-save" onclick="wpSalvarBem(\'' + clienteId + '\',\'' + (bemId || '') + '\')">Salvar</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+
+  if (isEdit) {
+    db.collection('clientes').doc(clienteId).collection('wp_bens').doc(bemId).get().then(function(snap) {
+      if (!snap.exists) return;
+      var b = snap.data();
+      document.getElementById('wp-bem-tipo').value = b.tipo || '';
+      document.getElementById('wp-bem-desc').value = b.descricao || '';
+      document.getElementById('wp-bem-valor').value = b.valorEstimado || '';
+      document.getElementById('wp-bem-local').value = b.localizacao || '';
+      document.getElementById('wp-bem-area').value = b.area || '';
+      document.getElementById('wp-bem-ano').value = b.anoAquisicao || '';
+      document.getElementById('wp-bem-valoraq').value = b.valorAquisicao || '';
+      document.getElementById('wp-bem-registro').value = b.registro || '';
+      document.getElementById('wp-bem-financiado').checked = !!b.financiado;
+      document.getElementById('wp-bem-alugado').checked = !!b.alugado;
+      document.getElementById('wp-bem-saldo').value = b.saldoDevedor || '';
+      document.getElementById('wp-bem-renda').value = b.rendaMensal || '';
+      document.getElementById('wp-bem-obs').value = b.observacoes || '';
+    });
+  }
+}
+
+function wpSalvarBem(clienteId, bemId) {
+  var tipo = document.getElementById('wp-bem-tipo').value;
+  var desc = document.getElementById('wp-bem-desc').value.trim();
+  var valor = Number(document.getElementById('wp-bem-valor').value) || 0;
+  if (!tipo || !desc || valor <= 0) { alert('Preencha tipo, descrição e valor estimado.'); return; }
+
+  var data = {
+    tipo: tipo,
+    descricao: desc,
+    valorEstimado: valor,
+    localizacao: document.getElementById('wp-bem-local').value.trim(),
+    area: document.getElementById('wp-bem-area').value.trim(),
+    anoAquisicao: document.getElementById('wp-bem-ano').value.trim(),
+    valorAquisicao: Number(document.getElementById('wp-bem-valoraq').value) || 0,
+    registro: document.getElementById('wp-bem-registro').value.trim(),
+    financiado: document.getElementById('wp-bem-financiado').checked,
+    alugado: document.getElementById('wp-bem-alugado').checked,
+    saldoDevedor: Number(document.getElementById('wp-bem-saldo').value) || 0,
+    rendaMensal: Number(document.getElementById('wp-bem-renda').value) || 0,
+    observacoes: document.getElementById('wp-bem-obs').value.trim(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (!bemId) data.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+
+  var ref = db.collection('clientes').doc(clienteId).collection('wp_bens');
+  var promise = bemId ? ref.doc(bemId).update(data) : ref.add(data);
+  promise.then(function() {
+    document.getElementById('wp-modal-bem').remove();
+    wpAuditLog(clienteId, bemId ? 'bem_editado' : 'bem_criado', { tipo: tipo, descricao: desc });
+    var container = document.getElementById('wp-modules-content');
+    if (container) wpRenderBens(container, clienteId, wpIsAdminView);
+  }).catch(function(e) { alert('Erro ao salvar: ' + e.message); });
+}
+
+function wpDeleteBem(clienteId, bemId) {
+  if (!confirm('Excluir este bem?')) return;
+  db.collection('clientes').doc(clienteId).collection('wp_bens').doc(bemId).delete().then(function() {
+    wpAuditLog(clienteId, 'bem_excluido', { id: bemId });
+    var container = document.getElementById('wp-modules-content');
+    if (container) wpRenderBens(container, clienteId, wpIsAdminView);
+  }).catch(function(e) { alert('Erro: ' + e.message); });
+}
+
+// ═══════════════════════════════════════════════════════════
+// WP MODULE: PREVIDÊNCIA
+// ═══════════════════════════════════════════════════════════
+var WP_PREV_TIPOS = ['PGBL', 'VGBL', 'Previdência Empresarial', 'Fundo de Pensão', 'Outro'];
+
+function wpRenderPrevidencia(container, clienteId, isAdmin) {
+  if (!clienteId) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Selecione um cliente</div>'; return; }
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Carregando previdências...</div>';
+  db.collection('clientes').doc(clienteId).collection('wp_previdencia').orderBy('criadoEm','desc').get().then(function(snap) {
+    var prevs = [];
+    snap.forEach(function(d) { var p = d.data(); p.id = d.id; prevs.push(p); });
+    var totalSaldo = prevs.reduce(function(s, p) { return s + (Number(p.saldoAtual) || 0); }, 0);
+    var totalContrib = prevs.reduce(function(s, p) { return s + (Number(p.contribuicaoMensal) || 0); }, 0);
+    var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+      + '<div><div style="font-size:15px;font-weight:600;color:var(--white)">Previdência Privada</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + prevs.length + ' plano' + (prevs.length !== 1 ? 's' : '') + ' | Saldo: ' + wpFmtMoeda(totalSaldo) + ' | Contrib: ' + wpFmtMoeda(totalContrib) + '/mês</div></div>'
+      + '<button class="btn-primary" onclick="wpModalPrevidencia(\'' + clienteId + '\')" style="padding:8px 16px;font-size:12px">+ Adicionar Plano</button>'
+      + '</div>';
+    if (prevs.length === 0) {
+      html += '<div class="card" style="padding:40px;text-align:center"><div style="color:var(--text3);font-size:13px">Nenhum plano de previdência cadastrado.</div></div>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px">';
+      prevs.forEach(function(p) {
+        html += '<div class="card" style="padding:18px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">'
+          + '<div>'
+          + '<div style="font-size:14px;font-weight:600;color:var(--white)">' + (p.nome || 'Sem nome') + '</div>'
+          + '<div style="font-size:11px;color:var(--text3)">' + (p.tipo || '') + (p.seguradora ? ' | ' + p.seguradora : '') + '</div>'
+          + '</div>'
+          + '<div style="display:flex;gap:4px">'
+          + '<button onclick="wpModalPrevidencia(\'' + clienteId + '\',\'' + p.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
+          + '<button onclick="wpDeletePrevidencia(\'' + clienteId + '\',\'' + p.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px" title="Excluir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
+          + '</div></div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px">'
+          + '<div><div style="font-size:11px;color:var(--text3)">Saldo atual</div><div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--pos)">' + wpFmtMoeda(p.saldoAtual) + '</div></div>'
+          + '<div><div style="font-size:11px;color:var(--text3)">Contrib. mensal</div><div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:var(--blue)">' + wpFmtMoeda(p.contribuicaoMensal) + '</div></div>'
+          + '</div>'
+          + '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        if (p.tributacao) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)">Tabela ' + p.tributacao + '</span>';
+        if (p.beneficiarios) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)">Benef: ' + p.beneficiarios + '</span>';
+        if (p.dataVencimento) html += '<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)">Venc: ' + p.dataVencimento + '</span>';
+        html += '</div>';
+        if (p.observacoes) html += '<div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.4">' + p.observacoes + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }).catch(function(e) {
+    container.innerHTML = '<div class="card" style="padding:24px;text-align:center;color:var(--neg)">Erro ao carregar previdências: ' + e.message + '</div>';
+  });
+}
+
+function wpModalPrevidencia(clienteId, prevId) {
+  var isEdit = !!prevId;
+  var modal = document.createElement('div');
+  modal.id = 'wp-modal-prev';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55)';
+  modal.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:520px;max-height:85vh;overflow-y:auto;padding:24px;position:relative">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
+    + '<div style="font-size:16px;font-weight:600;color:var(--white)">' + (isEdit ? 'Editar Plano' : 'Adicionar Plano de Previdência') + '</div>'
+    + '<button onclick="document.getElementById(\'wp-modal-prev\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px">&times;</button></div>'
+    + '<div class="form-grid" style="gap:12px">'
+    + '<div class="form-group"><label>Tipo *</label><select class="form-input" id="wp-prev-tipo"><option value="">Selecione...</option>'
+    + WP_PREV_TIPOS.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('')
+    + '</select></div>'
+    + '<div class="form-group"><label>Nome do plano *</label><input class="form-input" id="wp-prev-nome" placeholder="Ex: VGBL Bradesco Premium"></div>'
+    + '<div class="form-group"><label>Seguradora / Instituição</label><input class="form-input" id="wp-prev-seg" placeholder="Ex: Brasilprev, Icatu..."></div>'
+    + '<div class="form-group"><label>CNPJ do fundo</label><input class="form-input" id="wp-prev-cnpj" placeholder="00.000.000/0000-00"></div>'
+    + '<div class="form-group"><label>Saldo atual (R$) *</label><input class="form-input" id="wp-prev-saldo" type="number" step="100" placeholder="0"></div>'
+    + '<div class="form-group"><label>Contribuição mensal (R$)</label><input class="form-input" id="wp-prev-contrib" type="number" step="100" placeholder="0"></div>'
+    + '<div class="form-group"><label>Tributação</label><select class="form-input" id="wp-prev-trib"><option value="">Selecione...</option><option>Progressiva</option><option>Regressiva</option></select></div>'
+    + '<div class="form-group"><label>Data de vencimento</label><input class="form-input" id="wp-prev-venc" type="text" placeholder="MM/AAAA"></div>'
+    + '<div class="form-group"><label>Taxa de administração (%)</label><input class="form-input" id="wp-prev-taxa" type="number" step="0.01" placeholder="0.00"></div>'
+    + '<div class="form-group"><label>Taxa de carregamento (%)</label><input class="form-input" id="wp-prev-carreg" type="number" step="0.01" placeholder="0.00"></div>'
+    + '<div class="form-group form-full"><label>Beneficiários</label><input class="form-input" id="wp-prev-benef" placeholder="Nomes dos beneficiários e percentuais"></div>'
+    + '<div class="form-group form-full"><label>Observações</label><textarea class="form-input" id="wp-prev-obs" rows="2" placeholder="Informações adicionais..."></textarea></div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">'
+    + '<button class="btn-secondary" onclick="document.getElementById(\'wp-modal-prev\').remove()">Cancelar</button>'
+    + '<button class="btn-primary" onclick="wpSalvarPrevidencia(\'' + clienteId + '\',\'' + (prevId || '') + '\')">Salvar</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+
+  if (isEdit) {
+    db.collection('clientes').doc(clienteId).collection('wp_previdencia').doc(prevId).get().then(function(snap) {
+      if (!snap.exists) return;
+      var p = snap.data();
+      document.getElementById('wp-prev-tipo').value = p.tipo || '';
+      document.getElementById('wp-prev-nome').value = p.nome || '';
+      document.getElementById('wp-prev-seg').value = p.seguradora || '';
+      document.getElementById('wp-prev-cnpj').value = p.cnpj || '';
+      document.getElementById('wp-prev-saldo').value = p.saldoAtual || '';
+      document.getElementById('wp-prev-contrib').value = p.contribuicaoMensal || '';
+      document.getElementById('wp-prev-trib').value = p.tributacao || '';
+      document.getElementById('wp-prev-venc').value = p.dataVencimento || '';
+      document.getElementById('wp-prev-taxa').value = p.taxaAdmin || '';
+      document.getElementById('wp-prev-carreg').value = p.taxaCarregamento || '';
+      document.getElementById('wp-prev-benef').value = p.beneficiarios || '';
+      document.getElementById('wp-prev-obs').value = p.observacoes || '';
+    });
+  }
+}
+
+function wpSalvarPrevidencia(clienteId, prevId) {
+  var tipo = document.getElementById('wp-prev-tipo').value;
+  var nome = document.getElementById('wp-prev-nome').value.trim();
+  var saldo = Number(document.getElementById('wp-prev-saldo').value) || 0;
+  if (!tipo || !nome) { alert('Preencha tipo e nome do plano.'); return; }
+
+  var data = {
+    tipo: tipo,
+    nome: nome,
+    seguradora: document.getElementById('wp-prev-seg').value.trim(),
+    cnpj: document.getElementById('wp-prev-cnpj').value.trim(),
+    saldoAtual: saldo,
+    contribuicaoMensal: Number(document.getElementById('wp-prev-contrib').value) || 0,
+    tributacao: document.getElementById('wp-prev-trib').value,
+    dataVencimento: document.getElementById('wp-prev-venc').value.trim(),
+    taxaAdmin: Number(document.getElementById('wp-prev-taxa').value) || 0,
+    taxaCarregamento: Number(document.getElementById('wp-prev-carreg').value) || 0,
+    beneficiarios: document.getElementById('wp-prev-benef').value.trim(),
+    observacoes: document.getElementById('wp-prev-obs').value.trim(),
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (!prevId) data.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+
+  var ref = db.collection('clientes').doc(clienteId).collection('wp_previdencia');
+  var promise = prevId ? ref.doc(prevId).update(data) : ref.add(data);
+  promise.then(function() {
+    document.getElementById('wp-modal-prev').remove();
+    wpAuditLog(clienteId, prevId ? 'previdencia_editada' : 'previdencia_criada', { tipo: tipo, nome: nome });
+    var container = document.getElementById('wp-modules-content');
+    if (container) wpRenderPrevidencia(container, clienteId, wpIsAdminView);
+  }).catch(function(e) { alert('Erro ao salvar: ' + e.message); });
+}
+
+function wpDeletePrevidencia(clienteId, prevId) {
+  if (!confirm('Excluir este plano de previdência?')) return;
+  db.collection('clientes').doc(clienteId).collection('wp_previdencia').doc(prevId).delete().then(function() {
+    wpAuditLog(clienteId, 'previdencia_excluida', { id: prevId });
+    var container = document.getElementById('wp-modules-content');
+    if (container) wpRenderPrevidencia(container, clienteId, wpIsAdminView);
+  }).catch(function(e) { alert('Erro: ' + e.message); });
 }

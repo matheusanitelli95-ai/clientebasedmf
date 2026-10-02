@@ -7946,8 +7946,8 @@ function buildMinhaCarteiraView(){
     /* ── Tab bar ── */
     +'<div class="mc-tab-bar" id="mc-tabs">'
     +'<button class="mc-tab active" onclick="showMcTab(\'portfolio\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Portfolio</button>'
-    +'<button class="mc-tab" onclick="showMcTab(\'extrato\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Extrato</button>'
-    +'<button class="mc-tab" onclick="showMcTab(\'dados\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Dados</button>'
+    +'<button class="mc-tab" onclick="showMcTab(\'extrato\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Operações Black</button>'
+    +'<button class="mc-tab mc-tab-dados" onclick="showMcTab(\'dados\',this)" style="'+(typeof currentPerfil!=='undefined'&&currentPerfil==='cliente'?'display:none':'')+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Dados</button>'
     +'</div>'
     /* ── Portfolio tab ── */
     +'<div class="mc-tab-panel active" id="mc-tab-portfolio">'
@@ -7973,8 +7973,8 @@ function buildMinhaCarteiraView(){
     +'<div class="card" style="margin-bottom:16px;padding:20px"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Desempenho DMF Black</div><div style="font-size:11px;color:var(--text3);margin-bottom:14px">Resultado mensal + acumulado</div><div style="position:relative;height:220px"><canvas id="ext-chart"></canvas></div></div>'
     +'<div class="card"><div class="section-title">Histórico Mensal</div><div class="table-wrap" style="border:none"><table id="ext-table"><thead><tr><th>Mês/Ano</th><th>Saldo Opções</th><th>Custos</th><th>Líquido</th><th>Acumulado</th></tr></thead><tbody id="ext-tbody"></tbody></table></div></div>'
     +'</div>'
-    /* ── Dados tab ── */
-    +'<div class="mc-tab-panel" id="mc-tab-dados">'
+    /* ── Dados tab (admin/gestor only) ── */
+    +'<div class="mc-tab-panel" id="mc-tab-dados" style="'+(typeof currentPerfil!=='undefined'&&currentPerfil==='cliente'?'display:none !important':'')+'">'
     +'<div class="card" style="padding:24px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px"><div style="font-size:15px;font-weight:700;color:var(--text)">Meus Dados</div><button class="btn-primary" onclick="salvarMinhaConta()" style="padding:6px 16px;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button></div>'
     +'<div style="font-size:12px;font-weight:600;color:var(--text);text-transform:none;letter-spacing:.06em;margin-bottom:12px">Dados Pessoais</div>'
@@ -8047,11 +8047,17 @@ function loadMcExtrato(){
     });
     if(tbody) tbody.innerHTML=rows||'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">Nenhuma operação registrada</td></tr>';
     var media=meses>0?totalLiq/meses:0;
-    var ea=document.getElementById('ext-acumulado');if(ea)ea.textContent=mcMask(acum);
-    var em=document.getElementById('ext-media');if(em)em.textContent=mcMask(media);
-    var emm=document.getElementById('ext-meses');if(emm)emm.textContent=meses;
+    // Atualizar KPIs do Extrato — usar setTimeout para garantir que DOM está renderizado
+    setTimeout(function(){
+      var ea=document.getElementById('ext-acumulado');if(ea){ea.textContent=mcMask(acum);ea.style.color=acum>=0?'var(--pos)':'var(--neg)';}
+      var em=document.getElementById('ext-media');if(em){em.textContent=mcMask(media);em.style.color=media>=0?'var(--pos)':'var(--neg)';}
+      var emm=document.getElementById('ext-meses');if(emm)emm.textContent=meses;
+    }, 50);
     // Chart
     renderExtChart(labels,dataMensal,dataAcum);
+  }).catch(function(e){
+    console.error('Extrato load error:', e);
+    _extLoaded = false; // Permitir retry na próxima vez
   });
 }
 
@@ -8071,16 +8077,22 @@ function renderExtChart(labels,dataMensal,dataAcum){
   });
 }
 
+var _mcEvolLoading = false; // guard contra re-render durante loading
 function renderMcEvolucao(ops){
-  var ctx=document.getElementById('mc-evolucao-chart');if(!ctx)return;
-  if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
+  var ctx=document.getElementById('mc-evolucao-chart');if(!ctx&&!document.getElementById('mc-evol-loading'))return;
+  // Se já está carregando dados, não disparar de novo (evita flicker)
+  if(_mcEvolLoading) return;
 
   // Guardar referência do wrapper (div com height:220px) antes de mexer no innerHTML
-  var evolWrapper=ctx.parentElement;
+  var evolWrapper=(ctx||document.getElementById('mc-evol-loading')).parentElement;
 
   // Tentar carregar evolução real via API Mais Retorno
   if(currentClienteVinculado){
-    evolWrapper.innerHTML='<div id="mc-evol-loading" style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Carregando evolução...</div>';
+    _mcEvolLoading = true;
+    // Só mostrar loading se NÃO tem gráfico já renderizado (evita flicker em re-loads)
+    if(!_mcEvolChart){
+      evolWrapper.innerHTML='<div id="mc-evol-loading" style="display:flex;align-items:center;justify-content:center;height:220px;color:var(--text3);font-size:13px">Carregando evolução...</div>';
+    }
     db.collection('clientes').doc(currentClienteVinculado).collection('ativos').get().then(function(snap){
       var ativos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       if(!ativos.length){
@@ -8089,15 +8101,31 @@ function renderMcEvolucao(ops){
         return;
       }
       var tickers=[];
-      ativos.forEach(function(a){var t=(a.nome||'').trim().toUpperCase();if(t&&tickers.indexOf(t)<0)tickers.push(t);});
-      // Fetch stats de cada ativo + CDI
+      var ativoMap={}; // ticker → ativo data (para detectar internacionais)
+      ativos.forEach(function(a){var t=(a.nome||'').trim().toUpperCase();if(t&&tickers.indexOf(t)<0){tickers.push(t);ativoMap[t]=a;}});
+      // Crypto e UCITS conhecidos (mesma lista do pipeline de cotações)
+      var KNOWN_CRYPTO_EV=['BTC','ETH','SOL','ADA','DOT','AVAX','MATIC','LINK','UNI','XRP','DOGE','SHIB','BNB','LTC','ATOM','NEAR','FTM','ALGO','ICP','FIL','APE','AAVE','CRV','SAND','MANA','AXS','ENJ','CHZ','GALA','WBTC'];
+      var KNOWN_UCITS_EV=['IWDA','EIMI','SWDA','VWRA','VWCE','CSPX','IUSQ','EMIM','AGBP','IGLN','ISAC','VUAG','VUSA','IUIT','VFEM','HMWO','SWRD','SGLN','PHAU'];
+      // Fetch stats de cada ativo + CDI — usar API correta por tipo
       var allT=tickers.concat(['CDI']);
       var promises=allT.map(function(t){
-        var id=t.toLowerCase();
-        if(t==='CDI')id='cdi:idx';
-        else if(/^[A-Z]{2,5}$/.test(t)&&!/\d/.test(t))id=t.toLowerCase();
-        else id=t.toLowerCase()+':b3';
-        return fetch('/api/maisretorno?action=stats&identifier='+encodeURIComponent(id)+'&details=true').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
+        var a=ativoMap[t]||{};
+        var isCrypto=KNOWN_CRYPTO_EV.indexOf(t)>=0||(a.tipo||'').toLowerCase()==='cripto';
+        var isUcits=KNOWN_UCITS_EV.indexOf(t)>=0;
+        var isIntl=isCrypto||isUcits||(a.moeda||'').toUpperCase()==='USD'||(a.moeda||'').toUpperCase()==='EUR'||(a.tipo||'').toLowerCase()==='internacional';
+        if(!isIntl&&/^[A-Z]{2,5}$/.test(t)&&!/\d/.test(t))isIntl=true;
+        if(t==='CDI'){
+          // CDI via MR
+          return fetch('/api/maisretorno?action=stats&identifier=cdi:idx&details=true').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
+        } else if(isIntl){
+          // Internacional/Crypto/UCITS → usar Google Finance API
+          var gfId=a.gfinanceId||(isCrypto?t+'-USD':(isUcits?t+':LON':t));
+          return fetch('/api/gfinance?action=stats&symbol='+encodeURIComponent(gfId)+'&years=10').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
+        } else {
+          // B3 → usar MR com :b3
+          var id=t.toLowerCase()+':b3';
+          return fetch('/api/maisretorno?action=stats&identifier='+encodeURIComponent(id)+'&details=true').then(function(r){return r.json();}).then(function(d){return{ticker:t,data:d&&d.years?d:null};}).catch(function(){return{ticker:t,data:null};});
+        }
       });
       Promise.all(promises).then(function(results){
         var statsMap={};
@@ -8105,24 +8133,29 @@ function renderMcEvolucao(ops){
         // Restaurar canvas antes de desenhar
         _renderMcEvolRestore(evolWrapper);
         _renderMcEvolFromStats(ativos,statsMap);
+        _mcEvolLoading=false;
       }).catch(function(e){
         console.error('Evolução API error:',e);
         _renderMcEvolRestore(evolWrapper);
         _renderMcEvolFallback(ops);
+        _mcEvolLoading=false;
       });
     }).catch(function(e){
       console.error('Evolução Firestore error:',e);
       _renderMcEvolRestore(evolWrapper);
       _renderMcEvolFallback(ops);
+      _mcEvolLoading=false;
     });
     return;
   }
+  _mcEvolLoading=false;
   _renderMcEvolFallback(ops);
 }
 
 // Restaura o canvas no wrapper após o loading
 function _renderMcEvolRestore(wrapper){
   if(!wrapper) return;
+  if(_mcEvolChart){_mcEvolChart.destroy();_mcEvolChart=null;}
   wrapper.innerHTML='<canvas id="mc-evolucao-chart"></canvas>';
 }
 
@@ -9139,13 +9172,30 @@ function fetchGFinanceCotacoes(tickers, callback, gfMap){
     return r.json();
   }).then(function(data){
     var results = data.results || [];
+    // Build reverse lookup: strip suffixes to improve matching
+    // e.g. "BTC-USD" → "BTC", "PETR4:BVMF" → "PETR4", "IWDA:LON" → "IWDA"
+    var _gfReverse = {};
+    Object.keys(gfToTicker).forEach(function(gfId){
+      _gfReverse[gfId] = gfToTicker[gfId];
+      _gfReverse[gfId.toUpperCase()] = gfToTicker[gfId];
+      _gfReverse[gfId.toLowerCase()] = gfToTicker[gfId];
+    });
     results.forEach(function(r){
-      // Match result back to original ticker
+      // Match result back to original ticker — try multiple strategies
       var gfId = r._gfinanceId || '';
-      var ticker = gfToTicker[gfId] || r.symbol || '';
+      var ticker = _gfReverse[gfId] || _gfReverse[gfId.toUpperCase()] || gfToTicker[gfId] || '';
+      // Fallback: strip exchange suffix and try
+      if(!ticker && gfId){
+        var stripped = gfId.replace(/[-:].+$/, '').toUpperCase();
+        tickers.forEach(function(t){ if(t.toUpperCase() === stripped) ticker = t; });
+      }
+      // Fallback: try r.symbol
+      if(!ticker && r.symbol){
+        var sym = r.symbol.replace(/[-:].+$/, '').toUpperCase();
+        tickers.forEach(function(t){ if(t.toUpperCase() === sym) ticker = t; });
+      }
       ticker = ticker.toUpperCase();
-      // Also try without exchange suffix
-      if(!cotacoesCache[ticker]){
+      if(ticker && !cotacoesCache[ticker]){
         cotacoesCache[ticker] = {
           price: r.regularMarketPrice,
           change: r.regularMarketChange||0,
@@ -9395,6 +9445,18 @@ function _loadMinhaCarteiraReal(){
         _mcCotacoesCache = cotacoes;
         _mcCotacoesCacheTime = Date.now();
         renderAtivosCliente(ativos, cotacoes);
+        // Se tem ativos internacionais mas câmbio não veio, buscar separadamente e re-renderizar
+        if(intlTickers.length > 0 && !cotacoes['_USDBRL'] && !window._dmfLastUsdBrl){
+          fetch('/api/gfinance?action=quote&symbols='+encodeURIComponent('USD-BRL')).then(function(r){return r.json();}).then(function(d){
+            var res=(d.results||[])[0];
+            if(res && res.regularMarketPrice){
+              cotacoes['_USDBRL']={price:res.regularMarketPrice,currency:'BRL',_source:'gf-fallback'};
+              window._dmfLastUsdBrl=res.regularMarketPrice;
+              _mcCotacoesCache=cotacoes;
+              renderAtivosCliente(ativos, cotacoes);
+            }
+          }).catch(function(){});
+        }
       }, intlTickers, gfMap);
     } else {
       renderAtivosCliente(ativos, {});
@@ -9688,6 +9750,15 @@ function renderAtivosCliente(ativos, cotacoes){
   var _usdBrl = (cotacoes['_USDBRL'] && cotacoes['_USDBRL'].price) ? cotacoes['_USDBRL'].price : 0;
   // Fallback: tentar USDBRL sem underscore
   if(!_usdBrl && cotacoes['USDBRL'] && cotacoes['USDBRL'].price) _usdBrl = cotacoes['USDBRL'].price;
+  // Fallback: procurar qualquer cotação que tenha currency USD e extrair câmbio implícito
+  if(!_usdBrl){
+    Object.keys(cotacoes).forEach(function(k){
+      if(!_usdBrl && cotacoes[k] && cotacoes[k]._usdBrl) _usdBrl = cotacoes[k]._usdBrl;
+    });
+  }
+  // Último fallback: buscar câmbio assíncrono se tem ativos internacionais sem câmbio
+  if(!_usdBrl && window._dmfLastUsdBrl) _usdBrl = window._dmfLastUsdBrl;
+  if(_usdBrl > 0) window._dmfLastUsdBrl = _usdBrl;
 
   // Preparar dados enriquecidos
   var ativosRender = ativosConsolidados.map(function(a){
