@@ -3391,7 +3391,7 @@ function saveCliente(){
   var nome=document.getElementById('fc-nome').value.trim();
   if(!nome){alert('Nome é obrigatório!');return;}
   var email=document.getElementById('fc-email').value.trim().toLowerCase();
-  if(!email){alert('Email é obrigatório! O cliente precisa de um email para receber acesso à plataforma.');return;}
+  // Email opcional — se preenchido, vincula como usuário automaticamente
   var isCons=document.getElementById('fc-isConsultoria').checked;
   var isBlk=document.getElementById('fc-isBlack').checked;
   var isVit=document.getElementById('fc-isVitalicio').checked;
@@ -3464,9 +3464,9 @@ function saveCliente(){
     }
   };
 
-  // Salvar cliente e vincular automaticamente como usuário
+  // Salvar cliente e vincular automaticamente como usuário (só se tiver email)
   var salvarEVincular = function(clienteId){
-    // Criar/atualizar doc em 'usuarios' com o email do cliente
+    if(!email) return;
     var usrData={
       email:email,
       nome:nome,
