@@ -3149,6 +3149,9 @@ function wpDeletePrevidencia(clienteId, prevId) {
 // ═══════════════════════════════════════════════════════════
 
 var wpMCFilterConsultor = '';
+var wpMCFilterCarteira = '';
+var wpMCFilterContato = '';
+var wpMCFilterCorretora = '';
 var wpMCClientesData = []; // enriched client data with ativos status
 
 // Build map: clienteId → consultor nome from global consultores array
@@ -3287,12 +3290,36 @@ function wpRenderMeusClientes() {
     html += '</div></div>';
   }
 
+  // ── Collect unique corretoras for filter ──
+  var corretorasSet = {};
+  filtered.forEach(function(c) { if (c.banco) corretorasSet[c.banco] = true; });
+  var corretorasList = Object.keys(corretorasSet).sort();
+
   // ── Clients table ──
   html += '<div class="card" style="padding:0;overflow:hidden">'
-    + '<div style="padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between">'
+    + '<div style="padding:16px 16px 12px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
     + '<div style="font-size:13px;font-weight:600;color:var(--white)">Lista de Clientes</div>'
-    + '<div style="display:flex;gap:8px;align-items:center">'
     + '<input class="form-input" id="wp-mc-search" placeholder="Buscar cliente..." oninput="wpMCFilterTable()" style="max-width:200px;font-size:12px;padding:6px 10px">'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    + '<select id="wp-mc-filter-carteira" onchange="wpMCFilterCarteira=this.value;wpMCFilterTable()" class="form-input" style="font-size:11px;padding:4px 8px;max-width:150px">'
+    + '<option value="">Carteira: Todos</option>'
+    + '<option value="preenchida"' + (wpMCFilterCarteira === 'preenchida' ? ' selected' : '') + '>Preenchida</option>'
+    + '<option value="pendente"' + (wpMCFilterCarteira === 'pendente' ? ' selected' : '') + '>Pendente</option>'
+    + '</select>'
+    + '<select id="wp-mc-filter-contato" onchange="wpMCFilterContato=this.value;wpMCFilterTable()" class="form-input" style="font-size:11px;padding:4px 8px;max-width:160px">'
+    + '<option value="">Contato: Todos</option>'
+    + '<option value="30"' + (wpMCFilterContato === '30' ? ' selected' : '') + '>Sem contato +30d</option>'
+    + '<option value="60"' + (wpMCFilterContato === '60' ? ' selected' : '') + '>Sem contato +60d</option>'
+    + '<option value="90"' + (wpMCFilterContato === '90' ? ' selected' : '') + '>Sem contato +90d</option>'
+    + '</select>'
+    + '<select id="wp-mc-filter-corretora" onchange="wpMCFilterCorretora=this.value;wpMCFilterTable()" class="form-input" style="font-size:11px;padding:4px 8px;max-width:170px">'
+    + '<option value="">Corretora: Todas</option>';
+  corretorasList.forEach(function(b) {
+    html += '<option value="' + b + '"' + (wpMCFilterCorretora === b ? ' selected' : '') + '>' + b + '</option>';
+  });
+  html += '</select>'
     + '</div></div>'
     + '<div style="overflow-x:auto">'
     + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
@@ -3317,7 +3344,7 @@ function wpRenderMeusClientes() {
     var initial = (c.nome || '?').charAt(0).toUpperCase();
     var consultor = cliConsMap[c.id] || 'Não atribuído';
 
-    html += '<tr class="wp-mc-row" data-nome="' + (c.nome || '').toLowerCase() + '" style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
+    html += '<tr class="wp-mc-row" data-nome="' + (c.nome || '').toLowerCase() + '" data-dias="' + dias + '" data-banco="' + (c.banco || '') + '" data-carteira="' + ((c.patrimonio || 0) > 0 ? 'preenchida' : 'pendente') + '" style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
       + '<td style="padding:10px 14px"><div style="display:flex;align-items:center;gap:10px">'
       + '<div style="width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0">' + initial + '</div>'
       + '<div><div style="font-weight:600;color:var(--white);white-space:nowrap">' + (c.nome || 'Sem nome') + '</div>'
@@ -3377,7 +3404,15 @@ function wpMCFilterTable() {
   var rows = document.querySelectorAll('.wp-mc-row');
   rows.forEach(function(row) {
     var nome = row.getAttribute('data-nome') || '';
-    row.style.display = (!q || nome.indexOf(q) >= 0) ? '' : 'none';
+    var dias = Number(row.getAttribute('data-dias') || 0);
+    var banco = row.getAttribute('data-banco') || '';
+    var carteira = row.getAttribute('data-carteira') || '';
+    var show = true;
+    if (q && nome.indexOf(q) < 0) show = false;
+    if (wpMCFilterCarteira && carteira !== wpMCFilterCarteira) show = false;
+    if (wpMCFilterContato && dias < Number(wpMCFilterContato)) show = false;
+    if (wpMCFilterCorretora && banco !== wpMCFilterCorretora) show = false;
+    row.style.display = show ? '' : 'none';
   });
 }
 
