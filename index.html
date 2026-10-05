@@ -1893,6 +1893,10 @@ textarea.form-input{resize:vertical;min-height:80px}
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isVitalicio" style="accent-color:var(--blue);width:16px;height:16px"> Vitalício</label>
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isSocio" style="accent-color:var(--blue);width:16px;height:16px"> Sócio</label>
           </div>
+          <div id="fc-consultor-wrap" style="display:none;margin-top:12px">
+            <label style="font-size:12px;color:var(--text3);margin-bottom:4px;display:block">Consultor vinculado</label>
+            <select class="form-input" id="fc-consultor" style="max-width:360px"><option value="">Selecione um consultor...</option></select>
+          </div>
         </div>
       </div>
     </div>
@@ -3366,6 +3370,19 @@ function openModalCliente(id){
   document.getElementById('fc-estado-civil').value=c?c.estadoCivil||'':'';
   document.getElementById('fc-regime-bens').value=c?c.regimeBens||'':'';
   document.getElementById('fc-dependentes').value=c?c.dependentes||'':'';
+  // Popular select de consultores
+  var selCons=document.getElementById('fc-consultor');
+  selCons.innerHTML='<option value="">Selecione um consultor...</option>';
+  (typeof consultores!=='undefined'?consultores:[]).forEach(function(ct){
+    selCons.innerHTML+='<option value="'+ct.id+'">'+ct.nome+(ct.especialidade?' — '+ct.especialidade:'')+'</option>';
+  });
+  // Pre-selecionar o consultor que já tem este cliente vinculado
+  if(c && c.id){
+    var found=(typeof consultores!=='undefined'?consultores:[]).find(function(ct){
+      return (ct.clientesVinculados||[]).some(function(v){return v.id===c.id;});
+    });
+    if(found) selCons.value=found.id;
+  }
   toggleResp();
   openModal('modal-cliente');
 }
@@ -3422,6 +3439,31 @@ function saveCliente(){
     obs:document.getElementById('fc-obs').value
   };
 
+  // Vincular/desvincular consultor
+  var consultorSelecionado=isCons?document.getElementById('fc-consultor').value:'';
+  var vincularConsultor=function(clienteId){
+    var cArr=typeof consultores!=='undefined'?consultores:[];
+    // Remover este cliente de qualquer consultor antigo
+    cArr.forEach(function(ct){
+      var tem=(ct.clientesVinculados||[]).some(function(v){return v.id===clienteId;});
+      if(tem && ct.id!==consultorSelecionado){
+        var novos=(ct.clientesVinculados||[]).filter(function(v){return v.id!==clienteId;});
+        db.collection('consultores').doc(ct.id).update({clientesVinculados:novos,atualizadoEm:new Date().toISOString()}).catch(function(){});
+      }
+    });
+    // Adicionar ao consultor selecionado (se não estiver já)
+    if(consultorSelecionado){
+      var ctSel=cArr.find(function(ct){return ct.id===consultorSelecionado;});
+      if(ctSel){
+        var jaExiste=(ctSel.clientesVinculados||[]).some(function(v){return v.id===clienteId;});
+        if(!jaExiste){
+          var lista=(ctSel.clientesVinculados||[]).concat([{id:clienteId,nome:nome}]);
+          db.collection('consultores').doc(consultorSelecionado).update({clientesVinculados:lista,atualizadoEm:new Date().toISOString()}).catch(function(){});
+        }
+      }
+    }
+  };
+
   // Salvar cliente e vincular automaticamente como usuário
   var salvarEVincular = function(clienteId){
     // Criar/atualizar doc em 'usuarios' com o email do cliente
@@ -3447,10 +3489,12 @@ function saveCliente(){
         db.collection('usuarios').doc(emailAntigo).delete().catch(function(){});
       }
       salvarEVincular(editingCliId);
+      vincularConsultor(editingCliId);
     });
   } else {
     db.collection('clientes').add(data).then(function(ref){
       salvarEVincular(ref.id);
+      vincularConsultor(ref.id);
     });
   }
   closeModal('modal-cliente');
@@ -3471,7 +3515,11 @@ function deleteCliente(id){
 
 // PROFISSIONAIS
 function toggleResp(){
-  // Responsavel selects removidos — agora o vínculo é via Consultores
+  var wrap=document.getElementById('fc-consultor-wrap');
+  if(!wrap) return;
+  var isCons=document.getElementById('fc-isConsultoria').checked;
+  wrap.style.display=isCons?'block':'none';
+  if(!isCons) document.getElementById('fc-consultor').value='';
 }
 
 // ── Busca CEP via ViaCEP ─────────────────────────────────
@@ -3616,10 +3664,10 @@ function saveConsultor(){
     atualizadoEm:new Date().toISOString()
   };
   if(editingConsultorId){
-    db.collection('consultores').doc(editingConsultorId).update(data).then(function(){closeModal('modal-consultor');});
+    db.collection('consultores').doc(editingConsultorId).update(data).then(function(){closeModal('modal-consultor');}).catch(function(err){alert('Erro ao salvar consultor: '+err.message);});
   } else {
     data.criadoEm=new Date().toISOString();
-    db.collection('consultores').add(data).then(function(){closeModal('modal-consultor');});
+    db.collection('consultores').add(data).then(function(){closeModal('modal-consultor');}).catch(function(err){alert('Erro ao salvar consultor: '+err.message);});
   }
 }
 
