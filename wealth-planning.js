@@ -177,6 +177,19 @@ function buildWealthPlanningView() {
     + '<div class="page-sub">Planejamento financeiro completo</div></div>'
     + '</div>'
     + '<div class="page-content">'
+    // ── Top-level tabs: Meus Clientes vs Planejamento Individual ──
+    + '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)">'
+    + '<button class="wp-top-tab active" data-toptab="meus-clientes" onclick="wpSwitchTopTab(\'meus-clientes\')" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;font-size:14px;font-weight:600;color:var(--blue);border-bottom:2px solid var(--blue);margin-bottom:-2px;transition:all .15s">'
+    + '<span style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Meus Clientes</span></button>'
+    + '<button class="wp-top-tab" data-toptab="planejamento" onclick="wpSwitchTopTab(\'planejamento\')" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;font-size:14px;font-weight:400;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s">'
+    + '<span style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Planejamento Individual</span></button>'
+    + '</div>'
+    // ── Panel: Meus Clientes ──
+    + '<div id="wp-panel-meus-clientes">'
+    + '<div style="text-align:center;padding:40px;color:var(--text3)">Carregando dados dos clientes...</div>'
+    + '</div>'
+    // ── Panel: Planejamento Individual (current behavior) ──
+    + '<div id="wp-panel-planejamento" style="display:none">'
     // Barra de seleção de cliente
     + '<div class="card" style="margin-bottom:16px;padding:14px 16px">'
     + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
@@ -193,7 +206,9 @@ function buildWealthPlanningView() {
     + '<div style="margin-bottom:16px;opacity:.6"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>'
     + '<div class="empty-title" style="font-size:16px;margin-bottom:8px">Selecione um cliente acima</div>'
     + '<div style="font-size:13px;color:var(--text3);max-width:400px;margin:0 auto;line-height:1.6">Busque e selecione um cliente para visualizar e gerenciar o Wealth Planning como se fosse o portal do cliente.</div>'
-    + '</div></div></div>';
+    + '</div></div>'
+    + '</div>' // end wp-panel-planejamento
+    + '</div>'; // end page-content
   mainContent.appendChild(div);
 
   // Fechar dropdown ao clicar fora
@@ -349,6 +364,24 @@ function wpClearCliente() {
   }
 }
 
+// ── Top-level tab switch (Meus Clientes vs Planejamento) ──
+var wpCurrentTopTab = 'meus-clientes';
+function wpSwitchTopTab(tab) {
+  wpCurrentTopTab = tab;
+  document.querySelectorAll('.wp-top-tab').forEach(function(b) {
+    var isActive = b.getAttribute('data-toptab') === tab;
+    b.style.fontWeight = isActive ? '600' : '400';
+    b.style.color = isActive ? 'var(--blue)' : 'var(--text3)';
+    b.style.borderBottom = isActive ? '2px solid var(--blue)' : '2px solid transparent';
+    if (isActive) b.classList.add('active'); else b.classList.remove('active');
+  });
+  var panelMC = document.getElementById('wp-panel-meus-clientes');
+  var panelPlan = document.getElementById('wp-panel-planejamento');
+  if (panelMC) panelMC.style.display = tab === 'meus-clientes' ? '' : 'none';
+  if (panelPlan) panelPlan.style.display = tab === 'planejamento' ? '' : 'none';
+  if (tab === 'meus-clientes') wpRenderMeusClientes();
+}
+
 // ── Load Wealth Planning (admin/gestor) ──────────────────
 function loadWealthPlanning() {
   if (!document.getElementById('view-wealth-planning')) {
@@ -356,7 +389,11 @@ function loadWealthPlanning() {
   }
   // Pré-carregar cache de clientes assim que o WP abre
   wpLoadClientesCache();
-  // Se já tinha um cliente selecionado, recarregar
+  // Renderizar dashboard Meus Clientes se estiver na aba
+  if (wpCurrentTopTab === 'meus-clientes') {
+    wpRenderMeusClientes();
+  }
+  // Se já tinha um cliente selecionado no planejamento, recarregar
   if (wpSelectedClienteId) {
     wpSelectCliente(wpSelectedClienteId);
   }
@@ -3096,4 +3133,381 @@ function wpDeletePrevidencia(clienteId, prevId) {
     var container = document.getElementById('wp-modules-content');
     if (container) wpRenderPrevidencia(container, clienteId, wpIsAdminView);
   }).catch(function(e) { alert('Erro: ' + e.message); });
+}
+
+// ═══════════════════════════════════════════════════════════
+// MEUS CLIENTES — Dashboard consolidado para consultores
+// Visível apenas para adm/gestor
+// ═══════════════════════════════════════════════════════════
+
+var wpMCFilterConsultor = '';
+var wpMCClientesData = []; // enriched client data with ativos status
+
+function wpRenderMeusClientes() {
+  var panel = document.getElementById('wp-panel-meus-clientes');
+  if (!panel) return;
+
+  // Only for adm/gestor
+  if (typeof currentPerfil !== 'undefined' && currentPerfil === 'cliente') {
+    panel.innerHTML = '';
+    return;
+  }
+
+  if (!wpClientesCacheReady) {
+    panel.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Carregando dados dos clientes...</div>';
+    setTimeout(wpRenderMeusClientes, 500);
+    return;
+  }
+
+  // Filter only consultoria clients
+  var consultoriaClientes = wpClientesCache.filter(function(c) {
+    return clienteTemConsultoria(c);
+  });
+
+  // Extract unique consultores
+  var consultores = [];
+  var consultorMap = {};
+  consultoriaClientes.forEach(function(c) {
+    var cons = c.responsavelConsultoria || 'Não atribuído';
+    if (!consultorMap[cons]) {
+      consultorMap[cons] = { nome: cons, clientes: 0, patrimonio: 0 };
+      consultores.push(consultorMap[cons]);
+    }
+    consultorMap[cons].clientes++;
+    consultorMap[cons].patrimonio += (c.patrimonio || 0);
+  });
+
+  // Apply filter
+  var filtered = consultoriaClientes;
+  if (wpMCFilterConsultor) {
+    filtered = consultoriaClientes.filter(function(c) {
+      return (c.responsavelConsultoria || 'Não atribuído') === wpMCFilterConsultor;
+    });
+  }
+
+  // Calculate KPIs
+  var totalPatrimonio = 0;
+  var totalClientes = filtered.length;
+  var bancoMap = {};
+  var semContato30d = 0;
+
+  filtered.forEach(function(c) {
+    totalPatrimonio += (c.patrimonio || 0);
+    var banco = c.banco || 'Não informado';
+    if (!bancoMap[banco]) bancoMap[banco] = { clientes: 0, patrimonio: 0 };
+    bancoMap[banco].clientes++;
+    bancoMap[banco].patrimonio += (c.patrimonio || 0);
+    // Check ultimo contato > 30 dias
+    if (wpDaysSince(c.ultimoContato) > 30) semContato30d++;
+  });
+
+  var aumMedio = totalClientes > 0 ? totalPatrimonio / totalClientes : 0;
+
+  // Build HTML
+  var html = '';
+
+  // ── Filter bar ──
+  html += '<div class="card" style="margin-bottom:16px;padding:12px 16px">'
+    + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
+    + '<label style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap">Consultor:</label>'
+    + '<select id="wp-mc-filter-cons" onchange="wpMCFilterConsultor=this.value;wpRenderMeusClientes()" class="form-input" style="max-width:240px">'
+    + '<option value="">Todos os consultores</option>';
+  consultores.forEach(function(cons) {
+    html += '<option value="' + cons.nome + '"' + (wpMCFilterConsultor === cons.nome ? ' selected' : '') + '>' + cons.nome + ' (' + cons.clientes + ' clientes)</option>';
+  });
+  html += '</select>'
+    + '<div style="margin-left:auto;font-size:12px;color:var(--text3)">' + totalClientes + ' clientes de consultoria</div>'
+    + '</div></div>';
+
+  // ── KPI cards ──
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px">'
+    + wpMCKpiCard('Patrimônio Total (AUM)', wpFmtMoeda(totalPatrimonio), 'var(--blue)', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>')
+    + wpMCKpiCard('Clientes Ativos', totalClientes + '', 'var(--pos)', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>')
+    + wpMCKpiCard('AUM Médio / Cliente', wpFmtMoeda(aumMedio), '#a78bfa', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>')
+    + wpMCKpiCard('Sem Contato +30d', semContato30d + '', semContato30d > 0 ? 'var(--neg)' : 'var(--pos)', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>')
+    + '</div>';
+
+  // ── Consultores breakdown (only when showing all) ──
+  if (!wpMCFilterConsultor && consultores.length > 1) {
+    html += '<div style="display:grid;grid-template-columns:repeat(' + Math.min(consultores.length, 3) + ',1fr);gap:14px;margin-bottom:16px">';
+    consultores.forEach(function(cons) {
+      var initial = (cons.nome || '?').charAt(0).toUpperCase();
+      html += '<div class="card" style="padding:16px;cursor:pointer;transition:all .15s" onclick="wpMCFilterConsultor=\'' + cons.nome.replace(/'/g, "\\'") + '\';wpRenderMeusClientes()" onmouseover="this.style.borderColor=\'var(--blue)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+        + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+        + '<div style="width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">' + initial + '</div>'
+        + '<div><div style="font-size:14px;font-weight:600;color:var(--white)">' + cons.nome + '</div>'
+        + '<div style="font-size:12px;color:var(--text3)">' + cons.clientes + ' clientes</div></div></div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-bottom:4px">Patrimônio sob gestão</div>'
+        + '<div style="font-size:18px;font-weight:700;color:var(--blue)">' + wpFmtMoeda(cons.patrimonio) + '</div>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // ── Corretoras breakdown ──
+  var bancos = Object.keys(bancoMap).sort(function(a, b) { return bancoMap[b].patrimonio - bancoMap[a].patrimonio; });
+  if (bancos.length > 0) {
+    html += '<div class="card" style="margin-bottom:16px;padding:16px">'
+      + '<div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:12px">Distribuição por Corretora / Banco</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">';
+    bancos.forEach(function(banco) {
+      var b = bancoMap[banco];
+      var pct = totalPatrimonio > 0 ? Math.round(b.patrimonio / totalPatrimonio * 100) : 0;
+      html += '<div style="background:var(--border);border-radius:var(--radius-sm);padding:12px">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--white);margin-bottom:4px">' + banco + '</div>'
+        + '<div style="font-size:11px;color:var(--text3)">' + b.clientes + ' clientes · ' + pct + '%</div>'
+        + '<div style="font-size:15px;font-weight:700;color:var(--blue);margin-top:4px">' + wpFmtMoeda(b.patrimonio) + '</div>'
+        + '<div style="height:4px;background:var(--card);border-radius:2px;margin-top:6px"><div style="height:4px;background:var(--blue);border-radius:2px;width:' + pct + '%"></div></div>'
+        + '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // ── Clients table ──
+  html += '<div class="card" style="padding:0;overflow:hidden">'
+    + '<div style="padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between">'
+    + '<div style="font-size:13px;font-weight:600;color:var(--white)">Lista de Clientes</div>'
+    + '<div style="display:flex;gap:8px;align-items:center">'
+    + '<input class="form-input" id="wp-mc-search" placeholder="Buscar cliente..." oninput="wpMCFilterTable()" style="max-width:200px;font-size:12px;padding:6px 10px">'
+    + '</div></div>'
+    + '<div style="overflow-x:auto">'
+    + '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    + '<thead><tr style="background:var(--border)">'
+    + '<th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap">Cliente</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap">Consultor</th>'
+    + '<th style="padding:10px 14px;text-align:right;font-weight:600;color:var(--text2);white-space:nowrap">Patrimônio</th>'
+    + '<th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--text2);white-space:nowrap">Carteira</th>'
+    + '<th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--text2);white-space:nowrap">Último Contato</th>'
+    + '<th style="padding:10px 14px;text-align:center;font-weight:600;color:var(--text2);white-space:nowrap">Ações</th>'
+    + '</tr></thead>'
+    + '<tbody id="wp-mc-tbody">';
+
+  // Sort by patrimonio desc
+  filtered.sort(function(a, b) { return (b.patrimonio || 0) - (a.patrimonio || 0); });
+
+  filtered.forEach(function(c) {
+    var dias = wpDaysSince(c.ultimoContato);
+    var contatoColor = dias > 60 ? 'var(--neg)' : (dias > 30 ? '#d4a017' : 'var(--pos)');
+    var contatoText = c.ultimoContato ? wpFormatDateBR(c.ultimoContato) : 'Nunca';
+    var diasText = c.ultimoContato ? ' (' + dias + 'd)' : '';
+    var initial = (c.nome || '?').charAt(0).toUpperCase();
+    var consultor = c.responsavelConsultoria || 'Não atribuído';
+
+    html += '<tr class="wp-mc-row" data-nome="' + (c.nome || '').toLowerCase() + '" style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
+      + '<td style="padding:10px 14px"><div style="display:flex;align-items:center;gap:10px">'
+      + '<div style="width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0">' + initial + '</div>'
+      + '<div><div style="font-weight:600;color:var(--white);white-space:nowrap">' + (c.nome || 'Sem nome') + '</div>'
+      + '<div style="font-size:11px;color:var(--text3)">' + (c.email || '') + '</div></div></div></td>'
+      + '<td style="padding:10px 14px;color:var(--text2)">' + consultor + '</td>'
+      + '<td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--white);font-variant-numeric:tabular-nums">' + wpFmtMoeda(c.patrimonio || 0) + '</td>'
+      + '<td style="padding:10px 14px;text-align:center">'
+      + ((c.patrimonio || 0) > 0
+        ? '<span style="font-size:10px;background:var(--pos);color:#000;padding:2px 8px;border-radius:10px;font-weight:600">Preenchida</span>'
+        : '<span style="font-size:10px;background:var(--neg);color:#fff;padding:2px 8px;border-radius:10px;font-weight:600">Pendente</span>')
+      + '</td>'
+      + '<td style="padding:10px 14px;text-align:center;white-space:nowrap">'
+      + '<span style="color:' + contatoColor + ';font-weight:500">' + contatoText + '</span>'
+      + '<span style="font-size:10px;color:var(--text3)">' + diasText + '</span></td>'
+      + '<td style="padding:10px 14px;text-align:center;white-space:nowrap">'
+      + '<button onclick="wpMCOpenContato(\'' + c.id + '\',\'' + (c.nome || '').replace(/'/g, "\\'") + '\')" style="border:none;background:var(--blue);color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;margin-right:4px" title="Registrar contato">Contato</button>'
+      + '<button onclick="wpMCViewHistorico(\'' + c.id + '\',\'' + (c.nome || '').replace(/'/g, "\\'") + '\')" style="border:none;background:var(--border);color:var(--white);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500" title="Ver histórico">Histórico</button>'
+      + '</td></tr>';
+  });
+
+  html += '</tbody></table></div></div>';
+
+  panel.innerHTML = html;
+
+  // Async: check which clients have ativos filled
+  wpMCCheckAtivos(filtered);
+}
+
+function wpMCKpiCard(label, value, color, icon) {
+  return '<div class="card" style="padding:16px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    + '<div style="color:' + color + ';opacity:.7">' + icon + '</div>'
+    + '<div style="font-size:12px;color:var(--text3);font-weight:400">' + label + '</div></div>'
+    + '<div style="font-family:Inter,sans-serif;font-size:20px;font-weight:700;color:' + color + '">' + value + '</div>'
+    + '</div>';
+}
+
+function wpDaysSince(dateStr) {
+  if (!dateStr) return 999;
+  var parts = dateStr.split('-');
+  if (parts.length !== 3) return 999;
+  var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  var now = new Date();
+  return Math.floor((now - d) / (1000 * 60 * 60 * 24));
+}
+
+function wpFormatDateBR(dateStr) {
+  if (!dateStr) return '';
+  var parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+
+function wpMCFilterTable() {
+  var q = (document.getElementById('wp-mc-search') || {}).value || '';
+  q = q.toLowerCase().trim();
+  var rows = document.querySelectorAll('.wp-mc-row');
+  rows.forEach(function(row) {
+    var nome = row.getAttribute('data-nome') || '';
+    row.style.display = (!q || nome.indexOf(q) >= 0) ? '' : 'none';
+  });
+}
+
+// Async check which clients have ativos (to show accurate "Carteira" status)
+function wpMCCheckAtivos(clientes) {
+  if (!clientes || !clientes.length) return;
+  clientes.forEach(function(c) {
+    db.collection('clientes').doc(c.id).collection('ativos').limit(1).get().then(function(snap) {
+      // Already has patrimonio > 0 from sync — only update if ativos exist but patrimonio is 0
+      if (snap.size > 0 && (c.patrimonio || 0) === 0) {
+        // Client has ativos but patrimonio wasn't synced — mark as filled
+        var rows = document.querySelectorAll('.wp-mc-row');
+        rows.forEach(function(row) {
+          if (row.getAttribute('data-nome') === (c.nome || '').toLowerCase()) {
+            var badge = row.querySelectorAll('td')[3];
+            if (badge) badge.innerHTML = '<span style="font-size:10px;background:var(--pos);color:#000;padding:2px 8px;border-radius:10px;font-weight:600">Preenchida</span>';
+          }
+        });
+      }
+    }).catch(function() {});
+  });
+}
+
+// ── Registrar Contato (modal) ────────────────────────────
+function wpMCOpenContato(clienteId, clienteNome) {
+  // Remove existing modal if any
+  var old = document.getElementById('wp-mc-modal-contato');
+  if (old) old.remove();
+
+  var today = new Date();
+  var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+  var modal = document.createElement('div');
+  modal.id = 'wp-mc-modal-contato';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:24px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
+    + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">Registrar Contato</div>'
+    + '<button onclick="document.getElementById(\'wp-mc-modal-contato\').remove()" style="border:none;background:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px">&times;</button></div>'
+    + '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Cliente: <strong style="color:var(--white)">' + clienteNome + '</strong></div>'
+    + '<div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Data do Contato</label>'
+    + '<input class="form-input" type="date" id="wp-mc-ct-data" value="' + todayStr + '" style="width:100%"></div>'
+    + '<div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Tipo</label>'
+    + '<select class="form-input" id="wp-mc-ct-tipo" style="width:100%">'
+    + '<option value="Reunião">Reunião</option><option value="Ligação">Ligação</option>'
+    + '<option value="WhatsApp">WhatsApp</option><option value="Email">Email</option>'
+    + '<option value="Presencial">Presencial</option></select></div>'
+    + '<div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Resumo da conversa</label>'
+    + '<textarea class="form-input" id="wp-mc-ct-texto" rows="4" placeholder="O que foi discutido neste contato..." style="width:100%;resize:vertical"></textarea></div>'
+    + '<div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px">Próximo contato (opcional)</label>'
+    + '<input class="form-input" type="date" id="wp-mc-ct-proximo" style="width:100%"></div>'
+    + '<div style="display:flex;gap:8px;justify-content:flex-end">'
+    + '<button onclick="document.getElementById(\'wp-mc-modal-contato\').remove()" style="border:1px solid var(--border);background:var(--card);color:var(--text2);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px">Cancelar</button>'
+    + '<button onclick="wpMCSaveContato(\'' + clienteId + '\')" style="border:none;background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">Salvar</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+}
+
+function wpMCSaveContato(clienteId) {
+  var texto = (document.getElementById('wp-mc-ct-texto') || {}).value || '';
+  texto = texto.trim();
+  if (!texto) { alert('Informe o resumo do contato.'); return; }
+
+  var dataContato = (document.getElementById('wp-mc-ct-data') || {}).value || '';
+  var tipo = (document.getElementById('wp-mc-ct-tipo') || {}).value || 'Reunião';
+  var proximo = (document.getElementById('wp-mc-ct-proximo') || {}).value || '';
+
+  // Get current user name for author
+  var autor = '';
+  if (typeof currentUserData !== 'undefined' && currentUserData) {
+    autor = currentUserData.nome || currentUserData.email || '';
+  }
+
+  var data = {
+    data: dataContato,
+    tipo: tipo,
+    texto: texto,
+    proximoContato: proximo,
+    autor: autor,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  // Save to contatos subcollection
+  db.collection('clientes').doc(clienteId).collection('contatos').add(data).then(function() {
+    // Update ultimoContato on client doc
+    var upd = { ultimoContato: dataContato };
+    if (proximo) upd.proximoContato = proximo;
+    db.collection('clientes').doc(clienteId).update(upd);
+
+    // Update local cache
+    var cached = wpClientesCache.find(function(c) { return c.id === clienteId; });
+    if (cached) {
+      cached.ultimoContato = dataContato;
+      if (proximo) cached.proximoContato = proximo;
+    }
+
+    // Close modal and refresh
+    var modal = document.getElementById('wp-mc-modal-contato');
+    if (modal) modal.remove();
+    wpRenderMeusClientes();
+  }).catch(function(e) { alert('Erro ao salvar contato: ' + e.message); });
+}
+
+// ── Ver Histórico de Contatos ────────────────────────────
+function wpMCViewHistorico(clienteId, clienteNome) {
+  var old = document.getElementById('wp-mc-modal-hist');
+  if (old) old.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'wp-mc-modal-hist';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
+    + '<div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;color:var(--white)">Histórico de Contatos</div>'
+    + '<button onclick="document.getElementById(\'wp-mc-modal-hist\').remove()" style="border:none;background:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px">&times;</button></div>'
+    + '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Cliente: <strong style="color:var(--white)">' + clienteNome + '</strong></div>'
+    + '<div id="wp-mc-hist-list" style="color:var(--text3);font-size:13px">Carregando...</div>'
+    + '<div style="margin-top:16px;text-align:right">'
+    + '<button onclick="document.getElementById(\'wp-mc-modal-hist\').remove();wpMCOpenContato(\'' + clienteId + '\',\'' + clienteNome.replace(/'/g, "\\'") + '\')" style="border:none;background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">+ Novo Contato</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+
+  // Load contacts
+  db.collection('clientes').doc(clienteId).collection('contatos').orderBy('data', 'desc').limit(30).get().then(function(snap) {
+    var list = document.getElementById('wp-mc-hist-list');
+    if (!list) return;
+    if (snap.empty) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3)">Nenhum contato registrado para este cliente.</div>';
+      return;
+    }
+    var html = '';
+    snap.forEach(function(d) {
+      var ct = d.data();
+      var dataFmt = wpFormatDateBR(ct.data);
+      var tipoIcon = ct.tipo === 'Reunião' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'
+        : ct.tipo === 'Ligação' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+
+      html += '<div style="border-left:3px solid var(--blue);padding:12px 16px;margin-bottom:10px;background:var(--border);border-radius:0 var(--radius-sm) var(--radius-sm) 0">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+        + '<span style="color:var(--blue)">' + tipoIcon + '</span>'
+        + '<span style="font-weight:600;color:var(--white);font-size:12px">' + (ct.tipo || 'Contato') + '</span>'
+        + '<span style="font-size:11px;color:var(--text3)">' + dataFmt + '</span>'
+        + (ct.autor ? '<span style="font-size:10px;color:var(--text3);margin-left:auto">por ' + ct.autor + '</span>' : '')
+        + '</div>'
+        + '<div style="font-size:13px;color:var(--text2);line-height:1.5;white-space:pre-wrap">' + (ct.texto || '').replace(/</g, '&lt;') + '</div>'
+        + (ct.proximoContato ? '<div style="font-size:11px;color:var(--text3);margin-top:6px">Próximo contato: ' + wpFormatDateBR(ct.proximoContato) + '</div>' : '')
+        + '</div>';
+    });
+    list.innerHTML = html;
+  }).catch(function(e) {
+    var list = document.getElementById('wp-mc-hist-list');
+    if (list) list.innerHTML = '<div style="color:var(--neg)">Erro ao carregar: ' + e.message + '</div>';
+  });
 }
