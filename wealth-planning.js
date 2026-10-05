@@ -74,17 +74,27 @@ if (typeof PERFIL_MENUS !== 'undefined') {
     wpSection.className = 'nav-section';
     wpSection.textContent = 'Wealth Planning';
 
+    // Botão Meus Clientes
+    var wpBtnMC = document.createElement('button');
+    wpBtnMC.className = 'nav-item';
+    wpBtnMC.id = 'nav-wp-mc';
+    wpBtnMC.innerHTML = '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Meus Clientes</span>';
+    wpBtnMC.onclick = function() { wpCurrentTopTab='meus-clientes'; showView('wealth-planning', wpBtnMC); };
+
+    // Botão Planejamento
     var wpBtn = document.createElement('button');
     wpBtn.className = 'nav-item';
     wpBtn.id = 'nav-wp';
     wpBtn.innerHTML = '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span><span>Planejamento</span>';
-    wpBtn.onclick = function() { showView('wealth-planning', wpBtn); };
+    wpBtn.onclick = function() { wpCurrentTopTab='planejamento'; showView('wealth-planning', wpBtn); };
 
     if (ferramentasSection) {
       nav.insertBefore(wpSection, ferramentasSection);
+      nav.insertBefore(wpBtnMC, ferramentasSection);
       nav.insertBefore(wpBtn, ferramentasSection);
     } else {
       nav.appendChild(wpSection);
+      nav.appendChild(wpBtnMC);
       nav.appendChild(wpBtn);
     }
   }
@@ -389,12 +399,10 @@ function loadWealthPlanning() {
   }
   // Pré-carregar cache de clientes assim que o WP abre
   wpLoadClientesCache();
-  // Renderizar dashboard Meus Clientes se estiver na aba
-  if (wpCurrentTopTab === 'meus-clientes') {
-    wpRenderMeusClientes();
-  }
+  // Sincronizar a aba ativa
+  wpSwitchTopTab(wpCurrentTopTab);
   // Se já tinha um cliente selecionado no planejamento, recarregar
-  if (wpSelectedClienteId) {
+  if (wpSelectedClienteId && wpCurrentTopTab === 'planejamento') {
     wpSelectCliente(wpSelectedClienteId);
   }
 }
