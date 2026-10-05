@@ -3151,6 +3151,19 @@ function wpDeletePrevidencia(clienteId, prevId) {
 var wpMCFilterConsultor = '';
 var wpMCClientesData = []; // enriched client data with ativos status
 
+// Build map: clienteId → consultor nome from global consultores array
+function wpMCGetConsultorMap() {
+  var map = {};
+  if (typeof consultores !== 'undefined' && Array.isArray(consultores)) {
+    consultores.forEach(function(ct) {
+      (ct.clientesVinculados || []).forEach(function(v) {
+        map[v.id] = ct.nome;
+      });
+    });
+  }
+  return map;
+}
+
 function wpRenderMeusClientes() {
   var panel = document.getElementById('wp-panel-meus-clientes');
   if (!panel) return;
@@ -3172,24 +3185,27 @@ function wpRenderMeusClientes() {
     return clienteTemConsultoria(c);
   });
 
-  // Extract unique consultores
-  var consultores = [];
-  var consultorMap = {};
+  // Build client→consultant lookup from consultores collection
+  var cliConsMap = wpMCGetConsultorMap();
+
+  // Extract unique consultores for this view
+  var consListView = [];
+  var consultorMapView = {};
   consultoriaClientes.forEach(function(c) {
-    var cons = c.responsavelConsultoria || 'Não atribuído';
-    if (!consultorMap[cons]) {
-      consultorMap[cons] = { nome: cons, clientes: 0, patrimonio: 0 };
-      consultores.push(consultorMap[cons]);
+    var cons = cliConsMap[c.id] || 'Não atribuído';
+    if (!consultorMapView[cons]) {
+      consultorMapView[cons] = { nome: cons, clientes: 0, patrimonio: 0 };
+      consListView.push(consultorMapView[cons]);
     }
-    consultorMap[cons].clientes++;
-    consultorMap[cons].patrimonio += (c.patrimonio || 0);
+    consultorMapView[cons].clientes++;
+    consultorMapView[cons].patrimonio += (c.patrimonio || 0);
   });
 
   // Apply filter
   var filtered = consultoriaClientes;
   if (wpMCFilterConsultor) {
     filtered = consultoriaClientes.filter(function(c) {
-      return (c.responsavelConsultoria || 'Não atribuído') === wpMCFilterConsultor;
+      return (cliConsMap[c.id] || 'Não atribuído') === wpMCFilterConsultor;
     });
   }
 
@@ -3220,7 +3236,7 @@ function wpRenderMeusClientes() {
     + '<label style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap">Consultor:</label>'
     + '<select id="wp-mc-filter-cons" onchange="wpMCFilterConsultor=this.value;wpRenderMeusClientes()" class="form-input" style="max-width:240px">'
     + '<option value="">Todos os consultores</option>';
-  consultores.forEach(function(cons) {
+  consListView.forEach(function(cons) {
     html += '<option value="' + cons.nome + '"' + (wpMCFilterConsultor === cons.nome ? ' selected' : '') + '>' + cons.nome + ' (' + cons.clientes + ' clientes)</option>';
   });
   html += '</select>'
@@ -3236,9 +3252,9 @@ function wpRenderMeusClientes() {
     + '</div>';
 
   // ── Consultores breakdown (only when showing all) ──
-  if (!wpMCFilterConsultor && consultores.length > 1) {
-    html += '<div style="display:grid;grid-template-columns:repeat(' + Math.min(consultores.length, 3) + ',1fr);gap:14px;margin-bottom:16px">';
-    consultores.forEach(function(cons) {
+  if (!wpMCFilterConsultor && consListView.length > 1) {
+    html += '<div style="display:grid;grid-template-columns:repeat(' + Math.min(consListView.length, 3) + ',1fr);gap:14px;margin-bottom:16px">';
+    consListView.forEach(function(cons) {
       var initial = (cons.nome || '?').charAt(0).toUpperCase();
       html += '<div class="card" style="padding:16px;cursor:pointer;transition:all .15s" onclick="wpMCFilterConsultor=\'' + cons.nome.replace(/'/g, "\\'") + '\';wpRenderMeusClientes()" onmouseover="this.style.borderColor=\'var(--blue)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
         + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
@@ -3299,7 +3315,7 @@ function wpRenderMeusClientes() {
     var contatoText = c.ultimoContato ? wpFormatDateBR(c.ultimoContato) : 'Nunca';
     var diasText = c.ultimoContato ? ' (' + dias + 'd)' : '';
     var initial = (c.nome || '?').charAt(0).toUpperCase();
-    var consultor = c.responsavelConsultoria || 'Não atribuído';
+    var consultor = cliConsMap[c.id] || 'Não atribuído';
 
     html += '<tr class="wp-mc-row" data-nome="' + (c.nome || '').toLowerCase() + '" style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--border)\'" onmouseout="this.style.background=\'transparent\'">'
       + '<td style="padding:10px 14px"><div style="display:flex;align-items:center;gap:10px">'

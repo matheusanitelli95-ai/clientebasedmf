@@ -614,6 +614,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="sidebar-nav">
       <div class="nav-section">Principal</div>
       <button class="nav-item active" onclick="showView('clientes',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></button>
+      <button class="nav-item" onclick="showView('consultores',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Consultores</span></button>
       <div class="nav-section">Empresa</div>
       <button class="nav-item" onclick="showView('financeiro',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Financeiro</span></button>
       <button class="nav-item" onclick="showView('profissionais',this)"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></span><span>Profissionais</span></button>
@@ -680,7 +681,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <div class="charts-grid">
           <div class="card"><div class="section-title">Custódia por Objetivo</div><canvas id="chart-pie" height="200"></canvas></div>
-          <div class="card"><div class="section-title">Custódia por Profissional</div><canvas id="chart-bar" height="200"></canvas></div>
+          <div class="card"><div class="section-title">Custódia por Consultor</div><canvas id="chart-bar" height="200"></canvas></div>
         </div>
         <div class="grid-2" style="margin-bottom:16px">
           <div class="card"><div class="section-title">Por Status</div><div id="status-bars"></div></div>
@@ -706,7 +707,6 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="table-toolbar">
           <input class="filter-input" id="search-cli" placeholder="Buscar nome ou CPF..." oninput="renderClientes()" style="min-width:200px">
           <select class="filter-input" id="filter-cli-status" onchange="renderClientes()"><option value="">Todos os status</option><option>Ativo</option><option>Inativo</option><option>Prospecto</option></select>
-          <select class="filter-input" id="filter-cli-prof" onchange="renderClientes()"><option value="">Todos os profissionais</option></select>
           <select class="filter-input" id="filter-cli-srv" onchange="renderClientes()"><option value="">Todos os serviços</option><option value="consultoria">Consultoria</option><option value="black">Black</option><option value="vitalicio">Vitalício</option><option value="socio">Sócio</option></select>
         </div>
         <div id="bulk-toolbar" style="display:none;background:var(--blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;display:none;align-items:center;gap:16px">
@@ -733,14 +733,13 @@ textarea.form-input{resize:vertical;min-height:80px}
             <thead><tr>
               <th onclick="sortClientes('nome')">Nome ↕</th>
               <th>Nível</th>
-              <th onclick="sortClientes('responsavel')">Profissional</th>
               <th onclick="sortClientes('objetivo')">Objetivo</th>
               <th onclick="sortClientes('perfil')">Perfil</th>
               <th onclick="sortClientes('patrimonio')">Patrimônio ↕</th>
               <th onclick="sortClientes('status')">Status</th>
               <th>Ações</th>
             </tr></thead>
-            <tbody id="table-clientes"><tr><td colspan="8" style="text-align:center;padding:48px;color:var(--text3)">Carregando...</td></tr></tbody>
+            <tbody id="table-clientes"><tr><td colspan="7" style="text-align:center;padding:48px;color:var(--text3)">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -781,6 +780,17 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="page-content">
         <div id="prof-grid" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+    </div>
+
+    <!-- CONSULTORES -->
+    <div class="view" id="view-consultores">
+      <div class="page-header">
+        <div><div class="page-title">Consultores</div><div class="page-sub">Gestão dos consultores DMF</div></div>
+        <button class="btn-primary" onclick="openModalConsultor(null)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Consultor</button>
+      </div>
+      <div class="page-content">
+        <div id="consultores-grid" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
     </div>
 
@@ -1886,16 +1896,6 @@ textarea.form-input{resize:vertical;min-height:80px}
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="fc-isSocio" style="accent-color:var(--blue);width:16px;height:16px"> Sócio</label>
           </div>
         </div>
-        <!-- Responsável Consultoria -->
-        <div class="form-group" id="fc-resp-cons-wrap">
-          <label>Responsável — Consultoria</label>
-          <select class="form-input" id="fc-prof-cons"><option value="">Selecione...</option></select>
-        </div>
-        <!-- Responsável Black -->
-        <div class="form-group" id="fc-resp-black-wrap">
-          <label>Responsável — DMF Black</label>
-          <select class="form-input" id="fc-prof-black"><option value="">Selecione...</option></select>
-        </div>
       </div>
     </div>
 
@@ -1982,6 +1982,31 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modal-prof')">Cancelar</button>
       <button class="btn-primary" onclick="saveProfissional()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONSULTOR -->
+<div class="modal-overlay" id="modal-consultor" style="display:none" onclick="if(event.target===this)closeModal('modal-consultor')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-consultor-title">Novo Consultor</div>
+      <button class="modal-close" onclick="closeModal('modal-consultor')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group form-full"><label>Nome completo *</label><input class="form-input" id="fc2-nome" placeholder="Nome do consultor"></div>
+      <div class="form-group"><label>E-mail</label><input class="form-input" id="fc2-email" type="email" placeholder="email@dmfinvestimentos.com"></div>
+      <div class="form-group"><label>Telefone</label><input class="form-input" id="fc2-tel" placeholder="(11) 99999-9999"></div>
+      <div class="form-group"><label>Especialidade</label><input class="form-input" id="fc2-especialidade" placeholder="Ex: Renda Fixa, Wealth Planning"></div>
+      <div class="form-group form-full"><label>Link do Calendly</label><input class="form-input" id="fc2-calendly" placeholder="https://calendly.com/..."></div>
+      <div class="form-group form-full">
+        <label>Clientes vinculados</label>
+        <div id="fc2-clientes-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modal-consultor')">Cancelar</button>
+      <button class="btn-primary" onclick="saveConsultor()">Salvar</button>
     </div>
   </div>
 </div>
@@ -2998,7 +3023,7 @@ function _debouncedDashRender(){
 function loadData(){
   db.collection('profissionais').onSnapshot(function(snap){
     profissionais=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
-    updateProfSelect();renderProfissionais();
+    renderProfissionais();
   });
   db.collection('clientes').onSnapshot(function(snap){
     clientes=snap.docs.map(function(d){
@@ -3009,6 +3034,7 @@ function loadData(){
     }).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
     _debouncedDashRender();
   });
+  loadConsultores();
 }
 
 // NAV
@@ -3128,7 +3154,6 @@ function nivelBadge(c){
 function renderClientes(){
   var s=document.getElementById('search-cli').value.toLowerCase();
   var fs=document.getElementById('filter-cli-status').value;
-  var fp=document.getElementById('filter-cli-prof').value;
   var fsr=document.getElementById('filter-cli-srv').value;
   var f=clientes.filter(function(c){
     var srvOk=true;
@@ -3147,17 +3172,17 @@ function renderClientes(){
       }
     }
     return(!s||(c.nome||'').toLowerCase().includes(s)||(c.cpf||'').includes(s))
-      &&(!fs||c.status===fs)&&(!fp||c.responsavel===fp)&&srvOk;
+      &&(!fs||c.status===fs)&&srvOk;
   }).sort(function(a,b){
     var va=a[cliSortCol],vb=b[cliSortCol];
     return typeof va==='number'?(cliSortAsc?va-vb:vb-va):(cliSortAsc?String(va||'').localeCompare(String(vb||'')):String(vb||'').localeCompare(String(va||'')));
   });
   var tb=document.getElementById('table-clientes');
-  if(!f.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Nenhum cliente encontrado</td></tr>';return;}
+  if(!f.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:60px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Nenhum cliente encontrado</td></tr>';return;}
   tb.innerHTML=f.map(function(c){
     var sc=STATUS_C[c.status]||'#424242';
     var pat=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
-    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+(c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td style="font-size:13px">'+(c.responsavel||'—')+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:Inter,sans-serif;font-size:13px;color:var(--pos);font-weight:500">'+fmtFull(pat)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
+    return'<tr onclick="openClienteDetalhe(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:10px;background:'+avColor(c.nome)+';display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">'+initials(c.nome)+'</div><div><div style="font-weight:600;color:var(--white);font-size:13px">'+(c.nome||'—')+'</div><div style="font-size:11px;color:var(--text3)">'+(c.email||c.telefone||'')+'</div></div></div></td><td>'+nivelBadge(c)+'</td><td><span style="font-size:11px;padding:2px 8px;border-radius:12px;background:'+(OBJ_C[c.objetivo]||'#424242')+'22;color:'+(OBJ_C[c.objetivo]||'#999999')+'">'+(c.objetivo||'—')+'</span></td><td style="font-size:12px;color:var(--text3)">'+(c.perfil||'—')+'</td><td style="font-family:Inter,sans-serif;font-size:13px;color:var(--pos);font-weight:500">'+fmtFull(pat)+'</td><td><span class="badge" style="background:'+sc+'22;color:'+sc+'">'+(c.status||'—')+'</span></td><td onclick="event.stopPropagation()"><div style="display:flex;gap:6px"><button class="btn-ghost" onclick="openModalCliente(\''+c.id+'\')">'+icon('edit')+'</button><button class="btn-dsm" onclick="confirmDelete(function(){deleteCliente(\''+c.id+'\')})">'+icon('trash')+'</button></div></td></tr>';
   }).join('');
 }
 
@@ -3171,11 +3196,7 @@ function openClienteDetalhe(id){
   document.getElementById('btn-back-clientes').onclick=function(){showView('clientes',document.querySelectorAll('.nav-item')[1]);};
   db.collection('clientes').doc(id).update({ultimoContato:today()}).catch(function(){});
   var patrimonio=c.patrimonio||(c.custodiaRF||0)+(c.custodiaRV||0);
-  var respCons=c.responsavelConsultoria||'';
-  var respBlack=c.responsavelBlack||'';
   document.getElementById('client-header-card').innerHTML='<div style="display:flex;align-items:center;gap:20px"><div class="client-avatar" style="background:'+avColor(c.nome)+'">'+initials(c.nome)+'</div><div style="flex:1"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:800;color:var(--white)">'+c.nome+'</h2>'+nivelBadge(c)+'</div><div style="display:flex;gap:16px;flex-wrap:wrap">'
-    +(respCons?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Consultoria: '+respCons+'</span>':'')
-    +(respBlack&&respBlack!==respCons?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Black: '+respBlack+'</span>':(!respCons&&c.responsavel?'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg> '+c.responsavel+'</span>':''))
     +'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> '+(c.objetivo||'N/A')+'</span>'
     +'<span class="client-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> '+(c.perfil||'N/A')+'</span>'
     +'<span class="client-meta-item" style="color:var(--blue)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> '+(c.banco||'N/A')+'</span>'
@@ -3347,7 +3368,6 @@ function openModalCliente(id){
   document.getElementById('fc-estado-civil').value=c?c.estadoCivil||'':'';
   document.getElementById('fc-regime-bens').value=c?c.regimeBens||'':'';
   document.getElementById('fc-dependentes').value=c?c.dependentes||'':'';
-  updateProfSelect(c?c.responsavelConsId:'', c?c.responsavelBlackId:'');
   toggleResp();
   openModal('modal-cliente');
 }
@@ -3357,12 +3377,6 @@ function saveCliente(){
   if(!nome){alert('Nome é obrigatório!');return;}
   var email=document.getElementById('fc-email').value.trim().toLowerCase();
   if(!email){alert('Email é obrigatório! O cliente precisa de um email para receber acesso à plataforma.');return;}
-  var selCons=document.getElementById('fc-prof-cons');
-  var selBlack=document.getElementById('fc-prof-black');
-  var consNome=selCons&&selCons.selectedIndex>0?selCons.options[selCons.selectedIndex].text:'';
-  var blackNome=selBlack&&selBlack.selectedIndex>0?selBlack.options[selBlack.selectedIndex].text:'';
-  var respPrincipal = consNome || blackNome;
-  var respPrincipalId = selCons&&selCons.value?selCons.value:(selBlack?selBlack.value:'');
   var isCons=document.getElementById('fc-isConsultoria').checked;
   var isBlk=document.getElementById('fc-isBlack').checked;
   var isVit=document.getElementById('fc-isVitalicio').checked;
@@ -3387,12 +3401,6 @@ function saveCliente(){
     custodiaRF:Number(document.getElementById('fc-patrimonio').value)||0,
     custodiaRV:0,
     nivel:nivelStr,
-    responsavelConsultoria:consNome,
-    responsavelConsId:selCons?selCons.value:'',
-    responsavelBlack:blackNome,
-    responsavelBlackId:selBlack?selBlack.value:'',
-    responsavel:respPrincipal,
-    responsavelId:respPrincipalId,
     tipo:document.getElementById('fc-tipo').value,
     cpf:document.getElementById('fc-cpf').value,
     nasc:document.getElementById('fc-nasc').value,
@@ -3465,13 +3473,7 @@ function deleteCliente(id){
 
 // PROFISSIONAIS
 function toggleResp(){
-  var isCons = document.getElementById('fc-isConsultoria');
-  var isBlk = document.getElementById('fc-isBlack');
-  var consWrap = document.getElementById('fc-resp-cons-wrap');
-  var blackWrap = document.getElementById('fc-resp-black-wrap');
-  if(!consWrap||!blackWrap) return;
-  consWrap.style.display = (isCons&&isCons.checked) ? 'flex' : 'none';
-  blackWrap.style.display = (isBlk&&isBlk.checked) ? 'flex' : 'none';
+  // Responsavel selects removidos — agora o vínculo é via Consultores
 }
 
 // ── Busca CEP via ViaCEP ─────────────────────────────────
@@ -3498,17 +3500,6 @@ function buscarCep(val){
   },500);
 }
 
-function updateProfSelect(selConsId, selBlackId){
-  // Populate responsavel consultoria
-  ['fc-prof-cons','fc-prof-black'].forEach(function(id, idx){
-    var sel=document.getElementById(id);if(!sel)return;
-    var curId = idx===0?selConsId:selBlackId;
-    sel.innerHTML='<option value="">Selecione...</option>';
-    profissionais.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nome;if(p.id===curId)o.selected=true;sel.appendChild(o);});
-  });
-  var fp=document.getElementById('filter-cli-prof');
-  if(fp){var cur=fp.value;fp.innerHTML='<option value="">Todos os profissionais</option>';profissionais.forEach(function(p){var o=document.createElement('option');o.value=p.nome;o.textContent=p.nome;if(p.nome===cur)o.selected=true;fp.appendChild(o);});}
-}
 
 function renderProfissionais(){
   var grid=document.getElementById('prof-grid');if(!grid)return;
@@ -3544,6 +3535,97 @@ function saveProfissional(){
 }
 
 function deleteProfissional(id){db.collection('profissionais').doc(id).delete();}
+
+// ── CONSULTORES ──────────────────────────────────────────
+var consultores=[];
+var editingConsultorId=null;
+
+function loadConsultores(){
+  db.collection('consultores').onSnapshot(function(snap){
+    consultores=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).sort(function(a,b){return(a.nome||'').localeCompare(b.nome||'','pt-BR');});
+    renderConsultores();
+  });
+}
+
+function renderConsultores(){
+  var grid=document.getElementById('consultores-grid');if(!grid)return;
+  if(!consultores.length){
+    grid.innerHTML='<div class="empty" style="text-align:center;padding:60px"><div style="font-size:40px;margin-bottom:12px;opacity:.4"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div style="font-weight:700;color:var(--white);font-size:15px;margin-bottom:4px">Nenhum consultor cadastrado</div><p style="font-size:13px;color:var(--text3)">Adicione os consultores da equipe DMF</p></div>';
+    return;
+  }
+  grid.innerHTML=consultores.map(function(ct){
+    var vinculados=(ct.clientesVinculados||[]);
+    var nomes=vinculados.map(function(v){return v.nome||'';}).slice(0,5);
+    var extras=vinculados.length>5?(' +' + (vinculados.length-5)):'';
+    return '<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:16px">'
+      +'<div style="width:44px;height:44px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">'+initials(ct.nome)+'</div>'
+      +'<div style="flex:1">'
+      +'<div style="font-family:Inter,sans-serif;font-weight:700;color:var(--white);font-size:15px;margin-bottom:2px">'+ct.nome+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--text3)">'
+      +(ct.email?'<span>'+ct.email+'</span>':'')
+      +(ct.telefone?'<span>'+ct.telefone+'</span>':'')
+      +(ct.especialidade?'<span style="color:var(--blue)">'+ct.especialidade+'</span>':'')
+      +'</div>'
+      +(ct.calendly?'<div style="margin-top:6px"><a href="'+ct.calendly+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--blue);text-decoration:none">Calendly</a></div>':'')
+      +'</div>'
+      +'<div style="text-align:right;margin-left:16px">'
+      +'<div style="font-family:Inter,sans-serif;color:var(--blue);font-size:20px;font-weight:700">'+vinculados.length+'</div>'
+      +'<div style="font-size:11px;color:var(--text3)">clientes</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;margin-left:12px">'
+      +'<button class="btn-ghost" onclick="openModalConsultor(\''+ct.id+'\')">'+icon('edit')+'</button>'
+      +'<button class="btn-dsm" onclick="confirmDelete(function(){deleteConsultor(\''+ct.id+'\')})">'+icon('trash')+'</button>'
+      +'</div></div>'
+      +(vinculados.length?'<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:6px;letter-spacing:.08em">CLIENTES VINCULADOS</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+nomes.map(function(n){return '<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:var(--card2);color:var(--text)">'+n+'</span>';}).join('')+(extras?'<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:var(--card2);color:var(--text3)">'+extras+'</span>':'')+'</div></div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function openModalConsultor(id){
+  editingConsultorId=id;
+  var ct=id?consultores.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-consultor-title').textContent=id?'Editar Consultor':'Novo Consultor';
+  document.getElementById('fc2-nome').value=ct?ct.nome||'':'';
+  document.getElementById('fc2-email').value=ct?ct.email||'':'';
+  document.getElementById('fc2-tel').value=ct?ct.telefone||'':'';
+  document.getElementById('fc2-especialidade').value=ct?ct.especialidade||'':'';
+  document.getElementById('fc2-calendly').value=ct?ct.calendly||'':'';
+  // Render checkboxes de clientes
+  var wrap=document.getElementById('fc2-clientes-wrap');
+  var vinculadosIds=(ct&&ct.clientesVinculados||[]).map(function(v){return v.id;});
+  wrap.innerHTML=clientes.map(function(c){
+    var checked=vinculadosIds.indexOf(c.id)>=0?'checked':'';
+    return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:8px;background:var(--card2);cursor:pointer;white-space:nowrap"><input type="checkbox" value="'+c.id+'" data-nome="'+(c.nome||'').replace(/"/g,'&quot;')+'" '+checked+' style="margin:0"> '+c.nome+'</label>';
+  }).join('');
+  openModal('modal-consultor');
+}
+
+function saveConsultor(){
+  var nome=document.getElementById('fc2-nome').value.trim();
+  if(!nome){alert('Nome e obrigatorio!');return;}
+  // Coletar clientes vinculados
+  var wrap=document.getElementById('fc2-clientes-wrap');
+  var checks=wrap.querySelectorAll('input[type=checkbox]:checked');
+  var vinculados=[];
+  checks.forEach(function(cb){vinculados.push({id:cb.value,nome:cb.getAttribute('data-nome')});});
+  var data={
+    nome:nome,
+    email:document.getElementById('fc2-email').value.trim(),
+    telefone:document.getElementById('fc2-tel').value.trim(),
+    especialidade:document.getElementById('fc2-especialidade').value.trim(),
+    calendly:document.getElementById('fc2-calendly').value.trim(),
+    clientesVinculados:vinculados,
+    atualizadoEm:new Date().toISOString()
+  };
+  if(editingConsultorId){
+    db.collection('consultores').doc(editingConsultorId).update(data).then(function(){closeModal('modal-consultor');});
+  } else {
+    data.criadoEm=new Date().toISOString();
+    db.collection('consultores').add(data).then(function(){closeModal('modal-consultor');});
+  }
+}
+
+function deleteConsultor(id){db.collection('consultores').doc(id).delete();}
 
 // ATIVOS
 var SUBCATEGORIAS = {
@@ -7718,8 +7800,8 @@ function _ensureClienteVinculado(callback){
 }
 
 var PERFIL_MENUS = {
-  adm: ['clientes','cliente-detalhe','financeiro','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','configuracoes','minha-carteira','minhas-operacoes','metas-kpis'],
-  gestor: ['clientes','cliente-detalhe','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','minha-carteira','minhas-operacoes','metas-kpis'],
+  adm: ['clientes','cliente-detalhe','consultores','financeiro','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','configuracoes','minha-carteira','minhas-operacoes','metas-kpis'],
+  gestor: ['clientes','cliente-detalhe','consultores','profissionais','black-dashboard','black-operacoes','black-detalhe','estrategias','agendamento','simulador','calc-aposentadoria','glossario','controle-opcoes','minha-carteira','minhas-operacoes','metas-kpis'],
   cliente: ['minha-carteira','minhas-operacoes','agendamento','glossario','estrategias','controle-opcoes','materiais-cliente','calc-aposentadoria']
 };
 
