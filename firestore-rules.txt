@@ -1,0 +1,137 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Funções auxiliares ───────────────────────────────
+    function perfil() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.token.email)).data.perfil;
+    }
+    function isAuth()       { return request.auth != null; }
+    function isAdm()        { return isAuth() && perfil() == 'adm'; }
+    function isAdmGestor()  { return isAuth() && perfil() in ['adm', 'gestor']; }
+    function isCliente()    { return isAuth() && perfil() == 'cliente'; }
+    function meuClienteId() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.token.email)).data.clienteId;
+    }
+
+    // ─── Usuarios ─────────────────────────────────────────
+    // Cada um lê o próprio doc; adm gerencia todos
+    match /usuarios/{email} {
+      allow read: if isAuth() && (request.auth.token.email == email || isAdmGestor());
+      allow create: if isAuth() && (request.auth.token.email == email || isAdm());
+      allow update, delete: if isAdm();
+    }
+
+    // ─── Pendentes ────────────────────────────────────────
+    // Qualquer autenticado pode se registrar; adm aprova/rejeita
+    match /pendentes/{docId} {
+      allow read: if isAdmGestor();
+      allow create: if isAuth();
+      allow update, delete: if isAdm();
+    }
+
+    // ─── Clientes + subcollections (ativos, contatos) ────
+    match /clientes/{clienteId} {
+      allow read, write: if isAdmGestor();
+      allow read, update: if isCliente() && meuClienteId() == clienteId;
+
+      match /{subcol}/{docId} {
+        allow read, write: if isAdmGestor();
+        allow read, write: if isCliente() && meuClienteId() == clienteId;
+      }
+    }
+
+    // ─── Somente ADM / Gestor ─────────────────────────────
+    match /profissionais/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /consultores/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /financeiro/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /balanco/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /dre/{docId} {
+      allow read, write: if isAdm();
+    }
+    match /opcoes_posicoes/{docId} {
+      allow read, write: if isAdmGestor();
+      allow read, write: if isCliente() && resource.data.clienteId == meuClienteId();
+      allow create: if isCliente() && request.resource.data.clienteId == meuClienteId();
+    }
+    match /organograma/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /wa_grupos/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /leads/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /config/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /reunioes/{docId} {
+      allow read, write: if isAdmGestor();
+    }
+    match /grade_grupos/{docId} {
+      allow read, write: if isAdmGestor();
+      allow read: if isCliente();
+    }
+
+    // ─── Tarefas (equipe) — só ADM/Gestor ─────────────────
+    match /tarefas/{docId} {
+      allow read, write: if isAdmGestor();
+      match /comentarios/{comId} {
+        allow read, write: if isAdmGestor();
+      }
+    }
+
+    // ─── Black (operações + config) ───────────────────────
+    match /black_operacoes/{docId} {
+      allow read, write: if isAdmGestor();
+      allow read: if isCliente() && resource.data.clienteId == meuClienteId();
+    }
+    match /black_config/{docId} {
+      allow read, write: if isAdmGestor();
+      allow read: if isCliente() && docId == meuClienteId();
+    }
+
+    // ─── Comunicados — todos leem, adm/gestor escrevem ───
+    match /comunicados/{docId} {
+      allow read: if isAuth() && perfil() in ['adm', 'gestor', 'cliente'];
+      allow write: if isAdmGestor();
+      match /comentarios/{comId} {
+        allow read, write: if isAuth() && perfil() in ['adm', 'gestor', 'cliente'];
+      }
+    }
+
+    // ─── Glossário — todos leem, adm/gestor escrevem ─────
+    match /glossario/{docId} {
+      allow read: if isAuth() && perfil() in ['adm', 'gestor', 'cliente'];
+      allow write: if isAdmGestor();
+    }
+
+    // ─── Materiais — todos leem, adm/gestor escrevem ─────
+    match /materiais/{docId} {
+      allow read: if isAuth() && perfil() in ['adm', 'gestor', 'cliente'];
+      allow write: if isAdmGestor();
+    }
+
+    // ─── Chamados — cliente cria/lê os seus, adm gerencia ─
+    match /chamados/{docId} {
+      allow read, write: if isAdmGestor();
+      allow read: if isCliente() && resource.data.clienteId == meuClienteId();
+      allow create: if isCliente();
+    }
+
+    // ─── Academy Progress — cada um gerencia o seu ────────
+    match /academy_progress/{email} {
+      allow read, write: if isAuth() && request.auth.token.email == email;
+      allow read: if isAdmGestor();
+    }
+  }
+}

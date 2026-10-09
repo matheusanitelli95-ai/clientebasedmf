@@ -1173,6 +1173,16 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
       <div class="page-content">
+        <!-- Seletor de Cliente (admin/gestor) -->
+        <div id="opc-cliente-selector" style="display:none;margin-bottom:16px">
+          <div class="card" style="padding:14px 20px;display:flex;align-items:center;gap:14px">
+            <label style="font-size:12px;color:var(--text3);font-weight:500;white-space:nowrap">Cliente:</label>
+            <select id="opc-cliente-select" class="form-input" onchange="opcTrocarCliente()" style="max-width:360px;font-size:13px">
+              <option value="">Selecione um cliente...</option>
+            </select>
+            <span id="opc-cliente-aviso" style="font-size:11px;color:var(--text-muted);display:none">Selecione um cliente para ver as posições</span>
+          </div>
+        </div>
         <!-- KPIs -->
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative">
@@ -9530,8 +9540,9 @@ function _loadMinhaCarteiraReal(){
     // Render evolution chart
     if(typeof renderMcEvolucao==='function') renderMcEvolucao(ops);
   });
-  // Load P&L de Opções para integrar ao patrimônio
-  db.collection('opcoes_posicoes').get().then(function(snap){
+  // Load P&L de Opções para integrar ao patrimônio (filtrado por cliente)
+  var _opcPnlQuery = currentClienteVinculado ? db.collection('opcoes_posicoes').where('clienteId','==',currentClienteVinculado) : db.collection('opcoes_posicoes').where('clienteId','==','__none__');
+  _opcPnlQuery.get().then(function(snap){
     var posicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
     var totalPnl = 0;
     posicoes.forEach(function(p){
@@ -13974,39 +13985,65 @@ var _opcPosicoes = [];
 var _opcChartEst, _opcChartIntr, _opcChartPnl;
 var _opcInitialized = false;
 var _opcUnsubscribe = null;
+var _opcClienteAtual = '';
+
+function opcTrocarCliente(){
+  var sel = document.getElementById('opc-cliente-select');
+  _opcClienteAtual = sel ? sel.value : '';
+  var aviso = document.getElementById('opc-cliente-aviso');
+  if(aviso) aviso.style.display = _opcClienteAtual ? 'none' : '';
+  _opcInitialized = false;
+  initControleOpcoes();
+}
+
+function _opcGetClienteId(){
+  // Cliente: usa currentClienteVinculado; Admin/Gestor: usa seletor
+  if(currentPerfil === 'cliente') return currentClienteVinculado || '';
+  return _opcClienteAtual || '';
+}
 
 function initControleOpcoes(){
-  if(!_opcInitialized){
-    // Listener Firestore real-time para posições de opções
-    if(_opcUnsubscribe) _opcUnsubscribe();
-    _opcUnsubscribe = db.collection('opcoes_posicoes').orderBy('criadoEm','desc').onSnapshot(function(snap){
-      _opcPosicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      // Se Firestore veio vazio, verificar se tem dados legados no localStorage para migrar
-      if(_opcPosicoes.length === 0){
-        var legado = localStorage.getItem('dmf_opcoes_v2');
-        if(legado){
-          try {
-            var posLegadas = JSON.parse(legado);
-            if(posLegadas && posLegadas.length > 0){
-              console.log('Firestore vazio — migrando ' + posLegadas.length + ' posições do localStorage...');
-              _opcMigrarLegado(posLegadas);
-              return; // onSnapshot vai disparar de novo após a migração
-            }
-          } catch(e){}
-        }
+  // Mostrar/esconder seletor de cliente conforme perfil
+  var selectorWrap = document.getElementById('opc-cliente-selector');
+  if(selectorWrap){
+    if(currentPerfil === 'adm' || currentPerfil === 'gestor'){
+      selectorWrap.style.display = '';
+      // Popular select com clientes
+      var sel = document.getElementById('opc-cliente-select');
+      if(sel && sel.options.length <= 1){
+        (typeof clientes !== 'undefined' ? clientes : []).forEach(function(c){
+          var opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.nome || c.id;
+          sel.appendChild(opt);
+        });
       }
+      // Se não tem cliente selecionado, mostrar aviso
+      var aviso = document.getElementById('opc-cliente-aviso');
+      if(aviso) aviso.style.display = _opcClienteAtual ? 'none' : '';
+    } else {
+      selectorWrap.style.display = 'none';
+    }
+  }
+
+  var clienteId = _opcGetClienteId();
+  if(!clienteId){
+    // Sem cliente selecionado — limpar tela
+    _opcPosicoes = [];
+    if(_opcInitialized) opcRender();
+    return;
+  }
+
+  if(!_opcInitialized){
+    // Listener Firestore real-time para posições de opções filtrado por clienteId
+    if(_opcUnsubscribe) _opcUnsubscribe();
+    _opcUnsubscribe = db.collection('opcoes_posicoes').where('clienteId','==',clienteId).orderBy('criadoEm','desc').onSnapshot(function(snap){
+      _opcPosicoes = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       opcRender();
     }, function(err){
       console.error('Erro ao carregar opções:', err);
-      // Fallback: tenta localStorage legado
-      var legado = localStorage.getItem('dmf_opcoes_v2');
-      if(legado){
-        try {
-          _opcPosicoes = JSON.parse(legado);
-          opcRender();
-          _opcMigrarLegado(_opcPosicoes);
-        } catch(e){}
-      }
+      _opcPosicoes = [];
+      opcRender();
     });
 
     // ── Auto-fetch de cotação ao digitar o ativo ──
@@ -14183,7 +14220,9 @@ function opcAddPosicao(){
   if(!ativo||isNaN(cotacao)||!ticker||isNaN(strike)||isNaN(qtd)||isNaN(premioAtual)||isNaN(premioNeg)){
     alert('Preencha todos os campos antes de adicionar.'); return;
   }
-  var posData = {ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg,atualizadoEm:new Date().toISOString()};
+  var clienteId = _opcGetClienteId();
+  if(!clienteId){ alert('Selecione um cliente antes de adicionar posições.'); return; }
+  var posData = {ativo:ativo,cotacao:cotacao,ticker:ticker,tipo:tipo,direcao:direcao,strike:strike,qtd:qtd,premioAtual:premioAtual,vencimento:vencimento,premioNeg:premioNeg,clienteId:clienteId,atualizadoEm:new Date().toISOString()};
   if(_opcEditingId){
     // Modo edição: atualiza posição existente no Firestore
     db.collection('opcoes_posicoes').doc(_opcEditingId).update(posData).catch(function(err){
